@@ -376,7 +376,7 @@
 
   .upper-deck {
     display: grid;
-    grid-template-columns: 1.3fr 280px 1fr;
+    grid-template-columns: 1.15fr 270px 1.15fr;
     grid-template-areas: "scope chord keys";
     gap: 14px;
   }
@@ -415,7 +415,7 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), var(--eno-glow-shadow, 0 0 16px rgba(254, 211, 48, 0.18));
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
-  @media (max-width: 1320px) {
+  @media (max-width: 990px) {
     .upper-deck {
       grid-template-columns: 1fr 1fr;
       grid-template-areas:
@@ -423,7 +423,7 @@
         "chord chord";
     }
   }
-  @media (max-width: 1080px) {
+  @media (max-width: 810px) {
     .upper-deck {
       grid-template-columns: 1fr;
       grid-template-areas:
@@ -757,6 +757,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
   }
   /* Title keeps its own width; the hint truncates instead of wrapping onto
      a second/third line if the panel ever gets narrower than both can fit
@@ -764,9 +767,12 @@
      variable here). */
   .keyboard-panel-header {
     margin: 0;
+    padding: 0;
+    border-bottom: none;
     display: flex;
     align-items: baseline;
-    gap: 8px;
+    justify-content: flex-start;
+    gap: 10px;
     min-width: 0;
     flex: 1 1 auto;
   }
@@ -841,7 +847,7 @@
     flex-direction: column;
     justify-content: flex-end;
     align-items: center;
-    padding-bottom: 7px;
+    padding-bottom: 8px;
     box-shadow: inset 0 -3px 0 #08090d, 0 3px 6px rgba(0,0,0,0.5);
     transition: background 0.06s ease, border-color 0.06s ease, box-shadow 0.06s ease;
   }
@@ -852,13 +858,14 @@
 
   .black-keys-layer {
     position: absolute;
-    top: 6px; left: 6px; right: 6px; height: 60%;
+    top: 6px; left: 6px; right: 6px; height: 58%;
     pointer-events: none;
   }
   .black-key {
     position: absolute;
-    width: 4.6%;
+    width: 4.5%;
     height: 100%;
+    transform: translateX(-50%);
     background: linear-gradient(180deg, #0b0c10 0%, #040507 100%);
     border: 1px solid #1a1c26;
     border-top: 2px solid #2d3246;
@@ -870,7 +877,7 @@
     flex-direction: column;
     justify-content: flex-end;
     align-items: center;
-    padding-bottom: 5px;
+    padding-bottom: 6px;
     transition: background 0.06s ease, border-color 0.06s ease, box-shadow 0.06s ease;
   }
   .black-key:hover {
@@ -896,14 +903,14 @@
   }
 
   /* Reserve the bottom LED indicator bar on ALL keys so note labels and
-     shortcuts align on one consistent horizontal baseline across every key. */
+     LED bars sit anchored together on one consistent horizontal baseline. */
   .white-key::after {
     content: "";
-    width: 12px;
+    width: 14px;
     height: 3px;
     border-radius: 2px;
     background: rgba(255, 255, 255, 0.06);
-    margin-top: 4px;
+    margin-top: 5px;
     flex-shrink: 0;
   }
   .black-key::after {
@@ -934,7 +941,7 @@
     color: #838a9e;
     letter-spacing: 0.2px;
     pointer-events: none;
-    line-height: 1.1;
+    line-height: 1;
     height: 11px;
     display: flex;
     align-items: center;
@@ -947,7 +954,7 @@
     color: #7a8296;
     letter-spacing: 0.2px;
     pointer-events: none;
-    line-height: 1.1;
+    line-height: 1;
     height: 10px;
     display: flex;
     align-items: center;
@@ -958,7 +965,7 @@
     font-size: 7.5px;
     color: #4e5366;
     letter-spacing: 0.2px;
-    margin-top: 2px;
+    margin-bottom: 3px;
     line-height: 1;
     height: 9px;
     display: flex;
@@ -968,9 +975,7 @@
   }
   .black-key .key-shortcut {
     color: #454b5f;
-  }
-  .key-shortcut.empty-shortcut {
-    visibility: hidden;
+    margin-bottom: 2px;
   }
   .active-chord .key-label, .active-chord .black-key-label,
   .active-arp .key-label, .active-arp .black-key-label {
@@ -5655,13 +5660,12 @@ function buildKeyboard() {
   const whiteShortcuts = ["A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'"];
 
   const blackKeyOffsets = [
-    { semi: 1, pos: 0.65, key: "W" }, { semi: 3, pos: 1.70, key: "E" },
-    { semi: 6, pos: 3.65, key: "T" }, { semi: 8, pos: 4.70, key: "Y" },
-    { semi: 10, pos: 5.75, key: "U" }
+    { semi: 1, seam: 1, key: "W" }, { semi: 3, seam: 2, key: "E" },
+    { semi: 6, seam: 4, key: "T" }, { semi: 8, seam: 5, key: "Y" },
+    { semi: 10, seam: 6, key: "U" }
   ];
   const blackShortcutsOct2 = ["O", "P", "", "", ""];
 
-  const scale = SCALES[activeScaleKey];
   let whiteIdx = 0;
 
   for (let oct = 0; oct < 2; oct++) {
@@ -5672,20 +5676,18 @@ function buildKeyboard() {
 
       if (recentChordNotes.has(midi)) keyEl.classList.add("in-scale");
 
+      if (whiteIdx < whiteShortcuts.length) {
+        const sc = document.createElement("span");
+        sc.className = "key-shortcut";
+        sc.textContent = `[${whiteShortcuts[whiteIdx]}]`;
+        keyEl.appendChild(sc);
+      }
+
       const label = document.createElement("span");
       label.className = "key-label";
       label.textContent = `${NOTE_NAMES[midi % 12]}${Math.floor(midi / 12) - 1}`;
       keyEl.appendChild(label);
 
-      const sc = document.createElement("span");
-      if (whiteIdx < whiteShortcuts.length) {
-        sc.className = "key-shortcut";
-        sc.textContent = `[${whiteShortcuts[whiteIdx]}]`;
-      } else {
-        sc.className = "key-shortcut empty-shortcut";
-        sc.textContent = "[·]";
-      }
-      keyEl.appendChild(sc);
       whiteIdx++;
       bindKeyEvents(keyEl, midi);
       whiteKeysLayer.appendChild(keyEl);
@@ -5695,17 +5697,14 @@ function buildKeyboard() {
   const topMidi = (baseKeyboardOctave + 3) * 12;
   const topKey = document.createElement("div"); topKey.className = "white-key"; topKey.dataset.midi = topMidi;
   if (recentChordNotes.has(topMidi)) topKey.classList.add("in-scale");
-  const topLabel = document.createElement("span"); topLabel.className = "key-label";
-  topLabel.textContent = `C${Math.floor(topMidi / 12) - 1}`; topKey.appendChild(topLabel);
-  const topSc = document.createElement("span");
   if (whiteIdx < whiteShortcuts.length) {
+    const topSc = document.createElement("span");
     topSc.className = "key-shortcut";
     topSc.textContent = `[${whiteShortcuts[whiteIdx]}]`;
-  } else {
-    topSc.className = "key-shortcut empty-shortcut";
-    topSc.textContent = "[·]";
+    topKey.appendChild(topSc);
   }
-  topKey.appendChild(topSc);
+  const topLabel = document.createElement("span"); topLabel.className = "key-label";
+  topLabel.textContent = `C${Math.floor(topMidi / 12) - 1}`; topKey.appendChild(topLabel);
   bindKeyEvents(topKey, topMidi);
   whiteKeysLayer.appendChild(topKey);
 
@@ -5714,24 +5713,23 @@ function buildKeyboard() {
       const midi = (baseKeyboardOctave + oct + 1) * 12 + bk.semi;
       const bKeyEl = document.createElement("div"); bKeyEl.className = "black-key"; bKeyEl.dataset.midi = midi;
 
-      const leftPercent = ((oct * 7 + bk.pos) / 15) * 100;
-      bKeyEl.style.left = leftPercent + "%";
+      const seamIdx = oct * 7 + bk.seam;
+      const pct = (seamIdx / 15) * 100;
+      const gapOffsetPx = ((seamIdx - 7.5) / 15) * 3;
+      bKeyEl.style.left = `calc(${pct.toFixed(4)}% + ${gapOffsetPx.toFixed(2)}px)`;
 
       if (recentChordNotes.has(midi)) bKeyEl.classList.add("in-scale");
 
-      const bLabel = document.createElement("span"); bLabel.className = "black-key-label";
-      bLabel.textContent = `${NOTE_NAMES[midi % 12]}`; bKeyEl.appendChild(bLabel);
-
       const shortcutKey = oct === 0 ? bk.key : (blackShortcutsOct2[bIdx] || "");
-      const bSc = document.createElement("span");
       if (shortcutKey) {
+        const bSc = document.createElement("span");
         bSc.className = "key-shortcut";
         bSc.textContent = `[${shortcutKey}]`;
-      } else {
-        bSc.className = "key-shortcut empty-shortcut";
-        bSc.textContent = "[·]";
+        bKeyEl.appendChild(bSc);
       }
-      bKeyEl.appendChild(bSc);
+
+      const bLabel = document.createElement("span"); bLabel.className = "black-key-label";
+      bLabel.textContent = `${NOTE_NAMES[midi % 12]}`; bKeyEl.appendChild(bLabel);
 
       bindKeyEvents(bKeyEl, midi);
       blackKeysLayer.appendChild(bKeyEl);
