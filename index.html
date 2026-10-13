@@ -1071,6 +1071,17 @@
     transition: transform 0.26s cubic-bezier(0.18, 0.89, 0.32, 1.1);
     pointer-events: none;
   }
+  /* Below ~900px the arena itself is too narrow for 85% to leave any real
+     room for the remaining orbs -- the leftover sliver can't fit even one
+     orb's diameter, which read as overlapping/cut-off orb labels peeking
+     out from behind the panel. Let the panel take over the view almost
+     entirely instead of pretending there's still a usable constellation
+     visible beside it. */
+  @media (max-width: 900px) {
+    .orbital-side-panel {
+      max-width: 94%;
+    }
+  }
   .orbital-side-panel.active {
     transform: translateX(0);
     pointer-events: auto;
@@ -1649,8 +1660,8 @@
     pointer-events: none;
   }
   #enoWidgetCanvas {
-    width: 96px;
-    height: 96px;
+    width: 92px;
+    height: 92px;
     display: block;
     image-rendering: pixelated;
   }
@@ -1678,6 +1689,9 @@
     text-align: left;
     font-family: ui-monospace, SFMono-Regular, monospace;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .keyboard-stage {
@@ -1765,6 +1779,8 @@
     background: #090a10;
     font-family: ui-monospace, SFMono-Regular, monospace;
     transition: all 0.15s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .takeover-badge.active {
     color: var(--color-drone);
@@ -2884,7 +2900,7 @@ function handleLiveKeyInput() {
 
   const badge = document.getElementById("hudTakeover");
   if (badge) {
-    badge.textContent = "LIVE TAKEOVER";
+    badge.textContent = "LIVE";
     badge.classList.add("active");
   }
 }
@@ -6567,11 +6583,11 @@ function applyPreset(idx) {
     document.getElementById("knobDroneWander").value = 10;
     document.getElementById("knobDroneFx").value = 30;
 
-    // Warm analog pluck arp, locked to a hypnotic up/down pattern rather
+    // Organic pluck arp, locked to a hypnotic up/down pattern rather
     // than evolving mid-groove
     document.getElementById("selArpPattern").value = "PENDULUM";
     document.getElementById("chkAutoEvolveArpPattern").checked = false;
-    document.getElementById("selArpTimbre").value = "ANALOG_PULSE";
+    document.getElementById("selArpTimbre").value = "WATER_DROPLET";
     document.getElementById("chkAutoEvolveArpTimbre").checked = false;
     document.getElementById("knobArpEvolveChance").value = 10;
     document.getElementById("knobArpGate").value = 180;
