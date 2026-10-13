@@ -38,6 +38,11 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html {
+    zoom: 0.75;
+    background-color: var(--bg);
+  }
+
   body {
     background-color: var(--bg);
     background-image:
@@ -46,9 +51,9 @@
     background-size: 32px 32px;
     color: var(--text-primary);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-    min-height: 100vh;
+    min-height: calc(100vh / 0.75);
     height: auto;
-    overflow-y: scroll;
+    overflow-y: auto;
     padding: 16px 22px;
     display: flex;
     flex-direction: column;
@@ -4978,9 +4983,10 @@ let lastScopeFrameTs = null;
 let cachedScopeW = 0, cachedScopeH = 0;
 function updateCanvasDimensions() {
   const dpr = window.devicePixelRatio || 1;
-  const rect = scopeCanvas.parentElement.getBoundingClientRect();
-  const w = Math.round(rect.width || 460);
-  const h = Math.round(rect.height || 290);
+  const parent = scopeCanvas.parentElement;
+  const rect = parent.getBoundingClientRect();
+  const w = Math.round(parent.clientWidth || rect.width || 460);
+  const h = Math.round(parent.clientHeight || rect.height || 290);
   if (Math.abs(w - cachedScopeW) > 1 || Math.abs(h - cachedScopeH) > 1) {
     cachedScopeW = w;
     cachedScopeH = h;
@@ -7748,9 +7754,10 @@ function initOrbitalConstellation() {
   if (!orbitalCanvas) return;
   orbitalCtx = orbitalCanvas.getContext("2d");
 
-  const rect = orbitalCanvas.parentElement.getBoundingClientRect();
-  const w = rect.width || 800;
-  const h = rect.height || 380;
+  const parent = orbitalCanvas.parentElement;
+  const rect = parent.getBoundingClientRect();
+  const w = parent.clientWidth || rect.width || 800;
+  const h = parent.clientHeight || rect.height || 380;
   const cx = w / 2;
   const cy = h / 2;
   const orbitR = Math.min(w * 0.38, h * 0.36);
@@ -7775,8 +7782,10 @@ function initOrbitalConstellation() {
 
 function handleOrbitalClick(e) {
   const rect = orbitalCanvas.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  const clickY = e.clientY - rect.top;
+  const scaleX = (cachedOrbitalW || orbitalCanvas.clientWidth || rect.width) / (rect.width || 1);
+  const scaleY = (cachedOrbitalH || orbitalCanvas.clientHeight || rect.height) / (rect.height || 1);
+  const clickX = (e.clientX - rect.left) * scaleX;
+  const clickY = (e.clientY - rect.top) * scaleY;
 
   for (let i = 0; i < ORBITAL_MODULES.length; i++) {
     const orb = ORBITAL_MODULES[i];
@@ -7915,9 +7924,10 @@ function loopOrbitalPhysics() {
 let cachedOrbitalW = 0, cachedOrbitalH = 0;
 function updateAndDrawOrbitalCanvas() {
   const dpr = window.devicePixelRatio || 1;
-  const rect = orbitalCanvas.parentElement.getBoundingClientRect();
-  const w = Math.round(rect.width || 800);
-  const h = Math.round(rect.height || 380);
+  const parent = orbitalCanvas.parentElement;
+  const rect = parent.getBoundingClientRect();
+  const w = Math.round(parent.clientWidth || rect.width || 800);
+  const h = Math.round(parent.clientHeight || rect.height || 380);
 
   if (Math.abs(w - cachedOrbitalW) > 1 || Math.abs(h - cachedOrbitalH) > 1) {
     cachedOrbitalW = w;
@@ -7967,7 +7977,7 @@ function updateAndDrawOrbitalCanvas() {
   let leftPad = padding;
   if (orbitalPanelActive) {
     const panelEl = document.getElementById("orbitalSidePanel");
-    if (panelEl) leftPad = panelEl.getBoundingClientRect().width + 24;
+    if (panelEl) leftPad = (panelEl.offsetWidth || panelEl.getBoundingClientRect().width) + 24;
   }
 
   const now = performance.now();
