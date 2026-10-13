@@ -70,6 +70,48 @@ material now enters on the next natural downbeat instead.
 Reverb/Chorus module: Nostalgic Drift, Four Tet Organic, Shimmer Cascade, Hauntological Tape, Velvet
 Horizon, Pale Bloom, Green / Yoshimura, Khan Lineage (the Indian classical raga preset).
 
+## Update — 2026-10-13
+
+Everything in "What's in the current build" above is still accurate and still the baseline. Since that
+section was written, the following has also landed in `index.html` (same canonical path, same repo —
+`git log` shows all of it):
+
+**New drone timbre: Digeridoo.** Module 1 now has a "Drone Timbre" select (Sub Oscillator / Digeridoo).
+Digeridoo is a real synthesis build, not a filtered oscillator: a custom `PeriodicWave` excitation
+(~24 harmonics, deterministic jitter) through dedicated buzz oscillators detuned 9 cents apart and
+soft-clipped together, three broad formant resonances (150/440/1100 Hz), filtered breath noise, and
+three independent modulation layers (amplitude swell, pitch wobble, formant drift). Classic sub-osc mode
+is untouched — the buzz layer sits at gain 0 unless selected.
+
+**9th preset: "After Hours Deep."** Deep house, 112 BPM, Dorian, four-on-the-floor restrained drums,
+Rhodes chords, locked sub-bass (no wander), tempo-synced dotted-eighth dub delay, plate reverb + light
+chorus.
+
+**Khan Lineage (raga preset) refined**: root note and chord shape now randomize on every preset
+selection and app startup (not just this preset — applies globally); richer Tanpura overtone ring;
+deeper Bayan meend swoop; Sitar soloing locked to Raga Bilawal with note-priority voice stealing.
+
+**Module title de-duplication + styling unification.** The orbital side panel used to show a module's
+title twice — once in its own modal header, once from the reparented strip's own panel-header — with
+mismatched wording between the two. Fixed: the strip's inner title is now hidden when nested in the
+orbital panel, and the 8 module names are reconciled everywhere (orbital orb labels, modal titles, and
+console-rack panel headers all read identically, case aside). Console-rack titles also now pick up the
+same colored-glow treatment the orbital panel already used, driven by each module's own fixed accent
+color. Panel-header/control-label/control-val font sizes bumped slightly for legibility; verified no
+wrapping/overflow from 1920px down to 640px.
+
+**Responsive overflow pass.** Fixed several real narrow-viewport bugs found during an audit (app is
+clean from 1920px down to 640px now): the orbital module-expand panel was capped at a flat
+`max-width:85%` regardless of arena width, which broke down below ~900px; the "LIVE TAKEOVER" keyboard
+badge overflowed at narrow widths (now just "LIVE"); the Eno pod's phosphor label could wrap or get
+truncated — the "BIO-SCAN" text was removed from the pod entirely (just "ENO · <color letter>" remains)
+since there was never really enough room for both labels at the pod's ~100px width.
+
+**Arp timbre fix**: "After Hours Deep" now uses Water Droplet instead of Analog Pulse for its arp
+(Analog Pulse read as harsh and didn't blend with the preset). Also fixed a latent bug: the Digeridoo/
+Classic drone-timbre switch wasn't being reset on preset change like the other optional toggles, so a
+manually-selected Digeridoo mode could silently persist into presets that expect Classic sub-bass.
+
 ## If you're making changes
 
 Keep editing `index.html` in place at the canonical path. If you want to hand something back for
