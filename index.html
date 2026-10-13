@@ -2173,7 +2173,7 @@
   <div class="lower-deck view-grid-hidden">
     <div class="strip-channel drone-ch">
       <div class="panel-header">
-        <span>1. Sub & Tanpura Drone</span>
+        <span>1. Sub & Drone</span>
         <div class="panel-header-actions">
           <button class="btn-power active" id="btnPower_drone" onclick="toggleDronePower()" title="Toggle Sub-Drone Power (On / Off)">PWR</button>
           <button class="btn-mute" id="btnMute_drone" onclick="toggleMute('drone')" title="Mute Sub-Drone">M</button>
@@ -2409,7 +2409,7 @@
   <div class="master-chain-deck view-grid-hidden" style="margin-top: 14px;">
     <div class="strip-channel filter-ch">
       <div class="panel-header">
-        <span>5. Master Filter & Env</span>
+        <span>5. Filter & Env</span>
         <button class="badge-tag" style="color: var(--color-filter); border-color: rgba(46,213,115,0.3);" onclick="randomizeFilter()" title="Randomize this module">⟲</button>
       </div>
       <div class="control-row">
@@ -7514,11 +7514,11 @@ function drawStars(w, h) {
 }
 
 const ORBITAL_MODULES = [
-  { id: "drone",  name: "SUB & TANPURA DRONE", num: "1", color: "#00e5ff", rgb: [0, 229, 255], baseR: 40, x: 0, y: 0, vx: 0.18,  vy: 0.14,  chClass: "drone-ch",  analyser: () => droneAnalyser,  pulse: 0, bump: 0 },
+  { id: "drone",  name: "SUB & DRONE", num: "1", color: "#00e5ff", rgb: [0, 229, 255], baseR: 40, x: 0, y: 0, vx: 0.18,  vy: 0.14,  chClass: "drone-ch",  analyser: () => droneAnalyser,  pulse: 0, bump: 0 },
   { id: "drum",   name: "DRUMS",        num: "2", color: "#ff3838", rgb: [255, 56, 56],  baseR: 44, x: 0, y: 0, vx: -0.20, vy: 0.16,  chClass: "drum-ch",   analyser: () => drumAnalyser,   pulse: 0, bump: 0 },
   { id: "chord",  name: "CHORDS & VOICING",  num: "3", color: "#fed330", rgb: [254, 211, 48], baseR: 48, x: 0, y: 0, vx: 0.15,  vy: -0.19, chClass: "chord-ch",  analyser: () => chordAnalyser,  pulse: 0, bump: 0 },
   { id: "arp",    name: "SHIMMER ARP",  num: "4", color: "#7d5fff", rgb: [125, 95, 255], baseR: 42, x: 0, y: 0, vx: -0.16, vy: -0.14, chClass: "arp-ch",    analyser: () => arpAnalyser,    pulse: 0, bump: 0 },
-  { id: "filter", name: "MASTER FILTER & ENV",num: "5", color: "#2ed573", rgb: [46, 213, 115], baseR: 37, x: 0, y: 0, vx: 0.14,  vy: 0.17,  chClass: "filter-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
+  { id: "filter", name: "FILTER & ENV",num: "5", color: "#2ed573", rgb: [46, 213, 115], baseR: 37, x: 0, y: 0, vx: 0.14,  vy: 0.17,  chClass: "filter-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
   { id: "delay",  name: "ANALOG DELAY", num: "6", color: "#ff793f", rgb: [255, 121, 63], baseR: 35, x: 0, y: 0, vx: -0.18, vy: 0.12,  chClass: "delay-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 },
   { id: "reverb", name: "REVERB & CHORUS", num: "7", color: "#ff5fc4", rgb: [255, 95, 196], baseR: 38, x: 0, y: 0, vx: 0.17,  vy: 0.13,  chClass: "reverb-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
   { id: "space",  name: "SPACE & OUT",  num: "8", color: "#4b7bec", rgb: [75, 123, 236], baseR: 37, x: 0, y: 0, vx: 0.12,  vy: -0.16, chClass: "space-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 }
