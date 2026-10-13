@@ -2093,6 +2093,13 @@
         </div>
       </div>
       <div class="control-row">
+        <div class="control-label">Drone Timbre</div>
+        <select id="selDroneTimbre" onchange="updateAudioParams()">
+          <option value="SUB" selected>Sub Oscillator (Classic)</option>
+          <option value="DIDGERIDOO">Digeridoo (Buzzy Formant Drone)</option>
+        </select>
+      </div>
+      <div class="control-row">
         <div class="control-label">Drone Pitch Fundamental</div>
         <select id="selDroneOctave" onchange="updateAudioParams()">
           <option value="D1">Sub Octave (D1 / 36.7 Hz)</option>
@@ -2900,6 +2907,7 @@ let barCount = 0;
 let droneFilterHz = 180;
 let droneDetuneCents = 3.5;
 let droneOctaveChoice = "D2";
+let droneTimbre = "SUB";
 
 let droneWanderVal = 0.20;
 let droneWanderActive = false;
@@ -3008,6 +3016,7 @@ let masterVolumeVal = 0.85;
 let masterMuted = false;
 let drumBusGain, arpBusGain;
 let droneOsc1, droneOsc2, droneGain, droneFilter;
+let droneFormantFilter1, droneFormantFilter2, droneFormantGain, droneFormantLFO, droneFormantLFOGain;
 
 let drumAnalyser, chordAnalyser, arpAnalyser, droneAnalyser, masterAnalyser;
 let masterFilter1, masterFilter2;
@@ -3036,12 +3045,42 @@ function initAudio() {
   droneFilter = audioCtx.createBiquadFilter();
 
   droneFilter.type = "lowpass"; droneFilter.frequency.value = droneFilterHz;
-  droneOsc1.type = "triangle"; droneOsc2.type = "sawtooth";
+  if (droneTimbre === "DIDGERIDOO") {
+    droneOsc1.type = "sawtooth"; droneOsc2.type = "square";
+  } else {
+    droneOsc1.type = "triangle"; droneOsc2.type = "sawtooth";
+  }
   droneOsc1.detune.value = -droneDetuneCents; droneOsc2.detune.value = +droneDetuneCents;
 
   updateDronePitches();
   droneGain.gain.value = droneVol * 0.16;
   droneOsc1.connect(droneFilter); droneOsc2.connect(droneFilter); droneFilter.connect(droneGain);
+
+  // Digeridoo mode: a parallel buzzy-formant layer that sits on top of the
+  // same low fundamental (the lowpass path above is untouched/always on),
+  // rather than replacing it -- a real didgeridoo drone is both the deep
+  // fundamental AND buzzy upper-harmonic formants at once. Silent (gain 0)
+  // unless Digeridoo is selected, so Classic drone mode is bit-for-bit
+  // unaffected by any of this.
+  droneFormantFilter1 = audioCtx.createBiquadFilter(); droneFormantFilter1.type = "bandpass";
+  droneFormantFilter1.frequency.value = 280; droneFormantFilter1.Q.value = 3.5;
+  droneFormantFilter2 = audioCtx.createBiquadFilter(); droneFormantFilter2.type = "bandpass";
+  droneFormantFilter2.frequency.value = 650; droneFormantFilter2.Q.value = 4.5;
+  droneFormantGain = audioCtx.createGain();
+  droneFormantGain.gain.value = (droneTimbre === "DIDGERIDOO") ? droneVol * 0.12 : 0;
+
+  droneOsc1.connect(droneFormantFilter1); droneOsc2.connect(droneFormantFilter2);
+  droneFormantFilter1.connect(droneFormantGain); droneFormantFilter2.connect(droneFormantGain);
+  droneFormantGain.connect(droneGain);
+
+  // Slow "breath"/vocalization wobble on the upper formant, like a player's
+  // throat articulation on a sustained didgeridoo drone.
+  droneFormantLFO = audioCtx.createOscillator(); droneFormantLFO.type = "sine";
+  droneFormantLFO.frequency.value = 0.12;
+  droneFormantLFOGain = audioCtx.createGain(); droneFormantLFOGain.gain.value = 40;
+  droneFormantLFO.connect(droneFormantLFOGain);
+  droneFormantLFOGain.connect(droneFormantFilter2.frequency);
+  droneFormantLFO.start();
 
   tanpuraBusGain = audioCtx.createGain();
   tanpuraBusGain.gain.value = tanpuraVol * 0.95;
@@ -5532,6 +5571,20 @@ function updateAudioParams() {
     droneOctaveChoice = document.getElementById("selDroneOctave").value;
     updateDronePitches();
   }
+  if (document.getElementById("selDroneTimbre")) {
+    droneTimbre = document.getElementById("selDroneTimbre").value;
+    if (droneOsc1 && droneOsc2) {
+      if (droneTimbre === "DIDGERIDOO") {
+        droneOsc1.type = "sawtooth"; droneOsc2.type = "square";
+      } else {
+        droneOsc1.type = "triangle"; droneOsc2.type = "sawtooth";
+      }
+    }
+    if (droneFormantGain) {
+      const formantTarget = (droneTimbre === "DIDGERIDOO") ? droneVol * 0.12 : 0;
+      droneFormantGain.gain.setTargetAtTime(formantTarget, audioCtx.currentTime, 0.3);
+    }
+  }
 
   arpPattern = document.getElementById("selArpPattern").value;
   arpTimbre = document.getElementById("selArpTimbre").value;
@@ -5728,6 +5781,7 @@ function randomizeCheckbox(id) {
 }
 
 function randomizeDrone() {
+  randomizeSelect("selDroneTimbre");
   randomizeSelect("selDroneOctave");
   randomizeSelect("selTanpuraTuning");
   randomizeRange("knobTanpura");
