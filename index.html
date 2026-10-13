@@ -1106,6 +1106,16 @@
     gap: 8px;
     text-shadow: 0 0 12px var(--modal-accent-glow, rgba(0, 229, 255, 0.4));
   }
+  .orbital-modal-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  /* Holds the expanded module's own mute/solo/power/randomize icons,
+     borrowed up from its (now headless) strip -- see expandModuleOrb(). */
+  .orbital-modal-actions-slot:empty {
+    display: none;
+  }
   .orbital-modal-close {
     width: 24px;
     height: 24px;
@@ -1141,13 +1151,11 @@
     border-radius: 6px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--modal-accent-rgb, 0, 229, 255), 0.16) !important;
   }
+  /* The orbital modal header already shows this module's title and (once
+     borrowed up by expandModuleOrb) its mute/solo/power/randomize icons --
+     the strip's own header row would just be dead space here, so drop it
+     entirely rather than leaving an empty divider bar up top. */
   .orbital-side-panel .strip-channel .panel-header {
-    border-bottom: 1px solid rgba(var(--modal-accent-rgb, 0, 229, 255), 0.25);
-    justify-content: flex-end;
-  }
-  /* The orbital modal header already shows this module's title -- hide the
-     strip's own duplicate title span instead of showing it twice. */
-  .orbital-side-panel .strip-channel .panel-header > span:first-child {
     display: none;
   }
   .orbital-side-panel .strip-channel input[type="range"]::-webkit-slider-thumb {
@@ -1223,44 +1231,57 @@
   }
   .strip-channel.drone-ch  {
     border-top: 3px solid var(--color-drone);
-    border-color: rgba(0, 229, 255, 0.22);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 12px rgba(0, 229, 255, 0.10);
+    border-color: rgba(0, 229, 255, 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 229, 255, 0.16);
   }
   .strip-channel.drum-ch   {
     border-top: 3px solid var(--color-drum);
-    border-color: rgba(255, 56, 56, 0.22);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 56, 56, 0.10);
+    border-color: rgba(255, 56, 56, 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 56, 56, 0.16);
   }
   .strip-channel.chord-ch  {
     border-top: 3px solid var(--color-chord);
-    border-color: rgba(254, 211, 48, 0.22);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 12px rgba(254, 211, 48, 0.10);
+    border-color: rgba(254, 211, 48, 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(254, 211, 48, 0.16);
   }
   .strip-channel.arp-ch    {
     border-top: 3px solid var(--color-arp);
-    border-color: rgba(125, 95, 255, 0.22);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 12px rgba(125, 95, 255, 0.10);
+    border-color: rgba(125, 95, 255, 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(125, 95, 255, 0.16);
   }
   .strip-channel.filter-ch {
     border-top: 3px solid var(--color-filter);
-    border-color: rgba(46, 213, 115, 0.22);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 12px rgba(46, 213, 115, 0.10);
+    border-color: rgba(46, 213, 115, 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(46, 213, 115, 0.16);
   }
   .strip-channel.delay-ch  {
     border-top: 3px solid var(--color-delay);
-    border-color: rgba(255, 121, 63, 0.22);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 121, 63, 0.10);
+    border-color: rgba(255, 121, 63, 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 121, 63, 0.16);
   }
   .strip-channel.reverb-ch {
     border-top: 3px solid var(--color-reverb);
-    border-color: rgba(255, 95, 196, 0.22);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 95, 196, 0.10);
+    border-color: rgba(255, 95, 196, 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 95, 196, 0.16);
   }
   .strip-channel.space-ch  {
     border-top: 3px solid var(--color-space);
-    border-color: rgba(75, 123, 236, 0.22);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 12px rgba(75, 123, 236, 0.10);
+    border-color: rgba(75, 123, 236, 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(75, 123, 236, 0.16);
   }
+
+  /* Console rack cards now carry the same border/glow intensity the
+     orbital side panel uses for its (single, focused) expanded card --
+     unifies the two views' module chrome using the side panel as the
+     reference look. */
+  .strip-channel.drone-ch  .panel-header { border-bottom-color: rgba(0, 229, 255, 0.25); }
+  .strip-channel.drum-ch   .panel-header { border-bottom-color: rgba(255, 56, 56, 0.25); }
+  .strip-channel.chord-ch  .panel-header { border-bottom-color: rgba(254, 211, 48, 0.25); }
+  .strip-channel.arp-ch    .panel-header { border-bottom-color: rgba(125, 95, 255, 0.25); }
+  .strip-channel.filter-ch .panel-header { border-bottom-color: rgba(46, 213, 115, 0.25); }
+  .strip-channel.delay-ch  .panel-header { border-bottom-color: rgba(255, 121, 63, 0.25); }
+  .strip-channel.reverb-ch .panel-header { border-bottom-color: rgba(255, 95, 196, 0.25); }
+  .strip-channel.space-ch  .panel-header { border-bottom-color: rgba(75, 123, 236, 0.25); }
 
   /* Console rack module titles now carry the same colored-glow treatment
      the orbital side panel already used (via --modal-accent-*) -- same
@@ -2100,7 +2121,10 @@
     <div class="orbital-side-panel" id="orbitalSidePanel">
       <div class="orbital-modal-header">
         <span class="orbital-modal-title" id="orbitalModalTitle">MODULE CONTROLS</span>
-        <button class="orbital-modal-close" onclick="closeOrbitalModal()" title="Close Controls (ESC)">✕</button>
+        <div class="orbital-modal-header-right">
+          <div class="orbital-modal-actions-slot" id="orbitalModalActions"></div>
+          <button class="orbital-modal-close" onclick="closeOrbitalModal()" title="Close Controls (ESC)">✕</button>
+        </div>
       </div>
       <div class="orbital-modal-body" id="orbitalModalBody"></div>
     </div>
@@ -7556,6 +7580,20 @@ function expandModuleOrb(orbId) {
   if (sourceStrip) {
     body.appendChild(sourceStrip);
     sourceStrip.style.display = "flex";
+    // Borrow everything in the strip's own header except its title (that's
+    // either a .panel-header-actions row of mute/solo/power/randomize
+    // buttons, or -- for the master-chain modules, which have no per-channel
+    // mute/solo -- just a lone randomize button) up into the modal's top
+    // header, next to the close button, instead of leaving it sitting in
+    // the strip's now-title-less (and otherwise empty) header.
+    const header = sourceStrip.querySelector(".panel-header");
+    const actionsSlot = document.getElementById("orbitalModalActions");
+    if (header && actionsSlot) {
+      const titleSpan = header.querySelector(":scope > span:first-child");
+      [...header.children].forEach(child => {
+        if (child !== titleSpan) actionsSlot.appendChild(child);
+      });
+    }
   }
 
   panel.classList.add("active");
@@ -7581,6 +7619,21 @@ const ORBITAL_LOWER_DECK_IDS = ["drone", "drum", "chord", "arp"];
 function restoreStripsToRack() {
   const lowerRack = document.querySelector(".lower-deck");
   const masterRack = document.querySelector(".master-chain-deck");
+
+  // Give any icon row borrowed into the modal header (see expandModuleOrb)
+  // back to its home strip before that strip moves back into the rack --
+  // otherwise it's orphaned in the modal header and the console view loses
+  // its mute/solo/power/randomize controls for that module.
+  const modalBody = document.getElementById("orbitalModalBody");
+  const expandedStrip = modalBody ? modalBody.querySelector(".strip-channel") : null;
+  const actionsSlot = document.getElementById("orbitalModalActions");
+  if (expandedStrip && actionsSlot && actionsSlot.children.length) {
+    const homeHeader = expandedStrip.querySelector(".panel-header");
+    if (homeHeader) {
+      [...actionsSlot.children].forEach(child => homeHeader.appendChild(child));
+    }
+  }
+
   ORBITAL_MODULES.forEach(orb => {
     const strip = document.querySelector(`.strip-channel.${orb.chClass}`);
     if (!strip) return;
