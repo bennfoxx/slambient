@@ -2819,6 +2819,7 @@ let stepLead = 0;
 let stepDrone = 0;
 
 const activeMidiNotes = new Map();
+const recentChordNotes = new Set();
 
 let keyboardRoute = "CHORD";
 const activeLiveVoices = new Map();
@@ -3738,6 +3739,8 @@ function startNoteLive(midi, vel = 90) {
   heldMidiNotes.add(midi);
 
   if (keyboardRoute === "ARP") {
+    if (heldMidiNotes.size === 1) recentChordNotes.clear();
+    recentChordNotes.add(midi);
     lastArpVelocity = vel;
     handleLiveKeyInput();
     startLiveArp();
@@ -3749,6 +3752,14 @@ function startNoteLive(midi, vel = 90) {
   }
 
   triggerFilterEnvelope(vel);
+
+  if (heldMidiNotes.size === 1) {
+    recentChordNotes.clear();
+    for (const [m, info] of Array.from(activeMidiNotes.entries())) {
+      if (info.source === "CHORD" && !heldMidiNotes.has(m)) activeMidiNotes.delete(m);
+    }
+  }
+  recentChordNotes.add(midi);
 
   const now = audioCtx.currentTime;
   if (ringDynamics.chord) ringDynamics.chord.impulse = Math.min(2.5, ringDynamics.chord.impulse + 1.2);
@@ -3934,7 +3945,7 @@ function stopNoteLive(midi, instant = false) {
     }
 
     activeMidiNotes.set(midi, {
-      expiry: performance.now() + Math.min(1800, voice.releaseSec * 850),
+      expiry: performance.now() + Math.min(350, voice.releaseSec * 450),
       source: "CHORD"
     });
   }
@@ -3954,8 +3965,9 @@ function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0,
   const now = audioCtx.currentTime + delayOffsetSec;
 
   setTimeout(() => {
+    const highlightMs = Math.min(1100, duration * 420);
     activeMidiNotes.set(midi, {
-      expiry: performance.now() + (duration * 1000),
+      expiry: performance.now() + highlightMs,
       source: sourceTag
     });
   }, delayOffsetSec * 1000);
@@ -4122,12 +4134,19 @@ function triggerCurrentChord() {
   let rootMidi = 48 + rootNote + currentChordDeg;
   while (rootMidi > 57) rootMidi -= 12; // Keep chord fundamental in warm low-mid register (<= A3)
 
+  // Clear previous chord highlights and replace recentChordNotes with the new chord
+  recentChordNotes.clear();
+  for (const [m, info] of Array.from(activeMidiNotes.entries())) {
+    if (info.source === "CHORD" && !heldMidiNotes.has(m)) activeMidiNotes.delete(m);
+  }
+
   if (chordTimbre === "SITAR_STRINGS") {
     const soloPool = (scale && scale.length > 0) ? scale : [0, 2, 4, 5, 7, 9, 11];
     const sitarTonicMidi = 48 + rootNote;
     const swaraIndex = (currentChordStepIdx * 2 + randRange(0, 2)) % soloPool.length;
     const baseSwara = soloPool[swaraIndex];
     const sitarMidi = sitarTonicMidi + baseSwara;
+    recentChordNotes.add(sitarMidi);
 
     const dur1 = 3.2 + (1.0 - mutationVal);
     playSynthVoice(sitarMidi, dur1, 76 + randRange(0, 12), true, 0, "CHORD");
@@ -4135,6 +4154,7 @@ function triggerCurrentChord() {
     if (randFloat() < 0.60) {
       const nextSwaraIdx = (swaraIndex + (randFloat() < 0.5 ? 1 : -1) + soloPool.length) % soloPool.length;
       const nextMidi = sitarTonicMidi + soloPool[nextSwaraIdx];
+      recentChordNotes.add(nextMidi);
       const phraseDelay = 0.38 + (strumMs / 220);
       playSynthVoice(nextMidi, dur1 * 0.75, 68 + randRange(0, 12), true, phraseDelay, "CHORD");
     }
@@ -4149,6 +4169,7 @@ function triggerCurrentChord() {
       const offsetSec = (idx * strumMs) / 1000;
       let noteMidi = rootMidi + interval;
       while (noteMidi > 72) noteMidi -= 12; // Fold any voice above C5 down an octave for warm pad cohesion
+      recentChordNotes.add(noteMidi);
       const dur = 3.6 + (1.0 - mutationVal);
       playSynthVoice(noteMidi, dur, 68 + randRange(0, 14), false, offsetSec, "CHORD");
     });
@@ -5643,8 +5664,7 @@ function buildKeyboard() {
       const keyEl = document.createElement("div");
       keyEl.className = "white-key"; keyEl.dataset.midi = midi;
 
-      const relSemi = ((midi - (rootNote % 12)) % 12 + 12) % 12;
-      if (scale.includes(relSemi)) keyEl.classList.add("in-scale");
+      if (recentChordNotes.has(midi)) keyEl.classList.add("in-scale");
 
       const label = document.createElement("span");
       label.className = "key-label";
@@ -5668,8 +5688,7 @@ function buildKeyboard() {
 
   const topMidi = (baseKeyboardOctave + 3) * 12;
   const topKey = document.createElement("div"); topKey.className = "white-key"; topKey.dataset.midi = topMidi;
-  const topRel = ((topMidi - (rootNote % 12)) % 12 + 12) % 12;
-  if (scale.includes(topRel)) topKey.classList.add("in-scale");
+  if (recentChordNotes.has(topMidi)) topKey.classList.add("in-scale");
   const topLabel = document.createElement("span"); topLabel.className = "key-label";
   topLabel.textContent = `C${Math.floor(topMidi / 12) - 1}`; topKey.appendChild(topLabel);
   const topSc = document.createElement("span");
@@ -5692,8 +5711,7 @@ function buildKeyboard() {
       const leftPercent = ((oct * 7 + bk.pos) / 15) * 100;
       bKeyEl.style.left = leftPercent + "%";
 
-      const relSemi = ((midi - (rootNote % 12)) % 12 + 12) % 12;
-      if (scale.includes(relSemi)) bKeyEl.classList.add("in-scale");
+      if (recentChordNotes.has(midi)) bKeyEl.classList.add("in-scale");
 
       const bLabel = document.createElement("span"); bLabel.className = "black-key-label";
       bLabel.textContent = `${NOTE_NAMES[midi % 12]}`; bKeyEl.appendChild(bLabel);
@@ -5729,6 +5747,7 @@ function renderKeyboardHighlights() {
 
   allKeyEls.forEach(el => {
     const midi = parseInt(el.dataset.midi);
+    el.classList.toggle("in-scale", recentChordNotes.has(midi));
     if (activeMidiNotes.has(midi)) {
       const info = activeMidiNotes.get(midi);
       if (now < info.expiry) {
@@ -6988,6 +7007,7 @@ function panicMute() {
   heldMidiNotes.clear();
   activeLiveVoices.clear();
   activeMidiNotes.clear();
+  recentChordNotes.clear();
   if (audioCtx) audioCtx.suspend();
   document.getElementById("footerStatus").textContent = "Engine: Muted";
 }
