@@ -1827,8 +1827,8 @@
     background: #06070a;
     border: 1px solid var(--border);
     border-radius: 7px;
-    padding: 8px 6px;
-    width: 52px;
+    padding: 8px 5px;
+    width: 56px;
     box-shadow: inset 0 2px 8px rgba(0,0,0,0.85);
     flex-shrink: 0;
   }
@@ -1844,7 +1844,7 @@
   .vert-toggle-rack {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
     background: #090b12;
     border: 1px solid var(--border-light);
     border-radius: 6px;
@@ -1885,6 +1885,18 @@
     border-color: var(--color-arp);
     color: var(--color-arp);
     box-shadow: 0 0 14px rgba(125, 95, 255, 0.45);
+  }
+  .vert-mode-btn#btnLedRecent,
+  .vert-mode-btn#btnLedScale {
+    font-size: 9px;
+    letter-spacing: 0.5px;
+  }
+  .vert-mode-btn.active#btnLedRecent,
+  .vert-mode-btn.active#btnLedScale {
+    background: rgba(254, 211, 48, 0.16);
+    border-color: var(--color-chord);
+    color: var(--color-chord);
+    box-shadow: 0 0 12px rgba(254, 211, 48, 0.4);
   }
   .takeover-badge {
     font-size: 9px;
@@ -2161,11 +2173,16 @@
       </div>
 
       <div class="keyboard-stage">
-        <div class="vert-routing-control" title="Keyboard Target: Trigger Chord Instrument or Arp Input">
-          <span class="vert-ctrl-label">TARGET</span>
+        <div class="vert-routing-control">
+          <span class="vert-ctrl-label" title="Keyboard Target: Trigger Chord Instrument or Arp Input">TARGET</span>
           <div class="vert-toggle-rack">
-            <button class="vert-mode-btn active" id="btnModeChord" onclick="setKeyboardRoute('CHORD')">CHD</button>
-            <button class="vert-mode-btn" id="btnModeArp" onclick="setKeyboardRoute('ARP')">ARP</button>
+            <button class="vert-mode-btn active" id="btnModeChord" onclick="setKeyboardRoute('CHORD')" title="Route keyboard to Chord synth">CHD</button>
+            <button class="vert-mode-btn" id="btnModeArp" onclick="setKeyboardRoute('ARP')" title="Route keyboard to Arpeggiator">ARP</button>
+          </div>
+          <span class="vert-ctrl-label" style="margin-top: 2px;" title="Key LED Indicator Mode: Last Played Notes or Constant Scale Notes">KEY LED</span>
+          <div class="vert-toggle-rack">
+            <button class="vert-mode-btn active" id="btnLedRecent" onclick="setKeyLedMode('RECENT')" title="Highlight most recently played notes">LAST</button>
+            <button class="vert-mode-btn" id="btnLedScale" onclick="setKeyLedMode('SCALE')" title="Constantly highlight all notes in the active scale">SCALE</button>
           </div>
         </div>
 
@@ -2830,6 +2847,7 @@ let stepDrone = 0;
 
 const activeMidiNotes = new Map();
 const recentChordNotes = new Set();
+let keyLedMode = "RECENT";
 
 let keyboardRoute = "CHORD";
 const activeLiveVoices = new Map();
@@ -2943,6 +2961,24 @@ function setKeyboardRoute(mode) {
   } else {
     stopLiveArp();
   }
+}
+
+function isKeyLedLit(midi) {
+  if (keyLedMode === "SCALE") {
+    const scale = SCALES[activeScaleKey] || [0, 2, 4, 5, 7, 9, 11];
+    const relSemi = ((midi - (rootNote % 12)) % 12 + 12) % 12;
+    return scale.includes(relSemi);
+  }
+  return recentChordNotes.has(midi);
+}
+
+function setKeyLedMode(mode) {
+  keyLedMode = mode === "SCALE" ? "SCALE" : "RECENT";
+  const btnRecent = document.getElementById("btnLedRecent");
+  const btnScale = document.getElementById("btnLedScale");
+  if (btnRecent) btnRecent.classList.toggle("active", keyLedMode === "RECENT");
+  if (btnScale) btnScale.classList.toggle("active", keyLedMode === "SCALE");
+  renderKeyboardHighlights();
 }
 
 function getIntervalLabel(semis) {
@@ -5674,7 +5710,7 @@ function buildKeyboard() {
       const keyEl = document.createElement("div");
       keyEl.className = "white-key"; keyEl.dataset.midi = midi;
 
-      if (recentChordNotes.has(midi)) keyEl.classList.add("in-scale");
+      if (isKeyLedLit(midi)) keyEl.classList.add("in-scale");
 
       if (whiteIdx < whiteShortcuts.length) {
         const sc = document.createElement("span");
@@ -5696,7 +5732,7 @@ function buildKeyboard() {
 
   const topMidi = (baseKeyboardOctave + 3) * 12;
   const topKey = document.createElement("div"); topKey.className = "white-key"; topKey.dataset.midi = topMidi;
-  if (recentChordNotes.has(topMidi)) topKey.classList.add("in-scale");
+  if (isKeyLedLit(topMidi)) topKey.classList.add("in-scale");
   if (whiteIdx < whiteShortcuts.length) {
     const topSc = document.createElement("span");
     topSc.className = "key-shortcut";
@@ -5718,7 +5754,7 @@ function buildKeyboard() {
       const gapOffsetPx = ((seamIdx - 7.5) / 15) * 3;
       bKeyEl.style.left = `calc(${pct.toFixed(4)}% + ${gapOffsetPx.toFixed(2)}px)`;
 
-      if (recentChordNotes.has(midi)) bKeyEl.classList.add("in-scale");
+      if (isKeyLedLit(midi)) bKeyEl.classList.add("in-scale");
 
       const shortcutKey = oct === 0 ? bk.key : (blackShortcutsOct2[bIdx] || "");
       if (shortcutKey) {
@@ -5751,7 +5787,7 @@ function renderKeyboardHighlights() {
 
   allKeyEls.forEach(el => {
     const midi = parseInt(el.dataset.midi);
-    el.classList.toggle("in-scale", recentChordNotes.has(midi));
+    el.classList.toggle("in-scale", isKeyLedLit(midi));
     if (activeMidiNotes.has(midi)) {
       const info = activeMidiNotes.get(midi);
       if (now < info.expiry) {
