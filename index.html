@@ -1808,6 +1808,7 @@
           <button class="btn-preset-chip" onclick="applyPreset(5)">Pale Bloom</button>
           <button class="btn-preset-chip" onclick="applyPreset(6)">Green / Yoshimura</button>
           <button class="btn-preset-chip" onclick="applyPreset(7)">Khan Lineage</button>
+          <button class="btn-preset-chip" onclick="applyPreset(8)">After Hours Deep</button>
         </div>
       </div>
 
@@ -6108,6 +6109,13 @@ function applyPreset(idx) {
   const chkDelaySync = document.getElementById("chkDelayTempoSync");
   if (chkDelaySync) chkDelaySync.checked = false;
 
+  // Drone Timbre wasn't being reset either -- a manually-selected Digeridoo
+  // mode would silently carry over into every other preset's sub-bass.
+  // None of the presets below are built around it, so default it back to
+  // Classic every time.
+  const selDroneTimbre = document.getElementById("selDroneTimbre");
+  if (selDroneTimbre) selDroneTimbre.value = "SUB";
+
   if (idx === 0) {
     document.getElementById("selTimeSig").value = "7/4";
     activeScaleKey = "DORIAN";
@@ -6529,6 +6537,77 @@ function applyPreset(idx) {
     document.getElementById("knobChorusRate").value = 0.2;
     document.getElementById("knobChorusDepth").value = 15;
     document.getElementById("knobChorusMix").value = 10;
+  } else if (idx === 8) { // After Hours Deep (Super Chill Deep House)
+    document.getElementById("selTimeSig").value = "4/4";
+    activeScaleKey = "DORIAN";
+    document.getElementById("knobBpm").value = 112; // laid-back, still a real house pulse
+    document.getElementById("knobWeather").value = 35;
+    document.getElementById("knobMutation").value = 20; // slow-evolving, not twitchy
+
+    // Four-on-the-floor, kept well behind "full/hard" -- present but relaxed
+    document.getElementById("selDrumStyle").value = "FOUR_ON_FLOOR";
+    document.getElementById("chkAutoEvolveDrums").checked = false;
+    document.getElementById("knobDrumEvolveChance").value = 10;
+    document.getElementById("knobDrumVol").value = 78;
+    document.getElementById("knobDrumPunch").value = 55;
+    document.getElementById("knobDrumDensity").value = 45;
+    document.getElementById("knobDrumFx").value = 35;
+
+    // Rhodes chords -- the quintessential deep house stab/pad instrument
+    document.getElementById("knobStrum").value = 40;
+    document.getElementById("selChordTimbre").value = "RHODES";
+    document.getElementById("knobChordFx").value = 70;
+
+    // Deep sub-bass drone, locked to the root rather than wandering --
+    // house bass sits still, it doesn't noodle
+    document.getElementById("selDroneOctave").value = "D1";
+    document.getElementById("knobDrone").value = 78;
+    document.getElementById("knobDroneFilter").value = 140;
+    document.getElementById("knobDroneDetune").value = 2;
+    document.getElementById("knobDroneWander").value = 10;
+    document.getElementById("knobDroneFx").value = 30;
+
+    // Warm analog pluck arp, locked to a hypnotic up/down pattern rather
+    // than evolving mid-groove
+    document.getElementById("selArpPattern").value = "PENDULUM";
+    document.getElementById("chkAutoEvolveArpPattern").checked = false;
+    document.getElementById("selArpTimbre").value = "ANALOG_PULSE";
+    document.getElementById("chkAutoEvolveArpTimbre").checked = false;
+    document.getElementById("knobArpEvolveChance").value = 10;
+    document.getElementById("knobArpGate").value = 180;
+    document.getElementById("knobArpRest").value = 20;
+    document.getElementById("knobArpOctaves").value = 2;
+    document.getElementById("knobArpVol").value = 75;
+    document.getElementById("knobArpFx").value = 55;
+
+    // Gentle filter breathing, not a dramatic sweep -- tasteful movement,
+    // a little squelch, nothing acid
+    document.getElementById("knobMasterCutoff").value = 68;
+    document.getElementById("knobMasterRes").value = 3.2;
+    document.getElementById("knobFilterAttack").value = 80;
+    document.getElementById("knobFilterDecay").value = 900;
+    document.getElementById("knobFilterEnvDepth").value = 35;
+    document.getElementById("knobFilterLfoRate").value = 0.1;
+    document.getElementById("knobFilterLfoDepth").value = 20;
+
+    // Tempo-synced dotted-eighth dub delay -- classic deep house skip,
+    // always lands in time with the 4/4 pulse regardless of tempo tweaks
+    document.getElementById("chkDelayTempoSync").checked = true;
+    document.getElementById("selDelayNoteDivision").value = "0.75";
+    document.getElementById("knobDelayFeedback").value = 35;
+    document.getElementById("knobDelayTone").value = 2200;
+    document.getElementById("knobDelayFlutter").value = 15;
+    document.getElementById("knobDelayMix").value = 28;
+
+    // Tight plate reverb (keeps the groove from getting washy) plus a
+    // touch of classic chorus for that Rhodes-through-a-chorus-pedal width
+    document.getElementById("selReverbMode").value = "PLATE";
+    document.getElementById("knobReverbMix").value = 22;
+    document.getElementById("knobReverbTone").value = 6000;
+    document.getElementById("selChorusMode").value = "CLASSIC";
+    document.getElementById("knobChorusRate").value = 0.3;
+    document.getElementById("knobChorusDepth").value = 35;
+    document.getElementById("knobChorusMix").value = 20;
   }
 
   const scale = SCALES[activeScaleKey] || SCALES.DORIAN;
