@@ -2885,6 +2885,7 @@ let liveArpActive = false;
 let liveArpStepIdx = -1;
 let liveArpDirection = 1;
 let lastArpVelocity = 90;
+let lastLiveArpMidi = null;
 
 function triggerLiveArpStep() {
   if (keyboardRoute !== "ARP" || heldMidiNotes.size === 0) {
@@ -2900,8 +2901,31 @@ function triggerLiveArpStep() {
   for (let oct = 0; oct < octs; oct++) {
     held.forEach(note => pool.push(note + (oct * 12)));
   }
+  pool = Array.from(new Set(pool)).sort((a, b) => a - b);
 
   if (pool.length === 0) return;
+
+  // Keep the step index anchored to the last played pitch when notes are
+  // added or removed mid-arpeggio so the pattern flows continuously without
+  // restarting or repeating a note when the pool shifts.
+  if (lastLiveArpMidi !== null && liveArpStepIdx >= 0) {
+    const exactIdx = pool.indexOf(lastLiveArpMidi);
+    if (exactIdx !== -1) {
+      liveArpStepIdx = exactIdx;
+    } else if (liveArpDirection >= 0) {
+      let belowIdx = -1;
+      for (let i = 0; i < pool.length; i++) {
+        if (pool[i] < lastLiveArpMidi) belowIdx = i;
+      }
+      liveArpStepIdx = belowIdx;
+    } else {
+      let aboveIdx = pool.length;
+      for (let i = pool.length - 1; i >= 0; i--) {
+        if (pool[i] > lastLiveArpMidi) aboveIdx = i;
+      }
+      liveArpStepIdx = aboveIdx;
+    }
+  }
 
   const pat = (arpPattern === "OFF") ? "UP" : arpPattern;
   let targetMidi = pool[0];
@@ -2910,26 +2934,35 @@ function triggerLiveArpStep() {
     liveArpStepIdx = (liveArpStepIdx + 1) % pool.length;
     targetMidi = pool[liveArpStepIdx];
   } else if (pat === "PENDULUM") {
-    liveArpStepIdx += liveArpDirection;
-    if (liveArpStepIdx >= pool.length - 1) {
-      liveArpDirection = -1;
-      liveArpStepIdx = Math.max(0, pool.length - 1);
-    } else if (liveArpStepIdx <= 0) {
-      liveArpDirection = 1;
+    if (pool.length === 1) {
       liveArpStepIdx = 0;
+    } else {
+      liveArpStepIdx += liveArpDirection;
+      if (liveArpStepIdx >= pool.length - 1) {
+        liveArpDirection = -1;
+        liveArpStepIdx = Math.max(0, pool.length - 1);
+      } else if (liveArpStepIdx <= 0) {
+        liveArpDirection = 1;
+        liveArpStepIdx = 0;
+      }
     }
     targetMidi = pool[liveArpStepIdx];
   } else if (pat === "SHIMMER") {
     targetMidi = pool[randRange(0, pool.length - 1)];
+    liveArpStepIdx = pool.indexOf(targetMidi);
   } else if (pat === "RAGA_TAAN") {
-    const stepAmt = (randFloat() < 0.7) ? 1 : 2;
-    liveArpStepIdx += liveArpDirection * stepAmt;
-    if (liveArpStepIdx >= pool.length - 1) {
-      liveArpDirection = -1;
-      liveArpStepIdx = Math.max(0, pool.length - 1);
-    } else if (liveArpStepIdx <= 0) {
-      liveArpDirection = 1;
+    if (pool.length === 1) {
       liveArpStepIdx = 0;
+    } else {
+      const stepAmt = (randFloat() < 0.7) ? 1 : 2;
+      liveArpStepIdx += liveArpDirection * stepAmt;
+      if (liveArpStepIdx >= pool.length - 1) {
+        liveArpDirection = -1;
+        liveArpStepIdx = Math.max(0, pool.length - 1);
+      } else if (liveArpStepIdx <= 0) {
+        liveArpDirection = 1;
+        liveArpStepIdx = 0;
+      }
     }
     targetMidi = pool[liveArpStepIdx];
   } else if (pat === "CHORD_BURST") {
@@ -2945,12 +2978,18 @@ function triggerLiveArpStep() {
     }
   }
 
+  lastLiveArpMidi = targetMidi;
+  arpStepCounter = Math.max(0, liveArpStepIdx);
+  arpDirection = liveArpDirection;
   playArpNote(targetMidi, lastArpVelocity || 88, true);
 }
 
 function startLiveArp() {
+  if (liveArpActive) return;
   liveArpActive = true;
   liveArpStepIdx = -1;
+  liveArpDirection = 1;
+  lastLiveArpMidi = null;
   triggerLiveArpStep();
   if (!isPlaying) {
     if (liveArpTimer) clearInterval(liveArpTimer);
@@ -2961,6 +3000,7 @@ function startLiveArp() {
 
 function stopLiveArp() {
   liveArpActive = false;
+  lastLiveArpMidi = null;
   if (liveArpTimer) {
     clearInterval(liveArpTimer);
     liveArpTimer = null;
@@ -3805,14 +3845,17 @@ function startNoteLive(midi, vel = 90) {
   if (!audioCtx) initAudio();
   if (audioCtx.state === 'suspended') audioCtx.resume();
 
+  const wasAlreadyHeld = heldMidiNotes.has(midi);
   heldMidiNotes.add(midi);
 
   if (keyboardRoute === "ARP") {
-    if (heldMidiNotes.size === 1) recentChordNotes.clear();
+    if (heldMidiNotes.size === 1 && !wasAlreadyHeld) recentChordNotes.clear();
     recentChordNotes.add(midi);
     lastArpVelocity = vel;
     handleLiveKeyInput();
-    startLiveArp();
+    if (!liveArpActive) {
+      startLiveArp();
+    }
     return;
   }
 
