@@ -437,7 +437,7 @@
     border-bottom: 1px solid var(--border);
   }
   .panel-header > span:first-child {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 800;
     letter-spacing: 1.2px;
     text-transform: uppercase;
@@ -1143,10 +1143,12 @@
   }
   .orbital-side-panel .strip-channel .panel-header {
     border-bottom: 1px solid rgba(var(--modal-accent-rgb, 0, 229, 255), 0.25);
+    justify-content: flex-end;
   }
+  /* The orbital modal header already shows this module's title -- hide the
+     strip's own duplicate title span instead of showing it twice. */
   .orbital-side-panel .strip-channel .panel-header > span:first-child {
-    color: var(--modal-accent-color, var(--text-primary));
-    text-shadow: 0 0 8px rgba(var(--modal-accent-rgb, 0, 229, 255), 0.35);
+    display: none;
   }
   .orbital-side-panel .strip-channel input[type="range"]::-webkit-slider-thumb {
     border: 1.5px solid var(--modal-accent-color, var(--accent)) !important;
@@ -1260,6 +1262,20 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 12px rgba(75, 123, 236, 0.10);
   }
 
+  /* Console rack module titles now carry the same colored-glow treatment
+     the orbital side panel already used (via --modal-accent-*) -- same
+     look, just driven by each module's own fixed accent color instead of
+     a JS-set custom property, so it's consistent everywhere a module's
+     own card renders its own title. */
+  .strip-channel.drone-ch  .panel-header > span:first-child { color: var(--color-drone);  text-shadow: 0 0 8px rgba(0, 229, 255, 0.35); }
+  .strip-channel.drum-ch   .panel-header > span:first-child { color: var(--color-drum);   text-shadow: 0 0 8px rgba(255, 56, 56, 0.35); }
+  .strip-channel.chord-ch  .panel-header > span:first-child { color: var(--color-chord);  text-shadow: 0 0 8px rgba(254, 211, 48, 0.35); }
+  .strip-channel.arp-ch    .panel-header > span:first-child { color: var(--color-arp);    text-shadow: 0 0 8px rgba(125, 95, 255, 0.35); }
+  .strip-channel.filter-ch .panel-header > span:first-child { color: var(--color-filter); text-shadow: 0 0 8px rgba(46, 213, 115, 0.35); }
+  .strip-channel.delay-ch  .panel-header > span:first-child { color: var(--color-delay);  text-shadow: 0 0 8px rgba(255, 121, 63, 0.35); }
+  .strip-channel.reverb-ch .panel-header > span:first-child { color: var(--color-reverb); text-shadow: 0 0 8px rgba(255, 95, 196, 0.35); }
+  .strip-channel.space-ch  .panel-header > span:first-child { color: var(--color-space);  text-shadow: 0 0 8px rgba(75, 123, 236, 0.35); }
+
   .control-row {
     display: flex;
     flex-direction: column;
@@ -1268,14 +1284,14 @@
   .control-label {
     display: flex;
     justify-content: space-between;
-    font-size: 10.5px;
+    font-size: 11px;
     color: var(--text-secondary);
     font-weight: 600;
     letter-spacing: 0.3px;
   }
   .control-val {
     font-family: ui-monospace, SFMono-Regular, monospace;
-    font-size: 10.5px;
+    font-size: 11px;
     color: var(--accent);
     font-weight: 700;
   }
@@ -2093,7 +2109,7 @@
   <div class="lower-deck view-grid-hidden">
     <div class="strip-channel drone-ch">
       <div class="panel-header">
-        <span>1. Tape, Sub & Tanpura Drone</span>
+        <span>1. Sub & Tanpura Drone</span>
         <div class="panel-header-actions">
           <button class="btn-power active" id="btnPower_drone" onclick="toggleDronePower()" title="Toggle Sub-Drone Power (On / Off)">PWR</button>
           <button class="btn-mute" id="btnMute_drone" onclick="toggleMute('drone')" title="Mute Sub-Drone">M</button>
@@ -2165,7 +2181,7 @@
 
     <div class="strip-channel drum-ch">
       <div class="panel-header">
-        <span>2. Organic Drums</span>
+        <span>2. Drums</span>
         <div class="panel-header-actions">
           <button class="btn-mute" id="btnMute_drum" onclick="toggleMute('drum')" title="Mute Drums">M</button>
           <button class="btn-solo" id="btnSolo_drum" onclick="toggleSolo('drum')" title="Solo Drums">S</button>
@@ -2369,7 +2385,7 @@
 
     <div class="strip-channel delay-ch">
       <div class="panel-header">
-        <span>6. Analog Style Delay</span>
+        <span>6. Analog Delay</span>
         <button class="badge-tag" style="color: var(--color-delay); border-color: rgba(225,112,85,0.3);" onclick="randomizeDelay()" title="Randomize this module">⟲</button>
       </div>
       <div class="control-row">
@@ -2421,7 +2437,7 @@
 
     <div class="strip-channel reverb-ch">
       <div class="panel-header">
-        <span>7. Spacey Reverb & Chorus</span>
+        <span>7. Reverb & Chorus</span>
         <button class="badge-tag" style="color: var(--color-reverb); border-color: rgba(255,95,196,0.3);" onclick="randomizeReverbChorus()" title="Randomize this module">⟲</button>
       </div>
       <div class="control-row">
@@ -2469,7 +2485,7 @@
 
     <div class="strip-channel space-ch">
       <div class="panel-header">
-        <span>8. Master Space & Out</span>
+        <span>8. Space & Out</span>
         <button class="badge-tag" style="color: var(--color-space); border-color: rgba(75,123,236,0.3);" onclick="randomizeSpace()" title="Randomize this module">⟲</button>
       </div>
       <div class="control-row">
@@ -7432,9 +7448,9 @@ function drawStars(w, h) {
 const ORBITAL_MODULES = [
   { id: "drone",  name: "SUB & TANPURA DRONE", num: "1", color: "#00e5ff", rgb: [0, 229, 255], baseR: 40, x: 0, y: 0, vx: 0.18,  vy: 0.14,  chClass: "drone-ch",  analyser: () => droneAnalyser,  pulse: 0, bump: 0 },
   { id: "drum",   name: "DRUMS",        num: "2", color: "#ff3838", rgb: [255, 56, 56],  baseR: 44, x: 0, y: 0, vx: -0.20, vy: 0.16,  chClass: "drum-ch",   analyser: () => drumAnalyser,   pulse: 0, bump: 0 },
-  { id: "chord",  name: "CHORDS/LEAD",  num: "3", color: "#fed330", rgb: [254, 211, 48], baseR: 48, x: 0, y: 0, vx: 0.15,  vy: -0.19, chClass: "chord-ch",  analyser: () => chordAnalyser,  pulse: 0, bump: 0 },
+  { id: "chord",  name: "CHORDS & VOICING",  num: "3", color: "#fed330", rgb: [254, 211, 48], baseR: 48, x: 0, y: 0, vx: 0.15,  vy: -0.19, chClass: "chord-ch",  analyser: () => chordAnalyser,  pulse: 0, bump: 0 },
   { id: "arp",    name: "SHIMMER ARP",  num: "4", color: "#7d5fff", rgb: [125, 95, 255], baseR: 42, x: 0, y: 0, vx: -0.16, vy: -0.14, chClass: "arp-ch",    analyser: () => arpAnalyser,    pulse: 0, bump: 0 },
-  { id: "filter", name: "MASTER FILTER",num: "5", color: "#2ed573", rgb: [46, 213, 115], baseR: 37, x: 0, y: 0, vx: 0.14,  vy: 0.17,  chClass: "filter-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
+  { id: "filter", name: "MASTER FILTER & ENV",num: "5", color: "#2ed573", rgb: [46, 213, 115], baseR: 37, x: 0, y: 0, vx: 0.14,  vy: 0.17,  chClass: "filter-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
   { id: "delay",  name: "ANALOG DELAY", num: "6", color: "#ff793f", rgb: [255, 121, 63], baseR: 35, x: 0, y: 0, vx: -0.18, vy: 0.12,  chClass: "delay-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 },
   { id: "reverb", name: "REVERB & CHORUS", num: "7", color: "#ff5fc4", rgb: [255, 95, 196], baseR: 38, x: 0, y: 0, vx: 0.17,  vy: 0.13,  chClass: "reverb-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
   { id: "space",  name: "SPACE & OUT",  num: "8", color: "#4b7bec", rgb: [75, 123, 236], baseR: 37, x: 0, y: 0, vx: 0.12,  vy: -0.16, chClass: "space-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 }
