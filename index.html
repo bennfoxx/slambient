@@ -3260,9 +3260,7 @@ function playTanpuraPluck(stringIdx) {
       midi = baseSa - 5; // Pancham Pa (5th)
     }
   } else if (stringIdx === 1) {
-    // String 2: Middle Sa (Jodi 1) -- symmetric +/- chorus detune around true
-    // pitch center so the pair of Sa strings beats gently without reading
-    // as flat/sharp overall (the old -1.5 / +2.2 split was lopsided sharp).
+    // String 2: Middle Sa (Jodi 1) -- symmetric +/- chorus detune around true pitch center
     midi = baseSa;
     detuneCents = -1.5;
   } else if (stringIdx === 2) {
@@ -3276,58 +3274,65 @@ function playTanpuraPluck(stringIdx) {
   }
 
   const freq = midiToFreq(midi);
-  const ringDuration = 8.5; // Expansive resonant ring (all 4 strings overlap into golden bed)
+  const ringDuration = 9.5; // Expansive resonant ring (all 4 strings overlap into golden bed)
 
-  // Pluck Voice Gain Envelope: prominent golden resonance
+  // Pluck Voice Gain Envelope: rich golden acoustic resonance
   const voiceGain = audioCtx.createGain();
-  const stringWeight = stringIdx === 3 ? 1.35 : (stringIdx === 0 ? 1.10 : 0.95);
-  const peakGain = 0.52 * stringWeight * (0.5 + tanpuraVol * 0.7);
+  const stringWeight = stringIdx === 3 ? 1.45 : (stringIdx === 0 ? 1.15 : 1.0);
+  const peakGain = 0.68 * stringWeight * (0.6 + tanpuraVol * 0.8);
 
   voiceGain.gain.setValueAtTime(0.0001, now);
-  voiceGain.gain.linearRampToValueAtTime(peakGain, now + 0.024); // Soft fleshy finger release
-  voiceGain.gain.exponentialRampToValueAtTime(peakGain * 0.65, now + 0.75); // Sustained string resonance
-  voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + ringDuration); // Evolving golden decay
+  voiceGain.gain.linearRampToValueAtTime(peakGain, now + 0.025); // Fleshy fingertip sweep
+  voiceGain.gain.exponentialRampToValueAtTime(peakGain * 0.72, now + 0.85); // Sustained golden resonance
+  voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + ringDuration); // Evolving acoustic decay
 
-  // 1. Warm Wooden Gourd Fundamental (Triangle wave)
+  // 1. Warm Wooden Gourd Fundamental (Triangle/Sine acoustic blend)
   const oscBody = audioCtx.createOscillator();
   oscBody.type = "triangle";
   oscBody.frequency.setValueAtTime(freq, now);
   oscBody.detune.setValueAtTime(detuneCents, now);
 
+  const oscSubBody = audioCtx.createOscillator();
+  oscSubBody.type = "sine";
+  oscSubBody.frequency.setValueAtTime(freq, now);
+  oscSubBody.detune.setValueAtTime(detuneCents, now);
+
   // 2. Harmonic Overtone Generator (Sawtooth with rich partial cascade)
   const oscHarmonics = audioCtx.createOscillator();
   oscHarmonics.type = "sawtooth";
   oscHarmonics.frequency.setValueAtTime(freq, now);
-  oscHarmonics.detune.setValueAtTime(detuneCents + (Math.random() * 0.6 - 0.3), now);
+  oscHarmonics.detune.setValueAtTime(detuneCents + (Math.random() * 0.8 - 0.4), now);
 
   // 3. Golden Jawari Bridge Resonator (Silk/Cotton thread non-linear buzzing cascade)
   const jawariFilter = audioCtx.createBiquadFilter();
   jawariFilter.type = "bandpass";
-  const formantCenter = 1600 + javariVal * 1800; // 1600 Hz - 3400 Hz golden formant peak
+  const formantCenter = 1750 + javariVal * 1650; // 1750 Hz - 3400 Hz golden formant peak
   jawariFilter.frequency.setValueAtTime(formantCenter, now);
-  jawariFilter.Q.setValueAtTime(4.5 + javariVal * 4.5, now); // Sharp golden ring
+  jawariFilter.Q.setValueAtTime(5.0 + javariVal * 4.5, now); // Sharp golden ring
 
   // Micro-flutter on bridge contact (subtle acoustic undulation)
   const flutter = audioCtx.createOscillator();
   const flutterGain = audioCtx.createGain();
-  flutter.frequency.setValueAtTime(4.6 + Math.random() * 1.8, now);
-  flutterGain.gain.setValueAtTime(formantCenter * 0.14 * javariVal, now);
+  flutter.frequency.setValueAtTime(4.4 + Math.random() * 1.6, now);
+  flutterGain.gain.setValueAtTime(formantCenter * 0.15 * javariVal, now);
   flutter.connect(flutterGain);
   flutterGain.connect(jawariFilter.frequency);
 
   const buzzGain = audioCtx.createGain();
-  const buzzAmt = Math.min(1.0, 0.35 + javariVal * 0.95);
+  const buzzAmt = Math.min(1.0, 0.40 + javariVal * 0.90);
   buzzGain.gain.setValueAtTime(0.0001, now);
-  buzzGain.gain.linearRampToValueAtTime(0.38 * buzzAmt, now + 0.06);
-  // Swell into the golden overtone bloom
-  buzzGain.gain.linearRampToValueAtTime(0.50 * buzzAmt, now + 0.35);
+  buzzGain.gain.linearRampToValueAtTime(0.44 * buzzAmt, now + 0.05);
+  buzzGain.gain.linearRampToValueAtTime(0.58 * buzzAmt, now + 0.32); // Swell into golden bloom
   buzzGain.gain.exponentialRampToValueAtTime(0.0001, now + ringDuration * 0.9);
 
-  // 4. Warm Gourd Body Resonator (lowpass warmth)
+  // 4. Warm Gourd Body Resonator (cavity formant filter)
   const bodyFilter = audioCtx.createBiquadFilter();
-  bodyFilter.type = "lowpass";
-  bodyFilter.frequency.setValueAtTime(Math.min(9000, 1200 + javariVal * 3800), now);
-  bodyFilter.Q.setValueAtTime(1.8, now);
+  bodyFilter.type = "bandpass";
+  bodyFilter.frequency.setValueAtTime(stringIdx === 3 ? 180 : 340, now);
+  bodyFilter.Q.setValueAtTime(2.8, now);
+
+  const bodyMixGain = audioCtx.createGain();
+  bodyMixGain.gain.setValueAtTime(0.85, now);
 
   // Graph wiring
   oscHarmonics.connect(jawariFilter);
@@ -3335,28 +3340,34 @@ function playTanpuraPluck(stringIdx) {
   buzzGain.connect(voiceGain);
 
   oscBody.connect(bodyFilter);
-  bodyFilter.connect(voiceGain);
+  bodyFilter.connect(bodyMixGain);
+  bodyMixGain.connect(voiceGain);
+  oscSubBody.connect(voiceGain);
 
   voiceGain.connect(tanpuraBusGain);
 
   // Start & Stop
   oscBody.start(now);
+  oscSubBody.start(now);
   oscHarmonics.start(now);
   flutter.start(now);
 
   oscBody.stop(now + ringDuration + 0.1);
+  oscSubBody.stop(now + ringDuration + 0.1);
   oscHarmonics.stop(now + ringDuration + 0.1);
   flutter.stop(now + ringDuration + 0.1);
 
   setTimeout(() => {
     try {
       oscBody.disconnect();
+      oscSubBody.disconnect();
       oscHarmonics.disconnect();
       jawariFilter.disconnect();
       flutter.disconnect();
       flutterGain.disconnect();
       buzzGain.disconnect();
       bodyFilter.disconnect();
+      bodyMixGain.disconnect();
       voiceGain.disconnect();
     } catch (e) {}
   }, (ringDuration + 0.2) * 1000);
@@ -4228,39 +4239,39 @@ function playBayan(stroke = "GHE", slide = true, hard = 1.0) {
   oscSub.frequency.setValueAtTime(baseFreq * 0.5, now);
 
   if (slide) {
-    // Dynamic rubbery pitch swoop: 58 Hz -> 140 Hz -> 85 Hz -> 60 Hz
-    const peakFreq = 125 + randFloat() * 30; // Elastic upward snap (over an octave bend)
-    oscMain.frequency.exponentialRampToValueAtTime(baseFreq * 0.88, now + 0.018); // Initial palm press dip
-    oscMain.frequency.exponentialRampToValueAtTime(peakFreq, now + 0.13); // Elastic rubbery snap up
-    oscMain.frequency.exponentialRampToValueAtTime(baseFreq * 1.38, now + 0.30); // Vocal settle
-    oscMain.frequency.exponentialRampToValueAtTime(baseFreq, now + 0.62); // Resonant ring
+    // Dynamic rubbery pitch swoop: 54 Hz -> 46 Hz (palm touch) -> 148 Hz (elastic snap) -> 82 Hz -> 58 Hz
+    const peakFreq = 135 + randFloat() * 35; // Up to 170 Hz (wide vocal rubbery bend)
+    oscMain.frequency.exponentialRampToValueAtTime(baseFreq * 0.82, now + 0.020); // Initial skin press dip
+    oscMain.frequency.exponentialRampToValueAtTime(peakFreq, now + 0.14); // Elastic rubbery snap up
+    oscMain.frequency.exponentialRampToValueAtTime(baseFreq * 1.42, now + 0.35); // Vocal settle
+    oscMain.frequency.exponentialRampToValueAtTime(baseFreq, now + 0.72); // Deep resonant ring
 
     oscSub.frequency.setValueAtTime(baseFreq * 0.5, now);
-    oscSub.frequency.exponentialRampToValueAtTime(peakFreq * 0.5, now + 0.13);
-    oscSub.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, now + 0.55);
+    oscSub.frequency.exponentialRampToValueAtTime(peakFreq * 0.5, now + 0.14);
+    oscSub.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, now + 0.65);
 
-    // Undulating wrist flex / vibrato on the sustain (6.2 Hz)
-    oscMeendLFO.frequency.setValueAtTime(6.2, now);
+    // Undulating wrist flex / vibrato on the sustain (5.8 Hz)
+    oscMeendLFO.frequency.setValueAtTime(5.8, now);
     lfoGain.gain.setValueAtTime(0.001, now);
-    lfoGain.gain.linearRampToValueAtTime(14.0, now + 0.20);
-    lfoGain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+    lfoGain.gain.linearRampToValueAtTime(18.0, now + 0.22); // 18 Hz undulating wobble
+    lfoGain.gain.exponentialRampToValueAtTime(0.001, now + 0.72);
     oscMeendLFO.connect(lfoGain);
     lfoGain.connect(oscMain.frequency);
     oscMeendLFO.start(now);
-    oscMeendLFO.stop(now + 0.7);
+    oscMeendLFO.stop(now + 0.78);
   }
 
-  // Rubbery Bubbly Resonant Filter: Sweeps Q=5.2 peak through mid-bass
+  // Rubbery Bubbly Resonant Filter: Sweeps Q=6.2 peak through mid-bass
   resonantFilter.type = "lowpass";
-  resonantFilter.Q.setValueAtTime(5.2, now); // Juicy, resonant liquid peak
-  const filterStart = 90;
-  const filterPeak = slide ? (270 + randFloat() * 60) : 120;
+  resonantFilter.Q.setValueAtTime(6.2, now); // Juicy, resonant liquid peak
+  const filterStart = 110;
+  const filterPeak = slide ? (320 + randFloat() * 70) : 140;
   resonantFilter.frequency.setValueAtTime(filterStart, now);
-  resonantFilter.frequency.exponentialRampToValueAtTime(filterPeak, now + 0.13);
-  resonantFilter.frequency.exponentialRampToValueAtTime(85, now + 0.60);
+  resonantFilter.frequency.exponentialRampToValueAtTime(filterPeak, now + 0.14);
+  resonantFilter.frequency.exponentialRampToValueAtTime(95, now + 0.70);
 
-  const vol = (0.95 + drumPunch * 0.65) * drumVol * hard;
-  const decay = 0.58;
+  const vol = (1.05 + drumPunch * 0.70) * drumVol * hard;
+  const decay = 0.75;
   gain.gain.setValueAtTime(0.0001, now);
   gain.gain.linearRampToValueAtTime(vol, now + 0.015);
   gain.gain.exponentialRampToValueAtTime(vol * 0.6, now + 0.18);
@@ -4315,9 +4326,14 @@ function playTablaGroove(measureTick, isDownbeat, ts) {
         playBayan("GHE", true, 1.2);
         playDayan("NA", 1.15);
       }
-    } else if (subTick === 2 && randFloat() < (0.35 + drumDensity * 0.45)) {
+    } else if (subTick === 2 && randFloat() < (0.45 + drumDensity * 0.45)) {
+      // Offbeat syncopation: add vocal rubbery Bayan modulation so bass undulates actively
       if (currentBeat === 6) {
-        playDayan("NA", 0.7);
+        playBayan("GHE", true, 0.85);
+        playDayan("NA", 0.75);
+      } else if (currentBeat === 3 || currentBeat === 5) {
+        playBayan("GHE", true, 0.75);
+        playDayan("TUN", 0.70);
       } else if (currentBeat === 2 || currentBeat === 4) {
         playDayan("TI", 0.6);
       } else {
@@ -4348,11 +4364,12 @@ function playTablaGroove(measureTick, isDownbeat, ts) {
           playDayan("NA", 1.1);
         }
       }
-    } else if (subTick === 2 && randFloat() < (0.4 + drumDensity * 0.4)) {
-      if (currentBeat % 2 === 0) {
-        playDayan("TI", 0.65);
+    } else if (subTick === 2 && randFloat() < (0.45 + drumDensity * 0.45)) {
+      if (currentBeat === 0 || currentBeat === 2) {
+        playBayan("GHE", true, 0.80);
+        playDayan("TUN", 0.75);
       } else {
-        playDayan("TUN", 0.7);
+        playDayan("TI", 0.65);
       }
     }
   } else {
@@ -4587,7 +4604,10 @@ function clockTick() {
   // (resets every tala cycle) -- odd-length cycles like 7/4's 28 ticks
   // aren't evenly divisible by the half-time interval, which would
   // otherwise shorten one gap per cycle back toward real time.
-  const tanpuraInterval = (ts.ticksPerBeat || 4) * 2;
+  // Authentic cyclical Tanpura plucking: 1 string per beat in classical sequence
+  // (Pa - Sa - Sa - Sa). With the 9.2s resonant ring decay, all 4 strings continuously
+  // overlap into an unbroken, shimmering golden acoustic bed of sound.
+  const tanpuraInterval = ts.ticksPerBeat || 4;
   if (tanpuraEnabled && tickCount % tanpuraInterval === 0 && tanpuraVol > 0.01 && droneEnabled && !channelMute.drone) {
     playTanpuraPluck(tanpuraStep % 4);
     tanpuraStep++;
@@ -5941,7 +5961,6 @@ function applyPreset(idx) {
 
   if (idx === 0) {
     document.getElementById("selTimeSig").value = "7/4";
-    rootNote = 2; // D
     activeScaleKey = "DORIAN";
     document.getElementById("knobBpm").value = 72;
     document.getElementById("knobWeather").value = 45;
@@ -5991,7 +6010,6 @@ function applyPreset(idx) {
     document.getElementById("knobChorusMix").value = 25;
   } else if (idx === 1) {
     document.getElementById("selTimeSig").value = "5/8";
-    rootNote = 9; // A
     activeScaleKey = "DORIAN";
     document.getElementById("knobBpm").value = 88;
     document.getElementById("knobWeather").value = 55;
@@ -6044,7 +6062,6 @@ function applyPreset(idx) {
     document.getElementById("knobChorusMix").value = 18;
   } else if (idx === 2) {
     document.getElementById("selTimeSig").value = "7/8";
-    rootNote = 0; // C
     activeScaleKey = "LYDIAN";
     document.getElementById("knobBpm").value = 62;
     document.getElementById("knobWeather").value = 65;
@@ -6094,7 +6111,6 @@ function applyPreset(idx) {
     document.getElementById("knobChorusMix").value = 40;
   } else if (idx === 3) {
     document.getElementById("selTimeSig").value = "5/4";
-    rootNote = 7; // G
     activeScaleKey = "AEOLIAN";
     document.getElementById("knobBpm").value = 64;
     document.getElementById("knobWeather").value = 75;
@@ -6141,7 +6157,6 @@ function applyPreset(idx) {
     document.getElementById("knobChorusMix").value = 45;
   } else if (idx === 4) {
     document.getElementById("selTimeSig").value = "4/4";
-    rootNote = 4; // E
     activeScaleKey = "PHRYGIAN_AMB";
     document.getElementById("knobBpm").value = 56;
     document.getElementById("knobWeather").value = 60;
@@ -6191,7 +6206,6 @@ function applyPreset(idx) {
     document.getElementById("knobChorusMix").value = 35;
   } else if (idx === 5) {
     document.getElementById("selTimeSig").value = "3/4";
-    rootNote = 5; // F
     activeScaleKey = "MAJ_PENTATONIC";
     document.getElementById("knobBpm").value = 68;
     document.getElementById("knobWeather").value = 45;
@@ -6239,7 +6253,6 @@ function applyPreset(idx) {
   } else if (idx === 6) { // Green / Hiroshi Yoshimura (Environmental Kankyō Ongaku)
     document.getElementById("selTimeSig").value = "4/4";
     activeScaleKey = "HIRAJOSHI";
-    rootNote = 5; // F
     document.getElementById("knobBpm").value = 60;
     document.getElementById("knobWeather").value = 35; // Pure, pristine transparent space
     document.getElementById("knobMutation").value = 15; // Serene, stable harmonic architecture
@@ -6300,7 +6313,6 @@ function applyPreset(idx) {
   } else if (idx === 7) { // Khan Lineage (Indian Classical Raga / Maihar Tradition)
     document.getElementById("selTimeSig").value = "7/4"; // Rupak Taal (7 matras: 3 + 2 + 2)
     activeScaleKey = "BILAWAL";
-    rootNote = 2; // D (Classical home tonic Sa)
     document.getElementById("knobBpm").value = 68; // Meditative vilambit / madhya laya
     document.getElementById("knobWeather").value = 40;
     document.getElementById("knobMutation").value = 20;
