@@ -3016,12 +3016,39 @@ let masterVolumeVal = 0.85;
 let masterMuted = false;
 let drumBusGain, arpBusGain;
 let droneOsc1, droneOsc2, droneGain, droneFilter;
-let droneFormantFilter1, droneFormantFilter2, droneFormantGain, droneFormantLFO, droneFormantLFOGain;
+// Digeridoo buzz layer: dedicated lip-reed-style oscillators (not a reuse
+// of droneOsc1/2) feeding a distortion stage, a 3-formant resonance bank,
+// and filtered breath noise, with slow breath-swell and growl modulation.
+let droneBuzzWave;
+let droneBuzzOsc1, droneBuzzOsc2, droneBuzzShaper;
+let droneFormantFilter1, droneFormantFilter2, droneFormantFilter3, droneFormantGain;
+let droneBreathNoise, droneBreathFilter, droneBreathGain;
+let droneBreathLFO, droneBreathLFOGain;
+let droneGrowlLFO, droneGrowlLFOGain;
+let droneFormantLFO, droneFormantLFOGain;
 
 let drumAnalyser, chordAnalyser, arpAnalyser, droneAnalyser, masterAnalyser;
 let masterFilter1, masterFilter2;
 let analogDelayNode, delayFeedbackGain, delayDampingFilter, delaySaturationNode;
 let delayDryGain, delayWetGain, delayLFO, delayLFOGain;
+
+// A real didgeridoo's buzz comes from lip-reed excitation against the bore
+// -- harmonically dense and slightly irregular, not a clean built-in
+// sawtooth/square. Build a custom spectrum: ~1/n falloff (buzzy, not pure),
+// a touch of real-component asymmetry, and deterministic per-harmonic
+// jitter so it doesn't sound like a perfectly smooth synthetic ramp.
+function createDidgeridooBuzzWave(ctx) {
+  const numHarmonics = 24;
+  const real = new Float32Array(numHarmonics + 1);
+  const imag = new Float32Array(numHarmonics + 1);
+  for (let n = 1; n <= numHarmonics; n++) {
+    const falloff = 1 / Math.pow(n, 0.85);
+    const jitter = 0.85 + 0.3 * Math.sin(n * 2.399963); // golden-angle spacing, not periodic with n
+    imag[n] = falloff * jitter;
+    real[n] = falloff * jitter * 0.3; // slight asymmetry for extra buzz
+  }
+  return ctx.createPeriodicWave(real, imag, { disableNormalization: false });
+}
 
 function initAudio() {
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -3045,42 +3072,103 @@ function initAudio() {
   droneFilter = audioCtx.createBiquadFilter();
 
   droneFilter.type = "lowpass"; droneFilter.frequency.value = droneFilterHz;
-  if (droneTimbre === "DIDGERIDOO") {
-    droneOsc1.type = "sawtooth"; droneOsc2.type = "square";
-  } else {
-    droneOsc1.type = "triangle"; droneOsc2.type = "sawtooth";
-  }
+  droneOsc1.type = "triangle"; droneOsc2.type = "sawtooth";
   droneOsc1.detune.value = -droneDetuneCents; droneOsc2.detune.value = +droneDetuneCents;
 
   updateDronePitches();
   droneGain.gain.value = droneVol * 0.16;
   droneOsc1.connect(droneFilter); droneOsc2.connect(droneFilter); droneFilter.connect(droneGain);
 
-  // Digeridoo mode: a parallel buzzy-formant layer that sits on top of the
-  // same low fundamental (the lowpass path above is untouched/always on),
-  // rather than replacing it -- a real didgeridoo drone is both the deep
-  // fundamental AND buzzy upper-harmonic formants at once. Silent (gain 0)
-  // unless Digeridoo is selected, so Classic drone mode is bit-for-bit
-  // unaffected by any of this.
-  droneFormantFilter1 = audioCtx.createBiquadFilter(); droneFormantFilter1.type = "bandpass";
-  droneFormantFilter1.frequency.value = 280; droneFormantFilter1.Q.value = 3.5;
-  droneFormantFilter2 = audioCtx.createBiquadFilter(); droneFormantFilter2.type = "bandpass";
-  droneFormantFilter2.frequency.value = 650; droneFormantFilter2.Q.value = 4.5;
-  droneFormantGain = audioCtx.createGain();
-  droneFormantGain.gain.value = (droneTimbre === "DIDGERIDOO") ? droneVol * 0.12 : 0;
+  // Digeridoo mode: a parallel buzz layer that sits on top of the same low
+  // fundamental (the lowpass path above is untouched/always on, exactly as
+  // in Classic mode) rather than replacing it -- a real didgeridoo drone is
+  // both the deep fundamental AND a buzzy lip-reed excitation at once. Uses
+  // its own dedicated oscillators (droneOsc1/2 are never repurposed), so
+  // Classic mode is bit-for-bit unaffected regardless of this mode's state.
+  droneBuzzWave = createDidgeridooBuzzWave(audioCtx);
+  droneBuzzOsc1 = audioCtx.createOscillator(); droneBuzzOsc1.setPeriodicWave(droneBuzzWave);
+  droneBuzzOsc2 = audioCtx.createOscillator(); droneBuzzOsc2.setPeriodicWave(droneBuzzWave);
+  droneBuzzOsc2.detune.value = 9; // two "lips" slightly apart, natural beating
 
-  droneOsc1.connect(droneFormantFilter1); droneOsc2.connect(droneFormantFilter2);
-  droneFormantFilter1.connect(droneFormantGain); droneFormantFilter2.connect(droneFormantGain);
+  // Soft nonlinear clip -- the two (summed, slightly detuned) buzz
+  // oscillators drive this together, so their beating also intermodulates
+  // through the distortion, which reads as the characteristic unpredictable
+  // grit of a real lip-reed tone rather than two pristine harmonic series.
+  droneBuzzShaper = audioCtx.createWaveShaper();
+  const buzzCurve = new Float32Array(1024);
+  for (let i = 0; i < 1024; i++) {
+    const x = (i * 2) / 1024 - 1;
+    buzzCurve[i] = Math.tanh(x * 2.4);
+  }
+  droneBuzzShaper.curve = buzzCurve;
+  droneBuzzOsc1.connect(droneBuzzShaper);
+  droneBuzzOsc2.connect(droneBuzzShaper);
+
+  // Three broad (not narrow/whistly) formant resonances -- a real bore's
+  // resonances are broad humps, not isolated peaks.
+  droneFormantFilter1 = audioCtx.createBiquadFilter(); droneFormantFilter1.type = "bandpass";
+  droneFormantFilter1.frequency.value = 150; droneFormantFilter1.Q.value = 1.4;
+  droneFormantFilter2 = audioCtx.createBiquadFilter(); droneFormantFilter2.type = "bandpass";
+  droneFormantFilter2.frequency.value = 440; droneFormantFilter2.Q.value = 1.8;
+  droneFormantFilter3 = audioCtx.createBiquadFilter(); droneFormantFilter3.type = "bandpass";
+  droneFormantFilter3.frequency.value = 1100; droneFormantFilter3.Q.value = 1.2;
+  droneBuzzShaper.connect(droneFormantFilter1);
+  droneBuzzShaper.connect(droneFormantFilter2);
+  droneBuzzShaper.connect(droneFormantFilter3);
+
+  droneFormantGain = audioCtx.createGain();
+  droneFormantGain.gain.value = (droneTimbre === "DIDGERIDOO") ? 0.85 : 0;
+  droneFormantFilter1.connect(droneFormantGain);
+  droneFormantFilter2.connect(droneFormantGain);
+  droneFormantFilter3.connect(droneFormantGain);
+
+  // Filtered breath noise -- air turbulence from the player's mouth. A
+  // subtle but essential ingredient; pure oscillators alone read as
+  // synthetic no matter how the harmonics are shaped.
+  droneBreathNoise = audioCtx.createBufferSource();
+  droneBreathNoise.buffer = getNoiseBuffer();
+  droneBreathNoise.loop = true;
+  droneBreathFilter = audioCtx.createBiquadFilter(); droneBreathFilter.type = "bandpass";
+  droneBreathFilter.frequency.value = 2600; droneBreathFilter.Q.value = 0.7;
+  droneBreathGain = audioCtx.createGain(); droneBreathGain.gain.value = 0.16;
+  droneBreathNoise.connect(droneBreathFilter); droneBreathFilter.connect(droneBreathGain);
+  droneBreathGain.connect(droneFormantGain);
+  droneBreathNoise.start();
+
   droneFormantGain.connect(droneGain);
 
-  // Slow "breath"/vocalization wobble on the upper formant, like a player's
-  // throat articulation on a sustained didgeridoo drone.
+  // Circular-breathing swell: a slow amplitude pulse on the whole buzz
+  // layer (~4.5s cycle), not a frequency sweep -- this is what a sustained
+  // didgeridoo drone's "living" quality actually comes from.
+  droneBreathLFO = audioCtx.createOscillator(); droneBreathLFO.type = "sine";
+  droneBreathLFO.frequency.value = 0.22;
+  droneBreathLFOGain = audioCtx.createGain();
+  droneBreathLFOGain.gain.value = (droneTimbre === "DIDGERIDOO") ? 0.85 * 0.25 : 0;
+  droneBreathLFO.connect(droneBreathLFOGain);
+  droneBreathLFOGain.connect(droneFormantGain.gain);
+  droneBreathLFO.start();
+
+  // Growl: a faster, shallow pitch wobble on just the buzz oscillators,
+  // emulating lip-reed instability (not applied to the clean sub path).
+  droneGrowlLFO = audioCtx.createOscillator(); droneGrowlLFO.type = "sine";
+  droneGrowlLFO.frequency.value = 5.3;
+  droneGrowlLFOGain = audioCtx.createGain(); droneGrowlLFOGain.gain.value = 4; // cents
+  droneGrowlLFO.connect(droneGrowlLFOGain);
+  droneGrowlLFOGain.connect(droneBuzzOsc1.detune);
+  droneGrowlLFOGain.connect(droneBuzzOsc2.detune);
+  droneGrowlLFO.start();
+
+  // Slow vocal-tract-style drift on the mid formant, subtler than the
+  // breath/growl layers above -- a real player's throat shape never holds
+  // perfectly still even on a "steady" drone.
   droneFormantLFO = audioCtx.createOscillator(); droneFormantLFO.type = "sine";
-  droneFormantLFO.frequency.value = 0.12;
-  droneFormantLFOGain = audioCtx.createGain(); droneFormantLFOGain.gain.value = 40;
+  droneFormantLFO.frequency.value = 0.07;
+  droneFormantLFOGain = audioCtx.createGain(); droneFormantLFOGain.gain.value = 15;
   droneFormantLFO.connect(droneFormantLFOGain);
   droneFormantLFOGain.connect(droneFormantFilter2.frequency);
   droneFormantLFO.start();
+
+  droneBuzzOsc1.start(); droneBuzzOsc2.start();
 
   tanpuraBusGain = audioCtx.createGain();
   tanpuraBusGain.gain.value = tanpuraVol * 0.95;
@@ -3278,6 +3366,13 @@ function updateDronePitches(glide = true) {
   droneOsc2.frequency.cancelScheduledValues(now);
   droneOsc1.frequency.setTargetAtTime(target1, now, glide ? 0.75 : 0.20);
   droneOsc2.frequency.setTargetAtTime(target2, now, glide ? 0.75 : 0.20);
+
+  if (droneBuzzOsc1 && droneBuzzOsc2) {
+    droneBuzzOsc1.frequency.cancelScheduledValues(now);
+    droneBuzzOsc2.frequency.cancelScheduledValues(now);
+    droneBuzzOsc1.frequency.setTargetAtTime(target1, now, glide ? 0.75 : 0.20);
+    droneBuzzOsc2.frequency.setTargetAtTime(target1, now, glide ? 0.75 : 0.20);
+  }
 }
 
 function playTanpuraPluck(stringIdx) {
@@ -5573,16 +5668,16 @@ function updateAudioParams() {
   }
   if (document.getElementById("selDroneTimbre")) {
     droneTimbre = document.getElementById("selDroneTimbre").value;
-    if (droneOsc1 && droneOsc2) {
-      if (droneTimbre === "DIDGERIDOO") {
-        droneOsc1.type = "sawtooth"; droneOsc2.type = "square";
-      } else {
-        droneOsc1.type = "triangle"; droneOsc2.type = "sawtooth";
-      }
-    }
+    const isDidgeridoo = (droneTimbre === "DIDGERIDOO");
+    // droneOsc1/2 stay triangle/sawtooth always -- the buzz layer uses its
+    // own dedicated oscillators, so the classic sub path never changes here.
     if (droneFormantGain) {
-      const formantTarget = (droneTimbre === "DIDGERIDOO") ? droneVol * 0.12 : 0;
+      const formantTarget = isDidgeridoo ? 0.85 : 0;
       droneFormantGain.gain.setTargetAtTime(formantTarget, audioCtx.currentTime, 0.3);
+    }
+    if (droneBreathLFOGain) {
+      const breathDepth = isDidgeridoo ? 0.85 * 0.25 : 0;
+      droneBreathLFOGain.gain.setTargetAtTime(breathDepth, audioCtx.currentTime, 0.3);
     }
   }
 
