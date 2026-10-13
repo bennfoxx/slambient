@@ -890,23 +890,36 @@
     box-shadow: 0 0 20px rgba(0, 229, 255, 0.9), inset 0 0 10px #ffffff !important;
   }
 
-  .white-key.in-scale::after {
+  /* Reserve the bottom LED indicator bar on ALL keys so note labels and
+     shortcuts align on one consistent horizontal baseline across every key. */
+  .white-key::after {
     content: "";
     width: 12px;
     height: 3px;
     border-radius: 2px;
-    background: #fed330;
-    box-shadow: 0 0 5px rgba(254, 211, 48, 0.75);
-    margin-top: 3px;
+    background: rgba(255, 255, 255, 0.06);
+    margin-top: 4px;
+    flex-shrink: 0;
   }
-  .black-key.in-scale::after {
+  .black-key::after {
     content: "";
     width: 10px;
     height: 3px;
     border-radius: 2px;
+    background: rgba(255, 255, 255, 0.07);
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+  .white-key.in-scale::after,
+  .black-key.in-scale::after {
     background: #fed330;
     box-shadow: 0 0 5px rgba(254, 211, 48, 0.75);
-    margin-top: 3px;
+  }
+  .white-key.active-chord::after, .black-key.active-chord::after,
+  .white-key.active-arp::after, .black-key.active-arp::after,
+  .white-key.active-live::after, .black-key.active-live::after {
+    background: rgba(7, 8, 12, 0.65);
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.45);
   }
 
   .key-label {
@@ -917,6 +930,10 @@
     letter-spacing: 0.2px;
     pointer-events: none;
     line-height: 1.1;
+    height: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .black-key-label {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -926,14 +943,29 @@
     letter-spacing: 0.2px;
     pointer-events: none;
     line-height: 1.1;
+    height: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .key-shortcut {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 7.5px;
     color: #4e5366;
     letter-spacing: 0.2px;
-    margin-top: 1px;
+    margin-top: 2px;
+    line-height: 1;
+    height: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     pointer-events: none;
+  }
+  .black-key .key-shortcut {
+    color: #454b5f;
+  }
+  .key-shortcut.empty-shortcut {
+    visibility: hidden;
   }
   .active-chord .key-label, .active-chord .black-key-label,
   .active-arp .key-label, .active-arp .black-key-label {
@@ -943,6 +975,12 @@
   .active-live .key-label, .active-live .black-key-label {
     color: #000000 !important;
     font-weight: 800;
+  }
+  .active-chord .key-shortcut,
+  .active-arp .key-shortcut,
+  .active-live .key-shortcut {
+    color: rgba(7, 8, 12, 0.72) !important;
+    font-weight: 700;
   }
 
   .orbital-deck-header {
@@ -5613,11 +5651,15 @@ function buildKeyboard() {
       label.textContent = `${NOTE_NAMES[midi % 12]}${Math.floor(midi / 12) - 1}`;
       keyEl.appendChild(label);
 
+      const sc = document.createElement("span");
       if (whiteIdx < whiteShortcuts.length) {
-        const sc = document.createElement("span");
-        sc.className = "key-shortcut"; sc.textContent = `[${whiteShortcuts[whiteIdx]}]`;
-        keyEl.appendChild(sc);
+        sc.className = "key-shortcut";
+        sc.textContent = `[${whiteShortcuts[whiteIdx]}]`;
+      } else {
+        sc.className = "key-shortcut empty-shortcut";
+        sc.textContent = "[·]";
       }
+      keyEl.appendChild(sc);
       whiteIdx++;
       bindKeyEvents(keyEl, midi);
       whiteKeysLayer.appendChild(keyEl);
@@ -5630,10 +5672,15 @@ function buildKeyboard() {
   if (scale.includes(topRel)) topKey.classList.add("in-scale");
   const topLabel = document.createElement("span"); topLabel.className = "key-label";
   topLabel.textContent = `C${Math.floor(topMidi / 12) - 1}`; topKey.appendChild(topLabel);
+  const topSc = document.createElement("span");
   if (whiteIdx < whiteShortcuts.length) {
-    const sc = document.createElement("span"); sc.className = "key-shortcut";
-    sc.textContent = `[${whiteShortcuts[whiteIdx]}]`; topKey.appendChild(sc);
+    topSc.className = "key-shortcut";
+    topSc.textContent = `[${whiteShortcuts[whiteIdx]}]`;
+  } else {
+    topSc.className = "key-shortcut empty-shortcut";
+    topSc.textContent = "[·]";
   }
+  topKey.appendChild(topSc);
   bindKeyEvents(topKey, topMidi);
   whiteKeysLayer.appendChild(topKey);
 
@@ -5652,10 +5699,15 @@ function buildKeyboard() {
       bLabel.textContent = `${NOTE_NAMES[midi % 12]}`; bKeyEl.appendChild(bLabel);
 
       const shortcutKey = oct === 0 ? bk.key : (blackShortcutsOct2[bIdx] || "");
+      const bSc = document.createElement("span");
       if (shortcutKey) {
-        const sc = document.createElement("span"); sc.className = "key-shortcut";
-        sc.style.color = "#454b5f"; sc.textContent = `[${shortcutKey}]`; bKeyEl.appendChild(sc);
+        bSc.className = "key-shortcut";
+        bSc.textContent = `[${shortcutKey}]`;
+      } else {
+        bSc.className = "key-shortcut empty-shortcut";
+        bSc.textContent = "[·]";
       }
+      bKeyEl.appendChild(bSc);
 
       bindKeyEvents(bKeyEl, midi);
       blackKeysLayer.appendChild(bKeyEl);
