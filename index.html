@@ -753,6 +753,37 @@
     justify-content: space-between;
     align-items: center;
   }
+  /* Title keeps its own width; the hint truncates instead of wrapping onto
+     a second/third line if the panel ever gets narrower than both can fit
+     on one row (the AUTO/OCT controls never shrink, so they're not the
+     variable here). */
+  .keyboard-panel-header {
+    margin: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .keyboard-panel-header > span:first-child {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .keyboard-hint {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .keyboard-meta-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
   .oct-controls {
     display: flex;
     align-items: center;
@@ -2068,11 +2099,11 @@
 
     <div class="keyboard-panel">
       <div class="keyboard-meta">
-        <div class="panel-header" style="margin: 0; display: flex; align-items: baseline; gap: 8px;">
+        <div class="panel-header keyboard-panel-header">
           <span>Playable MIDI Keyboard</span>
-          <span style="font-size: 10px; color: var(--text-tertiary); font-weight: 500;">[Keys: A-K, Range: <span id="valOctave">C3 - C5</span>]</span>
+          <span class="keyboard-hint">Keys A-K · <span id="valOctave">C3 - C5</span></span>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="keyboard-meta-controls">
           <span class="takeover-badge" id="hudTakeover" title="Takeover Status: AUTO progression or LIVE keyboard takeover">AUTO</span>
           <div class="oct-controls">
             <button class="btn-oct" onclick="shiftOctave(-1)">OCT -</button>
@@ -2619,7 +2650,10 @@ function getVoicingIntervals(voicing, scaleArr, rootStep) {
   return voicing.degrees.map(d => degreeToSemitone(rootStep + d, scaleArr) - rootSemi);
 }
 
-const DEGREE_LABELS = { 0: "R", 1: "2nd", 2: "3rd", 3: "4th", 4: "5th", 5: "6th", 6: "7th", 7: "8ve", 8: "9th", 9: "10th", 10: "11th", 11: "12th", 12: "13th" };
+// Bare scale-degree numbers (no "nd"/"rd"/"th" ordinal suffixes) -- with a
+// full extended chord, those suffixes made the INTERVALS telemetry line
+// long enough to force the Chord Analysis panel to reflow.
+const DEGREE_LABELS = { 0: "R", 1: "2", 2: "3", 3: "4", 4: "5", 5: "6", 6: "7", 7: "8", 8: "9", 9: "10", 10: "11", 11: "12", 12: "13" };
 function degreeLabel(d) { return DEGREE_LABELS[d] || `+${d}`; }
 
 const CHORD_STEP_POOL = [0, 2, 3, 4, 5];
@@ -2820,15 +2854,16 @@ function setKeyboardRoute(mode) {
 function getIntervalLabel(semis) {
   const norm = semis % 12;
   const octs = Math.floor(semis / 12);
+  // Bare numbers, no ordinal suffixes -- see DEGREE_LABELS above for why.
   const map = {
-    0: "R", 1: "b9", 2: "2nd", 3: "m3", 4: "3rd", 5: "4th", 6: "#11",
-    7: "5th", 8: "b13", 9: "6th", 10: "m7", 11: "M7"
+    0: "R", 1: "b9", 2: "2", 3: "m3", 4: "3", 5: "4", 6: "#11",
+    7: "5", 8: "b13", 9: "6", 10: "m7", 11: "M7"
   };
   if (octs > 0) {
-    if (norm === 2) return "9th";
-    if (norm === 4) return "10th";
-    if (norm === 5) return "11th";
-    if (norm === 9) return "13th";
+    if (norm === 2) return "9";
+    if (norm === 4) return "10";
+    if (norm === 5) return "11";
+    if (norm === 9) return "13";
   }
   return map[norm] || `+${semis}`;
 }
