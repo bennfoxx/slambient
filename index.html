@@ -5167,7 +5167,13 @@ let lastScopeFrameTs = null;
 
 let cachedScopeW = 0, cachedScopeH = 0;
 function updateCanvasDimensions() {
-  const dpr = window.devicePixelRatio || 1;
+  // Fullscreen's CSS-pixel dimensions are already much larger than the
+  // windowed panel's, so the same devicePixelRatio there produces a far
+  // bigger pixel buffer for every canvas op (shadowBlur especially) to
+  // fill -- cap it in fullscreen only, where it was the difference between
+  // a ~1.3M-pixel and a ~13M-pixel canvas on a 1920x1080 HiDPI display.
+  const rawDpr = window.devicePixelRatio || 1;
+  const dpr = scopeFullscreen ? Math.min(1.5, rawDpr) : rawDpr;
   const parent = scopeCanvas.parentElement;
   const rect = parent.getBoundingClientRect();
   const w = Math.round(parent.clientWidth || rect.width || 460);
@@ -5425,6 +5431,10 @@ function drawFlightTerrainGrid(w, h) {
   if (!flightGridEnabled) return;
 
   scopeCtx.save();
+  // This function never sets its own shadowBlur, so without an explicit
+  // reset it inherits whatever the ring glow passes left behind -- cheap
+  // insurance against ~33 stroke() calls picking up an expensive blur.
+  scopeCtx.shadowBlur = 0;
 
   const horizonY = h * 0.58;
   const bottomY = h;
@@ -5539,8 +5549,22 @@ function drawSymmetricalRing(cfg, cx, cy) {
   if (!dyn) return;
 
   const bufLen = analyser ? analyser.frequencyBinCount : 256;
-  const rawData = new Uint8Array(bufLen).fill(128); const freqData = new Uint8Array(bufLen);
-  if (analyser) { analyser.getByteTimeDomainData(rawData); analyser.getByteFrequencyData(freqData); }
+  // Reuse one scratch buffer pair per ring across frames instead of
+  // allocating two new Uint8Arrays every frame -- 5 rings at 60+fps meant
+  // hundreds of allocations/sec, adding GC pressure on top of the
+  // shadowBlur cost that was the main source of fullscreen jank.
+  if (!dyn.rawData || dyn.rawData.length !== bufLen) {
+    dyn.rawData = new Uint8Array(bufLen);
+    dyn.freqData = new Uint8Array(bufLen);
+  }
+  const rawData = dyn.rawData, freqData = dyn.freqData;
+  if (analyser) {
+    analyser.getByteTimeDomainData(rawData);
+    analyser.getByteFrequencyData(freqData);
+  } else {
+    rawData.fill(128);
+    freqData.fill(0);
+  }
 
   let sumSquare = 0; let freqEnergy = 0;
   for (let i = 0; i < bufLen; i++) {
@@ -5808,7 +5832,12 @@ function drawScope(ts) {
   scopeRotationAngle += dtSec * beatsPerSec * (Math.PI * 2 / revolutionBeats) * (isPlaying ? 1 : 0.15);
 
   if (oscilloscopeRingsEnabled) {
-    const fit = scopeFullscreen ? (Math.min(w, h) / 330) : Math.min(1, Math.min(w, h) / 360);
+    // Capped at 2.3x -- uncapped, a large/HiDPI fullscreen viewport scaled
+    // the rings (and their shadowBlur glow, the single most expensive
+    // canvas op here) up 4x+, which is what made fullscreen choppy: blur
+    // cost grows with both the blur radius and the area it's spread over,
+    // and both were scaling with fit here.
+    const fit = scopeFullscreen ? Math.min(2.3, Math.min(w, h) / 330) : Math.min(1, Math.min(w, h) / 360);
     scopeCtx.save();
     scopeCtx.translate(cx, cy); scopeCtx.scale(fit, fit); scopeCtx.rotate(scopeRotationAngle); scopeCtx.translate(-cx, -cy);
     drawReferenceTracks(cx, cy);
