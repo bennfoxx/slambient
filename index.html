@@ -3385,7 +3385,7 @@
               </svg>
             </button>
 
-            <button class="btn-layer-toggle layer-fractal" id="btnToggleFractal" onclick="toggleFractalMode()" title="Fractal Mode: audio-reactive Julia set (replaces the waterfall, grid and shapes while on)">
+            <button class="btn-layer-toggle layer-fractal" id="btnToggleFractal" onclick="toggleFractalMode()" title="Fractal Mode: endless Mandelbrot zoom, tempo-driven (replaces the waterfall, grid and shapes while on)">
               <svg width="18" height="15" viewBox="0 0 18 15" fill="none">
                 <rect x="0.5" y="0.5" width="17" height="14" rx="2" stroke="rgba(140,110,255,0.5)" stroke-width="1"/>
                 <path d="M9 7.5C9 6.4 10.3 5.9 11.1 6.7C12.2 7.8 11.4 9.9 9.6 10.1C7.3 10.4 5.9 8 6.6 5.9C7.5 3.3 11.1 2.7 13.2 4.6C15.6 6.8 14.7 11 11.6 12.1" stroke="#8c6eff" stroke-width="1.1" stroke-linecap="round" fill="none"/>
@@ -8171,34 +8171,55 @@ function toggleRoadsideObjects() {
 
 /* ==========================================================================
    FRACTAL MODE (Phase 6)
-   An audio-reactive Julia set that takes over the scope's background in place
+   An endless Mandelbrot zoom that takes over the scope's background in place
    of the waterfall / flight grid / floating shapes (the oscilloscope rings
-   still draw on top when enabled). Rendered at low resolution into an
-   offscreen buffer and scaled up with smoothing, so it costs a few ms a frame
-   even fullscreen.
-     - c travels just inside the Mandelbrot main cardioid's edge, which keeps
-       the Julia set connected (filigree spirals, never scattered dust); θ
-       advances with BPM so the shape morphs in time with the music
-       (near-frozen when stopped)
-     - Drone energy breathes c toward/away from that edge (calmer <-> more
-       intricate)
-     - Drum hits punch a short zoom pulse
-     - Chord energy rotates the palette; arp energy brightens the fine edges
+   still draw on top when enabled).
+     - The camera dives continuously toward a point on the set's boundary,
+       one decade of magnification every FRACTAL_BEATS_PER_DECADE beats, so
+       the dive speed follows the tempo (a slow drift when stopped)
+     - Plain 64-bit floats run out of precision around 1e-13, so each dive
+       goes FRACTAL_DIVE_DECADES deep, then crossfades into a fresh dive from
+       the top on the next target in FRACTAL_ZOOM_TARGETS. Every target is a
+       boundary point checked to keep detail all the way down (no dead black
+       interior or flat exterior at depth)
+     - Iterations grow with depth (deeper = more needed to resolve detail),
+       and the buffer resolution adapts to keep the frame cost bounded
+     - Audio: drone energy and drum hits push the dive faster (a surge, not a
+       pulse back and forth), chord energy rotates the palette, arp energy
+       brightens the fine edges. Palette also cycles with depth, the classic
+       zoom-video look
    ========================================================================== */
 let fractalModeEnabled = false;
-const FRACTAL_MAX_ITER = 48;
+const FRACTAL_BEATS_PER_DECADE = 24;
+const FRACTAL_DIVE_DECADES = 7.5;
+const FRACTAL_START_SPAN = 3.2;
+const FRACTAL_CROSSFADE_SEC = 2.2;
+const FRACTAL_ZOOM_TARGETS = [
+  [-0.7746806106269039, -0.1374168856037867],
+  [0.3602404434376143, -0.6413130610648032],
+  [-0.10109636384562, 0.95628651080914],
+  [-1.7497591451303665, 0.0]
+];
+const FRACTAL_MIN_BUFFER_W = 140;
 const FRACTAL_MAX_BUFFER_W = 360;
+const FRACTAL_FRAME_BUDGET_MS = 9;
 const fractalBuf = document.createElement("canvas");
 const fractalBufCtx = fractalBuf.getContext("2d");
+const fractalFadeBuf = document.createElement("canvas");
+const fractalFadeCtx = fractalFadeBuf.getContext("2d");
 let fractalImage = null;
 let fractalPixels = null;
-let fractalTheta = 0.6;
+let fractalBufferW = 280;
+let fractalDepth = 0;          // decades of magnification into the current dive
+let fractalTargetIdx = 0;
+let fractalFade = 0;           // 1 -> 0 while the previous dive's last frame fades out
+let fractalRot = 0;
+let fractalFloorIter = 0;      // lowest escape count seen last frame (see lum below)
 let fractalLastTs = null;
-const fractalEnergy = { drone: 0, drum: 0, chord: 0, arp: 0, zoomPulse: 0 };
+const fractalEnergy = { drone: 0, drum: 0, chord: 0, arp: 0, surge: 0 };
 const fractalAnalyserBuf = new Uint8Array(32);
 
-// 256-step palette through the instrument colors, stored as packed RGBA
-// (little-endian ABGR) for direct writes into the ImageData buffer.
+// 256-step cyclic palette through the instrument colors, as [r, g, b].
 const FRACTAL_PALETTE = (() => {
   const stops = [
     [12, 13, 17], [125, 95, 255], [0, 229, 255], [46, 213, 115],
@@ -8243,13 +8264,13 @@ function updateFractalEnergy(dtSec) {
   };
   // A drum level jump well above its running average reads as a hit.
   if (targets.drum > fractalEnergy.drum + 0.18) {
-    fractalEnergy.zoomPulse = Math.min(1, fractalEnergy.zoomPulse + 0.55);
+    fractalEnergy.surge = Math.min(1, fractalEnergy.surge + 0.5);
   }
   smooth("drone", 2.5);
   smooth("drum", 9);
   smooth("chord", 3);
   smooth("arp", 6);
-  fractalEnergy.zoomPulse *= Math.exp(-dtSec * 5);
+  fractalEnergy.surge *= Math.exp(-dtSec * 3);
 }
 
 function drawFractalVisualizer(w, h, ts) {
@@ -8257,13 +8278,30 @@ function drawFractalVisualizer(w, h, ts) {
   const dtSec = Math.max(0, Math.min(0.1, (ts - fractalLastTs) / 1000));
   fractalLastTs = ts;
   updateFractalEnergy(dtSec);
+  const e = fractalEnergy;
 
-  // One full trip around the c-orbit every 256 beats while playing.
+  // Dive speed: tempo-locked, pushed forward by drone level and drum surges.
   const beatsPerSec = (typeof bpm !== "undefined" ? bpm : 72) / 60;
-  fractalTheta += dtSec * beatsPerSec * (Math.PI * 2 / 256) * (isPlaying ? 1 : 0.08);
+  const drive = isPlaying ? (0.75 + e.drone * 0.5 + e.surge * 1.4) : 0.15;
+  fractalDepth += dtSec * beatsPerSec / FRACTAL_BEATS_PER_DECADE * drive;
+  fractalRot += dtSec * beatsPerSec * 0.004 * (isPlaying ? 1 : 0.2);
 
-  const bw = Math.max(120, Math.min(FRACTAL_MAX_BUFFER_W, Math.round(w / 2)));
-  const bh = Math.max(50, Math.round(bw * h / w));
+  // Buffer size follows the canvas, capped by the adaptive frame budget.
+  const bw = Math.max(FRACTAL_MIN_BUFFER_W, Math.min(fractalBufferW, Math.round(w / 2)));
+  const bh = Math.max(60, Math.round(bw * h / w));
+
+  // End of the dive: keep its last frame to fade out over a fresh dive.
+  if (fractalDepth >= FRACTAL_DIVE_DECADES) {
+    if (fractalBuf.width > 0) {
+      fractalFadeBuf.width = fractalBuf.width;
+      fractalFadeBuf.height = fractalBuf.height;
+      fractalFadeCtx.drawImage(fractalBuf, 0, 0);
+      fractalFade = 1;
+    }
+    fractalDepth = 0;
+    fractalTargetIdx = (fractalTargetIdx + 1) % FRACTAL_ZOOM_TARGETS.length;
+  }
+
   if (fractalBuf.width !== bw || fractalBuf.height !== bh) {
     fractalBuf.width = bw;
     fractalBuf.height = bh;
@@ -8271,45 +8309,50 @@ function drawFractalVisualizer(w, h, ts) {
     fractalPixels = new Uint32Array(fractalImage.data.buffer);
   }
 
-  const e = fractalEnergy;
-  // Cardioid boundary point c = r·e^(iθ)/2 − r²·e^(2iθ)/4, pulled slightly inside.
-  const r = 0.985 - (1 - e.drone) * 0.03;
-  const cRe = r * Math.cos(fractalTheta) / 2 - r * r * Math.cos(2 * fractalTheta) / 4;
-  const cIm = r * Math.sin(fractalTheta) / 2 - r * r * Math.sin(2 * fractalTheta) / 4;
-  const zoom = 1.0 + e.zoomPulse * 0.12 + Math.sin(fractalTheta * 3) * 0.04;
-  const spanY = 2.5 / zoom;
+  const [tx, ty] = FRACTAL_ZOOM_TARGETS[fractalTargetIdx];
+  const spanY = FRACTAL_START_SPAN * Math.pow(10, -fractalDepth);
   const spanX = spanY * (bw / bh);
-  const rot = fractalTheta * 0.5;
-  const cosR = Math.cos(rot), sinR = Math.sin(rot);
-  const hueShift = (fractalTheta * 40 + e.chord * 90) % 256;
-  const gain = (isPlaying ? 0.55 : 0.32) + e.arp * 0.45 + e.drum * 0.15;
+  const cosR = Math.cos(fractalRot), sinR = Math.sin(fractalRot);
+  const maxIter = Math.round(90 + fractalDepth * 48);
+  const hueShift = fractalDepth * 46 + e.chord * 90;
+  const gain = (isPlaying ? 0.62 : 0.4) + e.arp * 0.38;
   const LOG2 = Math.log(2);
+  const t0 = performance.now();
+  const floorIter = fractalFloorIter;
+  let frameMinIter = Infinity;
 
   for (let py = 0; py < bh; py++) {
     const v = (py / bh - 0.5) * spanY;
     for (let px = 0; px < bw; px++) {
       const u = (px / bw - 0.5) * spanX;
-      let zr = u * cosR - v * sinR;
-      let zi = u * sinR + v * cosR;
-      let i = 0, zr2 = zr * zr, zi2 = zi * zi;
-      while (zr2 + zi2 < 16 && i < FRACTAL_MAX_ITER) {
-        zi = 2 * zr * zi + cIm;
-        zr = zr2 - zi2 + cRe;
-        zr2 = zr * zr; zi2 = zi * zi;
-        i++;
+      const cr = tx + u * cosR - v * sinR;
+      const ci = ty + u * sinR + v * cosR;
+      // Skip the main cardioid and period-2 bulb outright (always interior,
+      // and the most expensive pixels at shallow depth).
+      const q = (cr - 0.25) * (cr - 0.25) + ci * ci;
+      let i = 0, zr = 0, zi = 0, zr2 = 0, zi2 = 0;
+      if (q * (q + (cr - 0.25)) < 0.25 * ci * ci || (cr + 1) * (cr + 1) + ci * ci < 0.0625) {
+        i = maxIter;
+      } else {
+        while (zr2 + zi2 < 256 && i < maxIter) {
+          zi = 2 * zr * zi + ci;
+          zr = zr2 - zi2 + cr;
+          zr2 = zr * zr; zi2 = zi * zi;
+          i++;
+        }
       }
       let r, g, b;
-      if (i >= FRACTAL_MAX_ITER) {
-        // Interior: near-black, shaded by where the orbit settled so the
-        // body has a faint violet/drone-cyan texture instead of a flat fill.
-        const m = Math.min(1, Math.sqrt(zr2 + zi2) * 0.6);
-        r = 8 + m * 26; g = 10 + m * 14 + e.drone * 20; b = 18 + m * 44 + e.drone * 24;
+      if (i >= maxIter) {
+        r = 8; g = 9 + e.drone * 16; b = 15 + e.drone * 22;
       } else {
         const smoothIter = i + 1 - Math.log(Math.log(zr2 + zi2) / 2 / LOG2) / LOG2;
-        const t = smoothIter / FRACTAL_MAX_ITER;
-        const col = FRACTAL_PALETTE[Math.floor(smoothIter * 9 + hueShift) & 255];
-        // Edges near the set get brighter; far-field fades into the panel bg.
-        const lum = Math.min(1, Math.pow(t, 1.15) * 3.2) * gain;
+        if (smoothIter < frameMinIter) frameMinIter = smoothIter;
+        const col = FRACTAL_PALETTE[Math.floor(smoothIter * 7 + hueShift) & 255];
+        // Slow-escaping pixels hug the boundary and glow; the fastest ones
+        // in view (far field) sink toward the panel background. Measured
+        // against last frame's floor, since deep in a dive every pixel
+        // takes many iterations and an absolute scale would wash it all out.
+        const lum = Math.min(1, Math.pow(Math.max(0, smoothIter - floorIter) / 40, 0.7)) * gain;
         r = 12 + (col[0] - 12) * lum;
         g = 13 + (col[1] - 13) * lum;
         b = 17 + (col[2] - 17) * lum;
@@ -8318,11 +8361,26 @@ function drawFractalVisualizer(w, h, ts) {
     }
   }
   fractalBufCtx.putImageData(fractalImage, 0, 0);
+  // Ease toward the new floor so a crossfade or surge doesn't flicker.
+  if (frameMinIter !== Infinity) fractalFloorIter += (frameMinIter - fractalFloorIter) * (fractalDepth < 0.05 ? 1 : 0.2);
+
+  // Adapt resolution to the frame budget (deeper = more iterations).
+  const cost = performance.now() - t0;
+  if (cost > FRACTAL_FRAME_BUDGET_MS) fractalBufferW = Math.max(FRACTAL_MIN_BUFFER_W, Math.round(fractalBufferW * 0.9));
+  else if (cost < FRACTAL_FRAME_BUDGET_MS * 0.5) fractalBufferW = Math.min(FRACTAL_MAX_BUFFER_W, fractalBufferW + 4);
 
   scopeCtx.save();
   scopeCtx.imageSmoothingEnabled = true;
   scopeCtx.imageSmoothingQuality = "high";
   scopeCtx.drawImage(fractalBuf, 0, 0, w, h);
+  if (fractalFade > 0) {
+    // The old dive's last frame keeps zooming as it fades, so the handoff
+    // reads as one continuous plunge rather than a cut.
+    const grow = 1 + (1 - fractalFade) * 1.5;
+    scopeCtx.globalAlpha = fractalFade;
+    scopeCtx.drawImage(fractalFadeBuf, w / 2 - (w * grow) / 2, h / 2 - (h * grow) / 2, w * grow, h * grow);
+    fractalFade = Math.max(0, fractalFade - dtSec / FRACTAL_CROSSFADE_SEC);
+  }
   scopeCtx.restore();
 }
 

@@ -380,6 +380,29 @@ All items outlined in Phase 3 of the Technical Specification and Implementation 
 - Verified in headless Chromium: title → play → kills score → life loss → game over → restart →
   wave clear → wave 2 → Esc exits; music kept playing throughout; no new console errors.
 
+## Update — 2026-10-14 (Claude: Fractal mode is now an endless Mandelbrot zoom)
+
+Ben asked for the classic infinite-zoom effect instead of the beat-pulsing Julia set, so the
+Julia renderer described in the "Fractal visualizer mode" entry above has been **replaced** (same
+button, same `toggleFractalMode()` / `updateFractalEnergy()` / `fractalEnergy` names, which the
+arcade still shares; `fractalTheta` and `zoomPulse` are gone).
+
+- **The dive**: the camera zooms continuously toward a boundary point of the Mandelbrot set, one
+  decade of magnification every `FRACTAL_BEATS_PER_DECADE` (24) beats, so speed follows tempo
+  (~15% speed when stopped). Drone level and drum hits (`fractalEnergy.surge`) push it faster;
+  nothing pulses back out. Slow rotation around the target.
+- **Why it loops**: 64-bit floats lose precision around 1e-13, so each dive goes
+  `FRACTAL_DIVE_DECADES` (7.5) deep, then the last frame keeps growing while it crossfades
+  (`FRACTAL_CROSSFADE_SEC`) over a fresh dive on the next of 4 `FRACTAL_ZOOM_TARGETS`. Each target
+  was checked numerically to keep boundary detail at every depth (the famous seahorse-valley
+  point was rejected: it lands inside a minibrot and goes solid black past ~1e-7). If you add
+  targets, check them the same way.
+- **Rendering**: iterations grow with depth (`90 + 48·depth`); main cardioid / period-2 bulb are
+  skipped analytically. Brightness is measured against the previous frame's lowest escape count
+  (`fractalFloorIter`), otherwise deep frames wash out because every pixel takes many iterations.
+  Buffer width adapts between 140 and 360px to hold ~`FRACTAL_FRAME_BUDGET_MS` (9ms) per frame.
+  Palette cycles with depth; chords rotate it, arp brightens edges.
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE
@@ -422,7 +445,7 @@ All items outlined in Phase 3 of the Technical Specification and Implementation 
 
 ### Phase 6: Visualizers, Easter Eggs & Interaction Polishing — ✅ DONE
 - [x] Audio-gated 3D floating shapes fix (prevent idle blue spheres when stopped + increase sphere density 60%–95% scaling)
-- [x] Fractal visualizer mode (`FRACTAL` Julia/Mandelbrot option + updated visualizer control icons)
+- [x] Fractal visualizer mode (`FRACTAL` endless Mandelbrot zoom + updated visualizer control icons)
 - [x] Space Invaders audio-reactive arcade minigame inside the primary visualizer canvas
 - [x] Side-view orb click debouncing (250ms debounce to close active tab on click without double-click flicker)
 
