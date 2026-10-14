@@ -403,6 +403,25 @@ arcade still shares; `fractalTheta` and `zoomPulse` are gone).
   Buffer width adapts between 140 and 360px to hold ~`FRACTAL_FRAME_BUDGET_MS` (9ms) per frame.
   Palette cycles with depth; chords rotate it, arp brightens edges.
 
+## Update — 2026-10-14 (Claude: looser, more colorful floating shapes; Invaders button moved)
+
+- **Toolbar order**: the Slambient Invaders button now sits after the oscilloscope-rings button
+  (just before fullscreen), per Ben.
+- **Floating shapes are no longer a strict readout of the music** (Ben's call: "allow for some
+  random elements and different colors for each shape"):
+  - Colors are no longer fixed per instrument. Every shape draws a random color from
+    `ROADSIDE_COLORS` (weighted toward cyan / royal & bright blue / green / mint / hot pink / rose,
+    with violet, amber, crimson rarer), never the same color twice in a row (`pickRoadsideColor()`).
+  - A layer's note still *can* spawn a shape, but only ~35% of the time is it that layer's own
+    shape (drone→sphere, drums→cube, chords→pyramid, arp→diamond); otherwise it's random.
+  - New free-running `"ambient"` spawner in `drawRoadsideObjects()` adds shapes on its own while
+    playing (busier when fewer than 3 are on screen). It doesn't count toward the
+    activity-density scale. Still nothing spawns while stopped.
+  - **Why blue was missing before**: the only drone spawn call lives inside the Tanpura voice,
+    and Tanpura is off by default, so cyan spheres almost never appeared.
+- Verified in headless Chromium over 25s of playback: all 4 shapes and all 10 colors appeared,
+  0 spawns while stopped, no console errors.
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE

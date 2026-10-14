@@ -3395,14 +3395,6 @@
               </svg>
             </button>
 
-            <button class="btn-layer-toggle layer-arcade" id="btnToggleArcade" onclick="toggleArcadeGame()" title="Arcade: Space Invaders (← → move, Space fire, Esc quit)">
-              <svg width="18" height="15" viewBox="0 0 18 15" fill="none">
-                <rect x="0.5" y="0.5" width="17" height="14" rx="2" stroke="rgba(46,213,115,0.5)" stroke-width="1"/>
-                <path d="M6 3h1v1h-1zM11 3h1v1h-1zM7 4h4v1h-4zM6 5h6v1h-6zM5 6h2v1h-2zM8 6h2v1h-2zM11 6h2v1h-2zM4 7h10v1h-10zM4 8h1v1h-1zM6 8h6v1h-6zM13 8h1v1h-1zM4 9h1v1h-1zM6 9h1v1h-1zM11 9h1v1h-1zM13 9h1v1h-1zM7 10h1v1h-1zM10 10h1v1h-1z" fill="#2ed573"/>
-                <rect x="8.5" y="12" width="1" height="1.6" fill="#fed330"/>
-              </svg>
-            </button>
-
             <button class="btn-layer-toggle layer-rings active" id="btnToggleRings" onclick="toggleOscilloscopeRings()" title="Toggle Concentric Oscilloscope Rings">
               <svg width="18" height="15" viewBox="0 0 18 15" fill="none">
                 <rect x="0.5" y="0.5" width="17" height="14" rx="2" stroke="rgba(0,229,255,0.5)" stroke-width="1"/>
@@ -3410,6 +3402,14 @@
                 <circle cx="9" cy="7.5" r="3.8" stroke="#fed330" stroke-width="1.0" fill="none"/>
                 <circle cx="9" cy="7.5" r="2.1" stroke="#ff3838" stroke-width="1.0" fill="none"/>
                 <circle cx="9" cy="7.5" r="0.8" fill="#00e5ff"/>
+              </svg>
+            </button>
+
+            <button class="btn-layer-toggle layer-arcade" id="btnToggleArcade" onclick="toggleArcadeGame()" title="Arcade: Space Invaders (← → move, Space fire, Esc quit)">
+              <svg width="18" height="15" viewBox="0 0 18 15" fill="none">
+                <rect x="0.5" y="0.5" width="17" height="14" rx="2" stroke="rgba(46,213,115,0.5)" stroke-width="1"/>
+                <path d="M6 3h1v1h-1zM11 3h1v1h-1zM7 4h4v1h-4zM6 5h6v1h-6zM5 6h2v1h-2zM8 6h2v1h-2zM11 6h2v1h-2zM4 7h10v1h-10zM4 8h1v1h-1zM6 8h6v1h-6zM13 8h1v1h-1zM4 9h1v1h-1zM6 9h1v1h-1zM11 9h1v1h-1zM13 9h1v1h-1zM7 10h1v1h-1zM10 10h1v1h-1z" fill="#2ed573"/>
+                <rect x="8.5" y="12" width="1" height="1.6" fill="#fed330"/>
               </svg>
             </button>
 
@@ -8911,12 +8911,17 @@ function drawFlightTerrainGrid(w, h) {
    FLOATING 3D VECTOR OBJECTS (SPHERES, CUBES, PYRAMIDS, DIAMONDS)
    Luminous 3D wireframe geometric elements rendered in vintage CRT vector
    lines matching the MU-TH-UR 6000 / Eno head aesthetic.
-   Objects float above the flight-grid landscape and are triggered directly
-   by the 4 musical layers:
-     - Sub & Drone -> 3D Rotating Sphere (Electric Cyan #00e5ff)
-     - Drums       -> 3D Tumbling Cube (Phosphor Vector Crimson #ff3838)
-     - Chords      -> 3D Rotating Pyramid (Exhibition Amber #fed330)
-     - Shimmer Arp -> 3D Spinning Diamond / Octahedron (Cobalt/Violet #7d5fff)
+   Objects float above the flight-grid landscape. The music nudges them
+   (each layer's notes can spawn one, leaning toward that layer's shape:
+   drone -> sphere, drums -> cube, chords -> pyramid, arp -> diamond), but
+   they're deliberately loose rather than a strict readout:
+     - About two thirds of spawns pick a random shape instead of the layer's own
+     - Every shape gets a random color from ROADSIDE_COLORS (blues, greens and
+       pinks weighted up), never the same color twice in a row. Colors used
+       to be fixed per layer, and since the drone only spawns via the Tanpura
+       (off by default), cyan spheres almost never appeared
+     - A free-running random spawner adds shapes on its own while playing,
+       independent of any note
    ========================================================================== */
 // Shapes are strictly audio-gated: nothing spawns while stopped (the old idle
 // fallback left a lone cyan sphere drifting over a silent scope), and any
@@ -8928,7 +8933,7 @@ const ROADSIDE_BASE_MAX_OBJECTS = 6;
 const ROADSIDE_BASE_DEBOUNCE_MS = 1350;
 const ROADSIDE_ACTIVITY_WINDOW_MS = 4000;
 let roadsideObjects = [];
-let lastMusical3DSpawnTimes = { drone: 0, drum: 0, chord: 0, arp: 0 };
+let lastMusical3DSpawnTimes = { drone: 0, drum: 0, chord: 0, arp: 0, ambient: 0 };
 let lastMusical3DTriggerTimes = { drone: 0, drum: 0, chord: 0, arp: 0 };
 
 function getRoadsideDensityScale() {
@@ -8940,11 +8945,39 @@ function getRoadsideDensityScale() {
 }
 
 const MUSICAL_3D_TYPES = {
-  drone: { shape: "sphere",  rgb: [0, 229, 255] },
-  drum:  { shape: "cube",    rgb: [255, 56, 56] },
-  chord: { shape: "pyramid", rgb: [254, 211, 48] },
-  arp:   { shape: "diamond", rgb: [125, 95, 255] }
+  drone:   { shape: "sphere"  },
+  drum:    { shape: "cube"    },
+  chord:   { shape: "pyramid" },
+  arp:     { shape: "diamond" },
+  ambient: { shape: null      }   // free-running random spawner
 };
+const ROADSIDE_SHAPES = ["sphere", "cube", "pyramid", "diamond"];
+// [rgb, weight]: blues, greens and pinks weighted up.
+const ROADSIDE_COLORS = [
+  [[0, 229, 255], 3],    // electric cyan
+  [[75, 123, 236], 3],   // royal blue
+  [[47, 128, 255], 2],   // bright blue
+  [[46, 213, 115], 3],   // phosphor green
+  [[29, 209, 161], 2],   // mint
+  [[255, 95, 196], 3],   // hot pink
+  [[255, 77, 141], 2],   // rose
+  [[125, 95, 255], 1],   // violet
+  [[254, 211, 48], 1],   // amber
+  [[255, 56, 56], 1]     // crimson
+];
+const ROADSIDE_COLOR_WEIGHT_TOTAL = ROADSIDE_COLORS.reduce((a, c) => a + c[1], 0);
+let lastRoadsideColorIdx = -1;
+
+function pickRoadsideColor() {
+  let idx;
+  do {
+    let r = Math.random() * ROADSIDE_COLOR_WEIGHT_TOTAL;
+    idx = 0;
+    while (r >= ROADSIDE_COLORS[idx][1]) { r -= ROADSIDE_COLORS[idx][1]; idx++; }
+  } while (idx === lastRoadsideColorIdx);
+  lastRoadsideColorIdx = idx;
+  return ROADSIDE_COLORS[idx][0];
+}
 
 function triggerMusical3DObject(type) {
   if (!roadsideEnabled || !isPlaying) return;
@@ -8952,7 +8985,7 @@ function triggerMusical3DObject(type) {
   if (!cfg) return;
 
   const now = performance.now();
-  lastMusical3DTriggerTimes[type] = now;
+  if (type !== "ambient") lastMusical3DTriggerTimes[type] = now;
   const density = getRoadsideDensityScale();
   // Per-channel debounce so fast successive triggers don't clutter the horizon
   if (now - (lastMusical3DSpawnTimes[type] || 0) < ROADSIDE_BASE_DEBOUNCE_MS / density) return;
@@ -8963,14 +8996,18 @@ function triggerMusical3DObject(type) {
     roadsideObjects[0].progress = Math.max(roadsideObjects[0].progress, 0.90);
   }
 
+  const shape = (cfg.shape && Math.random() < 0.35)
+    ? cfg.shape
+    : ROADSIDE_SHAPES[Math.floor(Math.random() * ROADSIDE_SHAPES.length)];
+
   roadsideObjects.push({
     type,
-    shape: cfg.shape,
-    rgb: cfg.rgb,
+    shape,
+    rgb: pickRoadsideColor(),
     side: Math.random() < 0.5 ? -1 : 1,
     lateral: 0.14 + Math.random() * 0.36,
     progress: 0,
-    sizeMult: 0.85 + Math.random() * 0.45,
+    sizeMult: 0.7 + Math.random() * 0.75,
     floatAlt: 0.65 + Math.random() * 0.70,
     bobSeed: Math.random() * Math.PI * 2,
     bobSpeed: 0.0012 + Math.random() * 0.0009,
@@ -9139,11 +9176,11 @@ function drawRoadsideObjects(w, h) {
   const gridH = bottomY - horizonY;
   const vanishX = w * 0.5;
 
-  // Gentle fallback while playing a sparse passage so scenery stays alive.
-  // No idle spawn when stopped -- see the audio-gating note above.
-  if (isPlaying && roadsideObjects.length < 2 && Math.random() < 0.012) {
-    const keys = ["drone", "drum", "chord", "arp"];
-    triggerMusical3DObject(keys[Math.floor(Math.random() * keys.length)]);
+  // Free-running random spawner, independent of the notes (still nothing
+  // while stopped -- see the audio-gating note above). Busier when the
+  // scene is sparse so a quiet passage never leaves the road empty.
+  if (isPlaying && Math.random() < (roadsideObjects.length < 3 ? 0.025 : 0.008)) {
+    triggerMusical3DObject("ambient");
   }
 
   const tempoRate = (typeof bpm !== "undefined" ? bpm : 72) / 60;
