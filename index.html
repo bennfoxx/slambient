@@ -136,64 +136,65 @@
     align-items: center;
     justify-content: space-between;
     gap: 14px;
-    flex-wrap: wrap;
-    min-width: 0;
+    width: 100%;
   }
   .brand-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 14px;
-    flex-wrap: wrap;
+    gap: 16px;
+    width: 100%;
   }
   .transport-row {
     border-top: 1px solid var(--border);
     padding-top: 10px;
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    flex-wrap: wrap;
   }
 
   .brand-group {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 3px;
+    justify-content: center;
+    width: 260px;
+    gap: 4px;
     min-width: 0;
     flex-shrink: 0;
   }
   .app-title {
-    font-size: 24px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: 28px;
     font-weight: 900;
-    letter-spacing: 2.8px;
     text-transform: uppercase;
     color: #ffffff;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    text-shadow: 0 0 12px rgba(0, 229, 255, 0.45), 0 0 24px rgba(0, 229, 255, 0.15);
-    line-height: 1.1;
+    text-shadow: 0 0 14px rgba(0, 229, 255, 0.5), 0 0 28px rgba(0, 229, 255, 0.25);
+    line-height: 1;
   }
-  .app-tag {
-    font-size: 9px;
+  .app-sub {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
     font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
     color: var(--accent);
-    background: rgba(254, 211, 48, 0.08);
-    border: 1px solid rgba(254, 211, 48, 0.35);
-    padding: 2px 8px;
-    border-radius: 3px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    box-shadow: 0 0 6px rgba(254, 211, 48, 0.12);
+    text-shadow: 0 0 8px rgba(254, 211, 48, 0.4);
+    line-height: 1;
   }
 
-  .preset-bar {
+  .preset-group {
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 6px;
-    flex: 1;
-    min-width: 260px;
+    gap: 10px;
+    flex-shrink: 0;
   }
   .preset-label {
     font-size: 9.5px;
@@ -202,24 +203,38 @@
     letter-spacing: 1.2px;
     color: var(--accent);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    margin-right: 4px;
-    flex-shrink: 0;
+    white-space: nowrap;
+    line-height: 1;
+  }
+  .preset-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 5px;
+    align-items: center;
   }
   .btn-preset-chip {
     background: #0f121c;
     color: var(--text-secondary);
     border: 1px solid var(--border-light);
-    padding: 5px 10px;
+    padding: 0 8px;
+    height: 23px;
+    box-sizing: border-box;
     border-radius: 4px;
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 700;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.5px;
     text-transform: uppercase;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     cursor: pointer;
     transition: all 0.12s ease;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
   }
   .btn-preset-chip:hover {
     color: #ffffff;
@@ -245,7 +260,6 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
-    width: 100%;
   }
 
   .btn-main-play {
@@ -256,9 +270,9 @@
     box-sizing: border-box;
     gap: 8px;
     background: #101420;
-    color: #ffffff;
+    color: #2ed573;
     border: 1px solid #2ed573;
-    padding: 0 16px;
+    padding: 0 15px;
     border-radius: 4px;
     font-size: 11px;
     font-weight: 800;
@@ -279,18 +293,19 @@
     border-color: #2ed573;
     box-shadow: 0 0 18px rgba(46, 213, 115, 0.7);
   }
-  .play-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #2ed573;
-    box-shadow: 0 0 6px #2ed573;
-    transition: background 0.15s;
+  .play-icon-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 10px;
+    height: 11px;
+    color: currentColor;
+    flex-shrink: 0;
   }
-  .btn-main-play.active .play-dot {
-    background: #07080c;
-    box-shadow: none;
-  }
+  .btn-main-play .icon-play { display: block; }
+  .btn-main-play .icon-pause { display: none; }
+  .btn-main-play.active .icon-play { display: none; }
+  .btn-main-play.active .icon-pause { display: block; }
 
   .btn-record {
     background: #101420;
@@ -354,26 +369,41 @@
   }
   .tempo-ctrl input[type="range"] {
     width: 90px;
+    height: 16px;
+    background: transparent;
+    border: none;
     margin: 0;
-    height: 5px;
+    cursor: pointer;
+    vertical-align: middle;
+  }
+  .tempo-ctrl input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
     background: #050609;
     border: 1px solid var(--border);
-    border-radius: 2.5px;
-    cursor: pointer;
+    border-radius: 2px;
   }
   .tempo-ctrl input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
     width: 14px;
     height: 14px;
     background: #1c2234;
     border: 1.5px solid var(--accent);
     box-shadow: 0 0 8px rgba(254, 211, 48, 0.4);
     border-radius: 3px;
+    margin-top: -5px;
     cursor: pointer;
     transition: all 0.12s ease;
   }
   .tempo-ctrl input[type="range"]::-webkit-slider-thumb:hover {
     background: var(--accent);
     box-shadow: 0 0 12px rgba(254, 211, 48, 0.8);
+  }
+  .tempo-ctrl input[type="range"]::-moz-range-track {
+    height: 4px;
+    background: #050609;
+    border: 1px solid var(--border);
+    border-radius: 2px;
   }
   .tempo-ctrl input[type="range"]::-moz-range-thumb {
     width: 14px;
@@ -1882,46 +1912,52 @@
   input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
-    height: 5px;
-    border-radius: 2.5px;
-    background: #06070a;
-    border: 1px solid var(--border);
-    margin: 4px 0;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
-  }
-  input[type="range"]::-webkit-slider-runnable-track {
-    height: 5px;
-    border-radius: 2.5px;
+    width: 100%;
+    height: 16px;
     background: transparent;
     border: none;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+    outline: none;
   }
-  input[type="range"]::-moz-range-track {
-    height: 5px;
-    border-radius: 2.5px;
+  input[type="range"]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
     background: #06070a;
     border: 1px solid var(--border);
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+    border-radius: 2px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  input[type="range"]::-moz-range-track {
+    width: 100%;
+    height: 4px;
+    background: #06070a;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
   }
   input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 13px;
-    height: 13px;
+    width: 14px;
+    height: 14px;
     border-radius: 3px;
     background: #141724;
     border: 1.5px solid var(--border-bright);
     cursor: pointer;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+    margin-top: -5px;
     transition: all 0.1s ease;
   }
   input[type="range"]::-moz-range-thumb {
-    width: 13px;
-    height: 13px;
+    width: 14px;
+    height: 14px;
     border-radius: 3px;
     background: #141724;
     border: 1.5px solid var(--border-bright);
     cursor: pointer;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
     transition: all 0.1s ease;
   }
   input[type="range"]::-webkit-slider-thumb:hover {
@@ -2005,7 +2041,17 @@
   }
   .master-vol-slider-wrap input[type="range"] {
     width: 96px;
+    height: 16px;
+    background: transparent;
+    border: none;
+    margin: 0;
     transform: rotate(-90deg);
+  }
+  .master-vol-slider-wrap input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    background: #06070a;
+    border: 1px solid var(--border);
+    border-radius: 2px;
   }
   .master-vol-slider-wrap input[type="range"]::-webkit-slider-thumb {
     width: 14px;
@@ -2014,6 +2060,7 @@
     background: #1c2234;
     border: 1.5px solid var(--accent);
     box-shadow: 0 0 8px rgba(254, 211, 48, 0.4);
+    margin-top: -5px;
     cursor: pointer;
     transition: all 0.12s ease;
   }
@@ -2269,28 +2316,39 @@
     <header class="top-bar">
       <div class="top-bar-row brand-row">
         <div class="brand-group">
-          <span class="app-title">Slambient</span>
-          <span class="app-tag">FM-1 Engine Prototype</span>
+          <div class="app-title"><span>S</span><span>L</span><span>A</span><span>M</span><span>B</span><span>I</span><span>E</span><span>N</span><span>T</span></div>
+          <div class="app-sub"><span>m</span><span>e</span><span>a</span><span>n</span><span>d</span><span>e</span><span>r</span><span>&nbsp;</span><span>e</span><span>n</span><span>g</span><span>i</span><span>n</span><span>e</span></div>
         </div>
 
-        <div class="preset-bar">
-          <span class="preset-label">Presets:</span>
-          <button class="btn-preset-chip" onclick="applyPreset(0)">Nostalgic Drift</button>
-          <button class="btn-preset-chip" onclick="applyPreset(1)">Four Tet Organic</button>
-          <button class="btn-preset-chip" onclick="applyPreset(2)">Shimmer Cascade</button>
-          <button class="btn-preset-chip" onclick="applyPreset(3)">Hauntological Tape</button>
-          <button class="btn-preset-chip" onclick="applyPreset(4)">Velvet Horizon</button>
-          <button class="btn-preset-chip" onclick="applyPreset(5)">Pale Bloom</button>
-          <button class="btn-preset-chip" onclick="applyPreset(6)">Green / Yoshimura</button>
-          <button class="btn-preset-chip" onclick="applyPreset(7)">Khan Lineage</button>
-          <button class="btn-preset-chip" onclick="applyPreset(8)">After Hours Deep</button>
+        <div class="preset-group">
+          <span class="preset-label">PRESETS</span>
+          <div class="preset-bar">
+            <button class="btn-preset-chip" onclick="applyPreset(0)">Nostalgic Drift</button>
+            <button class="btn-preset-chip" onclick="applyPreset(1)">Four Tet Organic</button>
+            <button class="btn-preset-chip" onclick="applyPreset(2)">Shimmer Cascade</button>
+            <button class="btn-preset-chip" onclick="applyPreset(3)">Hauntological Tape</button>
+            <button class="btn-preset-chip" onclick="applyPreset(4)">Velvet Horizon</button>
+            <button class="btn-preset-chip" onclick="applyPreset(5)">Pale Bloom</button>
+            <button class="btn-preset-chip" onclick="applyPreset(6)">Green / Yoshimura</button>
+            <button class="btn-preset-chip" onclick="applyPreset(7)">Khan Lineage</button>
+            <button class="btn-preset-chip" onclick="applyPreset(8)">After Hours Deep</button>
+            <button class="btn-preset-chip" onclick="applyPreset(9)">Ambient 1 / Airports</button>
+          </div>
         </div>
       </div>
 
       <div class="top-bar-row transport-row">
         <div class="global-transport">
           <button class="btn-main-play" id="btnPlay" onclick="togglePlay()">
-            <div class="play-dot"></div>
+            <span class="play-icon-wrap" id="btnPlayIcon">
+              <svg class="icon-play" width="10" height="11" viewBox="0 0 10 11" fill="currentColor">
+                <path d="M1 1.5L9 5.5L1 9.5V1.5Z" />
+              </svg>
+              <svg class="icon-pause" width="10" height="11" viewBox="0 0 10 11" fill="currentColor">
+                <rect x="1" y="1.5" width="2.5" height="8" rx="0.5" />
+                <rect x="6.5" y="1.5" width="2.5" height="8" rx="0.5" />
+              </svg>
+            </span>
             <span id="btnPlayLabel">Start</span>
           </button>
 
@@ -7727,6 +7785,58 @@ function applyPreset(idx) {
     document.getElementById("knobChorusRate").value = 0.3;
     document.getElementById("knobChorusDepth").value = 35;
     document.getElementById("knobChorusMix").value = 20;
+  } else if (idx === 9) { // Ambient 1 / Airports (Brian Eno Tape Loop & Piano)
+    document.getElementById("selTimeSig").value = "4/4";
+    activeScaleKey = "LYDIAN";
+    document.getElementById("knobBpm").value = 58;
+    document.getElementById("knobWeather").value = 15;
+    document.getElementById("knobMutation").value = 12;
+
+    document.getElementById("selDrumStyle").value = "OFF";
+    document.getElementById("chkAutoEvolveDrums").checked = false;
+    document.getElementById("knobDrumVol").value = 0;
+
+    document.getElementById("knobStrum").value = 85;
+    document.getElementById("selChordTimbre").value = "ACOUSTIC_PIANO";
+    document.getElementById("knobChordFx").value = 88;
+
+    document.getElementById("selDroneOctave").value = "C2";
+    document.getElementById("knobDrone").value = 55;
+    document.getElementById("knobDroneFilter").value = 240;
+    document.getElementById("knobDroneDetune").value = 3;
+    document.getElementById("knobDroneWander").value = 20;
+    document.getElementById("knobDroneFx").value = 40;
+
+    document.getElementById("selArpPattern").value = "WANDER";
+    document.getElementById("selArpTimbre").value = "GLASS_BELL";
+    document.getElementById("knobArpGate").value = 260;
+    document.getElementById("knobArpRest").value = 50;
+    document.getElementById("knobArpOctaves").value = 2;
+    document.getElementById("knobArpVol").value = 60;
+    document.getElementById("knobArpFx").value = 75;
+
+    document.getElementById("knobMasterCutoff").value = 85;
+    document.getElementById("knobMasterRes").value = 1.5;
+    document.getElementById("knobFilterAttack").value = 140;
+    document.getElementById("knobFilterDecay").value = 1600;
+    document.getElementById("knobFilterEnvDepth").value = 25;
+    document.getElementById("knobFilterLfoRate").value = 0.05;
+    document.getElementById("knobFilterLfoDepth").value = 15;
+
+    document.getElementById("chkDelayTempoSync").checked = false;
+    document.getElementById("knobDelayTime").value = 720;
+    document.getElementById("knobDelayFeedback").value = 60;
+    document.getElementById("knobDelayTone").value = 1800;
+    document.getElementById("knobDelayFlutter").value = 40;
+    document.getElementById("knobDelayMix").value = 45;
+
+    document.getElementById("selReverbMode").value = "SHIMMER";
+    document.getElementById("knobReverbMix").value = 50;
+    document.getElementById("knobReverbTone").value = 5000;
+    document.getElementById("selChorusMode").value = "DIMENSION";
+    document.getElementById("knobChorusRate").value = 0.12;
+    document.getElementById("knobChorusDepth").value = 40;
+    document.getElementById("knobChorusMix").value = 28;
   }
 
   const scale = SCALES[activeScaleKey] || SCALES.DORIAN;
