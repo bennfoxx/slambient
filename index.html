@@ -105,6 +105,17 @@
     align-items: stretch;
     gap: 14px;
     width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    /* Break out of body's own padding so the frosted backdrop reaches the
+       true viewport edges while scrolled, then restore that spacing with
+       padding so the header's own content doesn't shift. */
+    margin: -16px -22px 0 -22px;
+    padding: 16px 22px 14px 22px;
+    background: rgba(7, 8, 12, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
   header.top-bar {
     display: flex;
