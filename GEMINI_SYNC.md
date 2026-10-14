@@ -314,7 +314,9 @@ All items outlined in Phase 3 of the Technical Specification and Implementation 
   - **Automatic Programmatic Sync**:
     - Intercepts `HTMLSelectElement.prototype.value` setter on upgraded selects and hooks `syncAllSmartDropdowns()` into `updateAudioParams()` so preset loads, randomizers, and meter cycles immediately update the custom triggers without extra boilerplate.
     - Automatically detects viewport bottom collision and flips the menu upward (`.drop-up`) when near the bottom edge of the screen.
-  - **Floating Header & Module Stacking Context**:
+  - **Floating Header & Module Stacking Context (Zero-Scroll Menus)**:
     - Changed `header.top-bar` from `overflow: hidden` to `overflow: visible; z-index: 1010;` and elevated `.header-bar-wrapper` to `z-index: 3000; overflow: visible;` so header dropdown menus (Root, Scale, Meter) float cleanly above the header boundary and over the upper visualizer deck.
-    - Added `.is-open` state toggling on `.custom-dropdown-wrap` (`z-index: 9500 !important`) and `:has(.custom-dropdown-menu.open)` elevation rules across `.strip-channel`, `.pedal-chassis`, `.root-scale-ctrl`, `.time-sig-ctrl`, and `header.top-bar` (`z-index: 9000 !important; overflow: visible !important`) so open menus always layer above neighboring modules.
+    - Removed the `max-height: 290px; overflow-y: auto;` constraint on `.custom-dropdown-menu` (`max-height: none; overflow: visible;`) and tightened `.custom-dropdown-item` row spacing (`padding: 4px 8px; line-height: 1.25;`) so all options across every dropdown display at once without vertical scrollbars.
+    - Added `.is-open` state toggling on `.custom-dropdown-wrap` (`z-index: 9500 !important`) and `:has(.custom-dropdown-menu.open)` elevation rules across `.strip-channel`, `.pedal-chassis`, `.orbital-side-panel`, `.root-scale-ctrl`, `.time-sig-ctrl`, and `header.top-bar` (`z-index: 9000 !important; overflow: visible !important`) so open menus always layer above neighboring modules.
+
 

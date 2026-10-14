@@ -2536,6 +2536,7 @@
   }
   .strip-channel:has(.custom-dropdown-menu.open),
   .pedal-chassis:has(.custom-dropdown-menu.open),
+  .orbital-side-panel:has(.custom-dropdown-menu.open),
   .root-scale-ctrl:has(.custom-dropdown-menu.open),
   .time-sig-ctrl:has(.custom-dropdown-menu.open),
   header.top-bar:has(.custom-dropdown-menu.open) {
@@ -2548,9 +2549,9 @@
     left: 0;
     min-width: 100%;
     width: max-content;
-    max-width: 340px;
-    max-height: 290px;
-    overflow-y: auto;
+    max-width: 360px;
+    max-height: none;
+    overflow: visible;
     background: #11141d;
     border: 1px solid var(--dd-accent, var(--border-bright));
     border-radius: 2px;
@@ -2567,7 +2568,8 @@
     bottom: calc(100% + 2px);
   }
   .custom-dropdown-item {
-    padding: 5px 9px;
+    padding: 4px 8px;
+    line-height: 1.25;
     font-size: 10.5px;
     font-weight: 600;
     color: #c8d1e6;
