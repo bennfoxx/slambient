@@ -577,15 +577,19 @@
   }
 
   .upper-deck {
-    display: grid;
-    grid-template-columns: 1.15fr 270px 1.15fr;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
     gap: 14px;
     position: relative;
     width: 100%;
+    box-sizing: border-box;
   }
   .upper-deck-card {
     transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
     user-select: none;
+    box-sizing: border-box;
+    min-height: 350px;
   }
   .upper-deck-card.dragging {
     opacity: 0.45;
@@ -620,6 +624,8 @@
     cursor: grabbing !important;
   }
   .scope-panel {
+    flex: 1.15 1 0;
+    min-width: 320px;
     background: var(--panel);
     border: 1px solid var(--eno-glow-border, var(--border));
     border-radius: 6px;
@@ -653,6 +659,10 @@
     overflow: hidden;
   }
   .chord-info-panel {
+    flex: 0 0 270px;
+    width: 270px;
+    min-width: 270px;
+    max-width: 270px;
     background: var(--panel);
     border: 1px solid var(--eno-glow-border, var(--border));
     border-radius: 6px;
@@ -664,6 +674,8 @@
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
   .keyboard-panel {
+    flex: 1.15 1 0;
+    min-width: 360px;
     background: var(--panel);
     border: 1px solid var(--eno-glow-border, var(--border));
     border-radius: 6px;
@@ -676,12 +688,23 @@
   }
   @media (max-width: 1100px) {
     .upper-deck {
-      grid-template-columns: 1fr 1fr;
+      flex-wrap: wrap;
+    }
+    .scope-panel, .keyboard-panel {
+      flex: 1 1 45%;
+    }
+    .chord-info-panel {
+      flex: 0 0 270px;
     }
   }
   @media (max-width: 780px) {
     .upper-deck {
-      grid-template-columns: 1fr;
+      flex-direction: column;
+    }
+    .scope-panel, .chord-info-panel, .keyboard-panel {
+      width: 100% !important;
+      max-width: 100% !important;
+      flex: 1 1 auto !important;
     }
   }
 
@@ -4981,6 +5004,7 @@ function initUpperDeckDragAndDrop() {
       upperWidgetOrder.splice(fromIdx, 1);
       upperWidgetOrder.splice(toIdx, 0, srcKey);
       renderUpperDeckOrder();
+      if (typeof resizeScopeCanvas === 'function') resizeScopeCanvas();
     }
   }
 
