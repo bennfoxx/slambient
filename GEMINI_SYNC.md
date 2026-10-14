@@ -278,3 +278,13 @@ All items outlined in Phase 3 of the Technical Specification and Implementation 
 3. **Standardized Channel Strip Anatomy (Modules 1–4)**:
    - Standardized channel strip headers across all 4 voice engines to feature a consistent Power switch (`PWR`), Mute (`M`), Solo (`S`), and module randomize button.
    - Unified bottom strip layout across all channels: auxiliary FX send slider positioned directly above a full-width horizontal master volume slider as the terminal control of each voice strip.
+
+## Update — 2026-10-14 (Upper Deck Widget Sizing Fix)
+
+- **Upper Deck Sizing & Proportions Fixed During Reordering**:
+  - Replaced the static column-area grid (`grid-template-columns: 1.15fr 270px 1.15fr`) on `.upper-deck` with a dynamic flex row layout (`display: flex; align-items: stretch`).
+  - Fixed each card's proportions to its native dimensions regardless of its position in the row:
+    - **Visualizer Scope** (`.scope-panel`): `flex: 1.15 1 0; min-width: 320px;`
+    - **Chord Analysis** (`.chord-info-panel`): `flex: 0 0 270px; width: 270px; min-width: 270px; max-width: 270px;` (anchors the chord wheel and meter gauges to their exact intended width).
+    - **Playable Keyboard** (`.keyboard-panel`): `flex: 1.15 1 0; min-width: 360px;` (maintains full horizontal piano key octave spread).
+  - Calling `renderUpperDeckOrder()` now triggers `resizeScopeCanvas()` to guarantee CRT visualizer rendering scales without pixel distortion.
