@@ -594,6 +594,10 @@
   .upper-deck-card.dragging {
     opacity: 0.45;
     transform: scale(0.98);
+    cursor: var(--cursor-grabbing) !important;
+  }
+  .upper-deck-card[draggable="true"] {
+    cursor: inherit;
   }
   .upper-deck-card.drag-over {
     border-color: var(--accent) !important;
@@ -601,7 +605,7 @@
     box-shadow: 0 0 20px rgba(254, 211, 48, 0.35), 0 8px 24px rgba(0,0,0,0.8);
   }
   .upper-drag-handle {
-    cursor: grab !important;
+    cursor: var(--cursor-grab) !important;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -621,7 +625,15 @@
     background: #151a28;
   }
   .upper-drag-handle:active {
-    cursor: grabbing !important;
+    cursor: var(--cursor-grabbing) !important;
+  }
+
+  /* Global body drag classes to keep circular cursor locked across entire window during drag */
+  body.upper-dragging,
+  body.upper-dragging *,
+  body.pedal-dragging,
+  body.pedal-dragging * {
+    cursor: var(--cursor-grabbing) !important;
   }
   .scope-panel {
     flex: 1.15 1 0;
@@ -2274,6 +2286,7 @@
   .pedal-chassis.dragging {
     opacity: 0.45;
     transform: scale(0.97);
+    cursor: var(--cursor-grabbing) !important;
   }
 
   /* Pedal color accents, matching the strip-channel.<x>-ch convention used
@@ -5013,6 +5026,7 @@ function initUpperDeckDragAndDrop() {
     card.addEventListener("dragstart", (e) => {
       draggedWidgetKey = card.getAttribute("data-upper-widget");
       card.classList.add("dragging");
+      document.body.classList.add("upper-dragging");
       if (e.dataTransfer) {
         e.dataTransfer.effectAllowed = "move";
         e.dataTransfer.setData("text/plain", draggedWidgetKey);
@@ -5021,6 +5035,7 @@ function initUpperDeckDragAndDrop() {
 
     card.addEventListener("dragend", () => {
       card.classList.remove("dragging");
+      document.body.classList.remove("upper-dragging");
       cards.forEach(c => c.classList.remove("drag-over"));
       draggedWidgetKey = null;
     });
@@ -5055,6 +5070,7 @@ function initUpperDeckDragAndDrop() {
       if (!activeCard) return;
       activeKey = activeCard.getAttribute("data-upper-widget");
       activeCard.classList.add("dragging");
+      document.body.classList.add("upper-dragging");
       handle.setPointerCapture(e.pointerId);
 
       const onPointerMove = (ev) => {
@@ -5076,6 +5092,7 @@ function initUpperDeckDragAndDrop() {
         window.removeEventListener("pointercancel", onPointerUp);
 
         activeCard.classList.remove("dragging");
+        document.body.classList.remove("upper-dragging");
         let dropTarget = null;
         cards.forEach(c => {
           c.classList.remove("drag-over");
