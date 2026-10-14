@@ -260,3 +260,21 @@ diffing against the stompbox-pedal commits above:
     - `5. Filter & Env`, `6. Analog Delay`, `7. Reverb & Chorus` (or any permutation like `5. Analog Delay`, `6. Filter & Env`, etc.).
   - Added span IDs (`#pedalTitle_FILTER`, `#pedalTitle_DELAY`, `#pedalTitle_SPACE`) for exact, flicker-free DOM text updates.
   - Linked dynamic numbering to `ORBITAL_MODULES` via `PEDAL_KEY_TO_ORBITAL_ID`: each orb's `num` string (`orb.num`) updates synchronously with the chain (`5`, `6`, or `7`). The orbital constellation drawing loop (`fillText(orb.num)`) and the orbital side-panel title (`${orb.num}. ${orb.name}`) reflect the live insert chain position in real time.
+
+## Update — 2026-10-14 (Phase 3 Completed)
+
+All items outlined in Phase 3 of the Technical Specification and Implementation Roadmap are now complete and committed in `index.html` (commit `5ca818d`):
+
+1. **Upper Visualizer Row Drag-Reordering**:
+   - Implemented drag-and-drop reordering for the 3 top-deck visualizer panels (`#scopePanel`, `#chordInfoPanel`, `#keyboardPanel`).
+   - Added subtle `⠿ DRAG` handles (`.upper-drag-handle`) beside the header titles with unified pointer-capture dragging and native HTML5 drag fallback.
+   - Replaced named grid areas with dynamic DOM node reordering (`renderUpperDeckOrder()`), supporting smooth `.drag-over` elevation cues across viewports.
+
+2. **Smart Component-Based Dropdowns (Scale & Meter)**:
+   - Built a custom dropdown component engine (`initSmartDropdowns()`) replacing native select styling while synchronizing hidden native select state for presets and event listeners.
+   - **Scale Dropdown**: Truncates parenthetical modal details in the collapsed trigger (e.g., `Dorian`, `Hirajoshi`, `Major 9`), while displaying full descriptions upon expansion (e.g., `Hirajoshi (Japanese Kankyō)`).
+   - **Meter Dropdown**: Displays clean time signatures when collapsed (e.g., `7/4`, `4/4`, `5/8`), while revealing descriptive labels on expansion (e.g., `7/4 (Odd Quarter)`, `5/4 (Take Five)`, `3/4 (Ambient Waltz)`).
+
+3. **Standardized Channel Strip Anatomy (Modules 1–4)**:
+   - Standardized channel strip headers across all 4 voice engines to feature a consistent Power switch (`PWR`), Mute (`M`), Solo (`S`), and module randomize button.
+   - Unified bottom strip layout across all channels: auxiliary FX send slider positioned directly above a full-width horizontal master volume slider as the terminal control of each voice strip.
