@@ -319,4 +319,55 @@ All items outlined in Phase 3 of the Technical Specification and Implementation 
     - Removed the `max-height: 290px; overflow-y: auto;` constraint on `.custom-dropdown-menu` (`max-height: none; overflow: visible;`) and tightened `.custom-dropdown-item` row spacing (`padding: 4px 8px; line-height: 1.25;`) so all options across every dropdown display at once without vertical scrollbars.
     - Added `.is-open` state toggling on `.custom-dropdown-wrap` (`z-index: 9500 !important`) and `:has(.custom-dropdown-menu.open)` elevation rules across `.strip-channel`, `.pedal-chassis`, `.orbital-side-panel`, `.root-scale-ctrl`, `.time-sig-ctrl`, and `header.top-bar` (`z-index: 9000 !important; overflow: visible !important`) so open menus always layer above neighboring modules.
 
+## Master Implementation Roadmap & Phase Status
+
+### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE
+- [x] Audio envelope de-clicking (`linearRampToValueAtTime`, 25–40ms, on init/transport/preset/randomize)
+- [x] Continuous pitch gliding (`setTargetAtTime` portamento, ~0.45s constant)
+- [x] 48% hard feedback limiter (enforced at HTML slider max, parameter-read clamp, AND ramp-application clamp)
+- [x] Dynamic AudioNode rewire manager (`rewireDspChain`, real `disconnect()`/`connect()` graph rewiring)
+
+### Phase 2: Multi-View Console & Pedals Architecture — ✅ DONE
+- [x] View switcher — Orbital/Console (2-way), with Pedals merged into Console
+- [x] Tactile pedalboard layout (restyled to panel-header look for visual harmony across modules)
+- [x] Drag-and-drop pedal reordering (pointer-capture based on `.pedal-drag-handle`)
+- [x] Dynamic pedal numbering (`5`, `6`, `7`) synced across Console Rack and Orbital View based on live `dspChainOrder`
+- [x] Cross-view state sync (shared DOM elements across views)
+- [x] Randomizer routing hook (`randomizeEverything()` shuffles the pedal chain)
+
+### Phase 3: Header, Branding & Instrument Standardization — ✅ DONE
+- [x] Sticky header with frosted backdrop (`z-index: 3000; overflow: visible`)
+- [x] Branding geometry (`260px` matched container + `MEANDER ENGINE` pill border)
+- [x] Transport cluster refinement (`⟲ ALL` beside Record, meter button → SVG refresh icon)
+- [x] Square `BIO-SCAN` Eno pod (matches header height, JS-enforced square)
+- [x] Upper visualizer row drag-reordering (`#scopePanel`, `#chordInfoPanel`, `#keyboardPanel`) preserving exact widths & circular cursors
+- [x] Unified channel strip anatomy (`PWR`/`M`/`S`/`⟲` header, FX send + master volume footer — modules 1–4)
+- [x] Smart truncated dropdowns (Ableton Live-style custom component across all 14 selects, floating & zero-scroll)
+
+### Phase 4: Voice Synthesizer Expansions & Environmental Noise — ⬜ NEXT UP
+- [ ] Drum fill generator (manual `FILL` button in Drum module header + automatic algorithmic fills on groove switch)
+- [ ] Tabla articulation engine (`Ge`/`Na`/`Tin`/`Dha` modeled strokes, high-speed scoop pitch bends, polyrhythmic fills)
+- [ ] Sitar physical modeling (Jawari bridge harmonic profiles + sympathetic string resonance algorithms)
+- [ ] Environmental soundscape / Noise module (rain, thunder, white noise, bubbling brooks, crickets, wind with adjustable parameters & randomized triggers)
+- [ ] Filter & Output saturation refinement (filter resonance/cutoff/LFO tuning + master soft-clip tape saturation waveshaper)
+
+### Phase 5: Preset Serialization & Signature Sound Profiles — ⬜ PENDING
+- [ ] JSON export/import (`Save Bank` / `Load Bank` including serialized `dspChainOrder`)
+- [ ] Signature factory presets engineered for specific DSP chain topologies:
+  - `Aphex Twin` (IDM rhythms, eerie ambient tones, delay-into-filter routing at 48% feedback)
+  - `Tangerine Dream` (Berlin School sequences, pulsing arpeggiators, filter sweeps feeding massive reverb spaces)
+  - `William Basinski` (Tape decay mechanics, pitch drift, reverb feeding heavy low-pass filters to muffle repeat tails)
+  - `Lo-Fi Chillhop` (Boom-bap swing, Rhodes chords, filter-to-delay-to-space signal chain for muffled tape warmth)
+
+### Phase 6: Visualizers, Easter Eggs & Interaction Polishing — ⬜ PENDING
+- [ ] Audio-gated 3D floating shapes fix (prevent idle blue spheres when stopped + increase sphere density 60%–95% scaling)
+- [ ] Fractal visualizer mode (`FRACTAL` Julia/Mandelbrot option + updated visualizer control icons)
+- [ ] Space Invaders audio-reactive arcade minigame inside the primary visualizer canvas
+- [ ] Side-view orb click debouncing (250ms debounce to close active tab on click without double-click flicker)
+
+### Phase 7: Global Shortcuts, Custom Theming & Final Polish — ⬜ PENDING
+- [ ] Keyboard playback bindings (`Spacebar` and `Enter` toggle play/pause)
+- [ ] Modular color palette picker (custom color assignments per instrument, effect, and noise module)
+
+
 
