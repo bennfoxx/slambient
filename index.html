@@ -3127,8 +3127,7 @@
   <div class="orbital-deck-header">
     <div class="view-switcher-group">
       <button class="btn-view-mode active" id="btnViewOrbital" onclick="setModuleView('orbital')" title="Floating Planetary Orb Constellation">Orbital View</button>
-      <button class="btn-view-mode" id="btnViewConsole" onclick="setModuleView('console')" title="Linear 7-Channel Mixing Console">Console Rack</button>
-      <button class="btn-view-mode" id="btnViewPedals" onclick="setModuleView('pedals')" title="Tactile 3-Pedal FX Insert Board">Pedals View</button>
+      <button class="btn-view-mode" id="btnViewConsole" onclick="setModuleView('console')" title="Console Rack & Pedalboard">Console Rack</button>
     </div>
 
     <div class="orbital-bar-center">
@@ -10162,31 +10161,30 @@ function handleOrbitalPointerUp(e) {
 }
 
 function setModuleView(mode) {
-  activeModuleView = mode;
+  activeModuleView = (mode === "orbital") ? "orbital" : "console";
   const btnOrb = document.getElementById("btnViewOrbital");
   const btnCon = document.getElementById("btnViewConsole");
-  const btnPed = document.getElementById("btnViewPedals");
   const arena = document.getElementById("orbitalArenaWrapper");
   const lowerRack = document.querySelector(".lower-deck");
   const masterRack = document.querySelector(".master-chain-deck");
   const pedalsRack = document.getElementById("pedalsContainer");
   const floatControls = document.getElementById("orbitalFloatControls");
 
-  if (btnOrb) btnOrb.classList.toggle("active", mode === "orbital");
-  if (btnCon) btnCon.classList.toggle("active", mode === "console");
-  if (btnPed) btnPed.classList.toggle("active", mode === "pedals");
+  if (btnOrb) btnOrb.classList.toggle("active", activeModuleView === "orbital");
+  if (btnCon) btnCon.classList.toggle("active", activeModuleView === "console");
 
-  if (mode === "orbital") {
+  if (activeModuleView === "orbital") {
     if (arena) arena.style.display = "block";
     if (lowerRack) lowerRack.classList.add("view-grid-hidden");
     if (masterRack) masterRack.classList.add("view-grid-hidden");
     if (pedalsRack) pedalsRack.classList.add("view-grid-hidden");
     if (floatControls) floatControls.style.display = "flex";
-  } else if (mode === "pedals") {
+  } else {
+    // Unified Console & Pedalboard mode
     if (floatControls) floatControls.style.display = "none";
     if (arena) arena.style.display = "none";
     if (lowerRack) lowerRack.classList.remove("view-grid-hidden");
-    if (masterRack) masterRack.classList.add("view-grid-hidden");
+    if (masterRack) masterRack.classList.remove("view-grid-hidden");
     if (pedalsRack) pedalsRack.classList.remove("view-grid-hidden");
     const panel = document.getElementById("orbitalSidePanel");
     if (panel) panel.classList.remove("active");
@@ -10197,20 +10195,6 @@ function setModuleView(mode) {
     restoreStripsToRack();
     updatePedalsOrderUI();
     syncPedalControlsFromConsole();
-  } else {
-    // Console mode
-    if (floatControls) floatControls.style.display = "none";
-    if (arena) arena.style.display = "none";
-    if (lowerRack) lowerRack.classList.remove("view-grid-hidden");
-    if (masterRack) masterRack.classList.remove("view-grid-hidden");
-    if (pedalsRack) pedalsRack.classList.add("view-grid-hidden");
-    const panel = document.getElementById("orbitalSidePanel");
-    if (panel) panel.classList.remove("active");
-    expandedOrbId = null;
-    orbitalPanelActive = false;
-    const hint = document.getElementById("orbitalHint");
-    if (hint) hint.classList.remove("hidden-by-panel");
-    restoreStripsToRack();
   }
 }
 
