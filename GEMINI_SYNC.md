@@ -299,3 +299,18 @@ All items outlined in Phase 3 of the Technical Specification and Implementation 
     - Active drag states on handles (`.upper-drag-handle:active`, `.pedal-drag-handle:active`)
     - Dragged cards in transit (`.upper-deck-card.dragging`, `.pedal-chassis.dragging`)
     - Global window during pointer capture (`body.upper-dragging *`, `body.pedal-dragging *`) so the custom circular cursor never flickers or reverts to standard OS arrows when moving rapidly across adjacent DOM elements.
+
+## Update — 2026-10-14 (Ableton Live-Style Smart Dropdown Menus Across All 14 Selects)
+
+- **Ableton-Style Smart Dropdown Component Engine (`initSmartDropdowns`)**:
+  - Upgraded all 14 `<select>` elements across the entire instrument (Header Root Key, Scale Mode, Meter; Drone Timbre, Octave, Tanpura Tuning; Drum Groove; Chord Timbre; Arp Pattern, Arp Timbre; Delay Note Division; Reverb Mode, Chorus Mode; Hardware MIDI Out) into tactile Ableton Live-inspired custom dropdown components.
+  - **Tactile Ableton UI Styling**:
+    - Sharp `2px` border radius, crisp `1px` borders, and monospace typography.
+    - When opened, the trigger button inverts to a solid high-contrast module accent fill with dark `#07080c` text and a rotated chevron.
+    - Hovering over menu items highlights the full row in the parent module's dedicated accent color (`--color-drone`, `--color-drum`, `--color-chord`, `--color-arp`, `--color-filter`, `--color-delay`, `--color-reverb`, `--color-space`, or `--accent` in the header) with a `▸` active selection marker.
+  - **Smart Collapsed vs. Expanded Truncation**:
+    - Automatically strips parenthetical details (`(...)`) and verbose meter tags in the collapsed button state so triggers stay compact and clean (e.g., `Hirajoshi`, `Sub Octave`, `Maihar Sitar Strings`, `7/4`, `1/8 Dotted`).
+    - Displays full two-column split descriptions (`Main Label` on the left, muted `(Sub-Description)` on the right) when the menu is expanded.
+  - **Automatic Programmatic Sync**:
+    - Intercepts `HTMLSelectElement.prototype.value` setter on upgraded selects and hooks `syncAllSmartDropdowns()` into `updateAudioParams()` so preset loads, randomizers, and meter cycles immediately update the custom triggers without extra boilerplate.
+    - Automatically detects viewport bottom collision and flips the menu upward (`.drop-up`) when near the bottom edge of the screen.
