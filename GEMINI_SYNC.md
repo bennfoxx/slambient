@@ -223,3 +223,32 @@ diffing against the stompbox-pedal commits above:
   layers), and `rewireDspChain()`'s real `AudioNode.disconnect()`/`.connect()` graph rewiring are
   all genuinely implemented, not stubs. Phase 2's Console/Pedals merge (one unified view, not three
   separate Orbital/Console/Pedals modes) is confirmed as the intended final design, not a gap.
+
+## Update — 2026-10-15 (Claude: orbital side-panel fix, start of Phase 3)
+
+- **Fixed a real bug, not a new feature**: clicking the Filter/Delay/Reverb orbs in orbital view
+  opened an empty side panel, and closing it made the pedal card vanish from the console rack
+  entirely until reload. Root cause: `expandModuleOrb()`/`restoreStripsToRack()` looked modules up
+  with `.strip-channel.<chClass>` — true for every module except these three, whose markup has been
+  a `.pedal-chassis` card (not `.strip-channel`) since the original stompbox redesign. Added
+  `getOrbModuleElement(orb)` (right after `ORBITAL_MODULES`) as the one place that knows how to find
+  a given orb's real control element — use it instead of re-deriving the lookup if you touch this
+  area again. `.orbital-side-panel`'s CSS accent treatment was extended to also match
+  `.pedal-chassis`, not just `.strip-channel`.
+- **Started Phase 3** (header/branding): sticky header with a frosted blur backdrop; `.app-sub`
+  ("MEANDER ENGINE") now has a pill border; `⟲ ALL` moved beside Record and the verbose "Change ⤾"
+  meter button became an icon-only SVG refresh glyph (same icon already used for the per-module
+  randomize buttons, for consistency); the Eno pod is now a true square that matches the header's
+  full height (JS-enforced in `syncEnoPodSquare()` — CSS `aspect-ratio` + flex-stretch alone resolved
+  inconsistently across browsers and rendered as a stretched rectangle in testing, so don't revert
+  this back to pure CSS without verifying across real browsers first) and the preset bank now hugs
+  the brand block on the left instead of being pushed to the far right.
+- **If you add any other full-bleed/sticky element that breaks out of body's padding**: note that
+  this page has a universal `box-sizing: border-box` reset. `width: 100%` + a negative side margin on
+  a border-box element does NOT widen it — it just shifts the whole box over by the margin amount,
+  so one edge ends up misaligned with every other panel. `.header-bar-wrapper` hit exactly this bug
+  (visible as the header's edges not lining up with the panels below it). The fix is
+  `width: calc(100% + 2×gutter)` alongside the negative margins, not just the margins alone.
+- **Still open in Phase 3**: upper visualizer row drag-reordering (new feature), unified channel
+  strip anatomy across all 8 modules (bigger refactor, touches every panel), smart truncated
+  dropdowns (new custom `<select>`-replacement component). None of these have been started.
