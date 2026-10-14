@@ -41,7 +41,12 @@
     --cursor-grabbing: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='7' fill='rgba(0,229,255,0.2)' stroke='%2300e5ff' stroke-width='1.8'/%3E%3Ccircle cx='12' cy='12' r='3.2' fill='%23ffffff'/%3E%3C/svg%3E") 12 12, grabbing;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    cursor: inherit;
+  }
 
   html {
     zoom: 0.75;
@@ -68,11 +73,31 @@
     cursor: var(--cursor-default);
   }
 
-  button, a, select, input[type="range"], input[type="checkbox"],
+  button, a, select, input, label,
   .white-key, .black-key, .btn-preset-chip, .btn-view-mode, .btn-oct,
   .vert-mode-btn, .btn-layer-toggle, .btn-main-play, .btn-record,
-  .btn-meter-cycle, .eno-standalone-pod, [onclick], .toggle-switch, .master-vol-mute {
+  .btn-meter-cycle, .eno-standalone-pod, [onclick], .toggle-switch, .master-vol-mute,
+  .badge-tag, .btn-mute, .btn-solo, .btn-power, .btn-telemetry-action {
     cursor: var(--cursor-pointer) !important;
+  }
+
+  /* Sliders: enforce custom cursor across track and thumb on hover and active drag */
+  input[type="range"] {
+    cursor: var(--cursor-pointer) !important;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    cursor: var(--cursor-pointer) !important;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    cursor: var(--cursor-pointer) !important;
+  }
+  input[type="range"]::-moz-range-thumb {
+    cursor: var(--cursor-pointer) !important;
+  }
+  input[type="range"]:active,
+  input[type="range"]:active::-webkit-slider-thumb,
+  input[type="range"]:active::-webkit-slider-runnable-track {
+    cursor: var(--cursor-grabbing) !important;
   }
 
   .header-bar-wrapper {
@@ -1243,8 +1268,14 @@
     width: 100%;
     height: 100%;
     display: block;
-    cursor: default;
+    cursor: var(--cursor-default);
     z-index: 1;
+  }
+  .orbital-arena-wrapper canvas#orbitalCanvas.orb-hover {
+    cursor: var(--cursor-grab) !important;
+  }
+  .orbital-arena-wrapper canvas#orbitalCanvas.orb-dragging {
+    cursor: var(--cursor-grabbing) !important;
   }
   .orbital-hint {
     position: absolute;
@@ -8412,6 +8443,9 @@ function initOrbitalConstellation() {
   orbitalCanvas.addEventListener("pointermove", handleOrbitalPointerMove);
   orbitalCanvas.addEventListener("pointerup", handleOrbitalPointerUp);
   orbitalCanvas.addEventListener("pointercancel", handleOrbitalPointerUp);
+  orbitalCanvas.addEventListener("pointerleave", () => {
+    if (!draggedOrbId) orbitalCanvas.classList.remove("orb-hover");
+  });
 
   window.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && expandedOrbId) closeOrbitalModal();
@@ -8451,7 +8485,8 @@ function handleOrbitalPointerDown(e) {
   dragMoved = false;
   lastDragX = x; lastDragY = y; lastDragTs = performance.now();
   try { orbitalCanvas.setPointerCapture(e.pointerId); } catch (err) {}
-  orbitalCanvas.style.cursor = "var(--cursor-grabbing), grabbing";
+  orbitalCanvas.classList.remove("orb-hover");
+  orbitalCanvas.classList.add("orb-dragging");
   e.preventDefault();
 }
 
@@ -8476,7 +8511,7 @@ function handleOrbitalPointerMove(e) {
   }
 
   // Not dragging -- just a hover cursor hint that an orb is grabbable.
-  orbitalCanvas.style.cursor = findOrbAt(x, y) ? "var(--cursor-grab), grab" : "";
+  orbitalCanvas.classList.toggle("orb-hover", !!findOrbAt(x, y));
 }
 
 function handleOrbitalPointerUp(e) {
@@ -8490,6 +8525,8 @@ function handleOrbitalPointerUp(e) {
   try { orbitalCanvas.releasePointerCapture(e.pointerId); } catch (err) {}
   draggedOrbId = null;
   dragPointerId = null;
+  orbitalCanvas.classList.remove("orb-dragging");
+  orbitalCanvas.classList.toggle("orb-hover", !!findOrbAt(orb.x, orb.y));
 
   if (orb) {
     if (wasDrag) {
@@ -8507,9 +8544,6 @@ function handleOrbitalPointerUp(e) {
       expandModuleOrb(orb.id);
     }
   }
-  // Next pointermove naturally recomputes grab-vs-default from wherever
-  // the cursor actually is now.
-  orbitalCanvas.style.cursor = "";
 }
 
 function setModuleView(mode) {
