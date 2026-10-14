@@ -3330,7 +3330,7 @@
       <!-- 1. FILTER PEDAL -->
       <div class="pedal-chassis pedal-filter" id="pedalCard_FILTER" data-module="FILTER">
         <div class="panel-header">
-          <span><span class="pedal-order-num" id="pedalNum_FILTER">1</span>. Filter &amp; Env</span>
+          <span>5. Filter &amp; Env</span>
           <div class="panel-header-actions">
             <span class="pedal-slot-badge" id="slotBadge_FILTER">IN</span>
             <button class="btn-pedal-shift" onclick="shiftPedalLeft('FILTER')" id="shiftLeft_FILTER" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
@@ -3385,7 +3385,7 @@
       <!-- 2. DELAY PEDAL -->
       <div class="pedal-chassis pedal-delay" id="pedalCard_DELAY" data-module="DELAY">
         <div class="panel-header">
-          <span><span class="pedal-order-num" id="pedalNum_DELAY">2</span>. Analog Delay</span>
+          <span>6. Analog Delay</span>
           <div class="panel-header-actions">
             <span class="pedal-slot-badge" id="slotBadge_DELAY">INSERT</span>
             <button class="btn-pedal-shift" onclick="shiftPedalLeft('DELAY')" id="shiftLeft_DELAY" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
@@ -3447,7 +3447,7 @@
       <!-- 3. REVERB & CHORUS PEDAL (Pink) -->
       <div class="pedal-chassis pedal-space pedal-reverb" id="pedalCard_SPACE" data-module="SPACE">
         <div class="panel-header">
-          <span><span class="pedal-order-num" id="pedalNum_SPACE">3</span>. Reverb &amp; Chorus</span>
+          <span>7. Reverb &amp; Chorus</span>
           <div class="panel-header-actions">
             <span class="pedal-slot-badge" id="slotBadge_SPACE">OUT</span>
             <button class="btn-pedal-shift" onclick="shiftPedalLeft('SPACE')" id="shiftLeft_SPACE" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
@@ -4614,12 +4614,6 @@ function updatePedalsOrderUI() {
       else if (idx === 1) slotBadge.textContent = "INSERT";
       else slotBadge.textContent = "OUT";
     }
-
-    // The number in the pedal title always reflects its live position in
-    // the signal chain, not a fixed module id -- keep it in sync on every
-    // reorder (shift arrows, drag/drop, shuffle, reset).
-    const orderNum = document.getElementById("pedalNum_" + key);
-    if (orderNum) orderNum.textContent = idx + 1;
 
     const shiftL = document.getElementById("shiftLeft_" + key);
     const shiftR = document.getElementById("shiftRight_" + key);
@@ -9851,6 +9845,29 @@ const ORBITAL_MODULES = [
   { id: "space",  name: "MASTER EQ & OUT", num: "8", color: "#4b7bec", rgb: [75, 123, 236], baseR: 37, x: 0, y: 0, vx: 0.12,  vy: -0.16, chClass: "space-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 }
 ];
 
+// Maps a dspChainOrder pedal key to the orbital orb it corresponds to --
+// note the pedal chain's "SPACE" key is the Reverb & Chorus pedal, not the
+// "space" orb (that id is the fixed Master EQ & Out orb, #8).
+const PEDAL_KEY_TO_ORBITAL_ID = { FILTER: "filter", DELAY: "delay", SPACE: "reverb" };
+
+// The constellation chain always links all 8 orbs 1->2->...->8, but the
+// Filter/Delay/Reverb segment (orbs 5-7) follows the live DSP insert
+// order instead of the fixed array order, so dragging/shuffling the
+// pedal chain visibly rewires the orbital connections too. Recomputed
+// every draw frame, so it stays live with no extra event wiring.
+function getOrbitalConnectionChain() {
+  const pedalIds = ["filter", "delay", "reverb"];
+  const leading = ORBITAL_MODULES.filter(o => !pedalIds.includes(o.id) && o.id !== "space");
+  const trailing = ORBITAL_MODULES.find(o => o.id === "space");
+  if (typeof dspChainOrder === "undefined" || !Array.isArray(dspChainOrder)) {
+    return ORBITAL_MODULES;
+  }
+  const pedalOrbs = dspChainOrder
+    .map(key => ORBITAL_MODULES.find(o => o.id === PEDAL_KEY_TO_ORBITAL_ID[key]))
+    .filter(Boolean);
+  return [...leading, ...pedalOrbs, trailing].filter(Boolean);
+}
+
 function initOrbitalConstellation() {
   orbitalCanvas = document.getElementById("orbitalCanvas");
   if (!orbitalCanvas) return;
@@ -10149,10 +10166,14 @@ function updateAndDrawOrbitalCanvas() {
   orbitalCtx.arc(cx, cy, Math.min(w, h) * 0.44, 0, Math.PI * 2);
   orbitalCtx.stroke();
 
-  // Open constellation chain: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 (Orb 8 is disconnected from Orb 1)
-  for (let i = 0; i < ORBITAL_MODULES.length - 1; i++) {
-    const a = ORBITAL_MODULES[i];
-    const b = ORBITAL_MODULES[i + 1];
+  // Open constellation chain: 1 -> 2 -> 3 -> 4 -> [Filter/Delay/Reverb in
+  // live DSP chain order] -> 8 (Orb 8 is disconnected from Orb 1). The
+  // 5-7 segment follows dspChainOrder, so reordering the pedals visibly
+  // rewires these connections too.
+  const connectionChain = getOrbitalConnectionChain();
+  for (let i = 0; i < connectionChain.length - 1; i++) {
+    const a = connectionChain[i];
+    const b = connectionChain[i + 1];
     const grad = orbitalCtx.createLinearGradient(a.x, a.y, b.x, b.y);
     const aExcite = a.pulse + a.bump, bExcite = b.pulse + b.bump;
     const alpha = (0.28 + (aExcite + bExcite) * 0.30).toFixed(3);
