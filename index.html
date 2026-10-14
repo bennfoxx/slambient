@@ -5880,7 +5880,7 @@ function drawRoadsideObjects(w, h) {
 
   scopeCtx.save();
   scopeCtx.beginPath();
-  scopeCtx.rect(0, horizonY - 2, w, gridH + 4);
+  scopeCtx.rect(0, 0, w, h);
   scopeCtx.clip();
 
   for (let i = roadsideObjects.length - 1; i >= 0; i--) {
