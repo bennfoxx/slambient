@@ -252,3 +252,11 @@ diffing against the stompbox-pedal commits above:
 - **Still open in Phase 3**: upper visualizer row drag-reordering (new feature), unified channel
   strip anatomy across all 8 modules (bigger refactor, touches every panel), smart truncated
   dropdowns (new custom `<select>`-replacement component). None of these have been started.
+
+## Update — 2026-10-14 (Dynamic Pedal Numbers: 5, 6, 7)
+
+- **Dynamic Module Numbering (5, 6, 7)**:
+  - Updated `updatePedalsOrderUI()` so that as the pedal chain (`dspChainOrder`) is reordered via drag-and-drop or shift buttons, each pedal's card header dynamically calculates and renders its exact 1-based order in the chain (`5 + idx` -> 5, 6, 7):
+    - `5. Filter & Env`, `6. Analog Delay`, `7. Reverb & Chorus` (or any permutation like `5. Analog Delay`, `6. Filter & Env`, etc.).
+  - Added span IDs (`#pedalTitle_FILTER`, `#pedalTitle_DELAY`, `#pedalTitle_SPACE`) for exact, flicker-free DOM text updates.
+  - Linked dynamic numbering to `ORBITAL_MODULES` via `PEDAL_KEY_TO_ORBITAL_ID`: each orb's `num` string (`orb.num`) updates synchronously with the chain (`5`, `6`, or `7`). The orbital constellation drawing loop (`fillText(orb.num)`) and the orbital side-panel title (`${orb.num}. ${orb.name}`) reflect the live insert chain position in real time.
