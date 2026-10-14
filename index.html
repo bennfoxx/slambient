@@ -38,9 +38,18 @@
     --color-reverb: #ff5fc4;
     --color-space: #4b7bec;
     --color-live: #ffffff;
+    --rgb-drone: 0, 229, 255;
+    --rgb-drum: 255, 56, 56;
+    --rgb-chord: 254, 211, 48;
+    --rgb-arp: 125, 95, 255;
+    --rgb-noise: 29, 209, 161;
+    --rgb-filter: 46, 213, 115;
+    --rgb-delay: 255, 121, 63;
+    --rgb-reverb: 255, 95, 196;
+    --rgb-space: 75, 123, 236;
 
-    --accent: #fed330;
-    --accent-dim: rgba(254, 211, 48, 0.14);
+    --accent: var(--color-chord);
+    --accent-dim: rgba(var(--rgb-chord), 0.14);
 
     --key-chassis: #07080c;
     --key-natural: #161822;
@@ -68,8 +77,8 @@
   body {
     background-color: var(--bg);
     background-image:
-      linear-gradient(rgba(0, 229, 255, 0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 229, 255, 0.025) 1px, transparent 1px);
+      linear-gradient(rgba(var(--rgb-drone), 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(var(--rgb-drone), 0.025) 1px, transparent 1px);
     background-size: 32px 32px;
     color: var(--text-primary);
     font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
@@ -142,13 +151,13 @@
     flex: 1;
     min-width: 0;
     background: var(--panel);
-    border: 1px solid var(--eno-glow-border, rgba(254, 211, 48, 0.65));
+    border: 1px solid var(--eno-glow-border, rgba(var(--rgb-chord), 0.65));
     border-radius: 6px;
     padding: 12px 18px;
     position: relative;
     overflow: visible;
     z-index: 1010;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), var(--eno-glow-shadow, 0 0 16px rgba(254, 211, 48, 0.25));
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), var(--eno-glow-shadow, 0 0 16px rgba(var(--rgb-chord), 0.25));
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
 
@@ -204,7 +213,7 @@
     text-transform: uppercase;
     color: #ffffff;
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    text-shadow: 0 0 14px rgba(0, 229, 255, 0.5), 0 0 28px rgba(0, 229, 255, 0.25);
+    text-shadow: 0 0 14px rgba(var(--rgb-drone), 0.5), 0 0 28px rgba(var(--rgb-drone), 0.25);
     line-height: 1;
   }
   .app-sub {
@@ -216,12 +225,12 @@
     font-weight: 800;
     color: var(--accent);
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    text-shadow: 0 0 8px rgba(254, 211, 48, 0.4);
+    text-shadow: 0 0 8px rgba(var(--rgb-chord), 0.4);
     line-height: 1;
-    border: 1px solid rgba(254, 211, 48, 0.4);
+    border: 1px solid rgba(var(--rgb-chord), 0.4);
     border-radius: 20px;
     padding: 4px 12px;
-    background: rgba(254, 211, 48, 0.07);
+    background: rgba(var(--rgb-chord), 0.07);
   }
 
   .preset-group {
@@ -275,7 +284,7 @@
   .btn-preset-io {
     background: #0f121c;
     color: var(--color-drone);
-    border: 1px solid rgba(0, 229, 255, 0.42);
+    border: 1px solid rgba(var(--rgb-drone), 0.42);
     padding: 0 12px;
     height: 25px;
     min-width: 78px;
@@ -296,10 +305,10 @@
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
   }
   .btn-preset-io:hover {
-    background: rgba(0, 229, 255, 0.16);
+    background: rgba(var(--rgb-drone), 0.16);
     color: #ffffff;
     border-color: var(--color-drone);
-    box-shadow: 0 0 10px rgba(0, 229, 255, 0.35);
+    box-shadow: 0 0 10px rgba(var(--rgb-drone), 0.35);
   }
   .btn-preset-chip {
     background: #0f121c;
@@ -330,19 +339,19 @@
     color: #ffffff;
     border-color: var(--border-bright);
     background: #171c2b;
-    box-shadow: 0 0 8px rgba(0, 229, 255, 0.18);
+    box-shadow: 0 0 8px rgba(var(--rgb-drone), 0.18);
   }
   .btn-preset-chip.active {
-    background: rgba(254, 211, 48, 0.12);
+    background: rgba(var(--rgb-chord), 0.12);
     color: var(--accent);
-    border-color: rgba(254, 211, 48, 0.65);
-    box-shadow: 0 0 12px rgba(254, 211, 48, 0.25), inset 0 0 8px rgba(254, 211, 48, 0.08);
+    border-color: rgba(var(--rgb-chord), 0.65);
+    box-shadow: 0 0 12px rgba(var(--rgb-chord), 0.25), inset 0 0 8px rgba(var(--rgb-chord), 0.08);
     font-weight: 800;
   }
   .btn-preset-chip.active:hover {
-    background: rgba(254, 211, 48, 0.18);
+    background: rgba(var(--rgb-chord), 0.18);
     color: #ffffff;
-    box-shadow: 0 0 16px rgba(254, 211, 48, 0.4);
+    box-shadow: 0 0 16px rgba(var(--rgb-chord), 0.4);
   }
 
   .global-transport {
@@ -365,8 +374,8 @@
     box-sizing: border-box;
     gap: 8px;
     background: #101420;
-    color: #2ed573;
-    border: 1px solid #2ed573;
+    color: var(--color-filter);
+    border: 1px solid var(--color-filter);
     padding: 0 15px;
     border-radius: 4px;
     font-size: 11px;
@@ -375,18 +384,18 @@
     text-transform: uppercase;
     cursor: pointer;
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    box-shadow: 0 0 8px rgba(46, 213, 115, 0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+    box-shadow: 0 0 8px rgba(var(--rgb-filter), 0.25), inset 0 1px 0 rgba(255,255,255,0.08);
     transition: all 0.15s ease;
   }
   .btn-main-play:hover {
     background: #161c2c;
-    box-shadow: 0 0 14px rgba(46, 213, 115, 0.5);
+    box-shadow: 0 0 14px rgba(var(--rgb-filter), 0.5);
   }
   .btn-main-play.active {
-    background: #2ed573;
+    background: var(--color-filter);
     color: #07080c;
-    border-color: #2ed573;
-    box-shadow: 0 0 18px rgba(46, 213, 115, 0.7);
+    border-color: var(--color-filter);
+    box-shadow: 0 0 18px rgba(var(--rgb-filter), 0.7);
   }
   .play-icon-wrap {
     display: inline-flex;
@@ -424,10 +433,10 @@
   }
   .btn-record:hover { color: #fff; border-color: var(--border-bright); background: #161c2c; }
   .btn-record.recording {
-    background: rgba(255, 56, 56, 0.2);
+    background: rgba(var(--rgb-drum), 0.2);
     border-color: var(--color-drum);
     color: var(--color-drum);
-    box-shadow: 0 0 10px rgba(255, 56, 56, 0.5);
+    box-shadow: 0 0 10px rgba(var(--rgb-drum), 0.5);
   }
   .rec-dot {
     width: 6px;
@@ -484,7 +493,7 @@
     height: 14px;
     background: #1c2234;
     border: 1.5px solid var(--accent);
-    box-shadow: 0 0 8px rgba(254, 211, 48, 0.4);
+    box-shadow: 0 0 8px rgba(var(--rgb-chord), 0.4);
     border-radius: 3px;
     margin-top: -5px;
     cursor: pointer;
@@ -492,7 +501,7 @@
   }
   .tempo-ctrl input[type="range"]::-webkit-slider-thumb:hover {
     background: var(--accent);
-    box-shadow: 0 0 12px rgba(254, 211, 48, 0.8);
+    box-shadow: 0 0 12px rgba(var(--rgb-chord), 0.8);
   }
   .tempo-ctrl input[type="range"]::-moz-range-track {
     height: 4px;
@@ -505,7 +514,7 @@
     height: 14px;
     background: #1c2234;
     border: 1.5px solid var(--accent);
-    box-shadow: 0 0 8px rgba(254, 211, 48, 0.4);
+    box-shadow: 0 0 8px rgba(var(--rgb-chord), 0.4);
     border-radius: 3px;
     cursor: pointer;
   }
@@ -517,7 +526,7 @@
     min-width: 52px;
     text-align: right;
     letter-spacing: 0.5px;
-    text-shadow: 0 0 6px rgba(254, 211, 48, 0.3);
+    text-shadow: 0 0 6px rgba(var(--rgb-chord), 0.3);
   }
   .root-scale-ctrl .tag, .time-sig-ctrl .tag, .tempo-ctrl .tag {
     font-size: 9.5px;
@@ -558,12 +567,12 @@
   }
   .root-scale-ctrl select:focus, .time-sig-ctrl select:focus {
     border-color: var(--accent);
-    box-shadow: 0 0 6px rgba(254, 211, 48, 0.35);
+    box-shadow: 0 0 6px rgba(var(--rgb-chord), 0.35);
   }
   .btn-meter-cycle {
     background: #101420;
     color: var(--color-drone);
-    border: 1px solid rgba(0, 229, 255, 0.35);
+    border: 1px solid rgba(var(--rgb-drone), 0.35);
     width: 24px;
     height: 24px;
     box-sizing: border-box;
@@ -577,9 +586,9 @@
     transition: all 0.12s ease;
   }
   .btn-meter-cycle:hover {
-    background: rgba(0, 229, 255, 0.16);
+    background: rgba(var(--rgb-drone), 0.16);
     border-color: var(--color-drone);
-    box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+    box-shadow: 0 0 8px rgba(var(--rgb-drone), 0.4);
   }
   .btn-randomize-all {
     display: inline-flex;
@@ -634,9 +643,65 @@
   }
   .btn-header-util.active {
     color: var(--color-drone);
-    border-color: rgba(0, 229, 255, 0.6);
-    box-shadow: 0 0 10px rgba(0, 229, 255, 0.25);
+    border-color: rgba(var(--rgb-drone), 0.6);
+    box-shadow: 0 0 10px rgba(var(--rgb-drone), 0.25);
   }
+  .palette-wrap { position: relative; }
+  .pal-btn-dots {
+    display: inline-grid !important;
+    grid-template-columns: repeat(2, 5px);
+    gap: 2px;
+  }
+  .pal-btn-dots i { width: 5px; height: 5px; border-radius: 50%; display: block; }
+  .palette-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 9600;
+    width: 300px;
+    padding: 8px;
+    background: var(--panel);
+    border: 1px solid var(--border-bright);
+    border-radius: 6px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+  .palette-menu.open { display: block; }
+  .pal-head {
+    padding: 2px 6px 8px;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .pal-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 6px;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-align: left;
+    cursor: pointer;
+  }
+  .pal-row:hover { background: #141824; color: #fff; }
+  .pal-row.active { border-color: rgba(var(--rgb-chord), 0.55); color: #fff; background: rgba(var(--rgb-chord), 0.06); }
+  .pal-random { margin-top: 4px; border-top: 1px solid var(--border); border-radius: 0 0 4px 4px; }
+  .pal-num { width: 14px; color: var(--text-tertiary); text-align: center; }
+  .pal-name { flex: 1; white-space: nowrap; }
+  .pal-hint { font-size: 9px; font-weight: 500; text-transform: none; color: var(--text-tertiary); }
+  .pal-swatches { display: inline-flex; gap: 3px; }
+  .pal-swatches i { width: 10px; height: 10px; border-radius: 2px; display: block; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.3); }
   .btn-header-util:disabled {
     opacity: 0.35;
     cursor: default;
@@ -653,7 +718,7 @@
     margin-left: 2px;
     background: #0d0f17;
     color: var(--accent);
-    border: 1px solid rgba(254, 211, 48, 0.4);
+    border: 1px solid rgba(var(--rgb-chord), 0.4);
     border-radius: 3px;
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 9.5px;
@@ -664,8 +729,8 @@
   }
   .btn-tap-tempo:hover { border-color: var(--accent); }
   .btn-tap-tempo.tapped {
-    background: rgba(254, 211, 48, 0.3);
-    box-shadow: 0 0 10px rgba(254, 211, 48, 0.5);
+    background: rgba(var(--rgb-chord), 0.3);
+    box-shadow: 0 0 10px rgba(var(--rgb-chord), 0.5);
   }
   .shortcuts-overlay {
     position: fixed;
@@ -684,9 +749,9 @@
     max-height: calc(100vh - 48px);
     overflow-y: auto;
     background: var(--panel);
-    border: 1px solid rgba(0, 229, 255, 0.45);
+    border: 1px solid rgba(var(--rgb-drone), 0.45);
     border-radius: 6px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 18px rgba(0, 229, 255, 0.15);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 18px rgba(var(--rgb-drone), 0.15);
     padding: 16px 18px 14px;
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     color: var(--text-secondary);
@@ -780,14 +845,14 @@
     font-weight: 700;
     font-size: 10.5px;
     letter-spacing: 0.5px;
-    text-shadow: 0 0 6px rgba(254, 211, 48, 0.3);
+    text-shadow: 0 0 6px rgba(var(--rgb-chord), 0.3);
   }
   .telemetry-pill .dot-live {
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background: #2ed573;
-    box-shadow: 0 0 6px #2ed573;
+    background: var(--color-filter);
+    box-shadow: 0 0 6px var(--color-filter);
     animation: livePulse 1.6s infinite ease-in-out;
   }
   @keyframes livePulse {
@@ -821,7 +886,7 @@
   .upper-deck-card.drag-over {
     border-color: var(--accent) !important;
     transform: translateY(-3px);
-    box-shadow: 0 0 20px rgba(254, 211, 48, 0.35), 0 8px 24px rgba(0,0,0,0.8);
+    box-shadow: 0 0 20px rgba(var(--rgb-chord), 0.35), 0 8px 24px rgba(0,0,0,0.8);
   }
   .upper-drag-handle {
     cursor: var(--cursor-grab) !important;
@@ -864,7 +929,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), var(--eno-glow-shadow, 0 0 16px rgba(254, 211, 48, 0.18));
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), var(--eno-glow-shadow, 0 0 16px rgba(var(--rgb-chord), 0.18));
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
   .scope-panel.is-fullscreen {
@@ -901,7 +966,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), var(--eno-glow-shadow, 0 0 16px rgba(254, 211, 48, 0.18));
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), var(--eno-glow-shadow, 0 0 16px rgba(var(--rgb-chord), 0.18));
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
   .keyboard-panel {
@@ -914,7 +979,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), var(--eno-glow-shadow, 0 0 16px rgba(254, 211, 48, 0.18));
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), var(--eno-glow-shadow, 0 0 16px rgba(var(--rgb-chord), 0.18));
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
   @media (max-width: 1100px) {
@@ -1031,9 +1096,9 @@
     pointer-events: none;
   }
   .btn-layer-toggle.active {
-    background: rgba(46, 213, 115, 0.12);
-    border-color: rgba(46, 213, 115, 0.6);
-    box-shadow: 0 0 8px rgba(46, 213, 115, 0.35);
+    background: rgba(var(--rgb-filter), 0.12);
+    border-color: rgba(var(--rgb-filter), 0.6);
+    box-shadow: 0 0 8px rgba(var(--rgb-filter), 0.35);
   }
   .btn-layer-toggle:not(.active) {
     opacity: 0.38;
@@ -1042,24 +1107,24 @@
     border-color: rgba(255, 255, 255, 0.08);
   }
   .btn-layer-toggle.layer-rings.active {
-    background: rgba(0, 229, 255, 0.12);
-    border-color: rgba(0, 229, 255, 0.65);
-    box-shadow: 0 0 8px rgba(0, 229, 255, 0.35);
+    background: rgba(var(--rgb-drone), 0.12);
+    border-color: rgba(var(--rgb-drone), 0.65);
+    box-shadow: 0 0 8px rgba(var(--rgb-drone), 0.35);
   }
   .btn-layer-toggle.layer-flight.active {
-    background: rgba(46, 213, 115, 0.12);
-    border-color: rgba(46, 213, 115, 0.65);
-    box-shadow: 0 0 8px rgba(46, 213, 115, 0.35);
+    background: rgba(var(--rgb-filter), 0.12);
+    border-color: rgba(var(--rgb-filter), 0.65);
+    box-shadow: 0 0 8px rgba(var(--rgb-filter), 0.35);
   }
   .btn-layer-toggle.layer-waterfall.active {
-    background: rgba(254, 211, 48, 0.12);
-    border-color: rgba(254, 211, 48, 0.65);
-    box-shadow: 0 0 8px rgba(254, 211, 48, 0.35);
+    background: rgba(var(--rgb-chord), 0.12);
+    border-color: rgba(var(--rgb-chord), 0.65);
+    box-shadow: 0 0 8px rgba(var(--rgb-chord), 0.35);
   }
   .btn-layer-toggle.layer-roadside.active {
-    background: rgba(255, 121, 63, 0.12);
-    border-color: rgba(255, 121, 63, 0.65);
-    box-shadow: 0 0 8px rgba(255, 121, 63, 0.35);
+    background: rgba(var(--rgb-delay), 0.12);
+    border-color: rgba(var(--rgb-delay), 0.65);
+    box-shadow: 0 0 8px rgba(var(--rgb-delay), 0.35);
   }
   /* The arcade button is a launcher, not a layer: it stays at full strength
      when inactive instead of picking up the dimmed :not(.active) look. */
@@ -1068,14 +1133,14 @@
     filter: none;
   }
   .btn-layer-toggle.layer-arcade.active {
-    background: rgba(46, 213, 115, 0.14);
-    border-color: rgba(46, 213, 115, 0.7);
-    box-shadow: 0 0 8px rgba(46, 213, 115, 0.4);
+    background: rgba(var(--rgb-filter), 0.14);
+    border-color: rgba(var(--rgb-filter), 0.7);
+    box-shadow: 0 0 8px rgba(var(--rgb-filter), 0.4);
   }
   .btn-layer-toggle.layer-fractal.active {
-    background: rgba(140, 110, 255, 0.14);
-    border-color: rgba(140, 110, 255, 0.7);
-    box-shadow: 0 0 8px rgba(140, 110, 255, 0.4);
+    background: rgba(var(--rgb-arp), 0.14);
+    border-color: rgba(var(--rgb-arp), 0.7);
+    box-shadow: 0 0 8px rgba(var(--rgb-arp), 0.4);
   }
   .btn-layer-toggle.layer-fullscreen {
     opacity: 0.78;
@@ -1094,9 +1159,9 @@
     opacity: 1;
     filter: none;
     color: var(--color-drone);
-    background: rgba(0, 229, 255, 0.14);
-    border-color: rgba(0, 229, 255, 0.7);
-    box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+    background: rgba(var(--rgb-drone), 0.14);
+    border-color: rgba(var(--rgb-drone), 0.7);
+    box-shadow: 0 0 8px rgba(var(--rgb-drone), 0.4);
   }
 
   /* The randomize (⟲) icon button is unified in size/shape with the
@@ -1159,10 +1224,10 @@
     transition: all 0.12s ease;
   }
   .btn-power.active {
-    background: rgba(0, 229, 255, 0.18);
+    background: rgba(var(--rgb-drone), 0.18);
     border-color: var(--color-drone);
     color: var(--color-drone);
-    box-shadow: 0 0 7px rgba(0, 229, 255, 0.45);
+    box-shadow: 0 0 7px rgba(var(--rgb-drone), 0.45);
   }
   .btn-power:not(.active) {
     background: rgba(255, 255, 255, 0.03);
@@ -1170,16 +1235,16 @@
     color: #4b5563;
   }
   .btn-mute.active {
-    background: rgba(255, 56, 56, 0.18);
+    background: rgba(var(--rgb-drum), 0.18);
     border-color: var(--color-drum);
     color: var(--color-drum);
-    box-shadow: 0 0 6px rgba(255, 56, 56, 0.4);
+    box-shadow: 0 0 6px rgba(var(--rgb-drum), 0.4);
   }
   .btn-solo.active {
-    background: rgba(254, 211, 48, 0.18);
+    background: rgba(var(--rgb-chord), 0.18);
     border-color: var(--accent);
     color: var(--accent);
-    box-shadow: 0 0 6px rgba(254, 211, 48, 0.4);
+    box-shadow: 0 0 6px rgba(var(--rgb-chord), 0.4);
   }
 
   .scope-legend {
@@ -1243,7 +1308,7 @@
     justify-content: space-between;
     width: 100%;
     padding: 2px 6px 8px 6px;
-    border-bottom: 1px solid rgba(254, 211, 48, 0.25);
+    border-bottom: 1px solid rgba(var(--rgb-chord), 0.25);
   }
   .chord-wheel-root {
     font-size: 17px;
@@ -1252,7 +1317,7 @@
     letter-spacing: 0.5px;
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     line-height: 1;
-    text-shadow: 0 0 12px rgba(254, 211, 48, 0.6);
+    text-shadow: 0 0 12px rgba(var(--rgb-chord), 0.6);
   }
   .chord-wheel-voicing {
     font-size: 17px;
@@ -1262,7 +1327,7 @@
     text-transform: uppercase;
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     line-height: 1;
-    text-shadow: 0 0 10px rgba(254, 211, 48, 0.4);
+    text-shadow: 0 0 10px rgba(var(--rgb-chord), 0.4);
   }
   #chordWheelCanvas {
     width: 124px;
@@ -1474,20 +1539,20 @@
   }
 
   .white-key.active-chord, .black-key.active-chord {
-    background: linear-gradient(180deg, rgba(254, 211, 48, 0.25) 0%, rgba(254, 211, 48, 0.85) 100%) !important;
-    border-color: #fed330 !important;
-    box-shadow: 0 0 16px rgba(254, 211, 48, 0.7), inset 0 0 8px #fed330 !important;
+    background: linear-gradient(180deg, rgba(var(--rgb-chord), 0.25) 0%, rgba(var(--rgb-chord), 0.85) 100%) !important;
+    border-color: var(--color-chord) !important;
+    box-shadow: 0 0 16px rgba(var(--rgb-chord), 0.7), inset 0 0 8px var(--color-chord) !important;
   }
   .white-key.active-arp, .black-key.active-arp {
-    background: linear-gradient(180deg, rgba(125, 95, 255, 0.25) 0%, rgba(125, 95, 255, 0.85) 100%) !important;
-    border-color: #7d5fff !important;
-    box-shadow: 0 0 16px rgba(125, 95, 255, 0.7), inset 0 0 8px #7d5fff !important;
+    background: linear-gradient(180deg, rgba(var(--rgb-arp), 0.25) 0%, rgba(var(--rgb-arp), 0.85) 100%) !important;
+    border-color: var(--color-arp) !important;
+    box-shadow: 0 0 16px rgba(var(--rgb-arp), 0.7), inset 0 0 8px var(--color-arp) !important;
   }
   .white-key.active-live, .black-key.active-live,
   .white-key:active, .black-key:active {
-    background: linear-gradient(180deg, rgba(0, 229, 255, 0.4) 0%, #00e5ff 100%) !important;
-    border-color: #00e5ff !important;
-    box-shadow: 0 0 20px rgba(0, 229, 255, 0.9), inset 0 0 10px #ffffff !important;
+    background: linear-gradient(180deg, rgba(var(--rgb-drone), 0.4) 0%, var(--color-drone) 100%) !important;
+    border-color: var(--color-drone) !important;
+    box-shadow: 0 0 20px rgba(var(--rgb-drone), 0.9), inset 0 0 10px #ffffff !important;
   }
 
   /* Reserve the bottom LED indicator bar on ALL keys so note labels and
@@ -1512,8 +1577,8 @@
   }
   .white-key.in-scale::after,
   .black-key.in-scale::after {
-    background: #fed330;
-    box-shadow: 0 0 5px rgba(254, 211, 48, 0.75);
+    background: var(--color-chord);
+    box-shadow: 0 0 5px rgba(var(--rgb-chord), 0.75);
   }
   .white-key.active-chord::after, .black-key.active-chord::after,
   .white-key.active-arp::after, .black-key.active-arp::after,
@@ -1591,7 +1656,7 @@
     background: var(--panel);
     border: 1px solid var(--eno-glow-border, var(--border));
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5), var(--eno-glow-shadow, 0 0 12px rgba(254, 211, 48, 0.12));
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5), var(--eno-glow-shadow, 0 0 12px rgba(var(--rgb-chord), 0.12));
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
   .view-switcher-group {
@@ -1620,22 +1685,22 @@
   }
   .btn-view-mode:hover { color: #ffffff; }
   #btnViewOrbital.active {
-    background: rgba(0, 229, 255, 0.16);
-    border-color: #00e5ff;
-    color: #00e5ff;
-    box-shadow: 0 0 14px rgba(0, 229, 255, 0.45);
+    background: rgba(var(--rgb-drone), 0.16);
+    border-color: var(--color-drone);
+    color: var(--color-drone);
+    box-shadow: 0 0 14px rgba(var(--rgb-drone), 0.45);
   }
   #btnViewConsole.active {
-    background: rgba(254, 211, 48, 0.16);
+    background: rgba(var(--rgb-chord), 0.16);
     border-color: var(--accent);
     color: var(--accent);
-    box-shadow: 0 0 14px rgba(254, 211, 48, 0.45);
+    box-shadow: 0 0 14px rgba(var(--rgb-chord), 0.45);
   }
   #btnViewPedals.active {
-    background: rgba(255, 121, 63, 0.16);
+    background: rgba(var(--rgb-delay), 0.16);
     border-color: var(--color-delay);
     color: var(--color-delay);
-    box-shadow: 0 0 14px rgba(255, 121, 63, 0.45);
+    box-shadow: 0 0 14px rgba(var(--rgb-delay), 0.45);
   }
 
   .orbital-bar-center {
@@ -1665,8 +1730,8 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #2ed573;
-    box-shadow: 0 0 6px #2ed573;
+    background: var(--color-filter);
+    box-shadow: 0 0 6px var(--color-filter);
   }
   .orbital-bar-actions {
     display: flex;
@@ -1687,15 +1752,15 @@
     justify-content: center;
   }
   .orbital-slider-ctrl input[type="range"]::-webkit-slider-thumb {
-    border-color: #00e5ff;
-    box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+    border-color: var(--color-drone);
+    box-shadow: 0 0 8px rgba(var(--rgb-drone), 0.4);
   }
   .orbital-slider-ctrl input[type="range"]::-webkit-slider-thumb:hover {
-    background: #00e5ff;
-    box-shadow: 0 0 12px rgba(0, 229, 255, 0.8);
+    background: var(--color-drone);
+    box-shadow: 0 0 12px rgba(var(--rgb-drone), 0.8);
   }
   .orbital-slider-ctrl .tag, .orbital-slider-ctrl .tempo-val {
-    color: #00e5ff;
+    color: var(--color-drone);
     white-space: nowrap;
   }
   @media (max-width: 700px) {
@@ -1737,7 +1802,7 @@
     border: 1px solid var(--eno-glow-border, var(--border));
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: inset 0 0 28px rgba(0,0,0,0.9), 0 4px 16px rgba(0, 0, 0, 0.6), var(--eno-glow-shadow, 0 0 16px rgba(254, 211, 48, 0.18));
+    box-shadow: inset 0 0 28px rgba(0,0,0,0.9), 0 4px 16px rgba(0, 0, 0, 0.6), var(--eno-glow-shadow, 0 0 16px rgba(var(--rgb-chord), 0.18));
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
   .orbital-arena-wrapper canvas#orbitalCanvas {
@@ -1784,8 +1849,8 @@
     width: 620px;
     max-width: 85%;
     background: linear-gradient(145deg, rgba(var(--modal-accent-rgb, 0, 229, 255), 0.08) 0%, rgba(9, 12, 20, 0.98) 42%, #070910 100%);
-    border-right: 2px solid var(--modal-accent-color, #00e5ff);
-    box-shadow: 14px 0 36px var(--modal-accent-glow, rgba(0, 229, 255, 0.35)), inset -1px 0 0 rgba(var(--modal-accent-rgb, 0, 229, 255), 0.25), inset 0 0 20px rgba(0,0,0,0.8);
+    border-right: 2px solid var(--modal-accent-color, var(--color-drone));
+    box-shadow: 14px 0 36px var(--modal-accent-glow, rgba(var(--rgb-drone), 0.35)), inset -1px 0 0 rgba(var(--modal-accent-rgb, 0, 229, 255), 0.25), inset 0 0 20px rgba(0,0,0,0.8);
     padding: 16px 18px;
     overflow-y: auto;
     z-index: 5;
@@ -1826,7 +1891,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    text-shadow: 0 0 12px var(--modal-accent-glow, rgba(0, 229, 255, 0.4));
+    text-shadow: 0 0 12px var(--modal-accent-glow, rgba(var(--rgb-drone), 0.4));
   }
   .orbital-modal-header-right {
     display: flex;
@@ -1855,9 +1920,9 @@
   }
   .orbital-modal-close:hover {
     color: #ffffff;
-    border-color: var(--modal-accent-color, #00e5ff);
+    border-color: var(--modal-accent-color, var(--color-drone));
     background: rgba(var(--modal-accent-rgb, 0, 229, 255), 0.25);
-    box-shadow: 0 0 10px var(--modal-accent-glow, rgba(0, 229, 255, 0.5));
+    box-shadow: 0 0 10px var(--modal-accent-glow, rgba(var(--rgb-drone), 0.5));
   }
   .orbital-modal-body {
     display: flex;
@@ -1871,7 +1936,7 @@
   .orbital-side-panel .pedal-chassis {
     background: rgba(13, 16, 26, 0.90);
     border: 1px solid rgba(var(--modal-accent-rgb, 0, 229, 255), 0.38) !important;
-    border-top: 2px solid var(--modal-accent-color, #00e5ff) !important;
+    border-top: 2px solid var(--modal-accent-color, var(--color-drone)) !important;
     border-radius: 6px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--modal-accent-rgb, 0, 229, 255), 0.16) !important;
   }
@@ -1976,78 +2041,78 @@
   }
   .strip-channel.drone-ch  {
     border-top: 3px solid var(--color-drone);
-    border-color: rgba(0, 229, 255, 0.38);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 229, 255, 0.16);
+    border-color: rgba(var(--rgb-drone), 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--rgb-drone), 0.16);
   }
   .strip-channel.drum-ch   {
     border-top: 3px solid var(--color-drum);
-    border-color: rgba(255, 56, 56, 0.38);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 56, 56, 0.16);
+    border-color: rgba(var(--rgb-drum), 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--rgb-drum), 0.16);
   }
   .strip-channel.chord-ch  {
     border-top: 3px solid var(--color-chord);
-    border-color: rgba(254, 211, 48, 0.38);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(254, 211, 48, 0.16);
+    border-color: rgba(var(--rgb-chord), 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--rgb-chord), 0.16);
   }
   .strip-channel.arp-ch    {
     border-top: 3px solid var(--color-arp);
-    border-color: rgba(125, 95, 255, 0.38);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(125, 95, 255, 0.16);
+    border-color: rgba(var(--rgb-arp), 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--rgb-arp), 0.16);
   }
   .strip-channel.noise-ch  {
     border-top: 3px solid var(--color-noise);
-    border-color: rgba(29, 209, 161, 0.38);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(29, 209, 161, 0.16);
+    border-color: rgba(var(--rgb-noise), 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--rgb-noise), 0.16);
   }
   .strip-channel.filter-ch {
     border-top: 3px solid var(--color-filter);
-    border-color: rgba(46, 213, 115, 0.38);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(46, 213, 115, 0.16);
+    border-color: rgba(var(--rgb-filter), 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--rgb-filter), 0.16);
   }
   .strip-channel.delay-ch  {
     border-top: 3px solid var(--color-delay);
-    border-color: rgba(255, 121, 63, 0.38);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 121, 63, 0.16);
+    border-color: rgba(var(--rgb-delay), 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--rgb-delay), 0.16);
   }
   .strip-channel.reverb-ch {
     border-top: 3px solid var(--color-reverb);
-    border-color: rgba(255, 95, 196, 0.38);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 95, 196, 0.16);
+    border-color: rgba(var(--rgb-reverb), 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--rgb-reverb), 0.16);
   }
   .strip-channel.space-ch  {
     border-top: 3px solid var(--color-space);
-    border-color: rgba(75, 123, 236, 0.38);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(75, 123, 236, 0.16);
+    border-color: rgba(var(--rgb-space), 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--rgb-space), 0.16);
   }
 
   /* Console rack cards now carry the same border/glow intensity the
      orbital side panel uses for its (single, focused) expanded card --
      unifies the two views' module chrome using the side panel as the
      reference look. */
-  .strip-channel.drone-ch  .panel-header { border-bottom-color: rgba(0, 229, 255, 0.25); }
-  .strip-channel.drum-ch   .panel-header { border-bottom-color: rgba(255, 56, 56, 0.25); }
-  .strip-channel.chord-ch  .panel-header { border-bottom-color: rgba(254, 211, 48, 0.25); }
-  .strip-channel.arp-ch    .panel-header { border-bottom-color: rgba(125, 95, 255, 0.25); }
-  .strip-channel.noise-ch  .panel-header { border-bottom-color: rgba(29, 209, 161, 0.25); }
-  .strip-channel.filter-ch .panel-header { border-bottom-color: rgba(46, 213, 115, 0.25); }
-  .strip-channel.delay-ch  .panel-header { border-bottom-color: rgba(255, 121, 63, 0.25); }
-  .strip-channel.reverb-ch .panel-header { border-bottom-color: rgba(255, 95, 196, 0.25); }
-  .strip-channel.space-ch  .panel-header { border-bottom-color: rgba(75, 123, 236, 0.25); }
+  .strip-channel.drone-ch  .panel-header { border-bottom-color: rgba(var(--rgb-drone), 0.25); }
+  .strip-channel.drum-ch   .panel-header { border-bottom-color: rgba(var(--rgb-drum), 0.25); }
+  .strip-channel.chord-ch  .panel-header { border-bottom-color: rgba(var(--rgb-chord), 0.25); }
+  .strip-channel.arp-ch    .panel-header { border-bottom-color: rgba(var(--rgb-arp), 0.25); }
+  .strip-channel.noise-ch  .panel-header { border-bottom-color: rgba(var(--rgb-noise), 0.25); }
+  .strip-channel.filter-ch .panel-header { border-bottom-color: rgba(var(--rgb-filter), 0.25); }
+  .strip-channel.delay-ch  .panel-header { border-bottom-color: rgba(var(--rgb-delay), 0.25); }
+  .strip-channel.reverb-ch .panel-header { border-bottom-color: rgba(var(--rgb-reverb), 0.25); }
+  .strip-channel.space-ch  .panel-header { border-bottom-color: rgba(var(--rgb-space), 0.25); }
 
   /* Console rack module titles now carry the same colored-glow treatment
      the orbital side panel already used (via --modal-accent-*) -- same
      look, just driven by each module's own fixed accent color instead of
      a JS-set custom property, so it's consistent everywhere a module's
      own card renders its own title. */
-  .strip-channel.drone-ch  .panel-header > span:first-child { color: var(--color-drone);  text-shadow: 0 0 8px rgba(0, 229, 255, 0.35); }
-  .strip-channel.drum-ch   .panel-header > span:first-child { color: var(--color-drum);   text-shadow: 0 0 8px rgba(255, 56, 56, 0.35); }
-  .strip-channel.chord-ch  .panel-header > span:first-child { color: var(--color-chord);  text-shadow: 0 0 8px rgba(254, 211, 48, 0.35); }
-  .strip-channel.arp-ch    .panel-header > span:first-child { color: var(--color-arp);    text-shadow: 0 0 8px rgba(125, 95, 255, 0.35); }
-  .strip-channel.noise-ch  .panel-header > span:first-child { color: var(--color-noise);  text-shadow: 0 0 8px rgba(29, 209, 161, 0.35); }
-  .strip-channel.filter-ch .panel-header > span:first-child { color: var(--color-filter); text-shadow: 0 0 8px rgba(46, 213, 115, 0.35); }
-  .strip-channel.delay-ch  .panel-header > span:first-child { color: var(--color-delay);  text-shadow: 0 0 8px rgba(255, 121, 63, 0.35); }
-  .strip-channel.reverb-ch .panel-header > span:first-child { color: var(--color-reverb); text-shadow: 0 0 8px rgba(255, 95, 196, 0.35); }
-  .strip-channel.space-ch  .panel-header > span:first-child { color: var(--color-space);  text-shadow: 0 0 8px rgba(75, 123, 236, 0.35); }
+  .strip-channel.drone-ch  .panel-header > span:first-child { color: var(--color-drone);  text-shadow: 0 0 8px rgba(var(--rgb-drone), 0.35); }
+  .strip-channel.drum-ch   .panel-header > span:first-child { color: var(--color-drum);   text-shadow: 0 0 8px rgba(var(--rgb-drum), 0.35); }
+  .strip-channel.chord-ch  .panel-header > span:first-child { color: var(--color-chord);  text-shadow: 0 0 8px rgba(var(--rgb-chord), 0.35); }
+  .strip-channel.arp-ch    .panel-header > span:first-child { color: var(--color-arp);    text-shadow: 0 0 8px rgba(var(--rgb-arp), 0.35); }
+  .strip-channel.noise-ch  .panel-header > span:first-child { color: var(--color-noise);  text-shadow: 0 0 8px rgba(var(--rgb-noise), 0.35); }
+  .strip-channel.filter-ch .panel-header > span:first-child { color: var(--color-filter); text-shadow: 0 0 8px rgba(var(--rgb-filter), 0.35); }
+  .strip-channel.delay-ch  .panel-header > span:first-child { color: var(--color-delay);  text-shadow: 0 0 8px rgba(var(--rgb-delay), 0.35); }
+  .strip-channel.reverb-ch .panel-header > span:first-child { color: var(--color-reverb); text-shadow: 0 0 8px rgba(var(--rgb-reverb), 0.35); }
+  .strip-channel.space-ch  .panel-header > span:first-child { color: var(--color-space);  text-shadow: 0 0 8px rgba(var(--rgb-space), 0.35); }
 
   .control-row {
     display: flex;
@@ -2138,9 +2203,9 @@
     border-color: var(--border-bright);
   }
   .toggle-switch input:checked + .toggle-track {
-    background: rgba(254, 211, 48, 0.20);
+    background: rgba(var(--rgb-chord), 0.20);
     border-color: var(--accent);
-    box-shadow: 0 0 8px rgba(254, 211, 48, 0.35);
+    box-shadow: 0 0 8px rgba(var(--rgb-chord), 0.35);
   }
   .toggle-switch input:checked + .toggle-track::before {
     transform: translateX(14px);
@@ -2150,107 +2215,107 @@
 
   /* Per-module toggle switch color schemes */
   .drone-ch .toggle-switch input:checked + .toggle-track {
-    background: rgba(0, 229, 255, 0.22);
+    background: rgba(var(--rgb-drone), 0.22);
     border-color: var(--color-drone);
-    box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+    box-shadow: 0 0 8px rgba(var(--rgb-drone), 0.4);
   }
   .drone-ch .toggle-switch input:checked + .toggle-track::before {
     background: var(--color-drone);
     box-shadow: 0 0 6px var(--color-drone);
   }
   .drone-ch .toggle-switch:hover .toggle-track {
-    border-color: rgba(0, 229, 255, 0.6);
+    border-color: rgba(var(--rgb-drone), 0.6);
   }
 
   .drum-ch .toggle-switch input:checked + .toggle-track {
-    background: rgba(255, 56, 56, 0.22);
+    background: rgba(var(--rgb-drum), 0.22);
     border-color: var(--color-drum);
-    box-shadow: 0 0 8px rgba(255, 56, 56, 0.4);
+    box-shadow: 0 0 8px rgba(var(--rgb-drum), 0.4);
   }
   .drum-ch .toggle-switch input:checked + .toggle-track::before {
     background: var(--color-drum);
     box-shadow: 0 0 6px var(--color-drum);
   }
   .drum-ch .toggle-switch:hover .toggle-track {
-    border-color: rgba(255, 56, 56, 0.6);
+    border-color: rgba(var(--rgb-drum), 0.6);
   }
 
   .chord-ch .toggle-switch input:checked + .toggle-track {
-    background: rgba(254, 211, 48, 0.22);
+    background: rgba(var(--rgb-chord), 0.22);
     border-color: var(--color-chord);
-    box-shadow: 0 0 8px rgba(254, 211, 48, 0.4);
+    box-shadow: 0 0 8px rgba(var(--rgb-chord), 0.4);
   }
   .chord-ch .toggle-switch input:checked + .toggle-track::before {
     background: var(--color-chord);
     box-shadow: 0 0 6px var(--color-chord);
   }
   .chord-ch .toggle-switch:hover .toggle-track {
-    border-color: rgba(254, 211, 48, 0.6);
+    border-color: rgba(var(--rgb-chord), 0.6);
   }
 
   .arp-ch .toggle-switch input:checked + .toggle-track {
-    background: rgba(125, 95, 255, 0.25);
+    background: rgba(var(--rgb-arp), 0.25);
     border-color: var(--color-arp);
-    box-shadow: 0 0 8px rgba(125, 95, 255, 0.45);
+    box-shadow: 0 0 8px rgba(var(--rgb-arp), 0.45);
   }
   .arp-ch .toggle-switch input:checked + .toggle-track::before {
     background: var(--color-arp);
     box-shadow: 0 0 6px var(--color-arp);
   }
   .arp-ch .toggle-switch:hover .toggle-track {
-    border-color: rgba(125, 95, 255, 0.6);
+    border-color: rgba(var(--rgb-arp), 0.6);
   }
 
   .noise-ch .toggle-switch input:checked + .toggle-track {
-    background: rgba(29, 209, 161, 0.22);
+    background: rgba(var(--rgb-noise), 0.22);
     border-color: var(--color-noise);
-    box-shadow: 0 0 8px rgba(29, 209, 161, 0.4);
+    box-shadow: 0 0 8px rgba(var(--rgb-noise), 0.4);
   }
   .noise-ch .toggle-switch input:checked + .toggle-track::before {
     background: var(--color-noise);
     box-shadow: 0 0 6px var(--color-noise);
   }
   .noise-ch .toggle-switch:hover .toggle-track {
-    border-color: rgba(29, 209, 161, 0.6);
+    border-color: rgba(var(--rgb-noise), 0.6);
   }
 
   .filter-ch .toggle-switch input:checked + .toggle-track {
-    background: rgba(46, 213, 115, 0.22);
+    background: rgba(var(--rgb-filter), 0.22);
     border-color: var(--color-filter);
-    box-shadow: 0 0 8px rgba(46, 213, 115, 0.4);
+    box-shadow: 0 0 8px rgba(var(--rgb-filter), 0.4);
   }
   .filter-ch .toggle-switch input:checked + .toggle-track::before {
     background: var(--color-filter);
     box-shadow: 0 0 6px var(--color-filter);
   }
   .filter-ch .toggle-switch:hover .toggle-track {
-    border-color: rgba(46, 213, 115, 0.6);
+    border-color: rgba(var(--rgb-filter), 0.6);
   }
 
   .delay-ch .toggle-switch input:checked + .toggle-track {
-    background: rgba(255, 121, 63, 0.22);
+    background: rgba(var(--rgb-delay), 0.22);
     border-color: var(--color-delay);
-    box-shadow: 0 0 8px rgba(255, 121, 63, 0.4);
+    box-shadow: 0 0 8px rgba(var(--rgb-delay), 0.4);
   }
   .delay-ch .toggle-switch input:checked + .toggle-track::before {
     background: var(--color-delay);
     box-shadow: 0 0 6px var(--color-delay);
   }
   .delay-ch .toggle-switch:hover .toggle-track {
-    border-color: rgba(255, 121, 63, 0.6);
+    border-color: rgba(var(--rgb-delay), 0.6);
   }
 
   .space-ch .toggle-switch input:checked + .toggle-track {
-    background: rgba(75, 123, 236, 0.22);
+    background: rgba(var(--rgb-space), 0.22);
     border-color: var(--color-space);
-    box-shadow: 0 0 8px rgba(75, 123, 236, 0.4);
+    box-shadow: 0 0 8px rgba(var(--rgb-space), 0.4);
   }
   .space-ch .toggle-switch input:checked + .toggle-track::before {
     background: var(--color-space);
     box-shadow: 0 0 6px var(--color-space);
   }
   .space-ch .toggle-switch:hover .toggle-track {
-    border-color: rgba(75, 123, 236, 0.6);
+    border-color: rgba(var(--rgb-space), 0.6);
   }
 
   select, input[type="range"] {
@@ -2282,7 +2347,7 @@
   }
   select:focus {
     border-color: var(--border-bright);
-    box-shadow: 0 0 6px rgba(0, 229, 255, 0.25);
+    box-shadow: 0 0 6px rgba(var(--rgb-drone), 0.25);
   }
   select option {
     background: #090b12;
@@ -2450,18 +2515,18 @@
     transition: all 0.15s ease;
   }
   .routing-pill.pill-mod1 {
-    background: rgba(46, 213, 115, 0.15);
-    border: 1px solid rgba(46, 213, 115, 0.5);
+    background: rgba(var(--rgb-filter), 0.15);
+    border: 1px solid rgba(var(--rgb-filter), 0.5);
     color: var(--color-filter);
   }
   .routing-pill.pill-mod2 {
-    background: rgba(255, 121, 63, 0.15);
-    border: 1px solid rgba(255, 121, 63, 0.5);
+    background: rgba(var(--rgb-delay), 0.15);
+    border: 1px solid rgba(var(--rgb-delay), 0.5);
     color: var(--color-delay);
   }
   .routing-pill.pill-mod3 {
-    background: rgba(255, 95, 196, 0.15);
-    border: 1px solid rgba(255, 95, 196, 0.5);
+    background: rgba(var(--rgb-reverb), 0.15);
+    border: 1px solid rgba(var(--rgb-reverb), 0.5);
     color: var(--color-reverb);
   }
 
@@ -2554,7 +2619,7 @@
   .pedal-chassis.drag-over {
     border-color: var(--accent) !important;
     transform: translateY(-4px) scale(1.015);
-    box-shadow: 0 0 24px rgba(254, 211, 48, 0.4), 0 16px 40px rgba(0, 0, 0, 0.9);
+    box-shadow: 0 0 24px rgba(var(--rgb-chord), 0.4), 0 16px 40px rgba(0, 0, 0, 0.9);
   }
 
   .pedal-chassis.dragging {
@@ -2567,49 +2632,49 @@
      by the other module panels (border-top stripe + tinted glow). */
   .pedal-chassis.pedal-filter {
     border-top: 3px solid var(--color-filter);
-    border-color: rgba(46, 213, 115, 0.38);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(46, 213, 115, 0.16);
+    border-color: rgba(var(--rgb-filter), 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--rgb-filter), 0.16);
   }
   .pedal-chassis.pedal-delay {
     border-top: 3px solid var(--color-delay);
-    border-color: rgba(255, 121, 63, 0.38);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 121, 63, 0.16);
+    border-color: rgba(var(--rgb-delay), 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--rgb-delay), 0.16);
   }
   .pedal-chassis.pedal-space,
   .pedal-chassis.pedal-reverb {
     border-top: 3px solid var(--color-reverb);
-    border-color: rgba(255, 95, 196, 0.38);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 95, 196, 0.16);
+    border-color: rgba(var(--rgb-reverb), 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--rgb-reverb), 0.16);
   }
 
   /* .btn-power.active is hardcoded to the drone module's cyan (its only
      other use) -- override per pedal so the bypass/engage glow matches
      that pedal's own accent color instead of always reading cyan. */
   .pedal-filter .btn-power.active {
-    background: rgba(46, 213, 115, 0.18);
+    background: rgba(var(--rgb-filter), 0.18);
     border-color: var(--color-filter);
     color: var(--color-filter);
-    box-shadow: 0 0 7px rgba(46, 213, 115, 0.45);
+    box-shadow: 0 0 7px rgba(var(--rgb-filter), 0.45);
   }
   .pedal-delay .btn-power.active {
-    background: rgba(255, 121, 63, 0.18);
+    background: rgba(var(--rgb-delay), 0.18);
     border-color: var(--color-delay);
     color: var(--color-delay);
-    box-shadow: 0 0 7px rgba(255, 121, 63, 0.45);
+    box-shadow: 0 0 7px rgba(var(--rgb-delay), 0.45);
   }
   .pedal-space .btn-power.active,
   .pedal-reverb .btn-power.active {
-    background: rgba(255, 95, 196, 0.18);
+    background: rgba(var(--rgb-reverb), 0.18);
     border-color: var(--color-reverb);
     color: var(--color-reverb);
-    box-shadow: 0 0 7px rgba(255, 95, 196, 0.45);
+    box-shadow: 0 0 7px rgba(var(--rgb-reverb), 0.45);
   }
 
   /* Pedal title color accents, matching the panel-header > span:first-child
      convention used by the other (strip-channel) module panels. */
-  .pedal-filter .panel-header > span:first-child { color: var(--color-filter); text-shadow: 0 0 8px rgba(46, 213, 115, 0.35); }
-  .pedal-delay .panel-header > span:first-child { color: var(--color-delay); text-shadow: 0 0 8px rgba(255, 121, 63, 0.35); }
-  .pedal-space .panel-header > span:first-child, .pedal-reverb .panel-header > span:first-child { color: var(--color-reverb); text-shadow: 0 0 8px rgba(255, 95, 196, 0.35); }
+  .pedal-filter .panel-header > span:first-child { color: var(--color-filter); text-shadow: 0 0 8px rgba(var(--rgb-filter), 0.35); }
+  .pedal-delay .panel-header > span:first-child { color: var(--color-delay); text-shadow: 0 0 8px rgba(var(--rgb-delay), 0.35); }
+  .pedal-space .panel-header > span:first-child, .pedal-reverb .panel-header > span:first-child { color: var(--color-reverb); text-shadow: 0 0 8px rgba(var(--rgb-reverb), 0.35); }
 
   .pedal-slot-badge {
     height: 24px;
@@ -2941,34 +3006,34 @@
     color: #fff;
   }
   .drone-ch .btn-aux-toggle.active, .drone-ch .btn-power.active {
-    background: rgba(0, 229, 255, 0.18);
+    background: rgba(var(--rgb-drone), 0.18);
     border-color: var(--color-drone);
     color: var(--color-drone);
-    box-shadow: 0 0 6px rgba(0, 229, 255, 0.35);
+    box-shadow: 0 0 6px rgba(var(--rgb-drone), 0.35);
   }
   .drum-ch .btn-aux-toggle.active, .drum-ch .btn-power.active {
-    background: rgba(255, 56, 56, 0.18);
+    background: rgba(var(--rgb-drum), 0.18);
     border-color: var(--color-drum);
     color: var(--color-drum);
-    box-shadow: 0 0 6px rgba(255, 56, 56, 0.35);
+    box-shadow: 0 0 6px rgba(var(--rgb-drum), 0.35);
   }
   .chord-ch .btn-aux-toggle.active, .chord-ch .btn-power.active {
-    background: rgba(254, 211, 48, 0.18);
+    background: rgba(var(--rgb-chord), 0.18);
     border-color: var(--color-chord);
     color: var(--color-chord);
-    box-shadow: 0 0 6px rgba(254, 211, 48, 0.35);
+    box-shadow: 0 0 6px rgba(var(--rgb-chord), 0.35);
   }
   .arp-ch .btn-aux-toggle.active, .arp-ch .btn-power.active {
-    background: rgba(125, 95, 255, 0.20);
+    background: rgba(var(--rgb-arp), 0.20);
     border-color: var(--color-arp);
     color: var(--color-arp);
-    box-shadow: 0 0 6px rgba(125, 95, 255, 0.35);
+    box-shadow: 0 0 6px rgba(var(--rgb-arp), 0.35);
   }
   .noise-ch .btn-aux-toggle.active, .noise-ch .btn-power.active {
-    background: rgba(29, 209, 161, 0.18);
+    background: rgba(var(--rgb-noise), 0.18);
     border-color: var(--color-noise);
     color: var(--color-noise);
-    box-shadow: 0 0 6px rgba(29, 209, 161, 0.35);
+    box-shadow: 0 0 6px rgba(var(--rgb-noise), 0.35);
   }
   .btn-drum-fill {
     height: 24px;
@@ -2980,24 +3045,24 @@
     font-weight: 800;
     letter-spacing: 0.7px;
     border-radius: 4px;
-    border: 1px solid rgba(255, 56, 56, 0.45);
-    background: rgba(255, 56, 56, 0.08);
+    border: 1px solid rgba(var(--rgb-drum), 0.45);
+    background: rgba(var(--rgb-drum), 0.08);
     color: var(--color-drum);
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     cursor: var(--cursor-pointer) !important;
     transition: all 0.12s ease;
   }
   .btn-drum-fill:hover {
-    background: rgba(255, 56, 56, 0.22);
+    background: rgba(var(--rgb-drum), 0.22);
     border-color: var(--color-drum);
-    box-shadow: 0 0 8px rgba(255, 56, 56, 0.45);
+    box-shadow: 0 0 8px rgba(var(--rgb-drum), 0.45);
     color: #fff;
   }
   .btn-drum-fill.filling, .btn-drum-fill:active {
     background: var(--color-drum);
     color: #07080c !important;
     border-color: var(--color-drum);
-    box-shadow: 0 0 12px rgba(255, 56, 56, 0.8);
+    box-shadow: 0 0 12px rgba(var(--rgb-drum), 0.8);
     transform: scale(0.96);
   }
   .strip-channel > .control-row:last-child {
@@ -3033,7 +3098,7 @@
     width: 72px;
     box-sizing: border-box;
     flex-shrink: 0;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.8), 0 4px 16px rgba(0,0,0,0.6), var(--eno-glow-shadow, 0 0 16px rgba(254, 211, 48, 0.18));
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.8), 0 4px 16px rgba(0,0,0,0.6), var(--eno-glow-shadow, 0 0 16px rgba(var(--rgb-chord), 0.18));
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
     user-select: none;
   }
@@ -3073,14 +3138,14 @@
     border-radius: 3px;
     background: #1c2234;
     border: 1.5px solid var(--accent);
-    box-shadow: 0 0 8px rgba(254, 211, 48, 0.4);
+    box-shadow: 0 0 8px rgba(var(--rgb-chord), 0.4);
     margin-top: -5px;
     cursor: pointer;
     transition: all 0.12s ease;
   }
   .master-vol-slider-wrap input[type="range"]::-webkit-slider-thumb:hover {
     background: var(--accent);
-    box-shadow: 0 0 12px rgba(254, 211, 48, 0.8);
+    box-shadow: 0 0 12px rgba(var(--rgb-chord), 0.8);
   }
   .master-vol-slider-wrap input[type="range"]::-moz-range-thumb {
     width: 14px;
@@ -3088,7 +3153,7 @@
     border-radius: 3px;
     background: #1c2234;
     border: 1.5px solid var(--accent);
-    box-shadow: 0 0 8px rgba(254, 211, 48, 0.4);
+    box-shadow: 0 0 8px rgba(var(--rgb-chord), 0.4);
     cursor: pointer;
   }
   .master-vol-val {
@@ -3096,7 +3161,7 @@
     font-size: 11px;
     font-weight: 800;
     color: var(--accent);
-    text-shadow: 0 0 6px rgba(254, 211, 48, 0.35);
+    text-shadow: 0 0 6px rgba(var(--rgb-chord), 0.35);
   }
   .master-vol-mute {
     width: 24px;
@@ -3113,10 +3178,10 @@
   }
   .master-vol-mute:hover { border-color: var(--border-bright); color: #ffffff; }
   .master-vol-mute.active {
-    background: rgba(255, 56, 56, 0.15);
+    background: rgba(var(--rgb-drum), 0.15);
     border-color: var(--color-drum);
     color: var(--color-drum);
-    box-shadow: 0 0 8px rgba(255, 56, 56, 0.35);
+    box-shadow: 0 0 8px rgba(var(--rgb-drum), 0.35);
   }
 
   .eno-standalone-pod {
@@ -3134,12 +3199,12 @@
     flex-shrink: 0;
     min-height: 0;
     cursor: pointer;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.8), 0 4px 16px rgba(0,0,0,0.6), var(--eno-glow-shadow, 0 0 16px rgba(254, 211, 48, 0.18));
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.8), 0 4px 16px rgba(0,0,0,0.6), var(--eno-glow-shadow, 0 0 16px rgba(var(--rgb-chord), 0.18));
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
     user-select: none;
   }
   .eno-standalone-pod:hover {
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.8), 0 0 16px var(--eno-glow-border, rgba(254, 211, 48, 0.5));
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.8), 0 0 16px var(--eno-glow-border, rgba(var(--rgb-chord), 0.5));
   }
 
   .eno-crt-screen {
@@ -3151,7 +3216,7 @@
     border-radius: 6px;
     overflow: hidden;
     border: 2px solid #1c2420;
-    box-shadow: inset 0 0 16px rgba(0,0,0,0.95), 0 0 10px rgba(46, 213, 115, 0.12);
+    box-shadow: inset 0 0 16px rgba(0,0,0,0.95), 0 0 10px rgba(var(--rgb-filter), 0.12);
   }
   .eno-bio-scan-label {
     position: absolute;
@@ -3160,8 +3225,8 @@
     font-size: 6.5px;
     font-weight: 800;
     letter-spacing: 0.6px;
-    color: #2ed573;
-    text-shadow: 0 0 4px rgba(46, 213, 115, 0.9), 0 0 8px rgba(46, 213, 115, 0.5);
+    color: var(--color-filter);
+    text-shadow: 0 0 4px rgba(var(--rgb-filter), 0.9), 0 0 8px rgba(var(--rgb-filter), 0.5);
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
     z-index: 4;
     pointer-events: none;
@@ -3278,16 +3343,16 @@
     background: rgba(255,255,255,0.05);
   }
   .vert-mode-btn.active#btnModeChord {
-    background: rgba(254, 211, 48, 0.16);
+    background: rgba(var(--rgb-chord), 0.16);
     border-color: var(--color-chord);
     color: var(--color-chord);
-    box-shadow: 0 0 14px rgba(254, 211, 48, 0.45);
+    box-shadow: 0 0 14px rgba(var(--rgb-chord), 0.45);
   }
   .vert-mode-btn.active#btnModeArp {
-    background: rgba(125, 95, 255, 0.16);
+    background: rgba(var(--rgb-arp), 0.16);
     border-color: var(--color-arp);
     color: var(--color-arp);
-    box-shadow: 0 0 14px rgba(125, 95, 255, 0.45);
+    box-shadow: 0 0 14px rgba(var(--rgb-arp), 0.45);
   }
   .vert-mode-btn#btnLedRecent,
   .vert-mode-btn#btnLedScale {
@@ -3299,10 +3364,10 @@
   }
   .vert-mode-btn.active#btnLedRecent,
   .vert-mode-btn.active#btnLedScale {
-    background: rgba(254, 211, 48, 0.16);
+    background: rgba(var(--rgb-chord), 0.16);
     border-color: var(--color-chord);
     color: var(--color-chord);
-    box-shadow: 0 0 12px rgba(254, 211, 48, 0.4);
+    box-shadow: 0 0 12px rgba(var(--rgb-chord), 0.4);
   }
   .takeover-badge {
     font-size: 9px;
@@ -3321,8 +3386,8 @@
   .takeover-badge.active {
     color: var(--color-drone);
     border-color: var(--color-drone);
-    background: rgba(0, 229, 255, 0.12);
-    box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+    background: rgba(var(--rgb-drone), 0.12);
+    box-shadow: 0 0 8px rgba(var(--rgb-drone), 0.3);
   }
 
   @media (max-width: 1440px) {
@@ -3483,6 +3548,13 @@
         </div>
 
         <div class="header-utils">
+          <div class="palette-wrap">
+            <button class="btn-header-util" id="btnPalette" onclick="togglePaletteMenu()" title="Color palette">
+              <span class="pal-btn-dots"><i></i><i></i><i></i><i></i></span>
+              <span>Palette</span>
+            </button>
+            <div class="palette-menu" id="paletteMenu" role="menu"></div>
+          </div>
           <button class="btn-header-util" id="btnUndoPatch" onclick="undoPatchChange()" title="Undo the last randomize / preset / new seed (Ctrl/⌘+Z)" disabled>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.5 3.5L2 7L5.5 10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 7H10a4 4 0 0 1 0 8H7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
             <span>Undo</span>
@@ -8405,10 +8477,12 @@ const fractalEnergy = { drone: 0, drum: 0, chord: 0, arp: 0, surge: 0 };
 const fractalAnalyserBuf = new Uint8Array(32);
 
 // 256-step cyclic palette through the instrument colors, as [r, g, b].
-const FRACTAL_PALETTE = (() => {
+// Rebuilt by applyColorTheme() so the zoom follows the chosen palette.
+function buildFractalPalette() {
+  const c = (k) => themeRgbArr(k);
   const stops = [
-    [12, 13, 17], [125, 95, 255], [0, 229, 255], [46, 213, 115],
-    [254, 211, 48], [255, 95, 196], [125, 95, 255], [12, 13, 17]
+    [12, 13, 17], c("arp"), c("drone"), c("filter"),
+    c("chord"), c("reverb"), c("arp"), [12, 13, 17]
   ];
   const lut = new Array(256);
   for (let i = 0; i < 256; i++) {
@@ -8418,7 +8492,8 @@ const FRACTAL_PALETTE = (() => {
     lut[i] = [0, 1, 2].map(j => a[j] + (b[j] - a[j]) * f);
   }
   return lut;
-})();
+}
+let FRACTAL_PALETTE = null;
 
 function toggleFractalMode() {
   fractalModeEnabled = !fractalModeEnabled;
@@ -8502,6 +8577,7 @@ function drawFractalVisualizer(w, h, ts) {
   const hueShift = fractalDepth * 46 + e.chord * 90;
   const gain = (isPlaying ? 0.62 : 0.4) + e.arp * 0.38;
   const LOG2 = Math.log(2);
+  if (!FRACTAL_PALETTE) FRACTAL_PALETTE = buildFractalPalette();
   const t0 = performance.now();
   const floorIter = fractalFloorIter;
   let frameMinIter = Infinity;
@@ -9056,7 +9132,7 @@ function arcadeLoseLife(g, L, w, ts) {
     if (v.dive) { v.dive.returning = true; v.dive.y = -12 * L.px; }
   });
   arcadeBlip(arcadeScaleMidi(2, 0), "sawtooth", 0.6, 0.06);
-  arcadeBurst(g, g.playerX * w, L.playerY + 3 * L.px, [46, 213, 115], 24, 140, 1.3);
+  arcadeBurst(g, g.playerX * w, L.playerY + 3 * L.px, themeRgbArr("filter"), 24, 140, 1.3);
   if (g.lives <= 0) g.hiScore = Math.max(g.hiScore, g.score);
 }
 
@@ -9106,11 +9182,11 @@ function drawArcadeGame(w, h, ts) {
   // Player (blinks while invulnerable, hidden while exploding).
   const blink = ts < g.invulnUntil && Math.floor(ts / 120) % 2 === 0;
   if ((g.phase === "playing" || g.phase === "cleared") && !blink) {
-    arcadeDrawSprite(ARCADE_PLAYER_SPRITE, g.playerX * w - 5.5 * L.px, L.playerY, L.px, [46, 213, 115], 0.95);
+    arcadeDrawSprite(ARCADE_PLAYER_SPRITE, g.playerX * w - 5.5 * L.px, L.playerY, L.px, themeRgbArr("filter"), 0.95);
   }
 
   if (g.shot && g.shot.y !== null) {
-    scopeCtx.fillStyle = "#fed330";
+    scopeCtx.fillStyle = themeHex("chord");
     scopeCtx.fillRect(g.shot.x * w - L.px / 2, g.shot.y, L.px, 4 * L.px);
   }
   g.enemyShots.forEach(s => {
@@ -9142,7 +9218,7 @@ function drawArcadeGame(w, h, ts) {
   });
 
   // Ground line.
-  scopeCtx.fillStyle = "rgba(46, 213, 115, 0.45)";
+  scopeCtx.fillStyle = `rgba(${themeRgb("filter")}, 0.45)`;
   scopeCtx.fillRect(8, L.playerY + 9 * L.px, w - 16, 1);
 
   // HUD.
@@ -9162,7 +9238,7 @@ function drawArcadeGame(w, h, ts) {
     scopeCtx.textBaseline = "middle";
     lines.forEach((ln, i) => {
       scopeCtx.font = `${i === 0 ? 800 : 500} ${i === 0 ? fs * 1.6 : fs}px "JetBrains Mono", ui-monospace, monospace`;
-      scopeCtx.fillStyle = i === 0 ? "#2ed573" : "rgba(230, 236, 255, 0.8)";
+      scopeCtx.fillStyle = i === 0 ? themeHex("filter") : "rgba(230, 236, 255, 0.8)";
       scopeCtx.fillText(ln, w / 2, h / 2 + (i - (lines.length - 1) / 2) * fs * 2);
     });
   };
@@ -9360,7 +9436,7 @@ const ROADSIDE_COLORS = [
   [[254, 211, 48], 1],   // amber
   [[255, 56, 56], 1]     // crimson
 ];
-const ROADSIDE_COLOR_WEIGHT_TOTAL = ROADSIDE_COLORS.reduce((a, c) => a + c[1], 0);
+let ROADSIDE_COLOR_WEIGHT_TOTAL = ROADSIDE_COLORS.reduce((a, c) => a + c[1], 0);
 let lastRoadsideColorIdx = -1;
 
 function pickRoadsideColor() {
@@ -9768,12 +9844,12 @@ function drawVisualizerCenterCore(cx, cy) {
   scopeCtx.beginPath();
   scopeCtx.moveTo(cx - tick, cy); scopeCtx.lineTo(cx + tick, cy);
   scopeCtx.moveTo(cx, cy - tick); scopeCtx.lineTo(cx, cy + tick);
-  scopeCtx.strokeStyle = "rgba(0, 229, 255, 0.45)"; scopeCtx.lineWidth = 1.0;
+  scopeCtx.strokeStyle = `rgba(${themeRgb("drone")}, 0.45)`; scopeCtx.lineWidth = 1.0;
   scopeCtx.stroke();
 
   const pulseR = 2.0 + Math.sin(scopeAngle * 3.0) * 0.7;
   scopeCtx.beginPath(); scopeCtx.arc(cx, cy, pulseR, 0, Math.PI * 2);
-  scopeCtx.fillStyle = "rgba(0, 229, 255, 0.85)"; scopeCtx.fill();
+  scopeCtx.fillStyle = `rgba(${themeRgb("drone")}, 0.85)`; scopeCtx.fill();
   scopeCtx.restore();
 }
 
@@ -9817,7 +9893,7 @@ function drawChordWheelCard() {
 
   const rimR = 54;
   chordWheelCtx.beginPath(); chordWheelCtx.arc(cx, cy, rimR, 0, Math.PI * 2);
-  chordWheelCtx.strokeStyle = "rgba(254, 211, 48, 0.18)"; chordWheelCtx.lineWidth = 1; chordWheelCtx.stroke();
+  chordWheelCtx.strokeStyle = `rgba(${themeRgb("chord")}, 0.18)`; chordWheelCtx.lineWidth = 1; chordWheelCtx.stroke();
 
   const dotR = 34;
   const labelR = 45;
@@ -9834,8 +9910,8 @@ function drawChordWheelCard() {
       else chordWheelCtx.lineTo(px, py);
     });
     chordWheelCtx.closePath();
-    chordWheelCtx.fillStyle = "rgba(254, 211, 48, 0.14)"; chordWheelCtx.fill();
-    chordWheelCtx.strokeStyle = "#fed330"; chordWheelCtx.lineWidth = 1.3; chordWheelCtx.stroke();
+    chordWheelCtx.fillStyle = `rgba(${themeRgb("chord")}, 0.14)`; chordWheelCtx.fill();
+    chordWheelCtx.strokeStyle = themeHex("chord"); chordWheelCtx.lineWidth = 1.3; chordWheelCtx.stroke();
   }
 
   chordWheelCtx.textAlign = "center";
@@ -9857,14 +9933,14 @@ function drawChordWheelCard() {
     chordWheelCtx.beginPath();
     chordWheelCtx.moveTo(cx + cosA * tickIn, cy + sinA * tickIn);
     chordWheelCtx.lineTo(cx + cosA * tickOut, cy + sinA * tickOut);
-    chordWheelCtx.strokeStyle = isRootTone ? "#ffffff" : (isChordTone ? "#fed330" : "rgba(255, 255, 255, 0.10)");
+    chordWheelCtx.strokeStyle = isRootTone ? "#ffffff" : (isChordTone ? themeHex("chord") : "rgba(255, 255, 255, 0.10)");
     chordWheelCtx.lineWidth = isRootTone ? 1.5 : (isChordTone ? 1.1 : 0.6);
     chordWheelCtx.stroke();
 
     chordWheelCtx.beginPath();
     if (isRootTone) {
       chordWheelCtx.arc(px, py, 5.5, 0, Math.PI * 2);
-      chordWheelCtx.strokeStyle = "rgba(254, 211, 48, 0.6)";
+      chordWheelCtx.strokeStyle = `rgba(${themeRgb("chord")}, 0.6)`;
       chordWheelCtx.lineWidth = 1.2;
       chordWheelCtx.stroke();
 
@@ -9874,7 +9950,7 @@ function drawChordWheelCard() {
       chordWheelCtx.fill();
     } else if (isChordTone) {
       chordWheelCtx.arc(px, py, 2.4, 0, Math.PI * 2);
-      chordWheelCtx.fillStyle = "#fed330";
+      chordWheelCtx.fillStyle = themeHex("chord");
       chordWheelCtx.fill();
     } else {
       chordWheelCtx.arc(px, py, 1.0, 0, Math.PI * 2);
@@ -9883,7 +9959,7 @@ function drawChordWheelCard() {
     }
 
     chordWheelCtx.font = isRootTone ? "bold 8.5px ui-monospace, monospace" : (isChordTone ? "bold 7.5px ui-monospace, monospace" : "6.5px ui-monospace, monospace");
-    chordWheelCtx.fillStyle = isRootTone ? "#ffffff" : (isChordTone ? "#fed330" : "rgba(255, 255, 255, 0.28)");
+    chordWheelCtx.fillStyle = isRootTone ? "#ffffff" : (isChordTone ? themeHex("chord") : "rgba(255, 255, 255, 0.28)");
     chordWheelCtx.fillText(CIRCLE_OF_FIFTHS[k], lx, ly);
   }
 
@@ -14149,6 +14225,189 @@ if (document.readyState === "loading") {
   syncEnoPodSquare();
 }
 
+
+/* ==========================================================================
+   COLOR PALETTE PICKER (Phase 7)
+   One theme = 9 colors, one per module (drone, drum, chord, arp, noise,
+   filter, delay, reverb, space). applyColorTheme() pushes them everywhere:
+     - CSS: --color-<module> and --rgb-<module> on :root. Every stylesheet
+       use of a module color reads those variables (the old hardcoded
+       rgba(0, 229, 255, ...) etc. were converted), and --accent follows the
+       chord color, so panels, header, dropdowns and glows all follow.
+     - Canvas: the oscilloscope rings, waterfall, orbital orbs, chord wheel,
+       scope core, fractal palette and Invaders read their colors from the
+       active theme (themeHex / themeRgb / themeRgbArr) or are updated in place.
+     - Floating shapes keep their hand-picked blue/green/pink-weighted mix on
+       the Slambient theme; other themes draw shapes from their own 9 colors.
+   The choice (including a randomized palette) is remembered per browser via
+   localStorage, which is optional: the page works the same without it.
+   The Eno pod's border-color cycling is separate and still works on top.
+   ========================================================================== */
+const THEME_KEYS = ["drone", "drum", "chord", "arp", "noise", "filter", "delay", "reverb", "space"];
+const COLOR_THEMES = [
+  { id: "slambient", name: "Slambient",     desc: "The original phosphor set",
+    colors: ["#00e5ff", "#ff3838", "#fed330", "#7d5fff", "#1dd1a1", "#2ed573", "#ff793f", "#ff5fc4", "#4b7bec"] },
+  { id: "kankyo",    name: "Kankyō Pastel", desc: "Soft 80s Japanese ambient",
+    colors: ["#7fc8d6", "#e07a5f", "#f2cc8f", "#a99bd8", "#8fc0a9", "#a8d672", "#e9a06b", "#eaa1c0", "#7b9fd9"] },
+  { id: "aurora",    name: "Aurora",        desc: "Electric greens, violets and magentas",
+    colors: ["#3cf2c2", "#ff4f8b", "#c6f35a", "#9d7bff", "#5ee6ff", "#54f08a", "#ffb347", "#f572ff", "#5a8cff"] },
+  { id: "sodium",    name: "Sodium Tape",   desc: "Warm amber CRT and worn tape",
+    colors: ["#ffb000", "#ff4a1c", "#ffd56b", "#ff7f6e", "#e9c46a", "#cddc6b", "#ff8c42", "#ff6f91", "#f4a261"] },
+  { id: "glacier",   name: "Glacier",       desc: "Cold blues with a pink pulse",
+    colors: ["#9be7ff", "#ff6b8b", "#e3f4ff", "#8ab4ff", "#7fe7d4", "#6ee7b7", "#a5b4fc", "#d0b5fd", "#60a5fa"] }
+];
+const THEME_STORAGE_KEY = "slambient.colorTheme";
+const DEFAULT_ROADSIDE_COLORS = ROADSIDE_COLORS.map(([rgb, w]) => [rgb.slice(), w]);
+let activeTheme = { id: "slambient", name: "Slambient", hex: {}, rgb: {} };
+
+function hexToRgbArr(hex) {
+  const n = parseInt(hex.replace("#", ""), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+function rgbArrToHex(rgb) {
+  return "#" + rgb.map(v => Math.round(v).toString(16).padStart(2, "0")).join("");
+}
+function hslToHex(h, s, l) {
+  s /= 100; l /= 100;
+  const k = n => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return rgbArrToHex([f(0) * 255, f(8) * 255, f(4) * 255]);
+}
+function mixRgb(a, b, t) { return a.map((v, i) => v + (b[i] - v) * t); }
+
+function themeHex(key) { return activeTheme.hex[key] || "#ffffff"; }
+function themeRgbArr(key) { return (activeTheme.rgb[key] || [255, 255, 255]).slice(); }
+function themeRgb(key) { return themeRgbArr(key).join(", "); }
+
+// Random palette: 9 hues spread evenly round the wheel from a random start,
+// shuffled across modules, with jitter so it never looks mechanical. Kept
+// bright enough to read on the dark panels; chords (also the UI accent)
+// stay lightest because they color a lot of text.
+function makeRandomTheme() {
+  const start = Math.random() * 360;
+  const hues = THEME_KEYS.map((_, i) => (start + i * 40 + (Math.random() - 0.5) * 18 + 360) % 360);
+  for (let i = hues.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [hues[i], hues[j]] = [hues[j], hues[i]];
+  }
+  const colors = THEME_KEYS.map((k, i) => hslToHex(
+    hues[i],
+    68 + Math.random() * 27,
+    k === "chord" ? 66 + Math.random() * 8 : 56 + Math.random() * 12
+  ));
+  return { id: "random", name: "Random", desc: "Randomized palette", colors };
+}
+
+function applyColorTheme(theme, persist = true) {
+  const hex = {}, rgb = {};
+  THEME_KEYS.forEach((k, i) => { hex[k] = theme.colors[i]; rgb[k] = hexToRgbArr(theme.colors[i]); });
+  activeTheme = { id: theme.id, name: theme.name, colors: theme.colors.slice(), hex, rgb };
+
+  // CSS variables
+  const root = document.documentElement.style;
+  THEME_KEYS.forEach(k => {
+    root.setProperty(`--color-${k}`, hex[k]);
+    root.setProperty(`--rgb-${k}`, rgb[k].join(", "));
+  });
+
+  // Canvas color tables, updated in place
+  RING_CONFIGS.forEach(cfg => {
+    if (hex[cfg.id]) cfg.color = hex[cfg.id];
+    else if (cfg.id === "arp_main") cfg.color = rgbArrToHex(mixRgb(rgb.arp, [255, 255, 255], 0.12));
+    else if (cfg.id === "arp_shimmer") cfg.color = rgbArrToHex(mixRgb(rgb.arp, [255, 255, 255], 0.7));
+  });
+  WATERFALL_TRACKS.forEach(t => { if (hex[t.id]) { t.color = hex[t.id]; t.rgb = rgb[t.id].slice(); } });
+  ORBITAL_MODULES.forEach(o => { if (hex[o.id]) { o.color = hex[o.id]; o.rgb = rgb[o.id].slice(); } });
+  Object.keys(ARCADE_TYPES).forEach(k => { if (rgb[k]) ARCADE_TYPES[k].rgb = rgb[k].slice(); });
+  rgb.reverb.forEach((v, i) => { ARCADE_UFO_RGB[i] = v; });
+  FRACTAL_PALETTE = buildFractalPalette();
+
+  // Floating shapes: curated mix on the home theme, the theme's own colors otherwise.
+  ROADSIDE_COLORS.length = 0;
+  if (theme.id === "slambient") DEFAULT_ROADSIDE_COLORS.forEach(([c, w]) => ROADSIDE_COLORS.push([c.slice(), w]));
+  else THEME_KEYS.forEach(k => ROADSIDE_COLORS.push([rgb[k].slice(), 1]));
+  ROADSIDE_COLOR_WEIGHT_TOTAL = ROADSIDE_COLORS.reduce((a, c) => a + c[1], 0);
+  lastRoadsideColorIdx = -1;
+
+  // An open orbital side panel keeps the accent it was opened with; refresh it.
+  if (typeof expandedOrbId !== "undefined" && expandedOrbId) {
+    const orb = ORBITAL_MODULES.find(o => o.id === expandedOrbId);
+    const panel = document.getElementById("orbitalSidePanel");
+    const title = document.getElementById("orbitalModalTitle");
+    if (orb && panel) {
+      panel.style.setProperty("--modal-accent-color", orb.color);
+      panel.style.setProperty("--modal-accent-glow", `rgba(${orb.rgb.join(", ")}, 0.45)`);
+      panel.style.setProperty("--modal-accent-rgb", orb.rgb.join(", "));
+      if (title) title.style.color = orb.color;
+    }
+  }
+
+  if (persist) {
+    try { localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify({ id: theme.id, name: theme.name, colors: theme.colors })); } catch (err) {}
+  }
+  renderPaletteMenu();
+}
+
+function selectColorTheme(id) {
+  const theme = id === "random" ? makeRandomTheme() : COLOR_THEMES.find(t => t.id === id);
+  if (!theme) return;
+  applyColorTheme(theme);
+  const status = document.getElementById("footerStatus");
+  if (status) status.textContent = `Palette: ${theme.name}`;
+}
+
+function renderPaletteMenu() {
+  const menu = document.getElementById("paletteMenu");
+  if (!menu) return;
+  const swatches = (colors) => `<span class="pal-swatches">${colors.map(c => `<i style="background:${c}"></i>`).join("")}</span>`;
+  const rows = COLOR_THEMES.map((t, i) => `
+    <button class="pal-row${activeTheme.id === t.id ? " active" : ""}" onclick="selectColorTheme('${t.id}')" title="${t.desc}">
+      <span class="pal-num">${i + 1}</span>
+      <span class="pal-name">${t.name}</span>
+      ${swatches(t.colors)}
+    </button>`).join("");
+  const randomColors = activeTheme.id === "random" ? activeTheme.colors : null;
+  menu.innerHTML = `
+    <div class="pal-head">Color Palette</div>
+    ${rows}
+    <button class="pal-row pal-random${randomColors ? " active" : ""}" onclick="selectColorTheme('random')" title="Generate a new random palette (click again for another)">
+      <span class="pal-num">⟲</span>
+      <span class="pal-name">Randomize</span>
+      ${randomColors ? swatches(randomColors) : `<span class="pal-hint">new palette each click</span>`}
+    </button>`;
+  const btnDots = document.querySelectorAll("#btnPalette .pal-btn-dots i");
+  ["drone", "drum", "chord", "arp"].forEach((k, i) => { if (btnDots[i]) btnDots[i].style.background = themeHex(k); });
+}
+
+function togglePaletteMenu(force) {
+  const menu = document.getElementById("paletteMenu");
+  const btn = document.getElementById("btnPalette");
+  if (!menu) return;
+  const open = typeof force === "boolean" ? force : !menu.classList.contains("open");
+  menu.classList.toggle("open", open);
+  if (btn) { btn.classList.toggle("active", open); btn.blur(); }
+}
+
+document.addEventListener("pointerdown", (e) => {
+  const menu = document.getElementById("paletteMenu");
+  if (!menu || !menu.classList.contains("open")) return;
+  if (e.target.closest("#paletteMenu") || e.target.closest("#btnPalette")) return;
+  togglePaletteMenu(false);
+});
+window.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  const menu = document.getElementById("paletteMenu");
+  if (menu && menu.classList.contains("open")) togglePaletteMenu(false);
+});
+
+(function initColorTheme() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(THEME_STORAGE_KEY) || "null"); } catch (err) {}
+  const valid = saved && Array.isArray(saved.colors) && saved.colors.length === THEME_KEYS.length &&
+    saved.colors.every(c => /^#[0-9a-f]{6}$/i.test(c));
+  applyColorTheme(valid ? saved : COLOR_THEMES[0], false);
+})();
 </script>
 </body>
 </html>

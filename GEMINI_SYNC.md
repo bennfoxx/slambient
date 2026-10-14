@@ -507,6 +507,42 @@ Ben approved all three suggested header buttons.
   the BPM; ? opens and Esc closes the panel; Enter still toggles play; header checked at
   100%/150%; no console errors.
 
+## Update — 2026-10-14 (Claude: header color palette picker, Phase 7 complete)
+
+Ben asked for a palette picker in the header with 5 themed options (option 1 = the current colors)
+plus a full randomize.
+
+- **Theming is now variable-driven.** Every hardcoded module color in `<style>` was converted to
+  `var(--color-<module>)` or `rgba(var(--rgb-<module>), a)`. `:root` defines both forms for the 9
+  module keys (drone, drum, chord, arp, noise, filter, delay, reverb, space). `--accent` is now
+  `var(--color-chord)`. **New UI must use these variables, not literal hex/rgb, or it won't follow
+  the theme.** Canvas code reads colors with `themeHex(key)`, `themeRgb(key)` and `themeRgbArr(key)`.
+- **Picker UI:** `#btnPalette` (4-dot icon + "Palette") at the start of `.header-utils` opens
+  `#paletteMenu`, a popover listing each theme with a swatch strip, plus **Randomize**. Closes on
+  outside click or Esc.
+- **`COLOR_THEMES`** (colors in THEME_KEYS order):
+  1. Slambient (the original scheme)
+  2. Kankyō Pastel (soft 80s Japanese environmental-music tones)
+  3. Aurora (neon greens, magentas, violets)
+  4. Sodium Tape (warm amber/orange analog tones)
+  5. Glacier (icy blues and lavenders with a pink accent)
+- **`makeRandomTheme()`**: 9 hues spread evenly around the wheel with jitter, shuffled across the
+  modules; saturation 68–95, lightness 56–68 (chord a bit lighter so the accent stays readable).
+  Each click gives a new theme.
+- **`applyColorTheme(theme, persist)`** sets the CSS variables and updates the JS color tables:
+  `RING_CONFIGS` (arp_main/arp_shimmer are lightened arp mixes), `WATERFALL_TRACKS`,
+  `ORBITAL_MODULES` (and an open orbital side panel's accent), `ARCADE_TYPES`, `ARCADE_UFO_RGB`
+  (reverb color), and rebuilds the Mandelbrot `FRACTAL_PALETTE` via `buildFractalPalette()`
+  (`FRACTAL_PALETTE` is now `let`, built lazily). `ROADSIDE_COLORS` keeps its curated mix on the
+  Slambient theme and uses the theme's 9 colors otherwise (`ROADSIDE_COLOR_WEIGHT_TOTAL` is now
+  `let`). The shapes visualizer keeps its own random colors on purpose, per Ben's earlier ask.
+- **Persistence:** the choice (including a generated random theme) is saved to localStorage key
+  `slambient.colorTheme` (try/catch guarded); `initColorTheme()` restores it on load or applies
+  theme 1.
+- Verified in headless Chromium: all 5 themes and Randomize change the CSS variables, computed
+  button colors, RING_CONFIGS and ORBITAL_MODULES; the choice survives a reload; screenshots of
+  each theme look right; no console errors.
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE
@@ -553,11 +589,11 @@ Ben approved all three suggested header buttons.
 - [x] Space Invaders audio-reactive arcade minigame inside the primary visualizer canvas
 - [x] Side-view orb click debouncing (250ms debounce to close active tab on click without double-click flicker)
 
-### Phase 7: Global Shortcuts, Custom Theming & Final Polish — 🟡 IN PROGRESS
+### Phase 7: Global Shortcuts, Custom Theming & Final Polish — ✅ DONE
 - [x] Keyboard playback binding (`Enter` toggles play/pause everywhere; Space reserved for Slambient Invaders)
 - [x] MP3 recording export (320 kbps via lazy-loaded lamejs, WAV fallback offline)
 - [x] Whole-app fullscreen button in header
 - [x] Header layout holds at 150% browser zoom
 - [x] Header Undo (patch history), Tap Tempo, and Keyboard Shortcuts panel
-- [ ] Modular color palette picker (custom color assignments per instrument, effect, and noise module)
+- [x] Modular color palette picker (header Palette menu: 5 themes + Randomize, applied to every module color and visualizer; saved in localStorage)
 
