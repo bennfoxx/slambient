@@ -1534,8 +1534,10 @@
     gap: 12px;
   }
 
-  /* Scoped styling for strip channel when inside the orbital side view widget */
-  .orbital-side-panel .strip-channel {
+  /* Scoped styling for strip channel (and, for the Filter/Delay/Reverb
+     orbs, the pedal-chassis card) when inside the orbital side view widget */
+  .orbital-side-panel .strip-channel,
+  .orbital-side-panel .pedal-chassis {
     background: rgba(13, 16, 26, 0.90);
     border: 1px solid rgba(var(--modal-accent-rgb, 0, 229, 255), 0.38) !important;
     border-top: 2px solid var(--modal-accent-color, #00e5ff) !important;
@@ -1543,28 +1545,35 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--modal-accent-rgb, 0, 229, 255), 0.16) !important;
   }
   /* The orbital modal header already shows this module's title and (once
-     borrowed up by expandModuleOrb) its mute/solo/power/randomize icons --
-     the strip's own header row would just be dead space here, so drop it
+     borrowed up by expandModuleOrb) its mute/solo/power/randomize icons
+     (or, for a pedal, its slot badge/shift/drag/bypass icons) -- the
+     strip's own header row would just be dead space here, so drop it
      entirely rather than leaving an empty divider bar up top. */
-  .orbital-side-panel .strip-channel .panel-header {
+  .orbital-side-panel .strip-channel .panel-header,
+  .orbital-side-panel .pedal-chassis .panel-header {
     display: none;
   }
-  .orbital-side-panel .strip-channel input[type="range"]::-webkit-slider-thumb {
+  .orbital-side-panel .strip-channel input[type="range"]::-webkit-slider-thumb,
+  .orbital-side-panel .pedal-chassis input[type="range"]::-webkit-slider-thumb {
     border: 1.5px solid var(--modal-accent-color, var(--accent)) !important;
     box-shadow: 0 0 8px rgba(var(--modal-accent-rgb, 0, 229, 255), 0.45);
   }
-  .orbital-side-panel .strip-channel input[type="range"]::-webkit-slider-thumb:hover {
+  .orbital-side-panel .strip-channel input[type="range"]::-webkit-slider-thumb:hover,
+  .orbital-side-panel .pedal-chassis input[type="range"]::-webkit-slider-thumb:hover {
     background: var(--modal-accent-color, var(--accent)) !important;
     box-shadow: 0 0 12px rgba(var(--modal-accent-rgb, 0, 229, 255), 0.85);
   }
-  .orbital-side-panel .strip-channel .control-val {
+  .orbital-side-panel .strip-channel .control-val,
+  .orbital-side-panel .pedal-chassis .control-val {
     color: var(--modal-accent-color, var(--accent)) !important;
     text-shadow: 0 0 8px rgba(var(--modal-accent-rgb, 0, 229, 255), 0.35);
   }
-  .orbital-side-panel .strip-channel select {
+  .orbital-side-panel .strip-channel select,
+  .orbital-side-panel .pedal-chassis select {
     border-color: rgba(var(--modal-accent-rgb, 0, 229, 255), 0.35);
   }
-  .orbital-side-panel .strip-channel select:focus {
+  .orbital-side-panel .strip-channel select:focus,
+  .orbital-side-panel .pedal-chassis select:focus {
     border-color: var(--modal-accent-color, var(--accent));
     box-shadow: 0 0 8px rgba(var(--modal-accent-rgb, 0, 229, 255), 0.4);
   }
@@ -1590,6 +1599,15 @@
   .orbital-side-panel .strip-channel .toggle-switch input:checked + .toggle-track::before {
     background: var(--modal-accent-color, var(--accent));
     box-shadow: 0 0 6px var(--modal-accent-color, var(--accent));
+  }
+  /* Borrowed pedal header-actions row (shift/drag/bypass icons) sitting in
+     the modal header -- give it the same accent glow treatment as the
+     randomize badge-tag above. */
+  .orbital-modal-header-right .btn-pedal-shift:hover,
+  .orbital-modal-header-right .pedal-drag-handle:hover,
+  .orbital-modal-header-right .btn-power.active {
+    border-color: var(--modal-accent-color, var(--accent)) !important;
+    box-shadow: 0 0 8px rgba(var(--modal-accent-rgb, 0, 229, 255), 0.5) !important;
   }
 
   .lower-deck.view-grid-hidden,
@@ -9691,6 +9709,20 @@ function getOrbitalConnectionChain() {
   return [...leading, ...pedalOrbs, trailing].filter(Boolean);
 }
 
+const ORBITAL_ID_TO_PEDAL_KEY = { filter: "FILTER", delay: "DELAY", reverb: "SPACE" };
+
+// The Filter/Delay/Reverb orbs' module is a .pedal-chassis card (id
+// pedalCard_FILTER etc), not a .strip-channel.<chClass> like every other
+// orb -- the pedal/stompbox redesign never updated this lookup, so
+// expanding those three orbs in orbital view opened an empty side panel.
+// Centralize "find this orb's actual control element" here so both
+// expandModuleOrb() and restoreStripsToRack() stay in sync.
+function getOrbModuleElement(orb) {
+  const pedalKey = ORBITAL_ID_TO_PEDAL_KEY[orb.id];
+  if (pedalKey) return document.getElementById("pedalCard_" + pedalKey);
+  return document.querySelector(`.strip-channel.${orb.chClass}`);
+}
+
 function initOrbitalConstellation() {
   orbitalCanvas = document.getElementById("orbitalCanvas");
   if (!orbitalCanvas) return;
@@ -9877,7 +9909,7 @@ function expandModuleOrb(orbId) {
   title.style.color = orb.color;
 
   body.innerHTML = "";
-  const sourceStrip = document.querySelector(`.strip-channel.${orb.chClass}`);
+  const sourceStrip = getOrbModuleElement(orb);
   if (sourceStrip) {
     body.appendChild(sourceStrip);
     sourceStrip.style.display = "flex";
@@ -9924,9 +9956,10 @@ function restoreStripsToRack() {
   // Give any icon row borrowed into the modal header (see expandModuleOrb)
   // back to its home strip before that strip moves back into the rack --
   // otherwise it's orphaned in the modal header and the console view loses
-  // its mute/solo/power/randomize controls for that module.
+  // its mute/solo/power/randomize (or, for a pedal, its slot badge/shift/
+  // drag/bypass) controls for that module.
   const modalBody = document.getElementById("orbitalModalBody");
-  const expandedStrip = modalBody ? modalBody.querySelector(".strip-channel") : null;
+  const expandedStrip = modalBody ? modalBody.querySelector(".strip-channel, .pedal-chassis") : null;
   const actionsSlot = document.getElementById("orbitalModalActions");
   if (expandedStrip && actionsSlot && actionsSlot.children.length) {
     const homeHeader = expandedStrip.querySelector(".panel-header");
@@ -9935,16 +9968,24 @@ function restoreStripsToRack() {
     }
   }
 
+  let movedAPedal = false;
   ORBITAL_MODULES.forEach(orb => {
-    const strip = document.querySelector(`.strip-channel.${orb.chClass}`);
+    const strip = getOrbModuleElement(orb);
     if (!strip) return;
     if (ORBITAL_LOWER_DECK_IDS.includes(orb.id)) {
       if (lowerRack) lowerRack.appendChild(strip);
     } else if (orb.id === "space") {
       const unifiedMaster = document.getElementById("masterDeckUnified");
       if (unifiedMaster) unifiedMaster.appendChild(strip);
+    } else if (ORBITAL_ID_TO_PEDAL_KEY[orb.id]) {
+      // Filter/Delay/Reverb pedal cards belong in the unified pedal deck too
+      // -- updatePedalsOrderUI() below puts them back in the right slot.
+      const unifiedMaster = document.getElementById("masterDeckUnified");
+      if (unifiedMaster) unifiedMaster.appendChild(strip);
+      movedAPedal = true;
     }
   });
+  if (movedAPedal && typeof updatePedalsOrderUI === "function") updatePedalsOrderUI();
 }
 
 function loopOrbitalPhysics() {
