@@ -104,13 +104,18 @@
     display: flex;
     align-items: stretch;
     gap: 14px;
-    width: 100%;
     position: sticky;
     top: 0;
     z-index: 1000;
     /* Break out of body's own padding so the frosted backdrop reaches the
        true viewport edges while scrolled, then restore that spacing with
-       padding so the header's own content doesn't shift. */
+       padding so the header's own content lines back up with the modules
+       below (which just inherit body's padding). With box-sizing:
+       border-box, width: 100% + a negative margin alone would shrink the
+       box by the margin instead of extending it -- width needs to grow by
+       the same 44px the margin gives up, on both sides, for the two edges
+       to land back in the same place as every other panel's. */
+    width: calc(100% + 44px);
     margin: -16px -22px 0 -22px;
     padding: 16px 22px 14px 22px;
     background: rgba(7, 8, 12, 0.92);
