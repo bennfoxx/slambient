@@ -7931,6 +7931,16 @@ let orbitalAnimId = null;
 let expandedOrbId = null;
 let orbitalPanelActive = false;
 
+// Click-and-drag state for the orbital orbs. A press only counts as a drag
+// (and suppresses the click-to-expand behavior) once the pointer has moved
+// past DRAG_MOVE_THRESHOLD px in canvas space -- below that it's still a
+// plain click/tap, same as before dragging existed.
+const DRAG_MOVE_THRESHOLD = 5;
+let draggedOrbId = null;
+let dragPointerId = null;
+let dragMoved = false;
+let lastDragX = 0, lastDragY = 0, lastDragTs = 0;
+
 // Background starfield for the orbital view: tiny white dots of varied size
 // and brightness that twinkle and drift slowly, to read as "floating in
 // space" behind the module orbs.
@@ -8001,7 +8011,10 @@ function initOrbitalConstellation() {
     orb.bump = 0;
   });
 
-  orbitalCanvas.addEventListener("pointerdown", handleOrbitalClick);
+  orbitalCanvas.addEventListener("pointerdown", handleOrbitalPointerDown);
+  orbitalCanvas.addEventListener("pointermove", handleOrbitalPointerMove);
+  orbitalCanvas.addEventListener("pointerup", handleOrbitalPointerUp);
+  orbitalCanvas.addEventListener("pointercancel", handleOrbitalPointerUp);
 
   window.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && expandedOrbId) closeOrbitalModal();
@@ -8011,24 +8024,95 @@ function initOrbitalConstellation() {
   requestAnimationFrame(loopOrbitalPhysics);
 }
 
-function handleOrbitalClick(e) {
+function orbitalPointerToCanvas(e) {
   const rect = orbitalCanvas.getBoundingClientRect();
   const scaleX = (cachedOrbitalW || orbitalCanvas.clientWidth || rect.width) / (rect.width || 1);
   const scaleY = (cachedOrbitalH || orbitalCanvas.clientHeight || rect.height) / (rect.height || 1);
-  const clickX = (e.clientX - rect.left) * scaleX;
-  const clickY = (e.clientY - rect.top) * scaleY;
+  return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+}
 
+function findOrbAt(x, y) {
   for (let i = 0; i < ORBITAL_MODULES.length; i++) {
     const orb = ORBITAL_MODULES[i];
     const currentR = orb.baseR * (1.0 + (orb.pulse + orb.bump) * 0.35);
-    const dist = Math.hypot(clickX - orb.x, clickY - orb.y);
-    if (dist <= currentR + 8) {
-      expandModuleOrb(orb.id);
-      return;
+    const dist = Math.hypot(x - orb.x, y - orb.y);
+    if (dist <= currentR + 8) return orb;
+  }
+  return null;
+}
+
+function handleOrbitalPointerDown(e) {
+  if (draggedOrbId) return;
+  const { x, y } = orbitalPointerToCanvas(e);
+  const orb = findOrbAt(x, y);
+  if (!orb) {
+    if (expandedOrbId) closeOrbitalModal();
+    return;
+  }
+  draggedOrbId = orb.id;
+  dragPointerId = e.pointerId;
+  dragMoved = false;
+  lastDragX = x; lastDragY = y; lastDragTs = performance.now();
+  try { orbitalCanvas.setPointerCapture(e.pointerId); } catch (err) {}
+  orbitalCanvas.style.cursor = "grabbing";
+  e.preventDefault();
+}
+
+function handleOrbitalPointerMove(e) {
+  const { x, y } = orbitalPointerToCanvas(e);
+
+  if (draggedOrbId && e.pointerId === dragPointerId) {
+    const orb = ORBITAL_MODULES.find(o => o.id === draggedOrbId);
+    if (orb) {
+      if (!dragMoved && Math.hypot(x - lastDragX, y - lastDragY) > DRAG_MOVE_THRESHOLD) dragMoved = true;
+      orb.x = x; orb.y = y;
+
+      // Track instantaneous drag velocity so a release can "fling" the orb
+      // onward instead of it just stopping dead where it was dropped.
+      const now = performance.now();
+      const dt = Math.max(1, now - lastDragTs);
+      orb.vx = (x - lastDragX) / dt * 16;
+      orb.vy = (y - lastDragY) / dt * 16;
+      lastDragX = x; lastDragY = y; lastDragTs = now;
     }
+    return;
   }
 
-  if (expandedOrbId) closeOrbitalModal();
+  // Not dragging -- just a hover cursor hint that an orb is grabbable.
+  orbitalCanvas.style.cursor = findOrbAt(x, y) ? "grab" : "";
+}
+
+function handleOrbitalPointerUp(e) {
+  if (!draggedOrbId || e.pointerId !== dragPointerId) return;
+  const orb = ORBITAL_MODULES.find(o => o.id === draggedOrbId);
+  const wasDrag = dragMoved;
+  // releasePointerCapture throws if the id was never actually captured (can
+  // happen in edge cases, not just synthetic events) -- that must never
+  // skip clearing the drag state below, or every orb gets stuck refusing
+  // further clicks/drags until a page reload.
+  try { orbitalCanvas.releasePointerCapture(e.pointerId); } catch (err) {}
+  draggedOrbId = null;
+  dragPointerId = null;
+
+  if (orb) {
+    if (wasDrag) {
+      // Carry the release velocity onward (capped so a hard flick doesn't
+      // send it rocketing off far faster than the ambient wander speed),
+      // and resync heading so the next physics tick continues smoothly
+      // from it instead of snapping to a stale pre-drag direction.
+      const flungSpeed = Math.min(3.0, Math.hypot(orb.vx, orb.vy));
+      const heading = Math.atan2(orb.vy, orb.vx);
+      orb.heading = heading;
+      orb.vx = Math.cos(heading) * flungSpeed;
+      orb.vy = Math.sin(heading) * flungSpeed;
+      orb.bump = Math.min(0.8, orb.bump + 0.1);
+    } else {
+      expandModuleOrb(orb.id);
+    }
+  }
+  // Next pointermove naturally recomputes grab-vs-default from wherever
+  // the cursor actually is now.
+  orbitalCanvas.style.cursor = "";
 }
 
 function setModuleView(mode) {
@@ -8245,29 +8329,34 @@ function updateAndDrawOrbitalCanvas() {
     // audio-reactive pulse above keeps its own snappier rhythm untouched.
     orb.bump *= 0.965;
 
-    // Organic celestial wander: each orb meanders independently along smooth curved paths
-    if (orb.heading === undefined) {
-      orb.heading = Math.atan2(orb.vy || 0.15, orb.vx || 0.15);
-    }
-    const wanderFreq = 0.0007 + (i * 0.00025);
-    orb.heading += Math.sin(now * wanderFreq + i * 1.9) * 0.007;
+    // Organic celestial wander: each orb meanders independently along smooth
+    // curved paths -- skipped entirely while the orb is being dragged, since
+    // handleOrbitalPointerMove is already driving its x/y directly and this
+    // would otherwise fight the pointer every frame.
+    if (orb.id !== draggedOrbId) {
+      if (orb.heading === undefined) {
+        orb.heading = Math.atan2(orb.vy || 0.15, orb.vx || 0.15);
+      }
+      const wanderFreq = 0.0007 + (i * 0.00025);
+      orb.heading += Math.sin(now * wanderFreq + i * 1.9) * 0.007;
 
-    // Split the difference: perfectly balanced gentle celestial drift (~18 px/sec when paused)
-    const currentSpeed = isPlaying
-      ? (0.40 + energy * 0.55 + orb.pulse * 0.20)
-      : 0.30;
+      // Split the difference: perfectly balanced gentle celestial drift (~18 px/sec when paused)
+      const currentSpeed = isPlaying
+        ? (0.40 + energy * 0.55 + orb.pulse * 0.20)
+        : 0.30;
 
-    orb.vx = Math.cos(orb.heading) * currentSpeed;
-    orb.vy = Math.sin(orb.heading) * currentSpeed;
+      orb.vx = Math.cos(orb.heading) * currentSpeed;
+      orb.vy = Math.sin(orb.heading) * currentSpeed;
 
-    orb.x += orb.vx;
-    orb.y += orb.vy;
+      orb.x += orb.vx;
+      orb.y += orb.vy;
 
-    // Subtle fluid wave undulation responding to audio track energy
-    if (isPlaying && energy > 0.03) {
-      const wave = Math.sin(now * 0.0018 + orb.baseR) * energy * 0.16;
-      orb.x += -Math.sin(orb.heading) * wave;
-      orb.y += Math.cos(orb.heading) * wave;
+      // Subtle fluid wave undulation responding to audio track energy
+      if (isPlaying && energy > 0.03) {
+        const wave = Math.sin(now * 0.0018 + orb.baseR) * energy * 0.16;
+        orb.x += -Math.sin(orb.heading) * wave;
+        orb.y += Math.cos(orb.heading) * wave;
+      }
     }
 
     // Smooth, cushioned boundary reflection
