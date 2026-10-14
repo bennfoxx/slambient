@@ -2706,6 +2706,7 @@
             <button class="btn-preset-chip" onclick="applyPreset(7)">Khan Lineage</button>
             <button class="btn-preset-chip" onclick="applyPreset(8)">After Hours Deep</button>
             <button class="btn-preset-chip" onclick="applyPreset(9)">Ambient 1 / Airports</button>
+            <button class="btn-preset-chip" onclick="applyPreset(10)">Twin Peaks / Badalamenti</button>
           </div>
         </div>
       </div>
@@ -8904,6 +8905,74 @@ function applyPreset(idx) {
     document.getElementById("knobChorusRate").value = 0.12;
     document.getElementById("knobChorusDepth").value = 40;
     document.getElementById("knobChorusMix").value = 28;
+  } else if (idx === 10) { // Twin Peaks / Badalamenti (noir vibraphone ballad, slow sub hum)
+    document.getElementById("selTimeSig").value = "4/4";
+    activeScaleKey = "AEOLIAN";
+    document.getElementById("knobBpm").value = 56;
+    document.getElementById("knobWeather").value = 70;
+    document.getElementById("knobMutation").value = 15;
+
+    // A slow sub kick + rim felt more than heard -- the uneasy pulse under
+    // the score, not a groove. No auto-evolve: this one holds still.
+    document.getElementById("selDrumStyle").value = "HEARTBEAT";
+    document.getElementById("chkAutoEvolveDrums").checked = false;
+    document.getElementById("knobDrumEvolveChance").value = 10;
+    document.getElementById("knobDrumVol").value = 35;
+    document.getElementById("knobDrumPunch").value = 50;
+    document.getElementById("knobDrumDensity").value = 25;
+
+    document.getElementById("knobStrum").value = 90;
+    document.getElementById("knobDrone").value = 75;
+    document.getElementById("selDroneOctave").value = "D1";
+    document.getElementById("knobDroneFilter").value = 140;
+    document.getElementById("knobDroneDetune").value = 4.5;
+    document.getElementById("knobDroneWander").value = 25;
+    document.getElementById("knobDroneFx").value = 30;
+    document.getElementById("knobDrumFx").value = 20;
+
+    // Vibraphone & celesta is the Twin Peaks sound -- long sustain, soft
+    // touch, heavily sent to the drenched delay/reverb below.
+    document.getElementById("selChordTimbre").value = "VIBES_CELESTE";
+    document.getElementById("knobChordDynamics").value = 70;
+    document.getElementById("knobChordSustain").value = 160;
+    document.getElementById("knobChordVol").value = 88;
+    document.getElementById("knobChordFx").value = 80;
+
+    // A slow rocking bell figure (Laura Palmer's Theme's chime motif),
+    // held static and spaced out rather than evolving or busy.
+    document.getElementById("selArpPattern").value = "PENDULUM";
+    document.getElementById("chkAutoEvolveArpPattern").checked = false;
+    document.getElementById("selArpTimbre").value = "GLASS_FM";
+    document.getElementById("chkAutoEvolveArpTimbre").checked = false;
+    document.getElementById("knobArpEvolveChance").value = 10;
+    document.getElementById("knobArpGate").value = 500;
+    document.getElementById("knobArpRest").value = 45;
+    document.getElementById("knobArpOctaves").value = 2;
+    document.getElementById("knobArpVol").value = 65;
+    document.getElementById("knobArpFx").value = 75;
+
+    document.getElementById("knobMasterCutoff").value = 58;
+    document.getElementById("knobMasterRes").value = 2.2;
+    document.getElementById("knobFilterAttack").value = 180;
+    document.getElementById("knobFilterDecay").value = 2000;
+    document.getElementById("knobFilterEnvDepth").value = 30;
+    document.getElementById("knobFilterLfoRate").value = 0.06;
+    document.getElementById("knobFilterLfoDepth").value = 18;
+
+    document.getElementById("chkDelayTempoSync").checked = false;
+    document.getElementById("knobDelayTime").value = 580;
+    document.getElementById("knobDelayFeedback").value = 42;
+    document.getElementById("knobDelayTone").value = 2200;
+    document.getElementById("knobDelayFlutter").value = 30;
+    document.getElementById("knobDelayMix").value = 40;
+
+    document.getElementById("selReverbMode").value = "CATHEDRAL";
+    document.getElementById("knobReverbMix").value = 55;
+    document.getElementById("knobReverbTone").value = 3800;
+    document.getElementById("selChorusMode").value = "ENSEMBLE";
+    document.getElementById("knobChorusRate").value = 0.3;
+    document.getElementById("knobChorusDepth").value = 45;
+    document.getElementById("knobChorusMix").value = 35;
   }
 
   const scale = SCALES[activeScaleKey] || SCALES.DORIAN;
