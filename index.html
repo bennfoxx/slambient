@@ -821,6 +821,13 @@
     flex-shrink: 0;
     white-space: nowrap;
   }
+  /* Bumped up from the shared 12px for legibility at 100% browser zoom --
+     scoped to just these three so every other module's panel title stays
+     at the original size. */
+  .panel-title-text {
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
   .badge-tag {
     font-size: 9.5px;
     font-weight: 800;
