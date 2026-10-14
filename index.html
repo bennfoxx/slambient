@@ -10785,7 +10785,7 @@ function serializeCurrentPatch() {
     currentChordVoicing,
     currentChordStepIdx,
     dspChainOrder: Array.isArray(dspChainOrder) ? [...dspChainOrder] : ["FILTER", "DELAY", "SPACE"],
-    pedalBypass: Object.assign({}, pedalBypass),
+    pedalBypass: typeof pedalBypassState !== "undefined" ? Object.assign({}, pedalBypassState) : { FILTER: false, DELAY: false, SPACE: false },
     channelPower: Object.assign({}, channelPower),
     channelAux: Object.assign({}, channelAux),
     channelMute: Object.assign({}, channelMute),
@@ -10798,7 +10798,7 @@ function savePresetBankJson() {
   try {
     const patch = serializeCurrentPatch();
     const jsonStr = JSON.stringify(patch, null, 2);
-    const blob = new Blob([jsonStr], { type: "application/json" });
+    const blob = new Blob([jsonStr], { type: "application/json;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const slug = (patch.presetName || "patch").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
     const a = document.createElement("a");
@@ -10808,9 +10808,9 @@ function savePresetBankJson() {
     document.body.appendChild(a);
     a.click();
     setTimeout(() => {
-      document.body.removeChild(a);
+      if (a.parentNode) a.parentNode.removeChild(a);
       URL.revokeObjectURL(url);
-    }, 120);
+    }, 250);
     const status = document.getElementById("footerStatus");
     if (status) status.textContent = `Saved Patch JSON (${patch.dspChainOrder.join(" ➔ ")})`;
   } catch (err) {
@@ -10888,14 +10888,14 @@ function loadPresetBankJson(event) {
       updateMuteSoloUI();
 
       // 4. Restore pedal bypass states and DSP chain routing topology
-      if (data.pedalBypass && typeof data.pedalBypass === "object") {
+      if (data.pedalBypass && typeof data.pedalBypass === "object" && typeof pedalBypassState !== "undefined") {
         ["FILTER", "DELAY", "SPACE"].forEach(k => {
           if (typeof data.pedalBypass[k] === "boolean") {
-            pedalBypass[k] = data.pedalBypass[k];
+            pedalBypassState[k] = data.pedalBypass[k];
             const card = document.getElementById("pedalCard_" + k);
-            const btn = document.getElementById("pedalSwitch_" + k);
-            if (card) card.classList.toggle("bypassed", pedalBypass[k]);
-            if (btn) btn.classList.toggle("active", !pedalBypass[k]);
+            const btn = document.getElementById("stompBtn_" + k);
+            if (card) card.classList.toggle("bypassed", pedalBypassState[k]);
+            if (btn) btn.classList.toggle("active", !pedalBypassState[k]);
           }
         });
       }
