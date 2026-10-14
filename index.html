@@ -2251,13 +2251,13 @@
               </svg>
             </button>
 
-            <button class="btn-layer-toggle layer-roadside active" id="btnToggleRoadside" onclick="toggleRoadsideObjects()" title="Toggle Roadside Shapes & Trees">
+            <button class="btn-layer-toggle layer-roadside active" id="btnToggleRoadside" onclick="toggleRoadsideObjects()" title="Toggle Floating 3D Vector Geometry (Spheres, Cubes, Pyramids, Diamonds)">
               <svg width="18" height="15" viewBox="0 0 18 15" fill="none">
                 <rect x="0.5" y="0.5" width="17" height="14" rx="2" stroke="rgba(255,121,63,0.5)" stroke-width="1"/>
-                <path d="M4 11.5V9.2L2.6 9.9L4 7.4L2.9 7.9L4.3 5.2L5.7 7.9L4.6 7.4L6 9.9L4.6 9.2V11.5H4Z" fill="#2ed573"/>
-                <path d="M13 11.5L11.5 8.7L12.3 8.7L13.5 6.5L14.7 8.7L15.5 8.7L14 11.5H13Z" fill="#ff793f"/>
-                <circle cx="9" cy="10.5" r="1.1" fill="#00e5ff"/>
-                <line x1="1.5" y1="11.5" x2="16.5" y2="11.5" stroke="rgba(255,255,255,0.3)" stroke-width="0.7"/>
+                <path d="M4 4.5L7.5 2.5L11 4.5L7.5 6.5L4 4.5Z" stroke="#ff3838" stroke-width="0.9" fill="none"/>
+                <path d="M4 4.5V8.5L7.5 10.5V6.5M11 4.5V8.5L7.5 10.5" stroke="#ff3838" stroke-width="0.9" fill="none"/>
+                <path d="M14 6L16 8.5L14 11L12 8.5L14 6Z" stroke="#7d5fff" stroke-width="0.9" fill="none"/>
+                <line x1="12" y1="8.5" x2="16" y2="8.5" stroke="#7d5fff" stroke-width="0.7"/>
               </svg>
             </button>
 
@@ -3993,6 +3993,7 @@ function maybeWanderDrone() {
     const step = wanderSteps[randRange(0, wanderSteps.length - 1)];
     droneWanderSemis = degreeToSemitone(step, scale) - degreeToSemitone(0, scale);
     droneWanderActive = true;
+    triggerMusical3DObject("drone");
   }
 }
 
@@ -4061,6 +4062,7 @@ function startNoteLive(midi, vel = 90) {
   const now = audioCtx.currentTime;
   if (ringDynamics.chord) ringDynamics.chord.impulse = Math.min(2.5, ringDynamics.chord.impulse + 1.2);
   activeMidiNotes.set(midi, { expiry: Infinity, source: "CHORD" });
+  triggerMusical3DObject("chord");
 
   const osc1 = audioCtx.createOscillator();
   const osc2 = audioCtx.createOscillator();
@@ -4474,6 +4476,7 @@ function triggerCurrentChord() {
 
   triggerFilterEnvelope(76);
   updateChordHud();
+  triggerMusical3DObject("chord");
 }
 
 function playArpNote(midi, vel = 85, isLive = false) {
@@ -4487,6 +4490,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
 
   if (ringDynamics.arp_main) ringDynamics.arp_main.impulse = 1.0;
   if (ringDynamics.arp_shimmer) ringDynamics.arp_shimmer.impulse = 1.4;
+  if (arpStepCounter === 0 || (isLive && randFloat() < 0.35)) triggerMusical3DObject("arp");
 
   const durationSec = arpGateMs / 1000;
   const freq = midiToFreq(midi);
@@ -4701,6 +4705,7 @@ function playKick(drive = 1.0) {
   if (ringDynamics.drum) {
     ringDynamics.drum.impulse = Math.min(2.5, ringDynamics.drum.impulse + 1.6 * drive);
   }
+  if (drive >= 0.85) triggerMusical3DObject("drum");
 
   if (droneGain && drumPunch > 0.1) {
     const origDrone = isChannelAudible('drone') ? droneVol * 0.16 : 0;
@@ -4941,6 +4946,7 @@ function playBayan(stroke = "GHE", slide = true, hard = 1.0) {
   oscSub.stop(now + decay + 0.05);
 
   if (ringDynamics.drum) ringDynamics.drum.impulse = Math.min(2.5, ringDynamics.drum.impulse + 1.8 * hard);
+  if (slide || hard > 0.8) triggerMusical3DObject("drum");
 
   if (droneGain && drumPunch > 0.1) {
     const origDrone = isChannelAudible('drone') ? droneVol * 0.16 : 0;
@@ -5647,202 +5653,209 @@ function drawFlightTerrainGrid(w, h) {
 // shapes (pyramid, sphere, square) drift above the ground at a height
 // proportional to their own size, with a slow bob -- these never touch
 // the floor.
-const ROADSIDE_ROOTED_SHAPES = ["tree", "cactus"];
-const ROADSIDE_FLOATING_SHAPES = ["pyramid", "sphere", "square"];
-const ROADSIDE_MAX_OBJECTS = 10;
+/* ==========================================================================
+   FLOATING 3D VECTOR OBJECTS (SPHERES, CUBES, PYRAMIDS, DIAMONDS)
+   Luminous 3D wireframe geometric elements rendered in vintage CRT vector
+   lines matching the MU-TH-UR 6000 / Eno head aesthetic.
+   Objects float above the flight-grid landscape and are triggered directly
+   by the 4 musical layers:
+     - Sub & Drone -> 3D Rotating Sphere (Electric Cyan #00e5ff)
+     - Drums       -> 3D Tumbling Cube (Phosphor Vector Crimson #ff3838)
+     - Chords      -> 3D Rotating Pyramid (Exhibition Amber #fed330)
+     - Shimmer Arp -> 3D Spinning Diamond / Octahedron (Cobalt/Violet #7d5fff)
+   ========================================================================== */
+const ROADSIDE_MAX_OBJECTS = 6;
 let roadsideObjects = [];
+let lastMusical3DSpawnTimes = { drone: 0, drum: 0, chord: 0, arp: 0 };
 
-function spawnRoadsideObject(trackId, rgb) {
-  if (roadsideObjects.length >= ROADSIDE_MAX_OBJECTS) return;
-  const rooted = Math.random() < 0.55;
-  const pool = rooted ? ROADSIDE_ROOTED_SHAPES : ROADSIDE_FLOATING_SHAPES;
+const MUSICAL_3D_TYPES = {
+  drone: { shape: "sphere",  rgb: [0, 229, 255] },
+  drum:  { shape: "cube",    rgb: [255, 56, 56] },
+  chord: { shape: "pyramid", rgb: [254, 211, 48] },
+  arp:   { shape: "diamond", rgb: [125, 95, 255] }
+};
+
+function triggerMusical3DObject(type) {
+  if (!roadsideEnabled) return;
+  const cfg = MUSICAL_3D_TYPES[type];
+  if (!cfg) return;
+
+  const now = performance.now();
+  // Per-channel debounce so fast successive triggers don't clutter the horizon
+  if (now - (lastMusical3DSpawnTimes[type] || 0) < 1350) return;
+  lastMusical3DSpawnTimes[type] = now;
+
+  if (roadsideObjects.length >= ROADSIDE_MAX_OBJECTS) {
+    // Gracefully speed up the oldest object to exit cleanly
+    roadsideObjects[0].progress = Math.max(roadsideObjects[0].progress, 0.90);
+  }
+
   roadsideObjects.push({
-    trackId,
-    rgb,
-    rooted,
+    type,
+    shape: cfg.shape,
+    rgb: cfg.rgb,
     side: Math.random() < 0.5 ? -1 : 1,
-    lateral: 0.12 + Math.random() * 0.38,
+    lateral: 0.14 + Math.random() * 0.36,
     progress: 0,
-    shape: pool[Math.floor(Math.random() * pool.length)],
-    sizeMult: 0.75 + Math.random() * 0.6,
-    // Fixed at spawn and reused every frame -- these drive per-object shape
-    // variation (branch count/angle, which side a cactus arm grows on,
-    // float height, bob phase/rate). Randomizing them per-frame instead
-    // would make the shapes flicker and jitter rather than hold steady as
-    // they travel.
-    seed1: Math.random(),
-    seed2: Math.random(),
+    sizeMult: 0.85 + Math.random() * 0.45,
+    floatAlt: 0.65 + Math.random() * 0.70,
     bobSeed: Math.random() * Math.PI * 2,
-    bobSpeed: 0.0012 + Math.random() * 0.0009
+    bobSpeed: 0.0012 + Math.random() * 0.0009,
+    rotX: Math.random() * Math.PI * 2,
+    rotY: Math.random() * Math.PI * 2,
+    rotZ: Math.random() * Math.PI * 2,
+    spinX: (Math.random() - 0.5) * 0.024,
+    spinY: 0.016 + Math.random() * 0.024,
+    spinZ: (Math.random() - 0.5) * 0.018
   });
 }
 
-// Fills whatever path is currently clipped on scopeCtx with an even
-// checkerboard of the instrument color at two close tones -- the "retro
-// digital" dithered texture from the reference image. A true 50/50
-// alternating grid (not noise) for a balanced, non-jittery look. Cell size
-// is derived from the object's own scale rather than its bounding box, so
-// a tall thin cactus trunk doesn't blow up into hundreds of tiny cells.
-function fillCheckered(x0, y0, x1, y1, rgb, cellSize) {
-  const dark = `rgba(${(rgb[0] * 0.56) | 0}, ${(rgb[1] * 0.56) | 0}, ${(rgb[2] * 0.56) | 0}, 0.8)`;
-  const light = `rgba(${Math.min(255, (rgb[0] * 1.18) | 0)}, ${Math.min(255, (rgb[1] * 1.18) | 0)}, ${Math.min(255, (rgb[2] * 1.18) | 0)}, 0.8)`;
-  let row = 0;
-  for (let gy = y0; gy < y1 && row < 9; gy += cellSize, row++) {
-    let col = 0;
-    for (let gx = x0; gx < x1 && col < 9; gx += cellSize, col++) {
-      scopeCtx.fillStyle = ((row + col) % 2 === 0) ? dark : light;
-      scopeCtx.fillRect(gx, gy, cellSize + 0.5, cellSize + 0.5);
+// Fast 3D Point Projection onto 2D canvas with Euler rotation
+function project3D(px, py, pz, rx, ry, rz, scale, cx, cy) {
+  // Rotate Y
+  const cosY = Math.cos(ry), sinY = Math.sin(ry);
+  const x1 = px * cosY + pz * sinY;
+  const z1 = -px * sinY + pz * cosY;
+  // Rotate X
+  const cosX = Math.cos(rx), sinX = Math.sin(rx);
+  const y2 = py * cosX - z1 * sinX;
+  const z2 = py * sinX + z1 * cosX;
+  // Rotate Z
+  const cosZ = Math.cos(rz), sinZ = Math.sin(rz);
+  const x3 = x1 * cosZ - y2 * sinZ;
+  const y3 = x1 * sinZ + y2 * cosZ;
+  return { x: cx + x3 * scale, y: cy + y3 * scale, z: z2 };
+}
+
+// Draws 3D wireframe edges with ENO-style front/back depth shading
+function drawWireframeEdges(edges, vertices, rx, ry, rz, scale, cx, cy, rgb, alpha) {
+  const projected = vertices.map(v => project3D(v[0], v[1], v[2], rx, ry, rz, scale, cx, cy));
+
+  edges.forEach(e => {
+    const p1 = projected[e[0]];
+    const p2 = projected[e[1]];
+    const avgZ = (p1.z + p2.z) / 2;
+
+    // Depth-based line weight and opacity (front-facing = luminous bright, back-facing = subtle ghost line)
+    const isFront = avgZ >= -0.10;
+    const edgeAlpha = alpha * (isFront ? 0.95 : 0.32);
+    const edgeWidth = isFront ? Math.max(1.1, scale * 0.045) : Math.max(0.65, scale * 0.024);
+
+    scopeCtx.beginPath();
+    scopeCtx.moveTo(p1.x, p1.y);
+    scopeCtx.lineTo(p2.x, p2.y);
+    scopeCtx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${edgeAlpha.toFixed(3)})`;
+    scopeCtx.lineWidth = edgeWidth;
+    scopeCtx.stroke();
+  });
+}
+
+// 1. 3D Wireframe Cube (Drums / Crimson #ff3838)
+const CUBE_VERTS = [
+  [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
+  [-1, -1,  1], [1, -1,  1], [1, 1,  1], [-1, 1,  1]
+];
+const CUBE_EDGES = [
+  [0, 1], [1, 2], [2, 3], [3, 0], // back face
+  [4, 5], [5, 6], [6, 7], [7, 4], // front face
+  [0, 4], [1, 5], [2, 6], [3, 7]  // connecting ribs
+];
+function draw3DCube(cx, cy, scale, rgb, alpha, rx, ry, rz) {
+  drawWireframeEdges(CUBE_EDGES, CUBE_VERTS, rx, ry, rz, scale * 0.52, cx, cy, rgb, alpha);
+}
+
+// 2. 3D Wireframe Pyramid (Chords / Amber #fed330)
+const PYRAMID_VERTS = [
+  [0, -1.25, 0], // apex
+  [-1, 0.85, -1], [1, 0.85, -1], [1, 0.85, 1], [-1, 0.85, 1] // square base
+];
+const PYRAMID_EDGES = [
+  [1, 2], [2, 3], [3, 4], [4, 1], // base perimeter
+  [0, 1], [0, 2], [0, 3], [0, 4]  // sides to apex
+];
+function draw3DPyramid(cx, cy, scale, rgb, alpha, rx, ry, rz) {
+  drawWireframeEdges(PYRAMID_EDGES, PYRAMID_VERTS, rx, ry, rz, scale * 0.58, cx, cy, rgb, alpha);
+}
+
+// 3. 3D Wireframe Diamond / Octahedron (Arp / Violet #7d5fff)
+const DIAMOND_VERTS = [
+  [0, -1.35, 0], [0, 1.35, 0], // top & bottom apex
+  [-1, 0, 0], [0, 0, -1], [1, 0, 0], [0, 0, 1] // equatorial ring
+];
+const DIAMOND_EDGES = [
+  [2, 3], [3, 4], [4, 5], [5, 2], // equator
+  [0, 2], [0, 3], [0, 4], [0, 5], // upper pyramid
+  [1, 2], [1, 3], [1, 4], [1, 5]  // lower pyramid
+];
+function draw3DDiamond(cx, cy, scale, rgb, alpha, rx, ry, rz) {
+  drawWireframeEdges(DIAMOND_EDGES, DIAMOND_VERTS, rx, ry, rz, scale * 0.56, cx, cy, rgb, alpha);
+}
+
+// 4. 3D Wireframe Sphere (Sub & Drone / Cyan #00e5ff)
+const SPHERE_RING_PTS = 16;
+function draw3DSphere(cx, cy, scale, rgb, alpha, rx, ry, rz) {
+  const r = scale * 0.58;
+  const rings = [
+    // Equator (XZ plane)
+    Array.from({ length: SPHERE_RING_PTS }, (_, i) => {
+      const a = (i / SPHERE_RING_PTS) * Math.PI * 2;
+      return [Math.cos(a), 0, Math.sin(a)];
+    }),
+    // Prime Meridian (YZ plane)
+    Array.from({ length: SPHERE_RING_PTS }, (_, i) => {
+      const a = (i / SPHERE_RING_PTS) * Math.PI * 2;
+      return [0, Math.sin(a), Math.cos(a)];
+    }),
+    // Axial (XY plane)
+    Array.from({ length: SPHERE_RING_PTS }, (_, i) => {
+      const a = (i / SPHERE_RING_PTS) * Math.PI * 2;
+      return [Math.cos(a), Math.sin(a), 0];
+    })
+  ];
+
+  rings.forEach(ring => {
+    const projected = ring.map(p => project3D(p[0], p[1], p[2], rx, ry, rz, r, cx, cy));
+    for (let i = 0; i < projected.length; i++) {
+      const p1 = projected[i];
+      const p2 = projected[(i + 1) % projected.length];
+      const avgZ = (p1.z + p2.z) / 2;
+      const isFront = avgZ >= -0.10;
+      const edgeAlpha = alpha * (isFront ? 0.95 : 0.32);
+
+      scopeCtx.beginPath();
+      scopeCtx.moveTo(p1.x, p1.y);
+      scopeCtx.lineTo(p2.x, p2.y);
+      scopeCtx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${edgeAlpha.toFixed(3)})`;
+      scopeCtx.lineWidth = isFront ? Math.max(1.1, scale * 0.04) : Math.max(0.65, scale * 0.022);
+      scopeCtx.stroke();
     }
-  }
-}
+  });
 
-// Wispy desert tree -- a thin trunk with a handful of sparse, thin
-// branches fanned near the top (Joshua-tree-like), stroked rather than
-// filled so it reads as delicate scrub, not a solid pine silhouette.
-// Rooted: y is the ground-contact point, grows upward from there.
-function drawWispyTree(x, y, size, rgb, alpha, seed) {
-  scopeCtx.save();
-  scopeCtx.globalAlpha = alpha;
-  scopeCtx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.85)`;
-  scopeCtx.lineWidth = Math.max(0.6, size * 0.035);
-  scopeCtx.lineCap = "round";
-
-  const trunkH = size * (0.55 + seed * 0.12);
+  // Small luminous center origin node
+  const centerNode = project3D(0, 0, 0, rx, ry, rz, r, cx, cy);
   scopeCtx.beginPath();
-  scopeCtx.moveTo(x, y);
-  scopeCtx.lineTo(x, y - trunkH);
-  scopeCtx.stroke();
-
-  const branchCount = 3 + Math.floor(seed * 3);
-  for (let b = 0; b < branchCount; b++) {
-    const t = 0.42 + (b / Math.max(1, branchCount - 1)) * 0.52;
-    const by = y - trunkH * t;
-    const frac = branchCount > 1 ? b / (branchCount - 1) : 0.5;
-    const angle = -1.0 + frac * 2.0 + (seed - 0.5) * 0.25;
-    const blen = size * (0.2 + ((seed * 37 + b * 13) % 10) / 10 * 0.18);
-    const ex = x + Math.sin(angle) * blen;
-    const ey = by - Math.cos(angle) * blen * 0.75;
-    scopeCtx.beginPath();
-    scopeCtx.moveTo(x, by);
-    scopeCtx.lineTo(ex, ey);
-    scopeCtx.stroke();
-  }
-  scopeCtx.restore();
-}
-
-// Blocky saguaro cactus built from plain rects (trunk + 0-2 L-shaped arms)
-// -- matches the reference image's chunky pixel-art silhouette rather than
-// a smoothly-curved one. Rooted: y is the ground-contact point.
-function drawCactus(x, y, size, rgb, alpha, seed1, seed2) {
-  scopeCtx.save();
-  scopeCtx.globalAlpha = alpha;
-  scopeCtx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.9)`;
-  scopeCtx.lineWidth = Math.max(0.6, size * 0.03);
-  const cell = Math.max(1.5, size * 0.1);
-
-  const trunkW = size * 0.17;
-  const trunkH = size * 0.85;
-  const topY = y - trunkH;
-
-  scopeCtx.beginPath();
-  scopeCtx.rect(x - trunkW / 2, topY, trunkW, trunkH);
-  scopeCtx.save();
-  scopeCtx.clip();
-  fillCheckered(x - trunkW / 2, topY, x + trunkW / 2, y, rgb, cell);
-  scopeCtx.restore();
-  scopeCtx.stroke();
-
-  const armCount = seed1 < 0.3 ? 0 : (seed1 < 0.75 ? 1 : 2);
-  for (let a = 0; a < armCount; a++) {
-    const side = ((a === 0) === (seed2 < 0.5)) ? -1 : 1;
-    const armY = topY + trunkH * (0.32 + a * 0.26);
-    const armW = trunkW * 0.85;
-    const outReach = size * 0.17;
-    const upReach = size * 0.26;
-    const outX = x + side * outReach;
-
-    scopeCtx.beginPath();
-    scopeCtx.rect(Math.min(x, outX) - armW / 2, armY - armW / 2, Math.abs(outX - x) + armW, armW);
-    scopeCtx.rect(outX - armW / 2, armY - upReach, armW, upReach + armW / 2);
-    scopeCtx.save();
-    scopeCtx.clip();
-    fillCheckered(Math.min(x, outX) - armW, armY - upReach - armW, Math.max(x, outX) + armW, armY + armW, rgb, cell);
-    scopeCtx.restore();
-    scopeCtx.stroke();
-  }
-  scopeCtx.restore();
-}
-
-// Floating shapes -- y is the shape's own vertical center, not a ground
-// contact point, since these never touch the floor.
-function drawFloatingPyramid(x, y, size, rgb, alpha) {
-  scopeCtx.save();
-  scopeCtx.globalAlpha = alpha;
-  scopeCtx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.9)`;
-  scopeCtx.lineWidth = Math.max(0.6, size * 0.035);
-  const halfW = size * 0.42, halfH = size * 0.38;
-
-  scopeCtx.beginPath();
-  scopeCtx.moveTo(x, y - halfH);
-  scopeCtx.lineTo(x + halfW, y + halfH);
-  scopeCtx.lineTo(x - halfW, y + halfH);
-  scopeCtx.closePath();
-  scopeCtx.save();
-  scopeCtx.clip();
-  fillCheckered(x - halfW, y - halfH, x + halfW, y + halfH, rgb, Math.max(1.5, size * 0.11));
-  scopeCtx.restore();
-  scopeCtx.stroke();
-
-  // A center ridge line hints at a second face, just enough to read as
-  // isometric without any real 3D projection math.
-  scopeCtx.beginPath();
-  scopeCtx.moveTo(x, y - halfH);
-  scopeCtx.lineTo(x, y + halfH);
-  scopeCtx.stroke();
-  scopeCtx.restore();
-}
-
-function drawFloatingSphere(x, y, size, rgb, alpha) {
-  scopeCtx.save();
-  scopeCtx.globalAlpha = alpha;
-  scopeCtx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.9)`;
-  scopeCtx.lineWidth = Math.max(0.6, size * 0.035);
-  const r = size * 0.4;
-
-  scopeCtx.beginPath();
-  scopeCtx.arc(x, y, r, 0, Math.PI * 2);
-  scopeCtx.save();
-  scopeCtx.clip();
-  fillCheckered(x - r, y - r, x + r, y + r, rgb, Math.max(1.5, size * 0.11));
-  scopeCtx.restore();
-  scopeCtx.stroke();
-  scopeCtx.restore();
-}
-
-function drawFloatingSquare(x, y, size, rgb, alpha) {
-  scopeCtx.save();
-  scopeCtx.globalAlpha = alpha;
-  scopeCtx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.9)`;
-  scopeCtx.lineWidth = Math.max(0.6, size * 0.035);
-  const half = size * 0.36;
-
-  scopeCtx.beginPath();
-  scopeCtx.rect(x - half, y - half, half * 2, half * 2);
-  scopeCtx.save();
-  scopeCtx.clip();
-  fillCheckered(x - half, y - half, x + half, y + half, rgb, Math.max(1.5, size * 0.11));
-  scopeCtx.restore();
-  scopeCtx.stroke();
-  scopeCtx.restore();
+  scopeCtx.arc(centerNode.x, centerNode.y, Math.max(1.2, scale * 0.05), 0, Math.PI * 2);
+  scopeCtx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${(alpha * 0.85).toFixed(3)})`;
+  scopeCtx.fill();
 }
 
 function drawRoadsideShape(obj, x, y, size, alpha) {
   const rgb = obj.rgb;
-  if (obj.shape === "tree") drawWispyTree(x, y, size, rgb, alpha, obj.seed1);
-  else if (obj.shape === "cactus") drawCactus(x, y, size, rgb, alpha, obj.seed1, obj.seed2);
-  else if (obj.shape === "pyramid") drawFloatingPyramid(x, y, size, rgb, alpha);
-  else if (obj.shape === "sphere") drawFloatingSphere(x, y, size, rgb, alpha);
-  else drawFloatingSquare(x, y, size, rgb, alpha);
+  scopeCtx.save();
+  scopeCtx.lineCap = "round";
+  scopeCtx.lineJoin = "round";
+
+  if (obj.shape === "cube") {
+    draw3DCube(x, y, size, rgb, alpha, obj.rotX, obj.rotY, obj.rotZ);
+  } else if (obj.shape === "pyramid") {
+    draw3DPyramid(x, y, size, rgb, alpha, obj.rotX, obj.rotY, obj.rotZ);
+  } else if (obj.shape === "diamond") {
+    draw3DDiamond(x, y, size, rgb, alpha, obj.rotX, obj.rotY, obj.rotZ);
+  } else {
+    draw3DSphere(x, y, size, rgb, alpha, obj.rotX, obj.rotY, obj.rotZ);
+  }
+
+  scopeCtx.restore();
 }
 
 function drawRoadsideObjects(w, h) {
@@ -5853,26 +5866,16 @@ function drawRoadsideObjects(w, h) {
   const gridH = bottomY - horizonY;
   const vanishX = w * 0.5;
 
-  if (isPlaying) {
-    WATERFALL_TRACKS.forEach(track => {
-      const buf = chBufs[track.id];
-      if (!buf) return;
-      let sum = 0;
-      for (let i = 1; i <= 10; i++) sum += buf[i];
-      const energy = sum / (10 * 255);
-      const spawnChance = 0.003 + Math.max(0, energy - 0.2) * 0.045;
-      if (Math.random() < spawnChance) spawnRoadsideObject(track.id, track.rgb);
-    });
-  } else if (Math.random() < 0.003) {
-    const t = WATERFALL_TRACKS[Math.floor(Math.random() * WATERFALL_TRACKS.length)];
-    spawnRoadsideObject(t.id, t.rgb);
+  // Gentle ambient fallback if music is quiet or idle so scenery stays alive
+  if (isPlaying && roadsideObjects.length < 2 && Math.random() < 0.012) {
+    const keys = ["drone", "drum", "chord", "arp"];
+    triggerMusical3DObject(keys[Math.floor(Math.random() * keys.length)]);
+  } else if (!isPlaying && roadsideObjects.length === 0 && Math.random() < 0.005) {
+    triggerMusical3DObject("drone");
   }
 
-  // Chill baseline that still breathes with the tempo -- about a third of
-  // the original speed, so an object's full horizon-to-exit journey takes
-  // roughly 8-10s at a typical ~70bpm instead of ~2-3s.
   const tempoRate = (typeof bpm !== "undefined" ? bpm : 72) / 60;
-  const speed = 0.0022 * tempoRate * (isPlaying ? 1 : 0.45);
+  const speed = 0.0020 * tempoRate * (isPlaying ? 1 : 0.45);
   const nowMs = performance.now();
 
   scopeCtx.save();
@@ -5885,26 +5888,27 @@ function drawRoadsideObjects(w, h) {
     obj.progress += speed;
     if (obj.progress >= 1) { roadsideObjects.splice(i, 1); continue; }
 
+    // Rotate 3D geometry smoothly each frame
+    obj.rotX += obj.spinX;
+    obj.rotY += obj.spinY;
+    obj.rotZ += obj.spinZ;
+
     const p = obj.progress;
     const eased = p * p;
     const groundY = horizonY + eased * gridH;
-    const edgeX = vanishX + obj.side * (w * (0.22 + obj.lateral));
-    const x = vanishX + (edgeX - vanishX) * Math.pow(p, 1.25);
-    const size = (4 + eased * 64) * obj.sizeMult;
+    const edgeX = vanishX + obj.side * (w * (0.24 + obj.lateral * 0.28));
+    const x = vanishX + (edgeX - vanishX) * Math.pow(p, 1.35);
+    const size = (6 + Math.pow(p, 1.6) * 72) * obj.sizeMult;
 
-    let y;
-    if (obj.rooted) {
-      y = groundY;
-    } else {
-      const floatHeight = size * (0.5 + obj.seed1 * 0.9);
-      const bob = Math.sin(nowMs * obj.bobSpeed + obj.bobSeed) * size * 0.08;
-      y = groundY - floatHeight + bob;
-    }
+    // All objects float suspended above the vector ground plane
+    const floatHeight = size * (0.8 + obj.floatAlt * 0.85);
+    const bob = Math.sin(nowMs * obj.bobSpeed + obj.bobSeed) * (size * 0.12);
+    const y = groundY - floatHeight + bob;
 
-    let alpha = 0.8;
-    if (p < 0.08) alpha = p / 0.08;
-    else if (p > 0.88) alpha = (1 - p) / 0.12;
-    alpha = Math.max(0, Math.min(0.8, alpha));
+    let alpha = 0.85;
+    if (p < 0.12) alpha = p / 0.12;
+    else if (p > 0.86) alpha = (1 - p) / 0.14;
+    alpha = Math.max(0, Math.min(0.88, alpha));
 
     drawRoadsideShape(obj, x, y, size, alpha);
   }
