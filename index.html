@@ -218,7 +218,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    min-width: 0;
   }
   .preset-label {
     font-size: 9.5px;
@@ -232,10 +233,45 @@
   }
   .preset-bar {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(8, auto);
     grid-template-rows: repeat(2, 1fr);
     gap: 5px;
     align-items: center;
+  }
+  .preset-io-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex-shrink: 0;
+    padding-left: 6px;
+    border-left: 1px solid var(--border-light);
+  }
+  .btn-preset-io {
+    background: #101522;
+    color: var(--color-drone);
+    border: 1px solid rgba(0, 229, 255, 0.38);
+    padding: 0 9px;
+    height: 23px;
+    box-sizing: border-box;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    cursor: var(--cursor-pointer) !important;
+    transition: all 0.12s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    white-space: nowrap;
+  }
+  .btn-preset-io:hover {
+    background: rgba(0, 229, 255, 0.15);
+    color: #ffffff;
+    border-color: var(--color-drone);
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.35);
   }
   .btn-preset-chip {
     background: #0f121c;
@@ -3119,6 +3155,21 @@
             <button class="btn-preset-chip" onclick="applyPreset(8)">After Hours Deep</button>
             <button class="btn-preset-chip" onclick="applyPreset(9)">Ambient 1 / Airports</button>
             <button class="btn-preset-chip" onclick="applyPreset(10)">Twin Peaks / Badalamenti</button>
+            <button class="btn-preset-chip" onclick="applyPreset(11)" title="IDM breakbeats, eerie glass pads, Delay ➔ Filter ➔ Space at 48% feedback">Aphex Twin</button>
+            <button class="btn-preset-chip" onclick="applyPreset(12)" title="Berlin School sequences, pulsing arpeggiators, Filter ➔ Delay ➔ Space cathedral sweeps">Tangerine Dream</button>
+            <button class="btn-preset-chip" onclick="applyPreset(13)" title="Disintegrating tape loops, pitch drift, Space ➔ Delay ➔ Filter dark low-pass repeats">William Basinski</button>
+            <button class="btn-preset-chip" onclick="applyPreset(14)" title="Boom-bap swing, dusty Rhodes chords, rain/vinyl texture, Filter ➔ Delay ➔ Space warmth">Lo-Fi Chillhop</button>
+          </div>
+          <div class="preset-io-stack">
+            <button class="btn-preset-io" onclick="savePresetBankJson()" title="Export current console & DSP chain patch as a JSON file">
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 1.5V8M6 8L3.2 5.2M6 8L8.8 5.2M2 10.5H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>SAVE</span>
+            </button>
+            <button class="btn-preset-io" onclick="triggerLoadPresetBankJson()" title="Import a saved JSON patch & restore console + DSP chain routing">
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 8.5V2M6 2L3.2 4.8M6 2L8.8 4.8M2 10.5H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>LOAD</span>
+            </button>
+            <input type="file" id="inputPresetJson" accept=".json,application/json" style="display:none;" onchange="loadPresetBankJson(event)">
           </div>
         </div>
       </div>
@@ -9714,21 +9765,27 @@ function applyPreset(idx) {
   const chkDelaySync = document.getElementById("chkDelayTempoSync");
   if (chkDelaySync) chkDelaySync.checked = false;
 
-  // Reset module controls that only certain presets override so switching
-  // presets or coming from Randomize All never leaks stale state.
+  // Reset module controls and DSP pedal routing that only certain presets override
+  // so switching presets or coming from Randomize All never leaks stale state.
+  if (typeof rewireDspChain === "function") {
+    rewireDspChain(['FILTER', 'DELAY', 'SPACE'], false);
+  }
   const selDroneTimbre = document.getElementById("selDroneTimbre");
   if (selDroneTimbre) selDroneTimbre.value = "SUB";
   if (document.getElementById("selDroneOctave")) document.getElementById("selDroneOctave").value = "D2";
   if (document.getElementById("selDrumKit")) document.getElementById("selDrumKit").value = "ORGANIC_KIT";
   if (document.getElementById("selChordVoicing")) document.getElementById("selChordVoicing").value = "AUTO";
   if (document.getElementById("selNoiseProfile")) {
-    const presetProfiles = ["RAIN", "WHITE_TAPE", "WIND", "BROOK", "CRICKETS", "THUNDER", "BROOK", "WIND", "WHITE_TAPE", "WHITE_TAPE", "RAIN"];
+    const presetProfiles = ["RAIN", "WHITE_TAPE", "WIND", "BROOK", "CRICKETS", "THUNDER", "BROOK", "WIND", "WHITE_TAPE", "WHITE_TAPE", "RAIN", "WHITE_TAPE", "WIND", "WHITE_TAPE", "RAIN"];
     document.getElementById("selNoiseProfile").value = presetProfiles[idx] || "RAIN";
   }
   if (document.getElementById("selNoiseMode")) {
-    const presetModes = ["GUSTS", "RHYTHMIC", "STORM_SWELL", "CONTINUOUS", "SPARSE", "STORM_SWELL", "CONTINUOUS", "SPARSE", "CONTINUOUS", "CONTINUOUS", "GUSTS"];
+    const presetModes = ["GUSTS", "RHYTHMIC", "STORM_SWELL", "CONTINUOUS", "SPARSE", "STORM_SWELL", "CONTINUOUS", "SPARSE", "CONTINUOUS", "CONTINUOUS", "GUSTS", "RHYTHMIC", "GUSTS", "CONTINUOUS", "GUSTS"];
     document.getElementById("selNoiseMode").value = presetModes[idx] || "GUSTS";
   }
+  if (document.getElementById("knobNoiseColor")) document.getElementById("knobNoiseColor").value = 45;
+  if (document.getElementById("knobNoiseRate")) document.getElementById("knobNoiseRate").value = 38;
+  if (document.getElementById("knobNoiseDrift")) document.getElementById("knobNoiseDrift").value = 42;
   if (document.getElementById("knobNoiseVol")) document.getElementById("knobNoiseVol").value = 24;
   if (document.getElementById("knobNoiseFx")) document.getElementById("knobNoiseFx").value = 60;
   if (document.getElementById("knobChordDynamics")) document.getElementById("knobChordDynamics").value = 90;
@@ -9738,6 +9795,10 @@ function applyPreset(idx) {
   if (document.getElementById("knobDrumFx")) document.getElementById("knobDrumFx").value = 40;
   if (document.getElementById("knobChordFx")) document.getElementById("knobChordFx").value = 85;
   if (document.getElementById("knobArpFx")) document.getElementById("knobArpFx").value = 85;
+  if (document.getElementById("knobEqLow")) document.getElementById("knobEqLow").value = 0;
+  if (document.getElementById("knobEqMid")) document.getElementById("knobEqMid").value = 0;
+  if (document.getElementById("knobEqHigh")) document.getElementById("knobEqHigh").value = 0;
+  if (document.getElementById("knobMasterDrive")) document.getElementById("knobMasterDrive").value = 12;
 
   if (idx === 0) {
     document.getElementById("selTimeSig").value = "7/4";
@@ -10358,6 +10419,302 @@ function applyPreset(idx) {
     document.getElementById("knobChorusRate").value = 0.3;
     document.getElementById("knobChorusDepth").value = 45;
     document.getElementById("knobChorusMix").value = 35;
+  } else if (idx === 11) { // Aphex Twin (Selected Ambient Works / IDM Micro-Poly, DELAY -> FILTER -> SPACE at 48% feedback)
+    rewireDspChain(['DELAY', 'FILTER', 'SPACE'], false);
+    document.getElementById("selTimeSig").value = "7/8";
+    activeScaleKey = "HIRAJOSHI";
+    document.getElementById("knobBpm").value = 104;
+    document.getElementById("knobWeather").value = 62;
+    document.getElementById("knobMutation").value = 48;
+
+    document.getElementById("selDrumStyle").value = "BREAKBEAT_POCKET";
+    if (document.getElementById("selDrumKit")) document.getElementById("selDrumKit").value = "ANALOG_CRUNCH";
+    document.getElementById("chkAutoEvolveDrums").checked = true;
+    document.getElementById("knobDrumEvolveChance").value = 38;
+    document.getElementById("knobDrumVol").value = 84;
+    document.getElementById("knobDrumPunch").value = 78;
+    document.getElementById("knobDrumDensity").value = 82;
+    document.getElementById("knobDrumFx").value = 52;
+
+    document.getElementById("knobStrum").value = 35;
+    document.getElementById("selChordTimbre").value = "PURE_SINE_GLASS";
+    document.getElementById("knobChordDynamics").value = 78;
+    document.getElementById("knobChordSustain").value = 145;
+    document.getElementById("knobChordVol").value = 80;
+    document.getElementById("knobChordFx").value = 92;
+
+    document.getElementById("selDroneOctave").value = "D1";
+    document.getElementById("knobDrone").value = 68;
+    document.getElementById("knobDroneFilter").value = 175;
+    document.getElementById("knobDroneDetune").value = 5.5;
+    document.getElementById("knobDroneWander").value = 35;
+    document.getElementById("knobDroneFx").value = 45;
+
+    document.getElementById("selArpPattern").value = "SHIMMER";
+    document.getElementById("chkAutoEvolveArpPattern").checked = true;
+    document.getElementById("selArpTimbre").value = "GLASS_FM";
+    document.getElementById("chkAutoEvolveArpTimbre").checked = false;
+    document.getElementById("knobArpEvolveChance").value = 32;
+    document.getElementById("knobArpGate").value = 190;
+    document.getElementById("knobArpRest").value = 18;
+    document.getElementById("knobArpOctaves").value = 2;
+    document.getElementById("knobArpVol").value = 76;
+    document.getElementById("knobArpFx").value = 90;
+
+    if (document.getElementById("selNoiseProfile")) document.getElementById("selNoiseProfile").value = "WHITE_TAPE";
+    if (document.getElementById("selNoiseMode")) document.getElementById("selNoiseMode").value = "RHYTHMIC";
+    if (document.getElementById("knobNoiseColor")) document.getElementById("knobNoiseColor").value = 64;
+    if (document.getElementById("knobNoiseRate")) document.getElementById("knobNoiseRate").value = 68;
+    if (document.getElementById("knobNoiseDrift")) document.getElementById("knobNoiseDrift").value = 55;
+    if (document.getElementById("knobNoiseVol")) document.getElementById("knobNoiseVol").value = 28;
+    if (document.getElementById("knobNoiseFx")) document.getElementById("knobNoiseFx").value = 75;
+
+    // Delay feeds into resonant filter at 48% feedback ceiling
+    document.getElementById("chkDelayTempoSync").checked = true;
+    document.getElementById("selDelayNoteDivision").value = "0.75";
+    document.getElementById("knobDelayFeedback").value = 48;
+    document.getElementById("knobDelayTone").value = 2800;
+    document.getElementById("knobDelayFlutter").value = 38;
+    document.getElementById("knobDelayMix").value = 46;
+
+    document.getElementById("knobMasterCutoff").value = 54;
+    document.getElementById("knobMasterRes").value = 3.8;
+    document.getElementById("knobFilterAttack").value = 35;
+    document.getElementById("knobFilterDecay").value = 520;
+    document.getElementById("knobFilterEnvDepth").value = 55;
+    document.getElementById("knobFilterLfoRate").value = 0.22;
+    document.getElementById("knobFilterLfoDepth").value = 32;
+
+    document.getElementById("selReverbMode").value = "CATHEDRAL";
+    document.getElementById("knobReverbMix").value = 48;
+    document.getElementById("knobReverbTone").value = 4600;
+    document.getElementById("selChorusMode").value = "VIBRATO";
+    document.getElementById("knobChorusRate").value = 0.42;
+    document.getElementById("knobChorusDepth").value = 36;
+    document.getElementById("knobChorusMix").value = 26;
+    if (document.getElementById("knobMasterDrive")) document.getElementById("knobMasterDrive").value = 22;
+  } else if (idx === 12) { // Tangerine Dream (Phaedra / Berlin School Sequencer, FILTER -> DELAY -> SPACE)
+    rewireDspChain(['FILTER', 'DELAY', 'SPACE'], false);
+    document.getElementById("selTimeSig").value = "4/4";
+    activeScaleKey = "PHRYGIAN";
+    document.getElementById("knobBpm").value = 96;
+    document.getElementById("knobWeather").value = 68;
+    document.getElementById("knobMutation").value = 32;
+
+    document.getElementById("selDrumStyle").value = "HEARTBEAT";
+    if (document.getElementById("selDrumKit")) document.getElementById("selDrumKit").value = "ANALOG_CRUNCH";
+    document.getElementById("chkAutoEvolveDrums").checked = false;
+    document.getElementById("knobDrumVol").value = 58;
+    document.getElementById("knobDrumPunch").value = 65;
+    document.getElementById("knobDrumDensity").value = 40;
+    document.getElementById("knobDrumFx").value = 45;
+
+    document.getElementById("knobStrum").value = 25;
+    document.getElementById("selChordTimbre").value = "DIGITAL_STRINGS";
+    document.getElementById("knobChordDynamics").value = 88;
+    document.getElementById("knobChordSustain").value = 155;
+    document.getElementById("knobChordVol").value = 84;
+    document.getElementById("knobChordFx").value = 90;
+
+    document.getElementById("selDroneOctave").value = "D1";
+    document.getElementById("knobDrone").value = 82;
+    document.getElementById("knobDroneFilter").value = 220;
+    document.getElementById("knobDroneDetune").value = 4.2;
+    document.getElementById("knobDroneWander").value = 15;
+    document.getElementById("knobDroneFx").value = 50;
+
+    // Hypnotic Berlin School sequenced arpeggiator
+    document.getElementById("selArpPattern").value = "UP";
+    document.getElementById("chkAutoEvolveArpPattern").checked = false;
+    document.getElementById("selArpTimbre").value = "ANALOG_PULSE";
+    document.getElementById("chkAutoEvolveArpTimbre").checked = false;
+    document.getElementById("knobArpGate").value = 165;
+    document.getElementById("knobArpRest").value = 5;
+    document.getElementById("knobArpOctaves").value = 2;
+    document.getElementById("knobArpVol").value = 88;
+    document.getElementById("knobArpFx").value = 92;
+
+    if (document.getElementById("selNoiseProfile")) document.getElementById("selNoiseProfile").value = "WIND";
+    if (document.getElementById("selNoiseMode")) document.getElementById("selNoiseMode").value = "GUSTS";
+    if (document.getElementById("knobNoiseColor")) document.getElementById("knobNoiseColor").value = 48;
+    if (document.getElementById("knobNoiseRate")) document.getElementById("knobNoiseRate").value = 35;
+    if (document.getElementById("knobNoiseDrift")) document.getElementById("knobNoiseDrift").value = 68;
+    if (document.getElementById("knobNoiseVol")) document.getElementById("knobNoiseVol").value = 32;
+    if (document.getElementById("knobNoiseFx")) document.getElementById("knobNoiseFx").value = 85;
+
+    // Sweeping resonant analog filter feeding dotted-eighth delay & cathedral space
+    document.getElementById("knobMasterCutoff").value = 56;
+    document.getElementById("knobMasterRes").value = 4.5;
+    document.getElementById("knobFilterAttack").value = 40;
+    document.getElementById("knobFilterDecay").value = 780;
+    document.getElementById("knobFilterEnvDepth").value = 68;
+    document.getElementById("knobFilterLfoRate").value = 0.14;
+    document.getElementById("knobFilterLfoDepth").value = 38;
+
+    document.getElementById("chkDelayTempoSync").checked = true;
+    document.getElementById("selDelayNoteDivision").value = "0.75";
+    document.getElementById("knobDelayFeedback").value = 46;
+    document.getElementById("knobDelayTone").value = 2400;
+    document.getElementById("knobDelayFlutter").value = 24;
+    document.getElementById("knobDelayMix").value = 48;
+
+    document.getElementById("selReverbMode").value = "CATHEDRAL";
+    document.getElementById("knobReverbMix").value = 58;
+    document.getElementById("knobReverbTone").value = 5200;
+    document.getElementById("selChorusMode").value = "ENSEMBLE";
+    document.getElementById("knobChorusRate").value = 0.28;
+    document.getElementById("knobChorusDepth").value = 48;
+    document.getElementById("knobChorusMix").value = 34;
+    if (document.getElementById("knobMasterDrive")) document.getElementById("knobMasterDrive").value = 24;
+  } else if (idx === 13) { // William Basinski (The Disintegration Loops, SPACE -> DELAY -> FILTER dark muffled repeats)
+    rewireDspChain(['SPACE', 'DELAY', 'FILTER'], false);
+    document.getElementById("selTimeSig").value = "3/4";
+    activeScaleKey = "LYDIAN";
+    document.getElementById("knobBpm").value = 52;
+    document.getElementById("knobWeather").value = 78;
+    document.getElementById("knobMutation").value = 10;
+
+    document.getElementById("selDrumStyle").value = "MUTED";
+    document.getElementById("chkAutoEvolveDrums").checked = false;
+    document.getElementById("knobDrumVol").value = 0;
+
+    document.getElementById("knobStrum").value = 115;
+    document.getElementById("selChordTimbre").value = "CHAMBER_WOODS";
+    document.getElementById("knobChordDynamics").value = 68;
+    document.getElementById("knobChordSustain").value = 185;
+    document.getElementById("knobChordVol").value = 86;
+    document.getElementById("knobChordFx").value = 95;
+
+    document.getElementById("selDroneOctave").value = "D1";
+    document.getElementById("knobDrone").value = 76;
+    document.getElementById("knobDroneFilter").value = 125;
+    document.getElementById("knobDroneDetune").value = 6.5;
+    document.getElementById("knobDroneWander").value = 32;
+    document.getElementById("knobDroneFx").value = 80;
+
+    document.getElementById("selArpPattern").value = "PENDULUM";
+    document.getElementById("chkAutoEvolveArpPattern").checked = false;
+    document.getElementById("selArpTimbre").value = "SINE_CRYSTAL";
+    document.getElementById("chkAutoEvolveArpTimbre").checked = false;
+    document.getElementById("knobArpGate").value = 480;
+    document.getElementById("knobArpRest").value = 55;
+    document.getElementById("knobArpOctaves").value = 1;
+    document.getElementById("knobArpVol").value = 52;
+    document.getElementById("knobArpFx").value = 92;
+
+    // Oxidized magnetic tape hiss & crackle
+    if (document.getElementById("selNoiseProfile")) document.getElementById("selNoiseProfile").value = "WHITE_TAPE";
+    if (document.getElementById("selNoiseMode")) document.getElementById("selNoiseMode").value = "CONTINUOUS";
+    if (document.getElementById("knobNoiseColor")) document.getElementById("knobNoiseColor").value = 28;
+    if (document.getElementById("knobNoiseRate")) document.getElementById("knobNoiseRate").value = 45;
+    if (document.getElementById("knobNoiseDrift")) document.getElementById("knobNoiseDrift").value = 75;
+    if (document.getElementById("knobNoiseVol")) document.getElementById("knobNoiseVol").value = 38;
+    if (document.getElementById("knobNoiseFx")) document.getElementById("knobNoiseFx").value = 88;
+
+    // Reverb & worn tape delay feed INTO a dark low-pass filter to muffle repeat tails
+    document.getElementById("selReverbMode").value = "CATHEDRAL";
+    document.getElementById("knobReverbMix").value = 62;
+    document.getElementById("knobReverbTone").value = 2600;
+    document.getElementById("selChorusMode").value = "VIBRATO";
+    document.getElementById("knobChorusRate").value = 0.18;
+    document.getElementById("knobChorusDepth").value = 52;
+    document.getElementById("knobChorusMix").value = 36;
+
+    document.getElementById("chkDelayTempoSync").checked = false;
+    document.getElementById("knobDelayTime").value = 680;
+    document.getElementById("knobDelayFeedback").value = 48;
+    document.getElementById("knobDelayTone").value = 1150;
+    document.getElementById("knobDelayFlutter").value = 65;
+    document.getElementById("knobDelayMix").value = 52;
+
+    document.getElementById("knobMasterCutoff").value = 38; // ~620 Hz dark muffled tape ceiling
+    document.getElementById("knobMasterRes").value = 1.8;
+    document.getElementById("knobFilterAttack").value = 240;
+    document.getElementById("knobFilterDecay").value = 2200;
+    document.getElementById("knobFilterEnvDepth").value = 18;
+    document.getElementById("knobFilterLfoRate").value = 0.04;
+    document.getElementById("knobFilterLfoDepth").value = 22;
+
+    if (document.getElementById("knobEqLow")) document.getElementById("knobEqLow").value = 3.0;
+    if (document.getElementById("knobEqHigh")) document.getElementById("knobEqHigh").value = -4.5;
+    if (document.getElementById("knobMasterDrive")) document.getElementById("knobMasterDrive").value = 42;
+  } else if (idx === 14) { // Lo-Fi Chillhop (Boom-Bap Swing, Rhodes Chords, Rain/Vinyl Texture, FILTER -> DELAY -> SPACE)
+    rewireDspChain(['FILTER', 'DELAY', 'SPACE'], false);
+    document.getElementById("selTimeSig").value = "4/4";
+    activeScaleKey = "DORIAN";
+    document.getElementById("knobBpm").value = 76;
+    document.getElementById("knobWeather").value = 42;
+    document.getElementById("knobMutation").value = 28;
+
+    document.getElementById("selDrumStyle").value = "BREAKBEAT_POCKET";
+    if (document.getElementById("selDrumKit")) document.getElementById("selDrumKit").value = "TAPE_DUST";
+    document.getElementById("chkAutoEvolveDrums").checked = true;
+    document.getElementById("knobDrumEvolveChance").value = 22;
+    document.getElementById("knobDrumVol").value = 82;
+    document.getElementById("knobDrumPunch").value = 68;
+    document.getElementById("knobDrumDensity").value = 55;
+    document.getElementById("knobDrumFx").value = 32;
+
+    document.getElementById("knobStrum").value = 65;
+    document.getElementById("selChordTimbre").value = "RHODES";
+    document.getElementById("knobChordDynamics").value = 76;
+    document.getElementById("knobChordSustain").value = 115;
+    document.getElementById("knobChordVol").value = 85;
+    document.getElementById("knobChordFx").value = 74;
+
+    document.getElementById("selDroneOctave").value = "D1";
+    document.getElementById("knobDrone").value = 72;
+    document.getElementById("knobDroneFilter").value = 135;
+    document.getElementById("knobDroneDetune").value = 2.5;
+    document.getElementById("knobDroneWander").value = 12;
+    document.getElementById("knobDroneFx").value = 25;
+
+    document.getElementById("selArpPattern").value = "PENDULUM";
+    document.getElementById("chkAutoEvolveArpPattern").checked = false;
+    document.getElementById("selArpTimbre").value = "KALIMBA";
+    document.getElementById("chkAutoEvolveArpTimbre").checked = false;
+    document.getElementById("knobArpGate").value = 220;
+    document.getElementById("knobArpRest").value = 30;
+    document.getElementById("knobArpOctaves").value = 2;
+    document.getElementById("knobArpVol").value = 68;
+    document.getElementById("knobArpFx").value = 65;
+
+    // Cozy window rain + vinyl warmth
+    if (document.getElementById("selNoiseProfile")) document.getElementById("selNoiseProfile").value = "RAIN";
+    if (document.getElementById("selNoiseMode")) document.getElementById("selNoiseMode").value = "GUSTS";
+    if (document.getElementById("knobNoiseColor")) document.getElementById("knobNoiseColor").value = 38;
+    if (document.getElementById("knobNoiseRate")) document.getElementById("knobNoiseRate").value = 42;
+    if (document.getElementById("knobNoiseDrift")) document.getElementById("knobNoiseDrift").value = 50;
+    if (document.getElementById("knobNoiseVol")) document.getElementById("knobNoiseVol").value = 34;
+    if (document.getElementById("knobNoiseFx")) document.getElementById("knobNoiseFx").value = 55;
+
+    // Filter -> Delay -> Space for warm muffled tape saturation
+    document.getElementById("knobMasterCutoff").value = 56;
+    document.getElementById("knobMasterRes").value = 1.6;
+    document.getElementById("knobFilterAttack").value = 55;
+    document.getElementById("knobFilterDecay").value = 720;
+    document.getElementById("knobFilterEnvDepth").value = 28;
+    document.getElementById("knobFilterLfoRate").value = 0.08;
+    document.getElementById("knobFilterLfoDepth").value = 16;
+
+    document.getElementById("chkDelayTempoSync").checked = true;
+    document.getElementById("selDelayNoteDivision").value = "1";
+    document.getElementById("knobDelayFeedback").value = 36;
+    document.getElementById("knobDelayTone").value = 1650;
+    document.getElementById("knobDelayFlutter").value = 34;
+    document.getElementById("knobDelayMix").value = 32;
+
+    document.getElementById("selReverbMode").value = "PLATE";
+    document.getElementById("knobReverbMix").value = 26;
+    document.getElementById("knobReverbTone").value = 4200;
+    document.getElementById("selChorusMode").value = "CLASSIC";
+    document.getElementById("knobChorusRate").value = 0.26;
+    document.getElementById("knobChorusDepth").value = 32;
+    document.getElementById("knobChorusMix").value = 28;
+
+    if (document.getElementById("knobEqLow")) document.getElementById("knobEqLow").value = 2.0;
+    if (document.getElementById("knobEqHigh")) document.getElementById("knobEqHigh").value = -2.0;
+    if (document.getElementById("knobMasterDrive")) document.getElementById("knobMasterDrive").value = 28;
   }
 
   const scale = SCALES[activeScaleKey] || SCALES.DORIAN;
@@ -10383,6 +10740,176 @@ function applyPreset(idx) {
   // the new preset's chord right on top of it clashed with that tail. The
   // next natural downbeat (main sequencer clock) brings in the new material
   // once the old tail has had room to decay.
+}
+
+/* ==========================================================================
+   PHASE 5: PRESET SERIALIZATION (JSON EXPORT / IMPORT WITH DSP CHAIN ORDER)
+   ========================================================================== */
+function serializeCurrentPatch() {
+  const controls = {};
+  document.querySelectorAll("input[id], select[id]").forEach(el => {
+    if (el.type === "file") return;
+    if (el.type === "checkbox") {
+      controls[el.id] = { type: "checkbox", checked: el.checked };
+    } else {
+      controls[el.id] = { type: el.tagName.toLowerCase(), value: el.value };
+    }
+  });
+
+  const activePresetBtn = document.querySelector(".preset-bar .btn-preset-chip.active");
+  return {
+    app: "Slambient Meander Engine",
+    version: "1.0",
+    exportedAt: new Date().toISOString(),
+    presetName: activePresetBtn ? activePresetBtn.textContent.trim() : "Custom Patch",
+    seed,
+    rootNote,
+    activeScaleKey,
+    currentTimeSig,
+    bpm,
+    currentChordVoicing,
+    currentChordStepIdx,
+    dspChainOrder: Array.isArray(dspChainOrder) ? [...dspChainOrder] : ["FILTER", "DELAY", "SPACE"],
+    pedalBypass: Object.assign({}, pedalBypass),
+    channelPower: Object.assign({}, channelPower),
+    channelAux: Object.assign({}, channelAux),
+    channelMute: Object.assign({}, channelMute),
+    channelSolo: Object.assign({}, channelSolo),
+    controls
+  };
+}
+
+function savePresetBankJson() {
+  try {
+    const patch = serializeCurrentPatch();
+    const jsonStr = JSON.stringify(patch, null, 2);
+    const blob = new Blob([jsonStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const slug = (patch.presetName || "patch").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const a = document.createElement("a");
+    a.style.display = "none";
+    a.href = url;
+    a.download = `slambient-${slug}-${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 120);
+    const status = document.getElementById("footerStatus");
+    if (status) status.textContent = `Saved Patch JSON (${patch.dspChainOrder.join(" ➔ ")})`;
+  } catch (err) {
+    console.error("Failed to export preset JSON:", err);
+  }
+}
+
+function triggerLoadPresetBankJson() {
+  const fileInput = document.getElementById("inputPresetJson");
+  if (fileInput) {
+    fileInput.value = "";
+    fileInput.click();
+  }
+}
+
+function loadPresetBankJson(event) {
+  const file = event && event.target && event.target.files ? event.target.files[0] : null;
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data || typeof data !== "object") throw new Error("Invalid JSON structure");
+
+      // 1. Restore all DOM controls (<input>, <select>)
+      if (data.controls && typeof data.controls === "object") {
+        Object.entries(data.controls).forEach(([id, entry]) => {
+          const el = document.getElementById(id);
+          if (!el || !entry) return;
+          if (entry.type === "checkbox" || el.type === "checkbox") {
+            el.checked = !!entry.checked;
+          } else if (entry.value !== undefined) {
+            el.value = String(entry.value);
+          }
+        });
+      }
+
+      // 2. Restore core musical state
+      if (typeof data.seed === "number") {
+        seed = data.seed >>> 0;
+        const hex = "#" + seed.toString(16).toUpperCase().padStart(8, "0").slice(0, 4) + "-" + seed.toString(16).toUpperCase().padStart(8, "0").slice(4);
+        const hudSeedEl = document.getElementById("hudSeed");
+        if (hudSeedEl) hudSeedEl.textContent = hex;
+      }
+      if (typeof data.rootNote === "number") rootNote = data.rootNote;
+      if (typeof data.activeScaleKey === "string" && SCALES[data.activeScaleKey]) activeScaleKey = data.activeScaleKey;
+      if (typeof data.currentTimeSig === "string" && TIME_SIGNATURES[data.currentTimeSig]) {
+        currentTimeSig = data.currentTimeSig;
+        const selTs = document.getElementById("selTimeSig");
+        if (selTs) selTs.value = currentTimeSig;
+      }
+      if (typeof data.bpm === "number") {
+        bpm = data.bpm;
+        const kb = document.getElementById("knobBpm");
+        if (kb) kb.value = bpm;
+      }
+      if (typeof data.currentChordVoicing === "number") currentChordVoicing = data.currentChordVoicing;
+      if (typeof data.currentChordStepIdx === "number") currentChordStepIdx = data.currentChordStepIdx;
+
+      const scale = SCALES[activeScaleKey] || SCALES.DORIAN;
+      currentChordRootStep = CHORD_STEP_POOL[currentChordStepIdx] || 0;
+      currentChordDeg = degreeToSemitone(currentChordRootStep, scale);
+
+      const elRoot = document.getElementById("topRootKey");
+      if (elRoot) elRoot.value = String(rootNote);
+      const elScale = document.getElementById("topScaleMode");
+      if (elScale) elScale.value = activeScaleKey;
+
+      // 3. Restore channel power, aux, mute, solo
+      if (data.channelPower && typeof data.channelPower === "object") Object.assign(channelPower, data.channelPower);
+      if (data.channelAux && typeof data.channelAux === "object") Object.assign(channelAux, data.channelAux);
+      if (data.channelMute && typeof data.channelMute === "object") Object.assign(channelMute, data.channelMute);
+      if (data.channelSolo && typeof data.channelSolo === "object") Object.assign(channelSolo, data.channelSolo);
+      droneEnabled = channelPower.drone !== false;
+      updateMuteSoloUI();
+
+      // 4. Restore pedal bypass states and DSP chain routing topology
+      if (data.pedalBypass && typeof data.pedalBypass === "object") {
+        ["FILTER", "DELAY", "SPACE"].forEach(k => {
+          if (typeof data.pedalBypass[k] === "boolean") {
+            pedalBypass[k] = data.pedalBypass[k];
+            const card = document.getElementById("pedalCard_" + k);
+            const btn = document.getElementById("pedalSwitch_" + k);
+            if (card) card.classList.toggle("bypassed", pedalBypass[k]);
+            if (btn) btn.classList.toggle("active", !pedalBypass[k]);
+          }
+        });
+      }
+      if (Array.isArray(data.dspChainOrder) && data.dspChainOrder.length === 3) {
+        rewireDspChain(data.dspChainOrder, false);
+      }
+
+      // Highlight matching preset chip if presetName matches
+      document.querySelectorAll(".preset-bar .btn-preset-chip").forEach(btn => {
+        btn.classList.toggle("active", data.presetName && btn.textContent.trim().toLowerCase() === data.presetName.trim().toLowerCase());
+      });
+
+      buildKeyboard();
+      updateChordHud();
+      updateDronePitches(true);
+      updateTimeSignature();
+      updateBpm();
+      updateMusicalConfig(false);
+      updateAudioParams();
+
+      const status = document.getElementById("footerStatus");
+      if (status) status.textContent = `Loaded Patch: ${data.presetName || file.name} (${dspChainOrder.join(" ➔ ")})`;
+    } catch (err) {
+      console.error("Failed to load preset JSON:", err);
+      const status = document.getElementById("footerStatus");
+      if (status) status.textContent = "Error: Invalid Preset JSON File";
+    }
+  };
+  reader.readAsText(file);
 }
 
 let sessionSeconds = 0;

@@ -351,15 +351,15 @@ All items outlined in Phase 3 of the Technical Specification and Implementation 
 - [x] Environmental soundscape / Noise instrument module (`5. Atmosphere & Noise` panel in `.lower-deck` with `RAIN`, `THUNDER`, `WHITE_TAPE`, `BROOK`, `CRICKETS`, `WIND` profiles, `GUSTS`/`CONTINUOUS`/`SPARSE`/`RHYTHMIC`/`STORM_SWELL` modes, `Evolve` toggle, `randomizeNoise()`, and Orbital View orb #5)
 - [x] Filter & Output saturation refinement (staggered dual-biquad Q + `masterFilterCompGain` resonance compensation + 2x-oversampled `makeAnalogTapeCurve()` asymmetric analog tape saturation on `masterDriveNode` and `saturationNode`)
 
-### Phase 5: Preset Serialization & Signature Sound Profiles — ⬜ NEXT UP
-- [ ] JSON export/import (`Save Bank` / `Load Bank` including serialized `dspChainOrder`)
-- [ ] Signature factory presets engineered for specific DSP chain topologies:
-  - `Aphex Twin` (IDM rhythms, eerie ambient tones, delay-into-filter routing at 48% feedback)
-  - `Tangerine Dream` (Berlin School sequences, pulsing arpeggiators, filter sweeps feeding massive reverb spaces)
-  - `William Basinski` (Tape decay mechanics, pitch drift, reverb feeding heavy low-pass filters to muffle repeat tails)
-  - `Lo-Fi Chillhop` (Boom-bap swing, Rhodes chords, filter-to-delay-to-space signal chain for muffled tape warmth)
+### Phase 5: Preset Serialization & Signature Sound Profiles — ✅ DONE
+- [x] JSON export/import (`SAVE` / `LOAD` buttons in header preset bank via `savePresetBankJson()` and `loadPresetBankJson()`, serializing all voice/effect controls, power/aux/mute/solo states, bypass states, and live `dspChainOrder`)
+- [x] Signature factory presets engineered for specific DSP chain topologies:
+  - `Aphex Twin` (IDM rhythms in 7/8 Hirajoshi, eerie glass pads, `DELAY ➔ FILTER ➔ SPACE` routing at 48% feedback)
+  - `Tangerine Dream` (Berlin School Phrygian sequences, pulsing arpeggiators, `FILTER ➔ DELAY ➔ SPACE` sweeps feeding cathedral reverb)
+  - `William Basinski` (Tape decay mechanics in 3/4, pitch drift, continuous vinyl/tape hiss, `SPACE ➔ DELAY ➔ FILTER` routing feeding dark low-pass filter to muffle repeat tails)
+  - `Lo-Fi Chillhop` (Boom-bap swing, dusty Rhodes chords, window rain gusts, `FILTER ➔ DELAY ➔ SPACE` signal chain for warm tape saturation)
 
-### Phase 6: Visualizers, Easter Eggs & Interaction Polishing — ⬜ PENDING
+### Phase 6: Visualizers, Easter Eggs & Interaction Polishing — ⬜ NEXT UP
 - [ ] Audio-gated 3D floating shapes fix (prevent idle blue spheres when stopped + increase sphere density 60%–95% scaling)
 - [ ] Fractal visualizer mode (`FRACTAL` Julia/Mandelbrot option + updated visualizer control icons)
 - [ ] Space Invaders audio-reactive arcade minigame inside the primary visualizer canvas
