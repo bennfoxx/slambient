@@ -8025,11 +8025,18 @@ function updateAudioParams() {
   }
   if (document.getElementById("knobFilterLfoRate")) {
     filterLfoRateHz = parseFloat(document.getElementById("knobFilterLfoRate").value);
-    document.getElementById("lblFilterLfoRate").textContent = filterLfoRateHz.toFixed(2) + " Hz";
   }
   if (document.getElementById("knobFilterLfoDepth")) {
     filterLfoDepth = parseInt(document.getElementById("knobFilterLfoDepth").value) / 100;
-    document.getElementById("lblFilterLfoDepth").textContent = Math.round(filterLfoDepth * 100) + "%";
+  }
+  // Rate and Depth share one combined label now (lblFilterLfoRate/
+  // lblFilterLfoDepth no longer exist separately) -- this was throwing
+  // uncaught on every call, which silently aborted the rest of this
+  // function (and, via setupRandomInitialState() at the bottom of the
+  // script, the rest of the whole script's top-level execution) ever
+  // since the pedal-view label consolidation.
+  if (document.getElementById("lblFilterLfoValues")) {
+    document.getElementById("lblFilterLfoValues").textContent = filterLfoRateHz.toFixed(2) + " Hz / " + Math.round(filterLfoDepth * 100) + "%";
   }
 
   const knobDelayTimeEl = document.getElementById("knobDelayTime");
@@ -8074,11 +8081,15 @@ function updateAudioParams() {
   }
   if (document.getElementById("knobReverbMix")) {
     reverbMixVal = parseInt(document.getElementById("knobReverbMix").value) / 100;
-    document.getElementById("lblReverbMix").textContent = Math.round(reverbMixVal * 100) + "%";
   }
   if (document.getElementById("knobReverbTone")) {
     reverbToneHz = parseInt(document.getElementById("knobReverbTone").value);
-    document.getElementById("lblReverbTone").textContent = reverbToneHz + " Hz";
+  }
+  // Mix and Tone share one combined label now (lblReverbTone no longer
+  // exists separately) -- same uncaught-crash pattern as the filter LFO
+  // label above.
+  if (document.getElementById("lblReverbMix")) {
+    document.getElementById("lblReverbMix").textContent = Math.round(reverbMixVal * 100) + "% / " + reverbToneHz + " Hz";
   }
   if (document.getElementById("selChorusMode")) {
     chorusMode = document.getElementById("selChorusMode").value;
