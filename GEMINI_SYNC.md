@@ -319,6 +319,25 @@ All items outlined in Phase 3 of the Technical Specification and Implementation 
     - Removed the `max-height: 290px; overflow-y: auto;` constraint on `.custom-dropdown-menu` (`max-height: none; overflow: visible;`) and tightened `.custom-dropdown-item` row spacing (`padding: 4px 8px; line-height: 1.25;`) so all options across every dropdown display at once without vertical scrollbars.
     - Added `.is-open` state toggling on `.custom-dropdown-wrap` (`z-index: 9500 !important`) and `:has(.custom-dropdown-menu.open)` elevation rules across `.strip-channel`, `.pedal-chassis`, `.orbital-side-panel`, `.root-scale-ctrl`, `.time-sig-ctrl`, and `header.top-bar` (`z-index: 9000 !important; overflow: visible !important`) so open menus always layer above neighboring modules.
 
+## Update — 2026-10-14 (Claude: Phase 6 — audio-gated shapes + orb click debounce)
+
+- **Floating 3D shapes are now audio-gated.** `triggerMusical3DObject()` returns early unless
+  `isPlaying`, and the idle `!isPlaying` fallback in `drawRoadsideObjects()` that spawned a lone cyan
+  drone sphere over a stopped scope is gone. Shapes already on screen at Stop finish their pass and
+  fade out normally. **Density now scales with activity**: `getRoadsideDensityScale()` counts how many
+  of the 4 layers (drone/drum/chord/arp) triggered in the last 4s and returns 1.60 (one layer) up to
+  1.95 (all four); both the object cap (`ROADSIDE_BASE_MAX_OBJECTS` 6 → 10–12) and the per-layer spawn
+  debounce (`ROADSIDE_BASE_DEBOUNCE_MS` 1350ms → ~690–840ms) scale by it. `ROADSIDE_MAX_OBJECTS` no
+  longer exists.
+- **Orb clicks toggle and are debounced.** In orbital view, clicking the orb whose side panel is
+  already open now closes it; clicks within `ORB_CLICK_DEBOUNCE_MS` (250ms) of the previous one are
+  ignored, so a double-click no longer opens-then-closes. Also fixed a latent race: `closeOrbitalModal()`
+  deferred `restoreStripsToRack()` by 260ms, so opening another orb inside that window had its module
+  yanked back out of the panel when the old timer fired. The timer is now tracked in
+  `orbitalRestoreTimer` and cleared by `expandModuleOrb()`.
+- Verified in headless Chromium: no shapes spawn while stopped, 3 layers playing gives scale 1.83,
+  open / double-click / toggle-close / fast open of a second orb all behave, no new console errors.
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE
@@ -359,11 +378,11 @@ All items outlined in Phase 3 of the Technical Specification and Implementation 
   - `William Basinski` (Tape decay mechanics in 3/4, pitch drift, continuous vinyl/tape hiss, `SPACE ➔ DELAY ➔ FILTER` routing feeding dark low-pass filter to muffle repeat tails)
   - `Lo-Fi Chillhop` (Boom-bap swing, dusty Rhodes chords, window rain gusts, `FILTER ➔ DELAY ➔ SPACE` signal chain for warm tape saturation)
 
-### Phase 6: Visualizers, Easter Eggs & Interaction Polishing — ⬜ NEXT UP
-- [ ] Audio-gated 3D floating shapes fix (prevent idle blue spheres when stopped + increase sphere density 60%–95% scaling)
+### Phase 6: Visualizers, Easter Eggs & Interaction Polishing — 🟡 IN PROGRESS
+- [x] Audio-gated 3D floating shapes fix (prevent idle blue spheres when stopped + increase sphere density 60%–95% scaling)
 - [ ] Fractal visualizer mode (`FRACTAL` Julia/Mandelbrot option + updated visualizer control icons)
 - [ ] Space Invaders audio-reactive arcade minigame inside the primary visualizer canvas
-- [ ] Side-view orb click debouncing (250ms debounce to close active tab on click without double-click flicker)
+- [x] Side-view orb click debouncing (250ms debounce to close active tab on click without double-click flicker)
 
 ### Phase 7: Global Shortcuts, Custom Theming & Final Polish — ⬜ PENDING
 - [ ] Keyboard playback bindings (`Spacebar` and `Enter` toggle play/pause)

@@ -8274,9 +8274,26 @@ function drawFlightTerrainGrid(w, h) {
      - Chords      -> 3D Rotating Pyramid (Exhibition Amber #fed330)
      - Shimmer Arp -> 3D Spinning Diamond / Octahedron (Cobalt/Violet #7d5fff)
    ========================================================================== */
-const ROADSIDE_MAX_OBJECTS = 6;
+// Shapes are strictly audio-gated: nothing spawns while stopped (the old idle
+// fallback left a lone cyan sphere drifting over a silent scope), and any
+// shapes still on screen at Stop just finish their pass and fade out.
+// Density scales with how many layers are actually sounding: the base cap of
+// 6 grows by 60% (one layer active) up to 95% (all four active), and the
+// per-layer spawn debounce shortens by the same factor.
+const ROADSIDE_BASE_MAX_OBJECTS = 6;
+const ROADSIDE_BASE_DEBOUNCE_MS = 1350;
+const ROADSIDE_ACTIVITY_WINDOW_MS = 4000;
 let roadsideObjects = [];
 let lastMusical3DSpawnTimes = { drone: 0, drum: 0, chord: 0, arp: 0 };
+let lastMusical3DTriggerTimes = { drone: 0, drum: 0, chord: 0, arp: 0 };
+
+function getRoadsideDensityScale() {
+  const now = performance.now();
+  const active = Object.values(lastMusical3DTriggerTimes)
+    .filter(t => t && now - t < ROADSIDE_ACTIVITY_WINDOW_MS).length;
+  if (active === 0) return 1;
+  return 1.60 + (active - 1) / 3 * 0.35;
+}
 
 const MUSICAL_3D_TYPES = {
   drone: { shape: "sphere",  rgb: [0, 229, 255] },
@@ -8286,16 +8303,18 @@ const MUSICAL_3D_TYPES = {
 };
 
 function triggerMusical3DObject(type) {
-  if (!roadsideEnabled) return;
+  if (!roadsideEnabled || !isPlaying) return;
   const cfg = MUSICAL_3D_TYPES[type];
   if (!cfg) return;
 
   const now = performance.now();
+  lastMusical3DTriggerTimes[type] = now;
+  const density = getRoadsideDensityScale();
   // Per-channel debounce so fast successive triggers don't clutter the horizon
-  if (now - (lastMusical3DSpawnTimes[type] || 0) < 1350) return;
+  if (now - (lastMusical3DSpawnTimes[type] || 0) < ROADSIDE_BASE_DEBOUNCE_MS / density) return;
   lastMusical3DSpawnTimes[type] = now;
 
-  if (roadsideObjects.length >= ROADSIDE_MAX_OBJECTS) {
+  if (roadsideObjects.length >= Math.round(ROADSIDE_BASE_MAX_OBJECTS * density)) {
     // Gracefully speed up the oldest object to exit cleanly
     roadsideObjects[0].progress = Math.max(roadsideObjects[0].progress, 0.90);
   }
@@ -8476,12 +8495,11 @@ function drawRoadsideObjects(w, h) {
   const gridH = bottomY - horizonY;
   const vanishX = w * 0.5;
 
-  // Gentle ambient fallback if music is quiet or idle so scenery stays alive
+  // Gentle fallback while playing a sparse passage so scenery stays alive.
+  // No idle spawn when stopped -- see the audio-gating note above.
   if (isPlaying && roadsideObjects.length < 2 && Math.random() < 0.012) {
     const keys = ["drone", "drum", "chord", "arp"];
     triggerMusical3DObject(keys[Math.floor(Math.random() * keys.length)]);
-  } else if (!isPlaying && roadsideObjects.length === 0 && Math.random() < 0.005) {
-    triggerMusical3DObject("drone");
   }
 
   const tempoRate = (typeof bpm !== "undefined" ? bpm : 72) / 60;
@@ -11746,6 +11764,12 @@ let orbitalCanvas, orbitalCtx;
 let orbitalAnimId = null;
 let expandedOrbId = null;
 let orbitalPanelActive = false;
+const ORB_CLICK_DEBOUNCE_MS = 250;
+let lastOrbClickTs = 0;
+// Pending deferred restoreStripsToRack() from closeOrbitalModal(); cleared
+// by expandModuleOrb() so a quick close-then-open doesn't pull the newly
+// opened module back out of the panel when the old timer fires.
+let orbitalRestoreTimer = null;
 
 // Click-and-drag state for the orbital orbs. A press only counts as a drag
 // (and suppresses the click-to-expand behavior) once the pointer has moved
@@ -12193,7 +12217,14 @@ function handleOrbitalPointerUp(e) {
       orb.vy = Math.sin(heading) * flungSpeed;
       orb.bump = Math.min(0.8, orb.bump + 0.1);
     } else {
-      expandModuleOrb(orb.id);
+      // Click toggles: clicking the orb whose panel is already open closes
+      // it. Clicks inside ORB_CLICK_DEBOUNCE_MS of the last one are ignored,
+      // so a double-click doesn't open-close (or close-reopen) and flicker.
+      const now = performance.now();
+      if (now - lastOrbClickTs < ORB_CLICK_DEBOUNCE_MS) return;
+      lastOrbClickTs = now;
+      if (orbitalPanelActive && expandedOrbId === orb.id) closeOrbitalModal();
+      else expandModuleOrb(orb.id);
     }
   }
 }
@@ -12239,6 +12270,7 @@ function expandModuleOrb(orbId) {
   const orb = ORBITAL_MODULES.find(o => o.id === orbId);
   if (!orb) return;
 
+  if (orbitalRestoreTimer) { clearTimeout(orbitalRestoreTimer); orbitalRestoreTimer = null; }
   restoreStripsToRack();
 
   expandedOrbId = orbId;
@@ -12289,7 +12321,8 @@ function closeOrbitalModal() {
   const hint = document.getElementById("orbitalHint");
   if (hint) hint.classList.remove("hidden-by-panel");
 
-  setTimeout(restoreStripsToRack, 260);
+  if (orbitalRestoreTimer) clearTimeout(orbitalRestoreTimer);
+  orbitalRestoreTimer = setTimeout(() => { orbitalRestoreTimer = null; restoreStripsToRack(); }, 260);
 }
 
 const ORBITAL_LOWER_DECK_IDS = ["drone", "drum", "chord", "arp", "noise"];
