@@ -338,6 +338,25 @@ All items outlined in Phase 3 of the Technical Specification and Implementation 
 - Verified in headless Chromium: no shapes spawn while stopped, 3 layers playing gives scale 1.83,
   open / double-click / toggle-close / fast open of a second orb all behave, no new console errors.
 
+## Update — 2026-10-14 (Claude: Phase 6 — Fractal visualizer mode)
+
+- **New `FRACTAL` layer button** in the visualizer toolbar (`#btnToggleFractal`, violet spiral icon,
+  off by default, styled like the other `.btn-layer-toggle`s via `.layer-fractal`). While on,
+  `drawScope()` calls `drawFractalVisualizer()` *instead of* the waterfall / flight grid / floating
+  shapes; the oscilloscope rings (if enabled) still draw on top. Toggling it clears
+  `roadsideObjects` so the landscape doesn't come back with a frozen batch of shapes.
+- **What it draws**: an audio-reactive Julia set. `c` travels just inside the edge of the Mandelbrot
+  main cardioid (`c = r·e^(iθ)/2 − r²·e^(2iθ)/4`), which keeps the set connected — filigree spirals,
+  never scattered dust (the classic `0.7885·e^(iθ)` circle was tried first and spends a lot of its
+  orbit as dust). θ advances one lap per 256 beats while playing, ~8% speed when stopped.
+  Drone energy moves `r` (calmer ↔ more intricate), drum hits punch a short zoom pulse, chord
+  energy rotates the palette, arp energy brightens the edges. Palette runs through the instrument
+  colors (violet / cyan / green / amber / pink) into the panel background.
+- **Cost**: rendered into an offscreen buffer at `min(360, w/2)` px wide and scaled up with
+  smoothing; ~6ms/frame windowed and ~13ms fullscreen in headless (software-rendered) Chromium,
+  expected lower on real hardware. If it ever drops frames, lower `FRACTAL_MAX_BUFFER_W` or
+  `FRACTAL_MAX_ITER` first.
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE
@@ -380,7 +399,7 @@ All items outlined in Phase 3 of the Technical Specification and Implementation 
 
 ### Phase 6: Visualizers, Easter Eggs & Interaction Polishing — 🟡 IN PROGRESS
 - [x] Audio-gated 3D floating shapes fix (prevent idle blue spheres when stopped + increase sphere density 60%–95% scaling)
-- [ ] Fractal visualizer mode (`FRACTAL` Julia/Mandelbrot option + updated visualizer control icons)
+- [x] Fractal visualizer mode (`FRACTAL` Julia/Mandelbrot option + updated visualizer control icons)
 - [ ] Space Invaders audio-reactive arcade minigame inside the primary visualizer canvas
 - [x] Side-view orb click debouncing (250ms debounce to close active tab on click without double-click flicker)
 

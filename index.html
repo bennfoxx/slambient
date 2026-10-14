@@ -902,6 +902,11 @@
     border-color: rgba(255, 121, 63, 0.65);
     box-shadow: 0 0 8px rgba(255, 121, 63, 0.35);
   }
+  .btn-layer-toggle.layer-fractal.active {
+    background: rgba(140, 110, 255, 0.14);
+    border-color: rgba(140, 110, 255, 0.7);
+    box-shadow: 0 0 8px rgba(140, 110, 255, 0.4);
+  }
   .btn-layer-toggle.layer-fullscreen {
     opacity: 0.78;
     filter: none;
@@ -3366,6 +3371,16 @@
                 <path d="M4 4.5V8.5L7.5 10.5V6.5M11 4.5V8.5L7.5 10.5" stroke="#ff3838" stroke-width="0.9" fill="none"/>
                 <path d="M14 6L16 8.5L14 11L12 8.5L14 6Z" stroke="#7d5fff" stroke-width="0.9" fill="none"/>
                 <line x1="12" y1="8.5" x2="16" y2="8.5" stroke="#7d5fff" stroke-width="0.7"/>
+              </svg>
+            </button>
+
+            <button class="btn-layer-toggle layer-fractal" id="btnToggleFractal" onclick="toggleFractalMode()" title="Fractal Mode: audio-reactive Julia set (replaces the waterfall, grid and shapes while on)">
+              <svg width="18" height="15" viewBox="0 0 18 15" fill="none">
+                <rect x="0.5" y="0.5" width="17" height="14" rx="2" stroke="rgba(140,110,255,0.5)" stroke-width="1"/>
+                <path d="M9 7.5C9 6.4 10.3 5.9 11.1 6.7C12.2 7.8 11.4 9.9 9.6 10.1C7.3 10.4 5.9 8 6.6 5.9C7.5 3.3 11.1 2.7 13.2 4.6C15.6 6.8 14.7 11 11.6 12.1" stroke="#8c6eff" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+                <circle cx="4.2" cy="11" r="1.1" fill="#00e5ff"/>
+                <circle cx="3.2" cy="4" r="0.7" fill="#fed330"/>
+                <circle cx="14.6" cy="2.6" r="0.6" fill="#ff5fc4"/>
               </svg>
             </button>
 
@@ -8135,6 +8150,163 @@ function toggleRoadsideObjects() {
   if (!roadsideEnabled) roadsideObjects.length = 0;
 }
 
+/* ==========================================================================
+   FRACTAL MODE (Phase 6)
+   An audio-reactive Julia set that takes over the scope's background in place
+   of the waterfall / flight grid / floating shapes (the oscilloscope rings
+   still draw on top when enabled). Rendered at low resolution into an
+   offscreen buffer and scaled up with smoothing, so it costs a few ms a frame
+   even fullscreen.
+     - c travels just inside the Mandelbrot main cardioid's edge, which keeps
+       the Julia set connected (filigree spirals, never scattered dust); θ
+       advances with BPM so the shape morphs in time with the music
+       (near-frozen when stopped)
+     - Drone energy breathes c toward/away from that edge (calmer <-> more
+       intricate)
+     - Drum hits punch a short zoom pulse
+     - Chord energy rotates the palette; arp energy brightens the fine edges
+   ========================================================================== */
+let fractalModeEnabled = false;
+const FRACTAL_MAX_ITER = 48;
+const FRACTAL_MAX_BUFFER_W = 360;
+const fractalBuf = document.createElement("canvas");
+const fractalBufCtx = fractalBuf.getContext("2d");
+let fractalImage = null;
+let fractalPixels = null;
+let fractalTheta = 0.6;
+let fractalLastTs = null;
+const fractalEnergy = { drone: 0, drum: 0, chord: 0, arp: 0, zoomPulse: 0 };
+const fractalAnalyserBuf = new Uint8Array(32);
+
+// 256-step palette through the instrument colors, stored as packed RGBA
+// (little-endian ABGR) for direct writes into the ImageData buffer.
+const FRACTAL_PALETTE = (() => {
+  const stops = [
+    [12, 13, 17], [125, 95, 255], [0, 229, 255], [46, 213, 115],
+    [254, 211, 48], [255, 95, 196], [125, 95, 255], [12, 13, 17]
+  ];
+  const lut = new Array(256);
+  for (let i = 0; i < 256; i++) {
+    const t = (i / 256) * (stops.length - 1);
+    const k = Math.floor(t), f = t - k;
+    const a = stops[k], b = stops[Math.min(stops.length - 1, k + 1)];
+    lut[i] = [0, 1, 2].map(j => a[j] + (b[j] - a[j]) * f);
+  }
+  return lut;
+})();
+
+function toggleFractalMode() {
+  fractalModeEnabled = !fractalModeEnabled;
+  const btn = document.getElementById('btnToggleFractal');
+  if (btn) btn.classList.toggle('active', fractalModeEnabled);
+  // Shapes don't advance while the fractal owns the background; drop them
+  // so returning to the landscape doesn't show a frozen batch mid-pass.
+  roadsideObjects.length = 0;
+}
+
+function readFractalBandEnergy(analyser) {
+  if (!analyser || !isPlaying) return 0;
+  analyser.getByteFrequencyData(fractalAnalyserBuf);
+  let sum = 0;
+  for (let i = 1; i < 24; i++) sum += fractalAnalyserBuf[i];
+  return Math.min(1, (sum / 23) / 160);
+}
+
+function updateFractalEnergy(dtSec) {
+  const targets = {
+    drone: readFractalBandEnergy(typeof droneAnalyser !== "undefined" ? droneAnalyser : null),
+    drum:  readFractalBandEnergy(typeof drumAnalyser  !== "undefined" ? drumAnalyser  : null),
+    chord: readFractalBandEnergy(typeof chordAnalyser !== "undefined" ? chordAnalyser : null),
+    arp:   readFractalBandEnergy(typeof arpAnalyser   !== "undefined" ? arpAnalyser   : null)
+  };
+  const smooth = (key, rate) => {
+    fractalEnergy[key] += (targets[key] - fractalEnergy[key]) * Math.min(1, dtSec * rate);
+  };
+  // A drum level jump well above its running average reads as a hit.
+  if (targets.drum > fractalEnergy.drum + 0.18) {
+    fractalEnergy.zoomPulse = Math.min(1, fractalEnergy.zoomPulse + 0.55);
+  }
+  smooth("drone", 2.5);
+  smooth("drum", 9);
+  smooth("chord", 3);
+  smooth("arp", 6);
+  fractalEnergy.zoomPulse *= Math.exp(-dtSec * 5);
+}
+
+function drawFractalVisualizer(w, h, ts) {
+  if (fractalLastTs === null) fractalLastTs = ts;
+  const dtSec = Math.max(0, Math.min(0.1, (ts - fractalLastTs) / 1000));
+  fractalLastTs = ts;
+  updateFractalEnergy(dtSec);
+
+  // One full trip around the c-orbit every 256 beats while playing.
+  const beatsPerSec = (typeof bpm !== "undefined" ? bpm : 72) / 60;
+  fractalTheta += dtSec * beatsPerSec * (Math.PI * 2 / 256) * (isPlaying ? 1 : 0.08);
+
+  const bw = Math.max(120, Math.min(FRACTAL_MAX_BUFFER_W, Math.round(w / 2)));
+  const bh = Math.max(50, Math.round(bw * h / w));
+  if (fractalBuf.width !== bw || fractalBuf.height !== bh) {
+    fractalBuf.width = bw;
+    fractalBuf.height = bh;
+    fractalImage = fractalBufCtx.createImageData(bw, bh);
+    fractalPixels = new Uint32Array(fractalImage.data.buffer);
+  }
+
+  const e = fractalEnergy;
+  // Cardioid boundary point c = r·e^(iθ)/2 − r²·e^(2iθ)/4, pulled slightly inside.
+  const r = 0.985 - (1 - e.drone) * 0.03;
+  const cRe = r * Math.cos(fractalTheta) / 2 - r * r * Math.cos(2 * fractalTheta) / 4;
+  const cIm = r * Math.sin(fractalTheta) / 2 - r * r * Math.sin(2 * fractalTheta) / 4;
+  const zoom = 1.0 + e.zoomPulse * 0.12 + Math.sin(fractalTheta * 3) * 0.04;
+  const spanY = 2.5 / zoom;
+  const spanX = spanY * (bw / bh);
+  const rot = fractalTheta * 0.5;
+  const cosR = Math.cos(rot), sinR = Math.sin(rot);
+  const hueShift = (fractalTheta * 40 + e.chord * 90) % 256;
+  const gain = (isPlaying ? 0.55 : 0.32) + e.arp * 0.45 + e.drum * 0.15;
+  const LOG2 = Math.log(2);
+
+  for (let py = 0; py < bh; py++) {
+    const v = (py / bh - 0.5) * spanY;
+    for (let px = 0; px < bw; px++) {
+      const u = (px / bw - 0.5) * spanX;
+      let zr = u * cosR - v * sinR;
+      let zi = u * sinR + v * cosR;
+      let i = 0, zr2 = zr * zr, zi2 = zi * zi;
+      while (zr2 + zi2 < 16 && i < FRACTAL_MAX_ITER) {
+        zi = 2 * zr * zi + cIm;
+        zr = zr2 - zi2 + cRe;
+        zr2 = zr * zr; zi2 = zi * zi;
+        i++;
+      }
+      let r, g, b;
+      if (i >= FRACTAL_MAX_ITER) {
+        // Interior: near-black, shaded by where the orbit settled so the
+        // body has a faint violet/drone-cyan texture instead of a flat fill.
+        const m = Math.min(1, Math.sqrt(zr2 + zi2) * 0.6);
+        r = 8 + m * 26; g = 10 + m * 14 + e.drone * 20; b = 18 + m * 44 + e.drone * 24;
+      } else {
+        const smoothIter = i + 1 - Math.log(Math.log(zr2 + zi2) / 2 / LOG2) / LOG2;
+        const t = smoothIter / FRACTAL_MAX_ITER;
+        const col = FRACTAL_PALETTE[Math.floor(smoothIter * 9 + hueShift) & 255];
+        // Edges near the set get brighter; far-field fades into the panel bg.
+        const lum = Math.min(1, Math.pow(t, 1.15) * 3.2) * gain;
+        r = 12 + (col[0] - 12) * lum;
+        g = 13 + (col[1] - 13) * lum;
+        b = 17 + (col[2] - 17) * lum;
+      }
+      fractalPixels[py * bw + px] = (255 << 24) | ((b & 255) << 16) | ((g & 255) << 8) | (r & 255);
+    }
+  }
+  fractalBufCtx.putImageData(fractalImage, 0, 0);
+
+  scopeCtx.save();
+  scopeCtx.imageSmoothingEnabled = true;
+  scopeCtx.imageSmoothingQuality = "high";
+  scopeCtx.drawImage(fractalBuf, 0, 0, w, h);
+  scopeCtx.restore();
+}
+
 function toggleScopeFullscreen(forceState) {
   scopeFullscreen = (typeof forceState === 'boolean') ? forceState : !scopeFullscreen;
   const panel = document.getElementById('scopePanel');
@@ -8842,9 +9014,13 @@ function drawScope(ts) {
   const { w, h, cx, cy } = updateCanvasDimensions();
   scopeCtx.fillStyle = "#0c0d11"; scopeCtx.fillRect(0, 0, w, h);
 
-  drawWaterfallSpectrogram(w, h);
-  drawFlightTerrainGrid(w, h);
-  drawRoadsideObjects(w, h);
+  if (fractalModeEnabled) {
+    drawFractalVisualizer(w, h, ts || performance.now());
+  } else {
+    drawWaterfallSpectrogram(w, h);
+    drawFlightTerrainGrid(w, h);
+    drawRoadsideObjects(w, h);
+  }
 
   // Tempo-synced rotation speed: a full revolution takes a fixed number of
   // beats, so the angular speed itself scales with bpm -- faster music spins
