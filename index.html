@@ -2278,7 +2278,16 @@
   .pedal-drag-handle:active {
     cursor: var(--cursor-grabbing) !important;
   }
-  .pedal-chassis.dragging {
+
+  /* :active/:hover alone drop the custom cursor as soon as the pointer
+     moves off the 24px handle mid-drag (pointer capture keeps the events
+     flowing to the handle, but the OS cursor still follows whatever DOM
+     element is actually under it). Force it everywhere for the duration
+     of the drag instead -- toggled on <body> by the handle's pointerdown
+     handler and removed on pointerup/cancel, so it reverts to each
+     element's own cursor the moment the drag ends. */
+  body.pedal-dragging,
+  body.pedal-dragging * {
     cursor: var(--cursor-grabbing) !important;
   }
 
@@ -4764,6 +4773,7 @@ function initPedalDragAndDrop() {
       draggedPedalKey = activeModule;
       pointerOriginX = e.clientX;
       activeCard.classList.add("dragging");
+      document.body.classList.add("pedal-dragging");
       handle.setPointerCapture(e.pointerId);
 
       const onPointerMove = (ev) => {
@@ -4785,6 +4795,7 @@ function initPedalDragAndDrop() {
         window.removeEventListener("pointerup", onPointerUp);
         window.removeEventListener("pointercancel", onPointerUp);
 
+        document.body.classList.remove("pedal-dragging");
         activeCard.classList.remove("dragging");
         let dropTarget = null;
         cards.forEach(c => {
