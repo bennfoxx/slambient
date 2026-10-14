@@ -1151,6 +1151,40 @@
     gap: 8px;
     flex-shrink: 0;
   }
+  /* Float Speed / Orb Size sliders -- only shown during orbital view (see
+     setModuleView()), filling the same middle slot as the telemetry chips
+     above. Reuses the header's .tempo-ctrl shape, retinted to the orbital
+     view's own cyan accent instead of the global yellow one. */
+  .orbital-float-controls {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+    justify-content: center;
+  }
+  .orbital-slider-ctrl input[type="range"]::-webkit-slider-thumb {
+    border-color: #00e5ff;
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+  }
+  .orbital-slider-ctrl input[type="range"]::-webkit-slider-thumb:hover {
+    background: #00e5ff;
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.8);
+  }
+  .orbital-slider-ctrl .tag, .orbital-slider-ctrl .tempo-val {
+    color: #00e5ff;
+    white-space: nowrap;
+  }
+  @media (max-width: 700px) {
+    .orbital-float-controls { gap: 6px; }
+    .orbital-float-controls .orbital-slider-ctrl { padding: 0 6px; gap: 5px; }
+    /* Extra-scoped selector so this beats the pre-existing, equally-specific
+       ".tempo-ctrl input[type=range] { width: 70px; }" under the page's own
+       max-width:900px rule later in the file -- same specificity, so without
+       this it would lose on source order alone despite the narrower (and
+       therefore more applicable) breakpoint here. */
+    .orbital-float-controls .orbital-slider-ctrl input[type="range"] { width: 44px; }
+  }
   .btn-telemetry-action {
     background: #0b0d14;
     border: 1px solid var(--border-light);
@@ -2311,6 +2345,19 @@
       <div class="telemetry-chip" style="border-left: 1px solid var(--border-light); padding-left: 12px;">
         <span>ACTIVE NODES:</span>
         <span class="val" id="dockActiveNodes">7 / 7 ONLINE</span>
+      </div>
+    </div>
+
+    <div class="orbital-float-controls" id="orbitalFloatControls">
+      <div class="tempo-ctrl orbital-slider-ctrl">
+        <span class="tag">FLOAT SPEED</span>
+        <input type="range" id="knobOrbFloatSpeed" min="0" max="250" value="100" oninput="updateOrbitalFeelParams()" title="How fast the module orbs drift and wander">
+        <span class="tempo-val" id="lblOrbFloatSpeed">100%</span>
+      </div>
+      <div class="tempo-ctrl orbital-slider-ctrl">
+        <span class="tag">ORB SIZE</span>
+        <input type="range" id="knobOrbBaseSize" min="50" max="200" value="100" oninput="updateOrbitalFeelParams()" title="Baseline size of the module orbs">
+        <span class="tempo-val" id="lblOrbBaseSize">100%</span>
       </div>
     </div>
 
@@ -7941,6 +7988,31 @@ let dragPointerId = null;
 let dragMoved = false;
 let lastDragX = 0, lastDragY = 0, lastDragTs = 0;
 
+// Float Speed / Orb Size sliders (orbital-deck-header) -- global multipliers
+// on top of each orb's own design speed/radius, not per-module values.
+let orbFloatSpeedMult = 1.0;
+let orbBaseSizeMult = 1.0;
+
+function updateOrbitalFeelParams() {
+  const speedEl = document.getElementById("knobOrbFloatSpeed");
+  const sizeEl = document.getElementById("knobOrbBaseSize");
+  if (speedEl) {
+    orbFloatSpeedMult = parseInt(speedEl.value) / 100;
+    document.getElementById("lblOrbFloatSpeed").textContent = speedEl.value + "%";
+  }
+  if (sizeEl) {
+    orbBaseSizeMult = parseInt(sizeEl.value) / 100;
+    document.getElementById("lblOrbBaseSize").textContent = sizeEl.value + "%";
+  }
+}
+
+// Every orb's displayed/collision radius, in one place -- orb.baseR is the
+// fixed per-module design size; orbBaseSizeMult is the global Orb Size
+// slider; the (1 + excite*0.35) term is the existing audio-reactive pulse.
+function effectiveOrbRadius(orb) {
+  return orb.baseR * orbBaseSizeMult * (1.0 + (orb.pulse + orb.bump) * 0.35);
+}
+
 // Background starfield for the orbital view: tiny white dots of varied size
 // and brightness that twinkle and drift slowly, to read as "floating in
 // space" behind the module orbs.
@@ -8034,7 +8106,7 @@ function orbitalPointerToCanvas(e) {
 function findOrbAt(x, y) {
   for (let i = 0; i < ORBITAL_MODULES.length; i++) {
     const orb = ORBITAL_MODULES[i];
-    const currentR = orb.baseR * (1.0 + (orb.pulse + orb.bump) * 0.35);
+    const currentR = effectiveOrbRadius(orb);
     const dist = Math.hypot(x - orb.x, y - orb.y);
     if (dist <= currentR + 8) return orb;
   }
@@ -8122,6 +8194,7 @@ function setModuleView(mode) {
   const arena = document.getElementById("orbitalArenaWrapper");
   const lowerRack = document.querySelector(".lower-deck");
   const masterRack = document.querySelector(".master-chain-deck");
+  const floatControls = document.getElementById("orbitalFloatControls");
 
   if (btnOrb) btnOrb.classList.toggle("active", mode === "orbital");
   if (btnCon) btnCon.classList.toggle("active", mode === "console");
@@ -8130,7 +8203,9 @@ function setModuleView(mode) {
     if (arena) arena.style.display = "block";
     if (lowerRack) lowerRack.classList.add("view-grid-hidden");
     if (masterRack) masterRack.classList.add("view-grid-hidden");
+    if (floatControls) floatControls.style.display = "flex";
   } else {
+    if (floatControls) floatControls.style.display = "none";
     if (arena) arena.style.display = "none";
     if (lowerRack) lowerRack.classList.remove("view-grid-hidden");
     if (masterRack) masterRack.classList.remove("view-grid-hidden");
@@ -8340,10 +8415,11 @@ function updateAndDrawOrbitalCanvas() {
       const wanderFreq = 0.0007 + (i * 0.00025);
       orb.heading += Math.sin(now * wanderFreq + i * 1.9) * 0.007;
 
-      // Split the difference: perfectly balanced gentle celestial drift (~18 px/sec when paused)
-      const currentSpeed = isPlaying
+      // Split the difference: perfectly balanced gentle celestial drift (~18 px/sec when paused).
+      // orbFloatSpeedMult (Float Speed slider) scales the whole thing, 0 = frozen in place.
+      const currentSpeed = (isPlaying
         ? (0.40 + energy * 0.55 + orb.pulse * 0.20)
-        : 0.30;
+        : 0.30) * orbFloatSpeedMult;
 
       orb.vx = Math.cos(orb.heading) * currentSpeed;
       orb.vy = Math.sin(orb.heading) * currentSpeed;
@@ -8353,14 +8429,14 @@ function updateAndDrawOrbitalCanvas() {
 
       // Subtle fluid wave undulation responding to audio track energy
       if (isPlaying && energy > 0.03) {
-        const wave = Math.sin(now * 0.0018 + orb.baseR) * energy * 0.16;
+        const wave = Math.sin(now * 0.0018 + orb.baseR) * energy * 0.16 * orbFloatSpeedMult;
         orb.x += -Math.sin(orb.heading) * wave;
         orb.y += Math.cos(orb.heading) * wave;
       }
     }
 
     // Smooth, cushioned boundary reflection
-    const r = orb.baseR * (1.0 + (orb.pulse + orb.bump) * 0.35);
+    const r = effectiveOrbRadius(orb);
     if (orb.x - r < leftPad) {
       orb.x = leftPad + r;
       orb.vx = Math.abs(orb.vx);
@@ -8399,8 +8475,8 @@ function updateAndDrawOrbitalCanvas() {
     for (let j = i + 1; j < ORBITAL_MODULES.length; j++) {
       const o1 = ORBITAL_MODULES[i];
       const o2 = ORBITAL_MODULES[j];
-      const r1 = o1.baseR * (1.0 + (o1.pulse + o1.bump) * 0.35);
-      const r2 = o2.baseR * (1.0 + (o2.pulse + o2.bump) * 0.35);
+      const r1 = effectiveOrbRadius(o1);
+      const r2 = effectiveOrbRadius(o2);
       const minDist = r1 + r2 + 22;
 
       const dx = o2.x - o1.x;
@@ -8441,7 +8517,7 @@ function updateAndDrawOrbitalCanvas() {
 
   ORBITAL_MODULES.forEach((orb) => {
     const excite = orb.pulse + orb.bump;
-    const curR = orb.baseR * (1.0 + excite * 0.35);
+    const curR = effectiveOrbRadius(orb);
     const rgb = orb.rgb;
 
     orbitalCtx.save();
