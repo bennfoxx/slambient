@@ -2206,6 +2206,29 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 95, 196, 0.16);
   }
 
+  /* .btn-power.active is hardcoded to the drone module's cyan (its only
+     other use) -- override per pedal so the bypass/engage glow matches
+     that pedal's own accent color instead of always reading cyan. */
+  .pedal-filter .btn-power.active {
+    background: rgba(46, 213, 115, 0.18);
+    border-color: var(--color-filter);
+    color: var(--color-filter);
+    box-shadow: 0 0 7px rgba(46, 213, 115, 0.45);
+  }
+  .pedal-delay .btn-power.active {
+    background: rgba(255, 121, 63, 0.18);
+    border-color: var(--color-delay);
+    color: var(--color-delay);
+    box-shadow: 0 0 7px rgba(255, 121, 63, 0.45);
+  }
+  .pedal-space .btn-power.active,
+  .pedal-reverb .btn-power.active {
+    background: rgba(255, 95, 196, 0.18);
+    border-color: var(--color-reverb);
+    color: var(--color-reverb);
+    box-shadow: 0 0 7px rgba(255, 95, 196, 0.45);
+  }
+
   /* Pedal title color accents, matching the panel-header > span:first-child
      convention used by the other (strip-channel) module panels. */
   .pedal-filter .panel-header > span:first-child { color: var(--color-filter); text-shadow: 0 0 8px rgba(46, 213, 115, 0.35); }
@@ -2213,11 +2236,16 @@
   .pedal-space .panel-header > span:first-child, .pedal-reverb .panel-header > span:first-child { color: var(--color-reverb); text-shadow: 0 0 8px rgba(255, 95, 196, 0.35); }
 
   .pedal-slot-badge {
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
     font-size: 8.5px;
     font-weight: 800;
     letter-spacing: 0.8px;
-    padding: 2px 6px;
-    border-radius: 3px;
+    padding: 0 8px;
+    border-radius: 4px;
     background: #090b12;
     border: 1px solid var(--border-light);
     color: var(--text-secondary);
@@ -3013,7 +3041,7 @@
           <button class="btn-power active" id="btnPower_drone" onclick="toggleDronePower()" title="Toggle Sub-Drone Power (On / Off)">PWR</button>
           <button class="btn-mute" id="btnMute_drone" onclick="toggleMute('drone')" title="Mute Sub-Drone">M</button>
           <button class="btn-solo" id="btnSolo_drone" onclick="toggleSolo('drone')" title="Solo Sub-Drone">S</button>
-          <button class="badge-tag" style="color: var(--color-drone); border-color: rgba(0,206,201,0.3);" onclick="randomizeDrone()" title="Randomize this module">⟲</button>
+          <button class="badge-tag" style="color: var(--color-drone); border-color: rgba(0,206,201,0.3);" onclick="randomizeDrone()" title="Randomize this module"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
         </div>
       </div>
       <div class="control-row">
@@ -3092,7 +3120,7 @@
         <div class="panel-header-actions">
           <button class="btn-mute" id="btnMute_drum" onclick="toggleMute('drum')" title="Mute Drums">M</button>
           <button class="btn-solo" id="btnSolo_drum" onclick="toggleSolo('drum')" title="Solo Drums">S</button>
-          <button class="badge-tag" style="color: var(--color-drum); border-color: rgba(255,71,87,0.3);" onclick="randomizeDrums()" title="Randomize this module">⟲</button>
+          <button class="badge-tag" style="color: var(--color-drum); border-color: rgba(255,71,87,0.3);" onclick="randomizeDrums()" title="Randomize this module"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
         </div>
       </div>
       <div class="control-row">
@@ -3143,7 +3171,7 @@
         <div class="panel-header-actions">
           <button class="btn-mute" id="btnMute_chord" onclick="toggleMute('chord')" title="Mute Chords">M</button>
           <button class="btn-solo" id="btnSolo_chord" onclick="toggleSolo('chord')" title="Solo Chords">S</button>
-          <button class="badge-tag" style="color: var(--color-chord); border-color: rgba(255,165,2,0.3);" onclick="randomizeChords()" title="Randomize this module">⟲</button>
+          <button class="badge-tag" style="color: var(--color-chord); border-color: rgba(255,165,2,0.3);" onclick="randomizeChords()" title="Randomize this module"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
         </div>
       </div>
       <div class="control-row">
@@ -3194,7 +3222,7 @@
         <div class="panel-header-actions">
           <button class="btn-mute" id="btnMute_arp" onclick="toggleMute('arp')" title="Mute Shimmer Arp">M</button>
           <button class="btn-solo" id="btnSolo_arp" onclick="toggleSolo('arp')" title="Solo Shimmer Arp">S</button>
-          <button class="badge-tag" style="color: var(--color-arp); border-color: rgba(162,155,254,0.3);" onclick="randomizeArp()" title="Randomize this module">⟲</button>
+          <button class="badge-tag" style="color: var(--color-arp); border-color: rgba(162,155,254,0.3);" onclick="randomizeArp()" title="Randomize this module"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
         </div>
       </div>
       <div class="control-row">
@@ -3289,13 +3317,13 @@
       <!-- 1. FILTER PEDAL -->
       <div class="pedal-chassis pedal-filter" id="pedalCard_FILTER" draggable="true" data-module="FILTER">
         <div class="panel-header">
-          <span>5. Filter &amp; Env</span>
+          <span><span class="pedal-order-num" id="pedalNum_FILTER">1</span>. Filter &amp; Env</span>
           <div class="panel-header-actions">
-            <span class="pedal-slot-badge" id="slotBadge_FILTER">SLOT 1 • IN</span>
-            <button class="btn-pedal-shift" onclick="shiftPedalLeft('FILTER')" id="shiftLeft_FILTER" title="Shift Left">◀</button>
-            <button class="btn-pedal-shift" onclick="shiftPedalRight('FILTER')" id="shiftRight_FILTER" title="Shift Right">▶</button>
-            <span class="pedal-drag-handle" title="Drag to reorder">⠿</span>
-            <button class="btn-power active" id="stompBtn_FILTER" onclick="togglePedalBypass('FILTER')" title="Bypass/engage Filter & Envelope">⏻</button>
+            <span class="pedal-slot-badge" id="slotBadge_FILTER">IN</span>
+            <button class="btn-pedal-shift" onclick="shiftPedalLeft('FILTER')" id="shiftLeft_FILTER" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
+            <button class="btn-pedal-shift" onclick="shiftPedalRight('FILTER')" id="shiftRight_FILTER" title="Shift Right"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg></button>
+            <span class="pedal-drag-handle" title="Drag to reorder"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg></span>
+            <button class="btn-power active" id="stompBtn_FILTER" onclick="togglePedalBypass('FILTER')" title="Bypass/engage Filter & Envelope"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="11"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/></svg></button>
           </div>
         </div>
 
@@ -3344,13 +3372,13 @@
       <!-- 2. DELAY PEDAL -->
       <div class="pedal-chassis pedal-delay" id="pedalCard_DELAY" draggable="true" data-module="DELAY">
         <div class="panel-header">
-          <span>6. Analog Delay</span>
+          <span><span class="pedal-order-num" id="pedalNum_DELAY">2</span>. Analog Delay</span>
           <div class="panel-header-actions">
-            <span class="pedal-slot-badge" id="slotBadge_DELAY">SLOT 2 • INSERT</span>
-            <button class="btn-pedal-shift" onclick="shiftPedalLeft('DELAY')" id="shiftLeft_DELAY" title="Shift Left">◀</button>
-            <button class="btn-pedal-shift" onclick="shiftPedalRight('DELAY')" id="shiftRight_DELAY" title="Shift Right">▶</button>
-            <span class="pedal-drag-handle" title="Drag to reorder">⠿</span>
-            <button class="btn-power active" id="stompBtn_DELAY" onclick="togglePedalBypass('DELAY')" title="Bypass/engage Delay">⏻</button>
+            <span class="pedal-slot-badge" id="slotBadge_DELAY">INSERT</span>
+            <button class="btn-pedal-shift" onclick="shiftPedalLeft('DELAY')" id="shiftLeft_DELAY" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
+            <button class="btn-pedal-shift" onclick="shiftPedalRight('DELAY')" id="shiftRight_DELAY" title="Shift Right"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg></button>
+            <span class="pedal-drag-handle" title="Drag to reorder"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg></span>
+            <button class="btn-power active" id="stompBtn_DELAY" onclick="togglePedalBypass('DELAY')" title="Bypass/engage Delay"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="11"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/></svg></button>
           </div>
         </div>
 
@@ -3406,13 +3434,13 @@
       <!-- 3. REVERB & CHORUS PEDAL (Pink) -->
       <div class="pedal-chassis pedal-space pedal-reverb" id="pedalCard_SPACE" draggable="true" data-module="SPACE">
         <div class="panel-header">
-          <span>7. Reverb &amp; Chorus</span>
+          <span><span class="pedal-order-num" id="pedalNum_SPACE">3</span>. Reverb &amp; Chorus</span>
           <div class="panel-header-actions">
-            <span class="pedal-slot-badge" id="slotBadge_SPACE">SLOT 3 • OUT</span>
-            <button class="btn-pedal-shift" onclick="shiftPedalLeft('SPACE')" id="shiftLeft_SPACE" title="Shift Left">◀</button>
-            <button class="btn-pedal-shift" onclick="shiftPedalRight('SPACE')" id="shiftRight_SPACE" title="Shift Right">▶</button>
-            <span class="pedal-drag-handle" title="Drag to reorder">⠿</span>
-            <button class="btn-power active" id="stompBtn_SPACE" onclick="togglePedalBypass('SPACE')" title="Bypass/engage Reverb & Chorus">⏻</button>
+            <span class="pedal-slot-badge" id="slotBadge_SPACE">OUT</span>
+            <button class="btn-pedal-shift" onclick="shiftPedalLeft('SPACE')" id="shiftLeft_SPACE" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
+            <button class="btn-pedal-shift" onclick="shiftPedalRight('SPACE')" id="shiftRight_SPACE" title="Shift Right"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg></button>
+            <span class="pedal-drag-handle" title="Drag to reorder"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg></span>
+            <button class="btn-power active" id="stompBtn_SPACE" onclick="togglePedalBypass('SPACE')" title="Bypass/engage Reverb & Chorus"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="11"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/></svg></button>
           </div>
         </div>
 
@@ -3470,7 +3498,7 @@
       <div class="strip-channel master-eq-ch space-ch" id="masterEqOutStrip">
         <div class="panel-header">
           <span>8. Master EQ &amp; Out</span>
-          <button class="badge-tag" style="color: var(--color-space); border-color: rgba(75,123,236,0.3);" onclick="randomizeSpace()" title="Randomize Master EQ & Out">⟲</button>
+          <button class="badge-tag" style="color: var(--color-space); border-color: rgba(75,123,236,0.3);" onclick="randomizeSpace()" title="Randomize Master EQ & Out"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
         </div>
         <div class="control-row">
           <div class="control-label">Hardware MIDI Output</div>
@@ -4569,10 +4597,16 @@ function updatePedalsOrderUI() {
 
     const slotBadge = document.getElementById("slotBadge_" + key);
     if (slotBadge) {
-      if (idx === 0) slotBadge.textContent = "SLOT 1 • IN";
-      else if (idx === 1) slotBadge.textContent = "SLOT 2 • INSERT";
-      else slotBadge.textContent = "SLOT 3 • OUT";
+      if (idx === 0) slotBadge.textContent = "IN";
+      else if (idx === 1) slotBadge.textContent = "INSERT";
+      else slotBadge.textContent = "OUT";
     }
+
+    // The number in the pedal title always reflects its live position in
+    // the signal chain, not a fixed module id -- keep it in sync on every
+    // reorder (shift arrows, drag/drop, shuffle, reset).
+    const orderNum = document.getElementById("pedalNum_" + key);
+    if (orderNum) orderNum.textContent = idx + 1;
 
     const shiftL = document.getElementById("shiftLeft_" + key);
     const shiftR = document.getElementById("shiftRight_" + key);
