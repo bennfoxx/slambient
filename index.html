@@ -6653,10 +6653,11 @@ function playKick(drive = 1.0) {
   }
   if (drive >= 0.85) triggerMusical3DObject("drum");
 
-  if (droneGain && drumPunch > 0.1) {
-    const origDrone = isChannelAudible('drone') ? droneVol * 0.16 : 0;
+  if (isPlaying && !isDrumFillActive && isChannelAudible('drone') && droneGain && drumPunch > 0.1) {
+    const origDrone = droneVol * 0.16;
     droneGain.gain.cancelScheduledValues(now);
-    droneGain.gain.setValueAtTime(origDrone * (1.0 - drumPunch * 0.72), now);
+    droneGain.gain.setValueAtTime(droneGain.gain.value, now);
+    droneGain.gain.linearRampToValueAtTime(origDrone * (1.0 - drumPunch * 0.72), now + 0.015);
     droneGain.gain.setTargetAtTime(origDrone, now + 0.07, 0.12);
   }
 }
@@ -6957,10 +6958,11 @@ function playBayan(stroke = "GHE", slide = true, hard = 1.0) {
   if (ringDynamics.drum) ringDynamics.drum.impulse = Math.min(2.5, ringDynamics.drum.impulse + 1.8 * hard);
   if (slide || hard > 0.8) triggerMusical3DObject("drum");
 
-  if (droneGain && drumPunch > 0.1) {
-    const origDrone = isChannelAudible('drone') ? droneVol * 0.16 : 0;
+  if (isPlaying && !isDrumFillActive && isChannelAudible('drone') && droneGain && drumPunch > 0.1) {
+    const origDrone = droneVol * 0.16;
     droneGain.gain.cancelScheduledValues(now);
-    droneGain.gain.setValueAtTime(origDrone * (1.0 - drumPunch * 0.4), now);
+    droneGain.gain.setValueAtTime(droneGain.gain.value, now);
+    droneGain.gain.linearRampToValueAtTime(origDrone * (1.0 - drumPunch * 0.4), now + 0.015);
     droneGain.gain.setTargetAtTime(origDrone, now + 0.07, 0.14);
   }
 }
