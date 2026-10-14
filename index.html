@@ -579,11 +579,47 @@
   .upper-deck {
     display: grid;
     grid-template-columns: 1.15fr 270px 1.15fr;
-    grid-template-areas: "scope chord keys";
     gap: 14px;
+    position: relative;
+    width: 100%;
+  }
+  .upper-deck-card {
+    transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+    user-select: none;
+  }
+  .upper-deck-card.dragging {
+    opacity: 0.45;
+    transform: scale(0.98);
+  }
+  .upper-deck-card.drag-over {
+    border-color: var(--accent) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 0 20px rgba(254, 211, 48, 0.35), 0 8px 24px rgba(0,0,0,0.8);
+  }
+  .upper-drag-handle {
+    cursor: grab !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 6px;
+    background: #0e121d;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    color: var(--text-tertiary);
+    transition: all 0.14s ease;
+    margin-right: 4px;
+    touch-action: none;
+    user-select: none;
+  }
+  .upper-drag-handle:hover {
+    color: var(--accent);
+    border-color: var(--border-bright);
+    background: #151a28;
+  }
+  .upper-drag-handle:active {
+    cursor: grabbing !important;
   }
   .scope-panel {
-    grid-area: scope;
     background: var(--panel);
     border: 1px solid var(--eno-glow-border, var(--border));
     border-radius: 6px;
@@ -617,7 +653,6 @@
     overflow: hidden;
   }
   .chord-info-panel {
-    grid-area: chord;
     background: var(--panel);
     border: 1px solid var(--eno-glow-border, var(--border));
     border-radius: 6px;
@@ -629,7 +664,6 @@
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
   .keyboard-panel {
-    grid-area: keys;
     background: var(--panel);
     border: 1px solid var(--eno-glow-border, var(--border));
     border-radius: 6px;
@@ -640,21 +674,14 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), var(--eno-glow-shadow, 0 0 16px rgba(254, 211, 48, 0.18));
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
-  @media (max-width: 990px) {
+  @media (max-width: 1100px) {
     .upper-deck {
       grid-template-columns: 1fr 1fr;
-      grid-template-areas:
-        "scope keys"
-        "chord chord";
     }
   }
-  @media (max-width: 810px) {
+  @media (max-width: 780px) {
     .upper-deck {
       grid-template-columns: 1fr;
-      grid-template-areas:
-        "scope"
-        "chord"
-        "keys";
     }
   }
 
@@ -2404,6 +2431,123 @@
     filter: grayscale(0.4);
   }
 
+
+  /* SMART CUSTOM DROPDOWN COMPONENT */
+  .custom-dropdown-wrap {
+    position: relative;
+    display: inline-block;
+    user-select: none;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+  .custom-dropdown-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 24px;
+    box-sizing: border-box;
+    background-color: #10131e;
+    color: #ffffff;
+    border: 1px solid var(--border);
+    padding: 0 8px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 3px;
+    cursor: pointer !important;
+    gap: 6px;
+    transition: all 0.12s ease;
+    white-space: nowrap;
+  }
+  .custom-dropdown-trigger:hover {
+    border-color: var(--border-bright);
+    background-color: #151a28;
+  }
+  .custom-dropdown-trigger.open {
+    border-color: var(--accent);
+    box-shadow: 0 0 8px var(--accent-dim);
+  }
+  .custom-dropdown-trigger svg {
+    color: var(--text-secondary);
+    transition: transform 0.15s ease;
+    flex-shrink: 0;
+  }
+  .custom-dropdown-trigger.open svg {
+    transform: rotate(180deg);
+    color: var(--accent);
+  }
+  .custom-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    min-width: 100%;
+    max-height: 280px;
+    overflow-y: auto;
+    background: #0b0e17;
+    border: 1px solid var(--border-bright);
+    border-radius: 4px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9), 0 0 12px rgba(254, 211, 48, 0.15);
+    z-index: 1000;
+    display: none;
+    padding: 4px;
+  }
+  .custom-dropdown-menu.open {
+    display: block;
+  }
+  .custom-dropdown-item {
+    padding: 5px 8px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-radius: 3px;
+    cursor: pointer !important;
+    transition: all 0.1s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .custom-dropdown-item:hover {
+    background: rgba(254, 211, 48, 0.12);
+    color: #ffffff;
+  }
+  .custom-dropdown-item.selected {
+    background: rgba(254, 211, 48, 0.18);
+    color: var(--accent);
+    font-weight: 800;
+  }
+  .custom-dropdown-item .item-sub {
+    font-size: 9.5px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+  }
+  .custom-dropdown-item:hover .item-sub {
+    color: var(--text-secondary);
+  }
+
+  /* UNIFIED CHANNEL STRIP MASTER VOLUME & AUX ROUTING */
+  .strip-footer-row {
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .strip-aux-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .strip-aux-label {
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
   footer.app-footer {
     display: flex;
     justify-content: space-between;
@@ -2875,9 +3019,12 @@
   </div>
 
   <div class="upper-deck">
-    <div class="scope-panel" id="scopePanel">
+    <div class="scope-panel upper-deck-card" id="scopePanel" draggable="true" data-upper-widget="scope">
       <div class="panel-header">
-        <span>Visualizer</span>
+        <div style="display: inline-flex; align-items: center; gap: 6px;">
+          <span class="upper-drag-handle" title="Drag to reorder visualizer widgets"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg></span>
+          <span>Visualizer</span>
+        </div>
         <div class="scope-legend">
           <div class="legend-item"><div class="legend-dot" style="background: var(--color-drone);"></div><span>DRONE</span></div>
           <div class="legend-item"><div class="legend-dot" style="background: var(--color-drum);"></div><span>DRUMS</span></div>
@@ -2944,9 +3091,12 @@
       </div>
     </div>
 
-    <div class="chord-info-panel">
+    <div class="chord-info-panel upper-deck-card" id="chordInfoPanel" draggable="true" data-upper-widget="chord">
       <div class="panel-header">
-        <span>Chord Analysis</span>
+        <div style="display: inline-flex; align-items: center; gap: 6px;">
+          <span class="upper-drag-handle" title="Drag to reorder visualizer widgets"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg></span>
+          <span>Chord Analysis</span>
+        </div>
       </div>
 
       <div class="chord-wheel-card">
@@ -2991,10 +3141,13 @@
       </div>
     </div>
 
-    <div class="keyboard-panel">
+    <div class="keyboard-panel upper-deck-card" id="keyboardPanel" draggable="true" data-upper-widget="keys">
       <div class="keyboard-meta">
         <div class="panel-header keyboard-panel-header">
-          <span>Playable MIDI Keyboard</span>
+          <div style="display: inline-flex; align-items: center; gap: 6px;">
+            <span class="upper-drag-handle" title="Drag to reorder visualizer widgets"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg></span>
+            <span>Playable MIDI Keyboard</span>
+          </div>
           <span class="keyboard-hint">Keys A-K · <span id="valOctave">C3 - C5</span></span>
         </div>
         <div class="keyboard-meta-controls">
@@ -3174,12 +3327,12 @@
         <input type="range" id="knobDroneWander" min="0" max="100" value="20" title="Occasional drift to a nearby in-scale note before resolving back to the root" oninput="updateAudioParams()">
       </div>
       <div class="control-row">
-        <div class="control-label"><span>Drone Master Volume</span><span class="control-val drone-val" id="lblDrone">70%</span></div>
-        <input type="range" id="knobDrone" min="0" max="100" value="70" oninput="updateAudioParams()">
-      </div>
-      <div class="control-row">
         <div class="control-label"><span>FX Send (Filter/Delay)</span><span class="control-val drone-val" id="lblDroneFx">35%</span></div>
         <input type="range" id="knobDroneFx" min="0" max="100" value="35" oninput="updateAudioParams()">
+      </div>
+      <div class="control-row">
+        <div class="control-label"><span>Drone Master Volume</span><span class="control-val drone-val" id="lblDrone">70%</span></div>
+        <input type="range" id="knobDrone" min="0" max="100" value="70" oninput="updateAudioParams()">
       </div>
     </div>
 
@@ -3187,6 +3340,7 @@
       <div class="panel-header">
         <span>2. Drums</span>
         <div class="panel-header-actions">
+          <button class="btn-power active" id="btnPower_drum" onclick="toggleMute('drum')" title="Toggle Drum Power (On / Off)">PWR</button>
           <button class="btn-mute" id="btnMute_drum" onclick="toggleMute('drum')" title="Mute Drums">M</button>
           <button class="btn-solo" id="btnSolo_drum" onclick="toggleSolo('drum')" title="Solo Drums">S</button>
           <button class="badge-tag" style="color: var(--color-drum); border-color: rgba(255,71,87,0.3);" onclick="randomizeDrums()" title="Randomize this module"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
@@ -3225,12 +3379,12 @@
         <input type="range" id="knobDrumDensity" min="0" max="100" value="65" oninput="updateAudioParams()">
       </div>
       <div class="control-row">
-        <div class="control-label"><span>Drum Master Volume</span><span class="control-val drum-val" id="lblDrumVol">85%</span></div>
-        <input type="range" id="knobDrumVol" min="0" max="100" value="85" oninput="updateAudioParams()">
-      </div>
-      <div class="control-row">
         <div class="control-label"><span>FX Send (Filter/Delay)</span><span class="control-val drum-val" id="lblDrumFx">40%</span></div>
         <input type="range" id="knobDrumFx" min="0" max="100" value="40" oninput="updateAudioParams()">
+      </div>
+      <div class="control-row">
+        <div class="control-label"><span>Drum Master Volume</span><span class="control-val drum-val" id="lblDrumVol">85%</span></div>
+        <input type="range" id="knobDrumVol" min="0" max="100" value="85" oninput="updateAudioParams()">
       </div>
     </div>
 
@@ -3238,6 +3392,7 @@
       <div class="panel-header">
         <span>3. Chords & Voicing</span>
         <div class="panel-header-actions">
+          <button class="btn-power active" id="btnPower_chord" onclick="toggleMute('chord')" title="Toggle Chord Voice Power (On / Off)">PWR</button>
           <button class="btn-mute" id="btnMute_chord" onclick="toggleMute('chord')" title="Mute Chords">M</button>
           <button class="btn-solo" id="btnSolo_chord" onclick="toggleSolo('chord')" title="Solo Chords">S</button>
           <button class="badge-tag" style="color: var(--color-chord); border-color: rgba(255,165,2,0.3);" onclick="randomizeChords()" title="Randomize this module"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
@@ -3276,12 +3431,12 @@
         <input type="range" id="knobChordSustain" min="50" max="200" value="100" title="Scales how long each chord/lead note rings out -- longer for atmospheric swells, shorter for a more rhythmic feel" oninput="updateAudioParams()">
       </div>
       <div class="control-row">
-        <div class="control-label"><span>Chord Master Volume</span><span class="control-val chord-val" id="lblChordVol">85%</span></div>
-        <input type="range" id="knobChordVol" min="0" max="100" value="85" oninput="updateAudioParams()">
-      </div>
-      <div class="control-row">
         <div class="control-label"><span>FX Send (Filter/Delay)</span><span class="control-val chord-val" id="lblChordFx">90%</span></div>
         <input type="range" id="knobChordFx" min="0" max="100" value="90" oninput="updateAudioParams()">
+      </div>
+      <div class="control-row">
+        <div class="control-label"><span>Chord Master Volume</span><span class="control-val chord-val" id="lblChordVol">85%</span></div>
+        <input type="range" id="knobChordVol" min="0" max="100" value="85" oninput="updateAudioParams()">
       </div>
     </div>
 
@@ -3289,6 +3444,7 @@
       <div class="panel-header">
         <span>4. Shimmer Arp</span>
         <div class="panel-header-actions">
+          <button class="btn-power active" id="btnPower_arp" onclick="toggleMute('arp')" title="Toggle Shimmer Arp Power (On / Off)">PWR</button>
           <button class="btn-mute" id="btnMute_arp" onclick="toggleMute('arp')" title="Mute Shimmer Arp">M</button>
           <button class="btn-solo" id="btnSolo_arp" onclick="toggleSolo('arp')" title="Solo Shimmer Arp">S</button>
           <button class="badge-tag" style="color: var(--color-arp); border-color: rgba(162,155,254,0.3);" onclick="randomizeArp()" title="Randomize this module"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
@@ -3348,12 +3504,12 @@
         <input type="range" id="knobArpOctaves" min="1" max="4" step="1" value="2" title="How many octaves the arp pool spans above the chord" oninput="updateAudioParams()">
       </div>
       <div class="control-row">
-        <div class="control-label"><span>Arp Master Volume</span><span class="control-val arp-val" id="lblArpVol">85%</span></div>
-        <input type="range" id="knobArpVol" min="0" max="100" value="85" oninput="updateAudioParams()">
-      </div>
-      <div class="control-row">
         <div class="control-label"><span>FX Send (Filter/Delay)</span><span class="control-val arp-val" id="lblArpFx">100%</span></div>
         <input type="range" id="knobArpFx" min="0" max="100" value="100" oninput="updateAudioParams()">
+      </div>
+      <div class="control-row">
+        <div class="control-label"><span>Arp Master Volume</span><span class="control-val arp-val" id="lblArpVol">85%</span></div>
+        <input type="range" id="knobArpVol" min="0" max="100" value="85" oninput="updateAudioParams()">
       </div>
     </div>
   </div>
@@ -4787,6 +4943,137 @@ function reorderDspChainModules(sourceKey, targetKey) {
     dspChainOrder.splice(toIdx, 0, sourceKey);
     rewireDspChain(dspChainOrder, false);
   }
+}
+
+
+/* ==========================================================================
+   UPPER DECK VISUALIZER WIDGET DRAG & DROP REORDERING
+   ========================================================================== */
+let upperWidgetOrder = ["scope", "chord", "keys"];
+const UPPER_WIDGET_IDS = {
+  scope: "scopePanel",
+  chord: "chordInfoPanel",
+  keys:  "keyboardPanel"
+};
+
+function renderUpperDeckOrder() {
+  const container = document.querySelector(".upper-deck");
+  if (!container) return;
+  upperWidgetOrder.forEach(key => {
+    const elId = UPPER_WIDGET_IDS[key];
+    const el = document.getElementById(elId);
+    if (el) container.appendChild(el);
+  });
+}
+
+function initUpperDeckDragAndDrop() {
+  const container = document.querySelector(".upper-deck");
+  if (!container) return;
+  const cards = container.querySelectorAll(".upper-deck-card");
+  const handles = container.querySelectorAll(".upper-drag-handle");
+  let draggedWidgetKey = null;
+
+  function reorderWidgets(srcKey, targetKey) {
+    if (!srcKey || !targetKey || srcKey === targetKey) return;
+    const fromIdx = upperWidgetOrder.indexOf(srcKey);
+    const toIdx = upperWidgetOrder.indexOf(targetKey);
+    if (fromIdx !== -1 && toIdx !== -1) {
+      upperWidgetOrder.splice(fromIdx, 1);
+      upperWidgetOrder.splice(toIdx, 0, srcKey);
+      renderUpperDeckOrder();
+    }
+  }
+
+  // HTML5 Drag & Drop
+  cards.forEach(card => {
+    card.addEventListener("dragstart", (e) => {
+      draggedWidgetKey = card.getAttribute("data-upper-widget");
+      card.classList.add("dragging");
+      if (e.dataTransfer) {
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", draggedWidgetKey);
+      }
+    });
+
+    card.addEventListener("dragend", () => {
+      card.classList.remove("dragging");
+      cards.forEach(c => c.classList.remove("drag-over"));
+      draggedWidgetKey = null;
+    });
+
+    card.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
+      card.classList.add("drag-over");
+    });
+
+    card.addEventListener("dragleave", () => {
+      card.classList.remove("drag-over");
+    });
+
+    card.addEventListener("drop", (e) => {
+      e.preventDefault();
+      card.classList.remove("drag-over");
+      const targetKey = card.getAttribute("data-upper-widget");
+      reorderWidgets(draggedWidgetKey, targetKey);
+    });
+  });
+
+  // Pointer Events on Drag Handle
+  handles.forEach(handle => {
+    let activeCard = null;
+    let activeKey = null;
+
+    handle.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activeCard = handle.closest(".upper-deck-card");
+      if (!activeCard) return;
+      activeKey = activeCard.getAttribute("data-upper-widget");
+      activeCard.classList.add("dragging");
+      handle.setPointerCapture(e.pointerId);
+
+      const onPointerMove = (ev) => {
+        cards.forEach(c => {
+          const rect = c.getBoundingClientRect();
+          if (ev.clientX >= rect.left && ev.clientX <= rect.right &&
+              ev.clientY >= rect.top && ev.clientY <= rect.bottom) {
+            c.classList.add("drag-over");
+          } else {
+            c.classList.remove("drag-over");
+          }
+        });
+      };
+
+      const onPointerUp = (ev) => {
+        handle.releasePointerCapture(ev.pointerId);
+        window.removeEventListener("pointermove", onPointerMove);
+        window.removeEventListener("pointerup", onPointerUp);
+        window.removeEventListener("pointercancel", onPointerUp);
+
+        activeCard.classList.remove("dragging");
+        let dropTarget = null;
+        cards.forEach(c => {
+          c.classList.remove("drag-over");
+          const rect = c.getBoundingClientRect();
+          if (ev.clientX >= rect.left && ev.clientX <= rect.right &&
+              ev.clientY >= rect.top && ev.clientY <= rect.bottom) {
+            dropTarget = c.getAttribute("data-upper-widget");
+          }
+        });
+
+        if (dropTarget && dropTarget !== activeKey) {
+          reorderWidgets(activeKey, dropTarget);
+        }
+        activeCard = null;
+        activeKey = null;
+      };
+
+      window.addEventListener("pointermove", onPointerMove);
+      window.addEventListener("pointerup", onPointerUp);
+      window.addEventListener("pointercancel", onPointerUp);
+    });
+  });
 }
 
 function initPedalDragAndDrop() {
@@ -9816,6 +10103,138 @@ function initOrbitalConstellation() {
   });
 
   if (typeof initPedalDragAndDrop === 'function') initPedalDragAndDrop();
+
+/* ==========================================================================
+   SMART COMPONENT-BASED DROPDOWNS (SCALE & METER SELECTORS)
+   ========================================================================== */
+function initSmartDropdowns() {
+  const selectsToUpgrade = [
+    { id: "topScaleMode", mode: "scale" },
+    { id: "selTimeSig", mode: "meter" }
+  ];
+
+  selectsToUpgrade.forEach(({ id, mode }) => {
+    const sel = document.getElementById(id);
+    if (!sel || sel.dataset.smartUpgraded) return;
+    sel.dataset.smartUpgraded = "true";
+
+    // Create wrapper
+    const wrap = document.createElement("div");
+    wrap.className = "custom-dropdown-wrap";
+    wrap.id = "wrap_" + id;
+
+    // Trigger button
+    const trigger = document.createElement("button");
+    trigger.type = "button";
+    trigger.className = "custom-dropdown-trigger";
+    trigger.id = "trigger_" + id;
+
+    const labelSpan = document.createElement("span");
+    labelSpan.className = "trigger-label";
+    trigger.appendChild(labelSpan);
+
+    const arrowSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    arrowSvg.setAttribute("width", "10");
+    arrowSvg.setAttribute("height", "7");
+    arrowSvg.setAttribute("viewBox", "0 0 10 7");
+    arrowSvg.setAttribute("fill", "none");
+    arrowSvg.innerHTML = '<path d="M1 1.5L5 5.5L9 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>';
+    trigger.appendChild(arrowSvg);
+
+    // Menu list
+    const menu = document.createElement("div");
+    menu.className = "custom-dropdown-menu";
+    menu.id = "menu_" + id;
+
+    // Helper to format collapsed vs expanded labels
+    function formatLabel(optionText, isCollapsed) {
+      if (mode === "scale") {
+        // e.g. "Hirajoshi (Japanese Kankyō)" -> collapsed: "Hirajoshi", expanded: "Hirajoshi" + "(Japanese Kankyō)"
+        const match = optionText.match(/^([^(]+)(?:\s*\((.*)\))?$/);
+        if (!match) return { main: optionText, sub: "" };
+        const main = match[1].trim();
+        const sub = match[2] ? `(${match[2].trim()})` : "";
+        return isCollapsed ? { main, sub: "" } : { main, sub };
+      } else if (mode === "meter") {
+        // e.g. "7/4 Odd Quarter" -> collapsed: "7/4", expanded: "7/4" + "Odd Quarter"
+        const parts = optionText.split(" ");
+        const main = parts[0];
+        const sub = parts.slice(1).join(" ");
+        return isCollapsed ? { main, sub: "" } : { main, sub };
+      }
+      return { main: optionText, sub: "" };
+    }
+
+    function updateTriggerLabel() {
+      const selectedOpt = sel.options[sel.selectedIndex];
+      if (!selectedOpt) return;
+      const { main } = formatLabel(selectedOpt.textContent, true);
+      labelSpan.textContent = main;
+    }
+
+    // Populate menu items
+    [...sel.options].forEach((opt, idx) => {
+      const item = document.createElement("div");
+      item.className = "custom-dropdown-item";
+      item.dataset.value = opt.value;
+      if (idx === sel.selectedIndex) item.classList.add("selected");
+
+      const { main, sub } = formatLabel(opt.textContent, false);
+      item.innerHTML = `<span>${main}</span>${sub ? `<span class="item-sub">${sub}</span>` : ""}`;
+
+      item.addEventListener("click", (e) => {
+        e.stopPropagation();
+        sel.value = opt.value;
+        sel.dispatchEvent(new Event("change", { bubbles: true }));
+        updateTriggerLabel();
+        menu.querySelectorAll(".custom-dropdown-item").forEach(i => i.classList.remove("selected"));
+        item.classList.add("selected");
+        closeDropdown();
+      });
+
+      menu.appendChild(item);
+    });
+
+    function toggleDropdown(e) {
+      e.stopPropagation();
+      const isOpen = menu.classList.contains("open");
+      document.querySelectorAll(".custom-dropdown-menu.open").forEach(m => m.classList.remove("open"));
+      document.querySelectorAll(".custom-dropdown-trigger.open").forEach(t => t.classList.remove("open"));
+      if (!isOpen) {
+        menu.classList.add("open");
+        trigger.classList.add("open");
+      }
+    }
+
+    function closeDropdown() {
+      menu.classList.remove("open");
+      trigger.classList.remove("open");
+    }
+
+    trigger.addEventListener("click", toggleDropdown);
+    document.addEventListener("click", closeDropdown);
+
+    // Keep trigger updated when native select changes programmatically (e.g. presets, randomizers)
+    sel.addEventListener("change", () => {
+      updateTriggerLabel();
+      menu.querySelectorAll(".custom-dropdown-item").forEach(i => {
+        i.classList.toggle("selected", i.dataset.value === sel.value);
+      });
+    });
+
+    // Replace native select in visual DOM while keeping native select hidden for forms/events
+    sel.style.display = "none";
+    sel.parentNode.insertBefore(wrap, sel);
+    wrap.appendChild(trigger);
+    wrap.appendChild(menu);
+    wrap.appendChild(sel);
+
+    updateTriggerLabel();
+  });
+}
+
+  if (typeof initUpperDeckDragAndDrop === 'function') initUpperDeckDragAndDrop();
+  if (typeof initSmartDropdowns === 'function') initSmartDropdowns();
   if (typeof updatePedalsOrderUI === 'function') updatePedalsOrderUI();
   setModuleView(activeModuleView);
   requestAnimationFrame(loopOrbitalPhysics);
