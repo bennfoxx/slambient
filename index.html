@@ -106,7 +106,8 @@
     gap: 14px;
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 3000;
+    overflow: visible;
     /* Break out of body's own padding so the frosted backdrop reaches the
        true viewport edges while scrolled, then restore that spacing with
        padding so the header's own content lines back up with the modules
@@ -134,7 +135,8 @@
     border-radius: 6px;
     padding: 12px 18px;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    z-index: 1010;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), var(--eno-glow-shadow, 0 0 16px rgba(254, 211, 48, 0.25));
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
@@ -2529,6 +2531,17 @@
     transform: rotate(180deg);
     color: #07080c !important;
   }
+  .custom-dropdown-wrap.is-open {
+    z-index: 9500 !important;
+  }
+  .strip-channel:has(.custom-dropdown-menu.open),
+  .pedal-chassis:has(.custom-dropdown-menu.open),
+  .root-scale-ctrl:has(.custom-dropdown-menu.open),
+  .time-sig-ctrl:has(.custom-dropdown-menu.open),
+  header.top-bar:has(.custom-dropdown-menu.open) {
+    z-index: 9000 !important;
+    overflow: visible !important;
+  }
   .custom-dropdown-menu {
     position: absolute;
     top: calc(100% + 2px);
@@ -2541,8 +2554,8 @@
     background: #11141d;
     border: 1px solid var(--dd-accent, var(--border-bright));
     border-radius: 2px;
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.92), 0 2px 6px rgba(0, 0, 0, 0.8);
-    z-index: 2500;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.95), 0 4px 10px rgba(0, 0, 0, 0.85);
+    z-index: 9999 !important;
     display: none;
     padding: 2px;
   }
@@ -10338,6 +10351,7 @@ function initSmartDropdowns() {
       const isOpen = menu.classList.contains("open");
       document.querySelectorAll(".custom-dropdown-menu.open").forEach(m => m.classList.remove("open", "drop-up"));
       document.querySelectorAll(".custom-dropdown-trigger.open").forEach(t => t.classList.remove("open"));
+      document.querySelectorAll(".custom-dropdown-wrap.is-open").forEach(w => w.classList.remove("is-open"));
       if (!isOpen) {
         // Re-build if dynamic options changed (like MIDI devices)
         if (menu.children.length !== sel.options.length) {
@@ -10346,6 +10360,7 @@ function initSmartDropdowns() {
         syncUI();
         menu.classList.add("open");
         trigger.classList.add("open");
+        wrap.classList.add("is-open");
         // Check viewport bottom collision to flip menu upward if needed
         const rect = menu.getBoundingClientRect();
         if (rect.bottom > window.innerHeight - 12) {
@@ -10357,6 +10372,7 @@ function initSmartDropdowns() {
     function closeDropdown() {
       menu.classList.remove("open", "drop-up");
       trigger.classList.remove("open");
+      wrap.classList.remove("is-open");
     }
 
     trigger.addEventListener("click", toggleDropdown);
@@ -10377,11 +10393,13 @@ function initSmartDropdowns() {
   document.addEventListener("click", () => {
     document.querySelectorAll(".custom-dropdown-menu.open").forEach(m => m.classList.remove("open", "drop-up"));
     document.querySelectorAll(".custom-dropdown-trigger.open").forEach(t => t.classList.remove("open"));
+    document.querySelectorAll(".custom-dropdown-wrap.is-open").forEach(w => w.classList.remove("is-open"));
   });
   window.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       document.querySelectorAll(".custom-dropdown-menu.open").forEach(m => m.classList.remove("open", "drop-up"));
       document.querySelectorAll(".custom-dropdown-trigger.open").forEach(t => t.classList.remove("open"));
+      document.querySelectorAll(".custom-dropdown-wrap.is-open").forEach(w => w.classList.remove("is-open"));
     }
   });
 }
