@@ -3386,7 +3386,7 @@
       <!-- 1. FILTER PEDAL -->
       <div class="pedal-chassis pedal-filter" id="pedalCard_FILTER" data-module="FILTER">
         <div class="panel-header">
-          <span>5. Filter &amp; Env</span>
+          <span id="pedalTitle_FILTER">5. Filter &amp; Env</span>
           <div class="panel-header-actions">
             <span class="pedal-slot-badge" id="slotBadge_FILTER">IN</span>
             <button class="btn-pedal-shift" onclick="shiftPedalLeft('FILTER')" id="shiftLeft_FILTER" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
@@ -3441,7 +3441,7 @@
       <!-- 2. DELAY PEDAL -->
       <div class="pedal-chassis pedal-delay" id="pedalCard_DELAY" data-module="DELAY">
         <div class="panel-header">
-          <span>6. Analog Delay</span>
+          <span id="pedalTitle_DELAY">6. Analog Delay</span>
           <div class="panel-header-actions">
             <span class="pedal-slot-badge" id="slotBadge_DELAY">INSERT</span>
             <button class="btn-pedal-shift" onclick="shiftPedalLeft('DELAY')" id="shiftLeft_DELAY" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
@@ -3503,7 +3503,7 @@
       <!-- 3. REVERB & CHORUS PEDAL (Pink) -->
       <div class="pedal-chassis pedal-space pedal-reverb" id="pedalCard_SPACE" data-module="SPACE">
         <div class="panel-header">
-          <span>7. Reverb &amp; Chorus</span>
+          <span id="pedalTitle_SPACE">7. Reverb &amp; Chorus</span>
           <div class="panel-header-actions">
             <span class="pedal-slot-badge" id="slotBadge_SPACE">OUT</span>
             <button class="btn-pedal-shift" onclick="shiftPedalLeft('SPACE')" id="shiftLeft_SPACE" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
@@ -4655,14 +4655,35 @@ const pedalBypassState = {
   SPACE: false
 };
 
+const PEDAL_BASE_NAMES = {
+  FILTER: "Filter & Env",
+  DELAY:  "Analog Delay",
+  SPACE:  "Reverb & Chorus"
+};
+
 function updatePedalsOrderUI() {
   const container = document.getElementById("masterDeckUnified") || document.getElementById("pedalsGrid");
   if (!container) return;
 
-  // Append each pedal in current dspChainOrder, keeping masterEqOutStrip at the end
+  // Append each pedal in current dspChainOrder, updating dynamic numbers (5, 6, 7)
   dspChainOrder.forEach((key, idx) => {
     const el = document.getElementById("pedalCard_" + key);
     if (el) container.appendChild(el);
+
+    const chainNum = 5 + idx; // Slot 0 -> 5, Slot 1 -> 6, Slot 2 -> 7
+
+    // Update pedal card header title
+    const titleEl = document.getElementById("pedalTitle_" + key) || (el ? el.querySelector(".panel-header > span:first-child") : null);
+    if (titleEl) {
+      titleEl.textContent = `${chainNum}. ${PEDAL_BASE_NAMES[key] || key}`;
+    }
+
+    // Synchronize corresponding orb number in ORBITAL_MODULES
+    if (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && typeof ORBITAL_MODULES !== "undefined") {
+      const orbId = PEDAL_KEY_TO_ORBITAL_ID[key];
+      const orb = ORBITAL_MODULES.find(o => o.id === orbId);
+      if (orb) orb.num = String(chainNum);
+    }
 
     const slotBadge = document.getElementById("slotBadge_" + key);
     if (slotBadge) {
