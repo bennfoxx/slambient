@@ -233,30 +233,40 @@
   }
   .preset-bar {
     display: grid;
-    grid-template-columns: repeat(8, auto);
-    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(3, 1fr);
     gap: 5px;
     align-items: center;
+  }
+  .patch-bank-section {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-left: 16px;
+    border-left: 1px solid var(--border);
+    flex-shrink: 0;
+    align-self: stretch;
   }
   .preset-io-stack {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    justify-content: center;
+    gap: 6px;
     flex-shrink: 0;
-    padding-left: 6px;
-    border-left: 1px solid var(--border-light);
   }
   .btn-preset-io {
-    background: #101522;
+    background: #0f121c;
     color: var(--color-drone);
-    border: 1px solid rgba(0, 229, 255, 0.38);
-    padding: 0 9px;
-    height: 23px;
+    border: 1px solid rgba(0, 229, 255, 0.42);
+    padding: 0 12px;
+    height: 25px;
+    min-width: 78px;
     box-sizing: border-box;
     border-radius: 4px;
-    font-size: 9px;
+    font-size: 9.5px;
     font-weight: 800;
-    letter-spacing: 0.7px;
+    letter-spacing: 0.8px;
     text-transform: uppercase;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     cursor: var(--cursor-pointer) !important;
@@ -264,11 +274,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 6px;
     white-space: nowrap;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
   }
   .btn-preset-io:hover {
-    background: rgba(0, 229, 255, 0.15);
+    background: rgba(0, 229, 255, 0.16);
     color: #ffffff;
     border-color: var(--color-drone);
     box-shadow: 0 0 10px rgba(0, 229, 255, 0.35);
@@ -277,8 +288,8 @@
     background: #0f121c;
     color: var(--text-secondary);
     border: 1px solid var(--border-light);
-    padding: 0 8px;
-    height: 23px;
+    padding: 0 9px;
+    height: 22px;
     box-sizing: border-box;
     border-radius: 4px;
     font-size: 9.5px;
@@ -3145,21 +3156,25 @@
           <span class="preset-label">PRESETS</span>
           <div class="preset-bar">
             <button class="btn-preset-chip" onclick="applyPreset(0)">Nostalgic Drift</button>
-            <button class="btn-preset-chip" onclick="applyPreset(1)">Four Tet Organic</button>
+            <button class="btn-preset-chip" onclick="applyPreset(1)">Organic</button>
             <button class="btn-preset-chip" onclick="applyPreset(2)">Shimmer Cascade</button>
-            <button class="btn-preset-chip" onclick="applyPreset(3)">Hauntological Tape</button>
+            <button class="btn-preset-chip" onclick="applyPreset(3)">Hauntology</button>
             <button class="btn-preset-chip" onclick="applyPreset(4)">Velvet Horizon</button>
             <button class="btn-preset-chip" onclick="applyPreset(5)">Pale Bloom</button>
-            <button class="btn-preset-chip" onclick="applyPreset(6)">Green / Yoshimura</button>
+            <button class="btn-preset-chip" onclick="applyPreset(6)">Green</button>
             <button class="btn-preset-chip" onclick="applyPreset(7)">Khan Lineage</button>
-            <button class="btn-preset-chip" onclick="applyPreset(8)">After Hours Deep</button>
-            <button class="btn-preset-chip" onclick="applyPreset(9)">Ambient 1 / Airports</button>
-            <button class="btn-preset-chip" onclick="applyPreset(10)">Twin Peaks / Badalamenti</button>
+            <button class="btn-preset-chip" onclick="applyPreset(8)">After Hours</button>
+            <button class="btn-preset-chip" onclick="applyPreset(9)">Airports</button>
+            <button class="btn-preset-chip" onclick="applyPreset(10)">Twin Peaks</button>
             <button class="btn-preset-chip" onclick="applyPreset(11)" title="IDM breakbeats, eerie glass pads, Delay ➔ Filter ➔ Space at 48% feedback">Aphex Twin</button>
             <button class="btn-preset-chip" onclick="applyPreset(12)" title="Berlin School sequences, pulsing arpeggiators, Filter ➔ Delay ➔ Space cathedral sweeps">Tangerine Dream</button>
             <button class="btn-preset-chip" onclick="applyPreset(13)" title="Disintegrating tape loops, pitch drift, Space ➔ Delay ➔ Filter dark low-pass repeats">William Basinski</button>
             <button class="btn-preset-chip" onclick="applyPreset(14)" title="Boom-bap swing, dusty Rhodes chords, rain/vinyl texture, Filter ➔ Delay ➔ Space warmth">Lo-Fi Chillhop</button>
           </div>
+        </div>
+
+        <div class="patch-bank-section">
+          <span class="preset-label">BANK</span>
           <div class="preset-io-stack">
             <button class="btn-preset-io" onclick="savePresetBankJson()" title="Export current console & DSP chain patch as a JSON file">
               <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 1.5V8M6 8L3.2 5.2M6 8L8.8 5.2M2 10.5H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
