@@ -288,3 +288,14 @@ All items outlined in Phase 3 of the Technical Specification and Implementation 
     - **Chord Analysis** (`.chord-info-panel`): `flex: 0 0 270px; width: 270px; min-width: 270px; max-width: 270px;` (anchors the chord wheel and meter gauges to their exact intended width).
     - **Playable Keyboard** (`.keyboard-panel`): `flex: 1.15 1 0; min-width: 360px;` (maintains full horizontal piano key octave spread).
   - Calling `renderUpperDeckOrder()` now triggers `resizeScopeCanvas()` to guarantee CRT visualizer rendering scales without pixel distortion.
+
+## Update — 2026-10-14 (Circular Cursors Enforced Across All Drag Elements)
+
+- **Circular Cursor Consistency**:
+  - Enforced `--cursor-grab` (circular reticle with cyan dashed outer orbit and yellow center pip) on all drag handles across both rows:
+    - Upper visualizer deck drag handles (`.upper-drag-handle`)
+    - Stompbox pedal drag handles (`.pedal-drag-handle`)
+  - Enforced `--cursor-grabbing` on all `:active` and drag states:
+    - Active drag states on handles (`.upper-drag-handle:active`, `.pedal-drag-handle:active`)
+    - Dragged cards in transit (`.upper-deck-card.dragging`, `.pedal-chassis.dragging`)
+    - Global window during pointer capture (`body.upper-dragging *`, `body.pedal-dragging *`) so the custom circular cursor never flickers or reverts to standard OS arrows when moving rapidly across adjacent DOM elements.
