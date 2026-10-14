@@ -2999,8 +2999,8 @@
         </select>
       </div>
       <div class="control-row">
-        <div class="control-label"><span>Feedback (Repeats)</span><span class="control-val delay-val" id="lblDelayFeedback">48%</span></div>
-        <input type="range" id="knobDelayFeedback" min="0" max="95" value="48" oninput="updateAudioParams()">
+        <div class="control-label"><span>Feedback (Repeats)</span><span class="control-val delay-val" id="lblDelayFeedback">35%</span></div>
+        <input type="range" id="knobDelayFeedback" min="0" max="48" value="35" oninput="updateAudioParams()">
       </div>
       <div class="control-row">
         <div class="control-label"><span>BBD Dark Damping (Tone)</span><span class="control-val delay-val" id="lblDelayTone">1900 Hz</span></div>
@@ -3735,6 +3735,13 @@ let masterFilter1, masterFilter2;
 let analogDelayNode, delayFeedbackGain, delayDampingFilter, delaySaturationNode;
 let delayDryGain, delayWetGain, delayLFO, delayLFOGain;
 
+// Dynamic DSP routing nodes
+let filterModuleInput, filterModuleOutput;
+let delayModuleInput, delayModuleOutput;
+let spaceModuleInput, spaceModuleOutput;
+let spaceDryGain;
+let dspChainOrder = ['FILTER', 'DELAY', 'SPACE'];
+
 // A real didgeridoo's buzz comes from lip-reed excitation against the bore
 // -- harmonically dense and slightly irregular, not a clean built-in
 // sawtooth/square. Build a custom spectrum: ~1/n falloff (buzzy, not pure),
@@ -3779,7 +3786,7 @@ function initAudio() {
   droneOsc1.detune.value = -droneDetuneCents; droneOsc2.detune.value = +droneDetuneCents;
 
   updateDronePitches();
-  droneGain.gain.value = droneVol * 0.16;
+  droneGain.gain.value = 0.0001; // soft startup: gated until transport engagement
   droneOsc1.connect(droneFilter); droneOsc2.connect(droneFilter); droneFilter.connect(droneGain);
 
   // Digeridoo mode: a parallel buzz layer that sits on top of the same low
@@ -3874,7 +3881,7 @@ function initAudio() {
   droneBuzzOsc1.start(); droneBuzzOsc2.start();
 
   tanpuraBusGain = audioCtx.createGain();
-  tanpuraBusGain.gain.value = tanpuraVol * 0.95;
+  tanpuraBusGain.gain.value = 0.0001; // soft startup: gated until transport engagement
   tanpuraBusGain.connect(droneAnalyser);
 
   masterBusPre = audioCtx.createGain(); masterBusPre.gain.value = 1.0;
@@ -3900,11 +3907,16 @@ function initAudio() {
   arpDryGain.connect(masterBusPost); arpAnalyser.connect(arpFxSendGain);
   arpFxSendGain.connect(masterBusPre);
 
+  // 1. FILTER Module boundary & internal wiring
+  filterModuleInput = audioCtx.createGain();
+  filterModuleOutput = audioCtx.createGain();
   masterFilter1 = audioCtx.createBiquadFilter(); masterFilter1.type = "lowpass";
   masterFilter1.frequency.value = masterBaseCutoff; masterFilter1.Q.value = masterResonance;
   masterFilter2 = audioCtx.createBiquadFilter(); masterFilter2.type = "lowpass";
   masterFilter2.frequency.value = masterBaseCutoff; masterFilter2.Q.value = masterResonance;
-  masterBusPre.connect(masterFilter1); masterFilter1.connect(masterFilter2);
+  filterModuleInput.connect(masterFilter1);
+  masterFilter1.connect(masterFilter2);
+  masterFilter2.connect(filterModuleOutput);
 
   filterLFO = audioCtx.createOscillator(); filterLFO.type = "sine";
   filterLFO.frequency.value = filterLfoRateHz;
@@ -3915,8 +3927,12 @@ function initAudio() {
   filterLFODepthGain.connect(masterFilter2.frequency);
   filterLFO.start();
 
+  // 2. DELAY Module boundary & internal wiring
+  delayModuleInput = audioCtx.createGain();
+  delayModuleOutput = audioCtx.createGain();
+
   analogDelayNode = audioCtx.createDelay(3.0); analogDelayNode.delayTime.value = delayTimeSec;
-  delayFeedbackGain = audioCtx.createGain(); delayFeedbackGain.gain.value = delayFeedbackVal;
+  delayFeedbackGain = audioCtx.createGain(); delayFeedbackGain.gain.value = Math.min(0.48, delayFeedbackVal);
   delayDampingFilter = audioCtx.createBiquadFilter(); delayDampingFilter.type = "lowpass";
   delayDampingFilter.frequency.value = delayToneHz;
 
@@ -3940,21 +3956,33 @@ function initAudio() {
   delayDryGain = audioCtx.createGain(); delayWetGain = audioCtx.createGain();
   delayDryGain.gain.value = 1.0 - (delayMixVal * 0.45);
   delayWetGain.gain.value = delayMixVal * 0.85;
-  masterFilter2.connect(delayDryGain); masterFilter2.connect(analogDelayNode);
+
+  delayModuleInput.connect(delayDryGain);
+  delayDryGain.connect(delayModuleOutput);
+  delayModuleInput.connect(analogDelayNode);
+  analogDelayNode.connect(delayWetGain);
+  delayWetGain.connect(delayModuleOutput);
+
+  // 3. SPACE Module boundary & internal wiring (Reverb + Chorus)
+  spaceModuleInput = audioCtx.createGain();
+  spaceModuleOutput = audioCtx.createGain();
+  spaceDryGain = audioCtx.createGain();
+  spaceDryGain.gain.value = 1.0;
+  spaceModuleInput.connect(spaceDryGain);
+  spaceDryGain.connect(spaceModuleOutput);
 
   reverbNode = audioCtx.createConvolver(); applyReverbMode(reverbMode);
   reverbToneFilter = audioCtx.createBiquadFilter(); reverbToneFilter.type = "lowpass";
   reverbToneFilter.frequency.value = reverbToneHz;
   reverbSend = audioCtx.createGain(); reverbSend.gain.value = weatherVal * reverbMixVal;
-  masterFilter2.connect(reverbSend); reverbSend.connect(reverbNode);
+  spaceModuleInput.connect(reverbSend); reverbSend.connect(reverbNode);
   reverbNode.connect(reverbToneFilter);
+  reverbToneFilter.connect(spaceModuleOutput);
 
-  // Chorus: 3 pre-built voices (short modulated delay lines), always
-  // connected -- "mode" just reactively adjusts each voice's gain/rate/depth
-  // rather than recreating nodes, same pattern as everything else here.
+  // Chorus: 3 pre-built voices (short modulated delay lines)
   chorusInputGain = audioCtx.createGain();
   chorusWetGain = audioCtx.createGain(); chorusWetGain.gain.value = chorusMixVal;
-  masterFilter2.connect(chorusInputGain);
+  spaceModuleInput.connect(chorusInputGain);
   const CHORUS_VOICE_SPECS = [
     { baseMs: 18, pan: -0.7 },
     { baseMs: 24, pan: 0.7 },
@@ -3978,10 +4006,11 @@ function initAudio() {
     return { delay: voiceDelay, lfo, lfoGain, voiceGain, panNode };
   });
 
-  delayDryGain.connect(masterBusPost); analogDelayNode.connect(delayWetGain);
-  delayWetGain.connect(masterBusPost); reverbToneFilter.connect(masterBusPost);
-  chorusWetGain.connect(masterBusPost);
+  chorusWetGain.connect(spaceModuleOutput);
   applyChorusModeParams();
+
+  // Connect initial serial topology via Live Web Audio API rewire manager
+  rewireDspChain(dspChainOrder, true);
 
   saturationNode = audioCtx.createWaveShaper(); saturationNode.curve = curve;
   limiterNode = audioCtx.createDynamicsCompressor();
@@ -3999,6 +4028,68 @@ function initAudio() {
   droneOsc1.start(); droneOsc2.start();
   updateAudioParams();
   if (enoHeadController) enoHeadController.attachAnalyser(masterAnalyser);
+}
+
+// Dynamic Web Audio API live node rewire manager for PEDALS & routing matrix
+function rewireDspChain(newOrder, immediate = false) {
+  if (!audioCtx || !masterBusPre || !masterBusPost) return;
+  if (newOrder && Array.isArray(newOrder) && newOrder.length === 3) {
+    dspChainOrder = [...newOrder];
+  }
+
+  const performConnect = () => {
+    try {
+      masterBusPre.disconnect();
+      if (filterModuleOutput) filterModuleOutput.disconnect();
+      if (delayModuleOutput) delayModuleOutput.disconnect();
+      if (spaceModuleOutput) spaceModuleOutput.disconnect();
+
+      const modules = {
+        FILTER: { in: filterModuleInput, out: filterModuleOutput },
+        DELAY:  { in: delayModuleInput,  out: delayModuleOutput },
+        SPACE:  { in: spaceModuleInput,  out: spaceModuleOutput }
+      };
+
+      let prevNode = masterBusPre;
+      for (let i = 0; i < dspChainOrder.length; i++) {
+        const key = dspChainOrder[i];
+        const m = modules[key];
+        if (m && m.in && m.out) {
+          prevNode.connect(m.in);
+          prevNode = m.out;
+        }
+      }
+      prevNode.connect(masterBusPost);
+
+      if (!immediate && audioCtx) {
+        const resumeNow = audioCtx.currentTime;
+        masterBusPre.gain.cancelScheduledValues(resumeNow);
+        masterBusPre.gain.setValueAtTime(0.001, resumeNow);
+        masterBusPre.gain.linearRampToValueAtTime(1.0, resumeNow + 0.015);
+      }
+      if (typeof updatePedalsOrderUI === 'function') updatePedalsOrderUI();
+    } catch (e) {
+      console.error('DSP chain rewire error:', e);
+    }
+  };
+
+  if (immediate) {
+    performConnect();
+  } else {
+    const now = audioCtx.currentTime;
+    masterBusPre.gain.cancelScheduledValues(now);
+    masterBusPre.gain.setValueAtTime(masterBusPre.gain.value, now);
+    masterBusPre.gain.linearRampToValueAtTime(0.001, now + 0.010);
+    setTimeout(performConnect, 12);
+  }
+}
+
+function getDspChainOrder() {
+  return [...dspChainOrder];
+}
+
+function setDspChainOrder(order) {
+  rewireDspChain(order, false);
 }
 
 // Three reverb "modes" -- distinct pre-baked impulse responses rather than a
@@ -4065,16 +4156,23 @@ function updateDronePitches(glide = true) {
   const target1 = Math.max(20, midiToFreq(droneMidi));
   const target2 = Math.max(10, midiToFreq(droneMidi - 12));
 
+  // Anchor current frequency before setting target curve to eliminate phase jumps and clicks
   droneOsc1.frequency.cancelScheduledValues(now);
+  droneOsc1.frequency.setValueAtTime(droneOsc1.frequency.value, now);
   droneOsc2.frequency.cancelScheduledValues(now);
-  droneOsc1.frequency.setTargetAtTime(target1, now, glide ? 0.75 : 0.20);
-  droneOsc2.frequency.setTargetAtTime(target2, now, glide ? 0.75 : 0.20);
+  droneOsc2.frequency.setValueAtTime(droneOsc2.frequency.value, now);
+
+  const timeConstant = glide ? 0.45 : 0.08;
+  droneOsc1.frequency.setTargetAtTime(target1, now, timeConstant);
+  droneOsc2.frequency.setTargetAtTime(target2, now, timeConstant);
 
   if (droneBuzzOsc1 && droneBuzzOsc2) {
     droneBuzzOsc1.frequency.cancelScheduledValues(now);
+    droneBuzzOsc1.frequency.setValueAtTime(droneBuzzOsc1.frequency.value, now);
     droneBuzzOsc2.frequency.cancelScheduledValues(now);
-    droneBuzzOsc1.frequency.setTargetAtTime(target1, now, glide ? 0.75 : 0.20);
-    droneBuzzOsc2.frequency.setTargetAtTime(target1, now, glide ? 0.75 : 0.20);
+    droneBuzzOsc2.frequency.setValueAtTime(droneBuzzOsc2.frequency.value, now);
+    droneBuzzOsc1.frequency.setTargetAtTime(target1, now, timeConstant);
+    droneBuzzOsc2.frequency.setTargetAtTime(target1, now, timeConstant);
   }
 }
 
@@ -6855,8 +6953,10 @@ function updateAudioParams() {
     }
   }
   if (document.getElementById("knobDelayFeedback")) {
-    delayFeedbackVal = parseInt(document.getElementById("knobDelayFeedback").value) / 100;
-    document.getElementById("lblDelayFeedback").textContent = Math.round(delayFeedbackVal * 100) + "%";
+    const rawFb = parseInt(document.getElementById("knobDelayFeedback").value);
+    const clampedFb = Math.min(48, Math.max(0, rawFb));
+    delayFeedbackVal = clampedFb / 100;
+    document.getElementById("lblDelayFeedback").textContent = clampedFb + "%";
   }
   if (document.getElementById("knobDelayTone")) {
     delayToneHz = parseInt(document.getElementById("knobDelayTone").value);
@@ -6915,10 +7015,19 @@ function updateAudioParams() {
   // Drum/chord/arp are note-triggered -- stopping the clock already silences
   // them naturally since nothing new gets scheduled. The drone (and its
   // Tanpura layer) is a continuous oscillator with no such natural gate, so
-  // it kept droning through Stop/pause regardless of PWR/mute state unless
-  // isPlaying is checked explicitly here too.
-  if (droneGain) droneGain.gain.setTargetAtTime((isPlaying && isChannelAudible('drone')) ? droneVol * 0.16 : 0, audioCtx.currentTime, 0.1);
-  if (tanpuraBusGain) tanpuraBusGain.gain.setTargetAtTime((isPlaying && isChannelAudible('drone')) ? tanpuraVol * 0.95 : 0, audioCtx.currentTime, 0.1);
+  // Anti-click soft envelope smoothing: cancel and linear ramp over 35ms
+  if (droneGain) {
+    const targetDrone = (isPlaying && isChannelAudible('drone')) ? droneVol * 0.16 : 0.0001;
+    droneGain.gain.cancelScheduledValues(audioCtx.currentTime);
+    droneGain.gain.setValueAtTime(droneGain.gain.value, audioCtx.currentTime);
+    droneGain.gain.linearRampToValueAtTime(targetDrone, audioCtx.currentTime + 0.035);
+  }
+  if (tanpuraBusGain) {
+    const targetTanpura = (isPlaying && isChannelAudible('drone') && tanpuraEnabled) ? tanpuraVol * 0.95 : 0.0001;
+    tanpuraBusGain.gain.cancelScheduledValues(audioCtx.currentTime);
+    tanpuraBusGain.gain.setValueAtTime(tanpuraBusGain.gain.value, audioCtx.currentTime);
+    tanpuraBusGain.gain.linearRampToValueAtTime(targetTanpura, audioCtx.currentTime + 0.035);
+  }
 
   // Drone/drum used a weaker 0.4 dry-bypass coefficient than chord/arp's 0.5,
   // so even at 100% FX Send their dry (unfiltered) path never dropped below
@@ -6962,7 +7071,7 @@ function updateAudioParams() {
       analogDelayNode.delayTime.setTargetAtTime(delayTimeSec, audioCtx.currentTime, 0.12);
     }
   }
-  if (delayFeedbackGain) delayFeedbackGain.gain.setTargetAtTime(delayFeedbackVal, audioCtx.currentTime, 0.12);
+  if (delayFeedbackGain) delayFeedbackGain.gain.setTargetAtTime(Math.min(0.48, delayFeedbackVal), audioCtx.currentTime, 0.12);
   if (delayDampingFilter) delayDampingFilter.frequency.setTargetAtTime(delayToneHz, audioCtx.currentTime, 0.08);
   if (delayLFOGain) delayLFOGain.gain.setTargetAtTime(0.0035 * (delayFlutterVal / 100), audioCtx.currentTime, 0.08);
   if (delayDryGain && delayWetGain) {
@@ -6978,7 +7087,7 @@ function updateAudioParams() {
 // warm, pleasing, balanced sound while manual slider tweaking retains the full
 // extreme range for getting darker, louder, or weirder.
 const RANDOM_SWEET_SPOTS = {
-  knobDelayFeedback: [20, 50],
+  knobDelayFeedback: [15, 48],
   knobMasterCutoff:  [38, 68],   // ~850 Hz to ~2300 Hz warm filter ceiling
   knobMasterRes:     [0.8, 3.2], // Musical resonance without piercing self-oscillation
   knobFilterEnvDepth:[-20, 55],
@@ -7204,6 +7313,10 @@ function randomizeEverything() {
   randomizeDelay();
   randomizeReverbChorus();
   randomizeSpace();
+
+  // Dynamic DSP routing shuffle on full randomization
+  const shuffledChain = ['FILTER', 'DELAY', 'SPACE'].sort(() => Math.random() - 0.5);
+  rewireDspChain(shuffledChain, false);
 
   document.querySelectorAll(".preset-bar button").forEach(b => b.classList.remove("active"));
 
@@ -7478,7 +7591,7 @@ function applyPreset(idx) {
     document.getElementById("knobFilterLfoRate").value = 0.06;
     document.getElementById("knobFilterLfoDepth").value = 35;
     document.getElementById("knobDelayTime").value = 520;
-    document.getElementById("knobDelayFeedback").value = 50;
+    document.getElementById("knobDelayFeedback").value = 48;
     document.getElementById("knobDelayTone").value = 1200;
     document.getElementById("knobDelayFlutter").value = 70;
     document.getElementById("knobDelayMix").value = 50;
@@ -7825,7 +7938,7 @@ function applyPreset(idx) {
 
     document.getElementById("chkDelayTempoSync").checked = false;
     document.getElementById("knobDelayTime").value = 720;
-    document.getElementById("knobDelayFeedback").value = 60;
+    document.getElementById("knobDelayFeedback").value = 48;
     document.getElementById("knobDelayTone").value = 1800;
     document.getElementById("knobDelayFlutter").value = 40;
     document.getElementById("knobDelayMix").value = 45;
@@ -7908,10 +8021,42 @@ function togglePlay() {
     const ms = (60000 / bpm) / 4; clockInterval = setInterval(clockTick, ms);
     triggerCurrentChord();
     startSessionTimer();
+
+    // Anti-click soft attack envelope on Drone & Sub-Bass
+    if (audioCtx) {
+      const now = audioCtx.currentTime;
+      const isDroneAudible = isChannelAudible('drone');
+      if (droneGain) {
+        droneGain.gain.cancelScheduledValues(now);
+        droneGain.gain.setValueAtTime(0.0001, now);
+        droneGain.gain.linearRampToValueAtTime(isDroneAudible ? droneVol * 0.16 : 0.0001, now + 0.035);
+      }
+      if (tanpuraBusGain) {
+        tanpuraBusGain.gain.cancelScheduledValues(now);
+        tanpuraBusGain.gain.setValueAtTime(0.0001, now);
+        tanpuraBusGain.gain.linearRampToValueAtTime((isDroneAudible && tanpuraEnabled) ? tanpuraVol * 0.95 : 0.0001, now + 0.035);
+      }
+    }
   } else {
     btn.classList.remove("active"); label.textContent = "Start";
     status.textContent = "Engine: Paused"; clearInterval(clockInterval);
     stopSessionTimer();
+
+    // Anti-click soft release envelope on Drone & Sub-Bass before full stop
+    if (audioCtx) {
+      const now = audioCtx.currentTime;
+      if (droneGain) {
+        droneGain.gain.cancelScheduledValues(now);
+        droneGain.gain.setValueAtTime(droneGain.gain.value, now);
+        droneGain.gain.linearRampToValueAtTime(0.0001, now + 0.040);
+      }
+      if (tanpuraBusGain) {
+        tanpuraBusGain.gain.cancelScheduledValues(now);
+        tanpuraBusGain.gain.setValueAtTime(tanpuraBusGain.gain.value, now);
+        tanpuraBusGain.gain.linearRampToValueAtTime(0.0001, now + 0.040);
+      }
+    }
+
     if (keyboardRoute === "ARP" && heldMidiNotes.size > 0) {
       const ms = (60000 / bpm) / 4;
       liveArpTimer = setInterval(triggerLiveArpStep, ms);
