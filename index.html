@@ -801,7 +801,13 @@
     box-sizing: border-box;
     gap: 10px;
   }
-  .panel-header > span:first-child {
+  /* .panel-title-text covers the Visualizer/Chord Analysis/Playable MIDI
+     Keyboard headers, where the title span got wrapped in a drag-handle
+     div (making it no longer :first-child of .panel-header) -- without
+     this, those three titles silently fall back to unstyled body text
+     instead of the HUD monospace look every other panel title has. */
+  .panel-header > span:first-child,
+  .panel-title-text {
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 1.2px;
@@ -3312,7 +3318,7 @@
       <div class="panel-header">
         <div style="display: inline-flex; align-items: center; gap: 6px;">
           <span class="upper-drag-handle" title="Drag to reorder visualizer widgets"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg></span>
-          <span>Visualizer</span>
+          <span class="panel-title-text">Visualizer</span>
         </div>
         <div class="scope-legend">
           <div class="legend-item"><div class="legend-dot" style="background: var(--color-drone);"></div><span>DRONE</span></div>
@@ -3384,7 +3390,7 @@
       <div class="panel-header">
         <div style="display: inline-flex; align-items: center; gap: 6px;">
           <span class="upper-drag-handle" title="Drag to reorder visualizer widgets"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg></span>
-          <span>Chord Analysis</span>
+          <span class="panel-title-text">Chord Analysis</span>
         </div>
       </div>
 
@@ -3435,7 +3441,7 @@
         <div class="panel-header keyboard-panel-header">
           <div style="display: inline-flex; align-items: center; gap: 6px;">
             <span class="upper-drag-handle" title="Drag to reorder visualizer widgets"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg></span>
-            <span>Playable MIDI Keyboard</span>
+            <span class="panel-title-text">Playable MIDI Keyboard</span>
           </div>
           <span class="keyboard-hint">Keys A-K · <span id="valOctave">C3 - C5</span></span>
         </div>
