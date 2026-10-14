@@ -1300,6 +1300,12 @@
     color: var(--accent);
     box-shadow: 0 0 14px rgba(254, 211, 48, 0.45);
   }
+  #btnViewPedals.active {
+    background: rgba(255, 121, 63, 0.16);
+    border-color: var(--color-delay);
+    color: var(--color-delay);
+    box-shadow: 0 0 14px rgba(255, 121, 63, 0.45);
+  }
 
   .orbital-bar-center {
     display: flex;
@@ -1587,7 +1593,8 @@
   }
 
   .lower-deck.view-grid-hidden,
-  .master-chain-deck.view-grid-hidden {
+  .master-chain-deck.view-grid-hidden,
+  .pedals-deck.view-grid-hidden {
     display: none !important;
   }
   .lower-deck {
@@ -1990,6 +1997,491 @@
   }
   @media (max-width: 640px) {
     .master-chain-deck { grid-template-columns: 1fr; }
+  }
+
+  /* PEDALS DECK & CHASSIS STYLING */
+  .pedals-deck {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+  }
+
+  .pedals-routing-header {
+    background: var(--panel);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  }
+
+  .pedals-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 220px;
+  }
+
+  .pedals-deck-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    color: #ffffff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    text-transform: uppercase;
+  }
+
+  .pedals-deck-sub {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  .pedals-routing-stream {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #080a11;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  .routing-node-badge {
+    font-size: 9.5px;
+    font-weight: 800;
+    color: var(--text-tertiary);
+    letter-spacing: 0.8px;
+  }
+
+  .routing-arrow {
+    color: var(--accent);
+    font-size: 10px;
+    opacity: 0.7;
+  }
+
+  .routing-pill {
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    transition: all 0.15s ease;
+  }
+  .routing-pill.pill-mod1 {
+    background: rgba(46, 213, 115, 0.15);
+    border: 1px solid rgba(46, 213, 115, 0.5);
+    color: var(--color-filter);
+  }
+  .routing-pill.pill-mod2 {
+    background: rgba(255, 121, 63, 0.15);
+    border: 1px solid rgba(255, 121, 63, 0.5);
+    color: var(--color-delay);
+  }
+  .routing-pill.pill-mod3 {
+    background: rgba(75, 123, 236, 0.15);
+    border: 1px solid rgba(75, 123, 236, 0.5);
+    color: var(--color-space);
+  }
+
+  .pedals-header-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-pedal-action {
+    background: #101420;
+    color: var(--text-primary);
+    border: 1px solid var(--border-light);
+    height: 28px;
+    box-sizing: border-box;
+    padding: 0 12px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .btn-pedal-action:hover {
+    background: #181f32;
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 10px var(--accent-dim);
+  }
+
+  .pedals-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    width: 100%;
+  }
+  @media (max-width: 1024px) {
+    .pedals-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* STOMPBOX PEDAL CHASSIS */
+  .pedal-chassis {
+    background: linear-gradient(180deg, #131722 0%, #0c0e16 100%);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px 20px 18px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.75),
+      inset 0 1px 1px rgba(255, 255, 255, 0.1),
+      inset 0 -1px 1px rgba(0, 0, 0, 0.8);
+    transition: transform 0.18s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.18s ease, border-color 0.18s ease;
+    user-select: none;
+  }
+
+  .pedal-chassis:hover {
+    box-shadow:
+      0 14px 36px rgba(0, 0, 0, 0.85),
+      inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  }
+
+  .pedal-chassis.drag-over {
+    border-color: var(--accent) !important;
+    transform: translateY(-4px) scale(1.015);
+    box-shadow: 0 0 24px rgba(254, 211, 48, 0.4), 0 16px 40px rgba(0, 0, 0, 0.9);
+  }
+
+  .pedal-chassis.dragging {
+    opacity: 0.45;
+    transform: scale(0.97);
+  }
+
+  /* Pedal color accents */
+  .pedal-chassis.pedal-filter {
+    border-color: rgba(46, 213, 115, 0.4);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), inset 0 2px 0 rgba(46, 213, 115, 0.4);
+  }
+  .pedal-chassis.pedal-filter:hover {
+    border-color: rgba(46, 213, 115, 0.75);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.8), 0 0 16px rgba(46, 213, 115, 0.25);
+  }
+
+  .pedal-chassis.pedal-delay {
+    border-color: rgba(255, 121, 63, 0.4);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), inset 0 2px 0 rgba(255, 121, 63, 0.4);
+  }
+  .pedal-chassis.pedal-delay:hover {
+    border-color: rgba(255, 121, 63, 0.75);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.8), 0 0 16px rgba(255, 121, 63, 0.25);
+  }
+
+  .pedal-chassis.pedal-space {
+    border-color: rgba(75, 123, 236, 0.4);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), inset 0 2px 0 rgba(75, 123, 236, 0.4);
+  }
+  .pedal-chassis.pedal-space:hover {
+    border-color: rgba(75, 123, 236, 0.75);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.8), 0 0 16px rgba(75, 123, 236, 0.25);
+  }
+
+  /* Chassis Screws */
+  .chassis-screw {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #555e75 30%, #202433 90%);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.8);
+    pointer-events: none;
+  }
+  .chassis-screw::after {
+    content: '';
+    position: absolute;
+    top: 3.5px;
+    left: 1.5px;
+    width: 5px;
+    height: 1px;
+    background: #11141c;
+  }
+  .chassis-screw.screw-tl { top: 7px; left: 8px; }
+  .chassis-screw.screw-tr { top: 7px; right: 8px; }
+  .chassis-screw.screw-bl { bottom: 7px; left: 8px; }
+  .chassis-screw.screw-br { bottom: 7px; right: 8px; }
+
+  /* Top Bar */
+  .pedal-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .pedal-slot-badge {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: #090b12;
+    border: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    white-space: nowrap;
+  }
+
+  .pedal-jacks {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 9px;
+    color: var(--text-tertiary);
+  }
+
+  .pedal-drag-handle {
+    cursor: grab !important;
+    background: #171c2b;
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    padding: 2px 7px;
+    color: var(--accent);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    transition: all 0.12s ease;
+  }
+  .pedal-drag-handle:hover {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: #ffffff;
+    box-shadow: 0 0 8px var(--accent-dim);
+  }
+  .pedal-drag-handle:active {
+    cursor: grabbing !important;
+  }
+
+  .pedal-shift-ctrls {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .btn-pedal-shift {
+    width: 22px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #0c0e17;
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    color: var(--text-secondary);
+    font-size: 9px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .btn-pedal-shift:hover:not(:disabled) {
+    background: #192033;
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .btn-pedal-shift:disabled {
+    opacity: 0.25;
+    cursor: not-allowed !important;
+  }
+
+  /* Branding */
+  .pedal-brand-banner {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background: #080a11;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+  .pedal-mfr {
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+  }
+  .pedal-model {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #ffffff;
+    text-transform: uppercase;
+  }
+  .pedal-filter .pedal-model { color: var(--color-filter); text-shadow: 0 0 10px rgba(46, 213, 115, 0.3); }
+  .pedal-delay .pedal-model { color: var(--color-delay); text-shadow: 0 0 10px rgba(255, 121, 63, 0.3); }
+  .pedal-space .pedal-model { color: var(--color-space); text-shadow: 0 0 10px rgba(75, 123, 236, 0.3); }
+
+  /* Controls Body */
+  .pedal-controls-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+  }
+
+  .pedal-controls-body .control-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .pedal-controls-body .control-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    letter-spacing: 0.5px;
+  }
+  .pedal-controls-body .control-sublabel {
+    font-size: 8.5px;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    margin-bottom: 2px;
+  }
+  .pedal-controls-body .control-val {
+    font-weight: 800;
+    font-size: 9.5px;
+  }
+  .pedal-controls-body select {
+    width: 100%;
+    height: 24px;
+    background: #090c15;
+    color: #ffffff;
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    padding: 0 8px;
+    font-size: 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  /* Footswitch & Stomp Bay */
+  .pedal-stomp-bay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+  }
+
+  .pedal-led-pod {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 8.5px;
+    font-weight: 800;
+    color: var(--text-tertiary);
+    letter-spacing: 1px;
+  }
+
+  .pedal-led {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #252834;
+    border: 1.5px solid #10121a;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+    transition: all 0.15s ease;
+  }
+  .pedal-led.active {
+    background: currentColor;
+    box-shadow: 0 0 12px currentColor, 0 0 20px currentColor, inset 0 1px 2px rgba(255,255,255,0.8);
+  }
+
+  .stomp-footswitch {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #383e52 20%, #151824 85%);
+    border: 3px solid #0d0f17;
+    box-shadow:
+      0 6px 14px rgba(0, 0, 0, 0.8),
+      inset 0 2px 2px rgba(255, 255, 255, 0.4),
+      inset 0 -2px 3px rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer !important;
+    position: relative;
+    padding: 0;
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+  .stomp-footswitch:hover {
+    box-shadow:
+      0 8px 18px rgba(0, 0, 0, 0.9),
+      inset 0 2px 3px rgba(255, 255, 255, 0.5),
+      inset 0 -2px 3px rgba(0, 0, 0, 0.8);
+  }
+  .stomp-footswitch:active {
+    transform: scale(0.92) translateY(2px);
+    box-shadow:
+      0 2px 6px rgba(0, 0, 0, 0.9),
+      inset 0 1px 1px rgba(255, 255, 255, 0.2),
+      inset 0 2px 4px rgba(0, 0, 0, 0.9);
+  }
+
+  .stomp-bezel {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #252a3a 0%, #121520 100%);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .stomp-cap {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #8c97b2 0%, #3e465b 70%, #1e2230 100%);
+    border: 1px solid #1a1e2b;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.6);
+  }
+
+  .stomp-action-label {
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--text-tertiary);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    text-transform: uppercase;
+  }
+
+  .pedal-chassis.bypassed {
+    opacity: 0.65;
+    filter: grayscale(0.4);
+  }
+  .pedal-chassis.bypassed .pedal-led {
+    background: #1c1f2a !important;
+    box-shadow: none !important;
+  }
+  .pedal-chassis.bypassed .pedal-led-label {
+    color: #4b5563;
   }
 
   footer.app-footer {
@@ -2619,6 +3111,7 @@
     <div class="view-switcher-group">
       <button class="btn-view-mode active" id="btnViewOrbital" onclick="setModuleView('orbital')" title="Floating Planetary Orb Constellation">Orbital View</button>
       <button class="btn-view-mode" id="btnViewConsole" onclick="setModuleView('console')" title="Linear 7-Channel Mixing Console">Console Rack</button>
+      <button class="btn-view-mode" id="btnViewPedals" onclick="setModuleView('pedals')" title="Tactile 3-Pedal FX Insert Board">Pedals View</button>
     </div>
 
     <div class="orbital-bar-center">
@@ -3085,6 +3578,282 @@
       <div class="control-row">
         <div class="control-label"><span>Diffusion Reverb Space</span><span class="control-val space-val" id="lblWeather">45%</span></div>
         <input type="range" id="knobWeather" min="0" max="100" value="45" oninput="updateAudioParams()">
+      </div>
+    </div>
+  </div>
+
+  <!-- PEDALS VIEW: Dedicated 3-Stompbox Insert Pedalboard & Routing Matrix -->
+  <div class="pedals-deck view-grid-hidden" id="pedalsContainer" style="margin-top: 14px;">
+    <div class="pedals-routing-header">
+      <div class="pedals-header-left">
+        <span class="pedals-deck-title">DSP INSERT PEDALBOARD // LIVE REWIRING MATRIX</span>
+        <span class="pedals-deck-sub">Drag &amp; drop pedals or click shift arrows to dynamically rewire Web Audio API graph in real-time</span>
+      </div>
+      <div class="pedals-routing-stream" id="pedalsRoutingStream">
+        <span class="routing-node-badge">BUS PRE</span>
+        <span class="routing-arrow">➔</span>
+        <span class="routing-pill pill-mod1" id="routeBadge1">1: FILTER</span>
+        <span class="routing-arrow">➔</span>
+        <span class="routing-pill pill-mod2" id="routeBadge2">2: DELAY</span>
+        <span class="routing-arrow">➔</span>
+        <span class="routing-pill pill-mod3" id="routeBadge3">3: SPACE</span>
+        <span class="routing-arrow">➔</span>
+        <span class="routing-node-badge">BUS POST</span>
+      </div>
+      <div class="pedals-header-actions">
+        <button class="btn-pedal-action" onclick="randomizeDspChain()" title="Randomly shuffle pedal insert order">⟲ SHUFFLE</button>
+        <button class="btn-pedal-action" onclick="resetDspChain()" title="Reset order to Filter ➔ Delay ➔ Space">RESET (F-D-S)</button>
+      </div>
+    </div>
+
+    <div class="pedals-grid" id="pedalsGrid">
+      <!-- 1. FILTER PEDAL -->
+      <div class="pedal-chassis pedal-filter" id="pedalCard_FILTER" draggable="true" data-module="FILTER">
+        <div class="chassis-screw screw-tl"></div>
+        <div class="chassis-screw screw-tr"></div>
+        <div class="chassis-screw screw-bl"></div>
+        <div class="chassis-screw screw-br"></div>
+
+        <div class="pedal-top-bar">
+          <span class="pedal-slot-badge" id="slotBadge_FILTER">SLOT 1 • IN</span>
+          <div class="pedal-jacks">
+            <span class="pedal-jack">IN ➔</span>
+            <span class="pedal-drag-handle" title="Drag to reorder">⠿ DRAG</span>
+            <span class="pedal-jack">➔ OUT</span>
+          </div>
+          <div class="pedal-shift-ctrls">
+            <button class="btn-pedal-shift" onclick="shiftPedalLeft('FILTER')" id="shiftLeft_FILTER" title="Shift Left">◀</button>
+            <button class="btn-pedal-shift" onclick="shiftPedalRight('FILTER')" id="shiftRight_FILTER" title="Shift Right">▶</button>
+          </div>
+        </div>
+
+        <div class="pedal-brand-banner">
+          <span class="pedal-mfr">KANKYŌ DSP</span>
+          <span class="pedal-model">DUAL VCF // FILTER &amp; ENV</span>
+        </div>
+
+        <div class="pedal-controls-body">
+          <div class="control-row">
+            <div class="control-label"><span>Cutoff Frequency</span><span class="control-val filter-val" id="lblPedalCutoff">2400 Hz</span></div>
+            <input type="range" id="pedal_knobMasterCutoff" min="0" max="100" step="0.1" value="64.4" oninput="syncFromPedal('knobMasterCutoff', this.value)">
+          </div>
+          <div class="control-row">
+            <div class="control-label"><span>Resonance (Q)</span><span class="control-val filter-val" id="lblPedalRes">1.8</span></div>
+            <input type="range" id="pedal_knobMasterRes" min="0.5" max="9.0" step="0.1" value="1.8" oninput="syncFromPedal('knobMasterRes', this.value)">
+          </div>
+          <div class="control-row">
+            <div class="control-label"><span>Attack / Decay</span><span class="control-val filter-val" id="lblPedalEnvTimes">80 ms / 700 ms</span></div>
+            <div style="display: flex; gap: 8px;">
+              <div style="flex: 1;">
+                <div class="control-sublabel">Attack</div>
+                <input type="range" id="pedal_knobFilterAttack" min="5" max="300" value="80" oninput="syncFromPedal('knobFilterAttack', this.value)">
+              </div>
+              <div style="flex: 1;">
+                <div class="control-sublabel">Decay</div>
+                <input type="range" id="pedal_knobFilterDecay" min="50" max="2000" value="700" oninput="syncFromPedal('knobFilterDecay', this.value)">
+              </div>
+            </div>
+          </div>
+          <div class="control-row">
+            <div class="control-label"><span>Envelope Depth</span><span class="control-val filter-val" id="lblPedalEnvDepth">35%</span></div>
+            <input type="range" id="pedal_knobFilterEnvDepth" min="-100" max="100" value="35" oninput="syncFromPedal('knobFilterEnvDepth', this.value)">
+          </div>
+          <div class="control-row">
+            <div class="control-label"><span>LFO Rate / Depth</span><span class="control-val filter-val" id="lblPedalLfoRate">0.12 Hz / 20%</span></div>
+            <div style="display: flex; gap: 8px;">
+              <div style="flex: 1;">
+                <div class="control-sublabel">Rate</div>
+                <input type="range" id="pedal_knobFilterLfoRate" min="0.01" max="2" step="0.01" value="0.12" oninput="syncFromPedal('knobFilterLfoRate', this.value)">
+              </div>
+              <div style="flex: 1;">
+                <div class="control-sublabel">Depth</div>
+                <input type="range" id="pedal_knobFilterLfoDepth" min="0" max="100" value="20" oninput="syncFromPedal('knobFilterLfoDepth', this.value)">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pedal-stomp-bay">
+          <div class="pedal-led-pod">
+            <div class="pedal-led active" id="pedalLed_FILTER" style="color: #2ed573;"></div>
+            <span class="pedal-led-label">ENGAGED</span>
+          </div>
+          <button class="stomp-footswitch active" id="stompBtn_FILTER" onclick="togglePedalBypass('FILTER')" title="Stomp to bypass/engage Filter">
+            <div class="stomp-bezel"><div class="stomp-cap"></div></div>
+          </button>
+          <span class="stomp-action-label">BYPASS / ENGAGE</span>
+        </div>
+      </div>
+
+      <!-- 2. DELAY PEDAL -->
+      <div class="pedal-chassis pedal-delay" id="pedalCard_DELAY" draggable="true" data-module="DELAY">
+        <div class="chassis-screw screw-tl"></div>
+        <div class="chassis-screw screw-tr"></div>
+        <div class="chassis-screw screw-bl"></div>
+        <div class="chassis-screw screw-br"></div>
+
+        <div class="pedal-top-bar">
+          <span class="pedal-slot-badge" id="slotBadge_DELAY">SLOT 2 • INSERT</span>
+          <div class="pedal-jacks">
+            <span class="pedal-jack">IN ➔</span>
+            <span class="pedal-drag-handle" title="Drag to reorder">⠿ DRAG</span>
+            <span class="pedal-jack">➔ OUT</span>
+          </div>
+          <div class="pedal-shift-ctrls">
+            <button class="btn-pedal-shift" onclick="shiftPedalLeft('DELAY')" id="shiftLeft_DELAY" title="Shift Left">◀</button>
+            <button class="btn-pedal-shift" onclick="shiftPedalRight('DELAY')" id="shiftRight_DELAY" title="Shift Right">▶</button>
+          </div>
+        </div>
+
+        <div class="pedal-brand-banner">
+          <span class="pedal-mfr">TIME DRIFT BBD</span>
+          <span class="pedal-model">ANALOG TAPE &amp; DUB ECHO</span>
+        </div>
+
+        <div class="pedal-controls-body">
+          <div class="control-row">
+            <div class="control-label">
+              <span>Delay Time</span>
+              <span class="control-val delay-val" id="lblPedalDelayTime">375 ms</span>
+            </div>
+            <div class="select-with-toggle" style="margin-bottom: 6px;">
+              <select id="pedal_selDelayNoteDivision" onchange="syncFromPedal('selDelayNoteDivision', this.value)">
+                <option value="0.25">1/16 Note</option>
+                <option value="0.375">1/16 Dotted</option>
+                <option value="0.5">1/8 Note</option>
+                <option value="0.75" selected>1/8 Dotted (Dub Skip)</option>
+                <option value="1">1/4 (Quarter Beat)</option>
+                <option value="1.5">1/4 Dotted</option>
+                <option value="2">1/2 (Half Measure)</option>
+                <option value="3">3/4 Measure</option>
+                <option value="4">1/1 (Whole Measure)</option>
+              </select>
+              <label class="toggle-switch" title="Lock delay time to master tempo grid">
+                <input type="checkbox" id="pedal_chkDelayTempoSync" onchange="syncFromPedal('chkDelayTempoSync', this.checked)">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            <input type="range" id="pedal_knobDelayTime" min="40" max="1400" value="375" oninput="syncFromPedal('knobDelayTime', this.value)">
+          </div>
+          <div class="control-row">
+            <div class="control-label"><span>Feedback (Max 48% Safe)</span><span class="control-val delay-val" id="lblPedalDelayFeedback">35%</span></div>
+            <input type="range" id="pedal_knobDelayFeedback" min="0" max="48" value="35" oninput="syncFromPedal('knobDelayFeedback', this.value)">
+          </div>
+          <div class="control-row">
+            <div class="control-label"><span>BBD Dark Damping (Tone)</span><span class="control-val delay-val" id="lblPedalDelayTone">1900 Hz</span></div>
+            <input type="range" id="pedal_knobDelayTone" min="400" max="4800" value="1900" oninput="syncFromPedal('knobDelayTone', this.value)">
+          </div>
+          <div class="control-row">
+            <div class="control-label"><span>Tape Flutter / Wet Mix</span><span class="control-val delay-val" id="lblPedalDelayFlutter">18% flt / 35% mix</span></div>
+            <div style="display: flex; gap: 8px;">
+              <div style="flex: 1;">
+                <div class="control-sublabel">Flutter</div>
+                <input type="range" id="pedal_knobDelayFlutter" min="0" max="100" value="18" oninput="syncFromPedal('knobDelayFlutter', this.value)">
+              </div>
+              <div style="flex: 1;">
+                <div class="control-sublabel">Mix</div>
+                <input type="range" id="pedal_knobDelayMix" min="0" max="100" value="35" oninput="syncFromPedal('knobDelayMix', this.value)">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pedal-stomp-bay">
+          <div class="pedal-led-pod">
+            <div class="pedal-led active" id="pedalLed_DELAY" style="color: #ff793f;"></div>
+            <span class="pedal-led-label">ENGAGED</span>
+          </div>
+          <button class="stomp-footswitch active" id="stompBtn_DELAY" onclick="togglePedalBypass('DELAY')" title="Stomp to bypass/engage Delay">
+            <div class="stomp-bezel"><div class="stomp-cap"></div></div>
+          </button>
+          <span class="stomp-action-label">BYPASS / ENGAGE</span>
+        </div>
+      </div>
+
+      <!-- 3. SPACE PEDAL -->
+      <div class="pedal-chassis pedal-space" id="pedalCard_SPACE" draggable="true" data-module="SPACE">
+        <div class="chassis-screw screw-tl"></div>
+        <div class="chassis-screw screw-tr"></div>
+        <div class="chassis-screw screw-bl"></div>
+        <div class="chassis-screw screw-br"></div>
+
+        <div class="pedal-top-bar">
+          <span class="pedal-slot-badge" id="slotBadge_SPACE">SLOT 3 • OUT</span>
+          <div class="pedal-jacks">
+            <span class="pedal-jack">IN ➔</span>
+            <span class="pedal-drag-handle" title="Drag to reorder">⠿ DRAG</span>
+            <span class="pedal-jack">➔ OUT</span>
+          </div>
+          <div class="pedal-shift-ctrls">
+            <button class="btn-pedal-shift" onclick="shiftPedalLeft('SPACE')" id="shiftLeft_SPACE" title="Shift Left">◀</button>
+            <button class="btn-pedal-shift" onclick="shiftPedalRight('SPACE')" id="shiftRight_SPACE" title="Shift Right">▶</button>
+          </div>
+        </div>
+
+        <div class="pedal-brand-banner">
+          <span class="pedal-mfr">COSMIC SPACE</span>
+          <span class="pedal-model">DIFFUSION REVERB &amp; JUNO CHORUS</span>
+        </div>
+
+        <div class="pedal-controls-body">
+          <div class="control-row">
+            <div class="control-label">Reverb Architecture</div>
+            <select id="pedal_selReverbMode" onchange="syncFromPedal('selReverbMode', this.value)">
+              <option value="PLATE">Plate (Dense / Shimmer)</option>
+              <option value="HALL" selected>Hall (Warm Ambient Space)</option>
+              <option value="CATHEDRAL">Cathedral (Infinite Cavern)</option>
+            </select>
+          </div>
+          <div class="control-row">
+            <div class="control-label"><span>Reverb Mix / Tone</span><span class="control-val reverb-val" id="lblPedalReverbMix">45% / 4200 Hz</span></div>
+            <div style="display: flex; gap: 8px;">
+              <div style="flex: 1;">
+                <div class="control-sublabel">Mix</div>
+                <input type="range" id="pedal_knobReverbMix" min="0" max="100" value="45" oninput="syncFromPedal('knobReverbMix', this.value)">
+              </div>
+              <div style="flex: 1;">
+                <div class="control-sublabel">Tone</div>
+                <input type="range" id="pedal_knobReverbTone" min="600" max="8000" value="4200" oninput="syncFromPedal('knobReverbTone', this.value)">
+              </div>
+            </div>
+          </div>
+          <div class="control-row">
+            <div class="control-label">Stereo Chorus Mode</div>
+            <select id="pedal_selChorusMode" onchange="syncFromPedal('selChorusMode', this.value)">
+              <option value="CLASSIC" selected>Classic (2-Voice Dimension)</option>
+              <option value="ENSEMBLE">Ensemble (3-Voice Lush Juno)</option>
+              <option value="VIBRATO">Vibrato (Pure Wobble)</option>
+            </select>
+          </div>
+          <div class="control-row">
+            <div class="control-label"><span>Chorus Rate</span><span class="control-val reverb-val" id="lblPedalChorusRate">0.45 Hz</span></div>
+            <input type="range" id="pedal_knobChorusRate" min="0.05" max="3" step="0.01" value="0.45" oninput="syncFromPedal('knobChorusRate', this.value)">
+          </div>
+          <div class="control-row">
+            <div class="control-label"><span>Chorus Depth / Mix</span><span class="control-val reverb-val" id="lblPedalChorusDepth">40% / 30%</span></div>
+            <div style="display: flex; gap: 8px;">
+              <div style="flex: 1;">
+                <div class="control-sublabel">Depth</div>
+                <input type="range" id="pedal_knobChorusDepth" min="0" max="100" value="40" oninput="syncFromPedal('knobChorusDepth', this.value)">
+              </div>
+              <div style="flex: 1;">
+                <div class="control-sublabel">Mix</div>
+                <input type="range" id="pedal_knobChorusMix" min="0" max="100" value="30" oninput="syncFromPedal('knobChorusMix', this.value)">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pedal-stomp-bay">
+          <div class="pedal-led-pod">
+            <div class="pedal-led active" id="pedalLed_SPACE" style="color: #4b7bec;"></div>
+            <span class="pedal-led-label">ENGAGED</span>
+          </div>
+          <button class="stomp-footswitch active" id="stompBtn_SPACE" onclick="togglePedalBypass('SPACE')" title="Stomp to bypass/engage Space">
+            <div class="stomp-bezel"><div class="stomp-cap"></div></div>
+          </button>
+          <span class="stomp-action-label">BYPASS / ENGAGE</span>
+        </div>
       </div>
     </div>
   </div>
@@ -4090,6 +4859,327 @@ function getDspChainOrder() {
 
 function setDspChainOrder(order) {
   rewireDspChain(order, false);
+}
+
+/* ==========================================================================
+   PEDALBOARD LOGIC, DRAG-AND-DROP REWIRING & CROSS-VIEW SYNCHRONIZATION
+   ========================================================================== */
+const pedalBypassState = {
+  FILTER: false,
+  DELAY: false,
+  SPACE: false
+};
+
+function updatePedalsOrderUI() {
+  const container = document.getElementById("pedalsGrid");
+  if (!container) return;
+
+  dspChainOrder.forEach((key, idx) => {
+    const el = document.getElementById("pedalCard_" + key);
+    if (el) container.appendChild(el);
+
+    const slotBadge = document.getElementById("slotBadge_" + key);
+    if (slotBadge) {
+      if (idx === 0) slotBadge.textContent = "SLOT 1 • IN";
+      else if (idx === 1) slotBadge.textContent = "SLOT 2 • INSERT";
+      else slotBadge.textContent = "SLOT 3 • OUT";
+    }
+
+    const shiftL = document.getElementById("shiftLeft_" + key);
+    const shiftR = document.getElementById("shiftRight_" + key);
+    if (shiftL) shiftL.disabled = (idx === 0);
+    if (shiftR) shiftR.disabled = (idx === dspChainOrder.length - 1);
+
+    const routeBadge = document.getElementById("routeBadge" + (idx + 1));
+    if (routeBadge) {
+      routeBadge.textContent = (idx + 1) + ": " + key;
+      routeBadge.className = "routing-pill pill-mod" + (key === "FILTER" ? "1" : key === "DELAY" ? "2" : "3");
+    }
+  });
+}
+
+function shiftPedalLeft(key) {
+  const idx = dspChainOrder.indexOf(key);
+  if (idx > 0) {
+    const temp = dspChainOrder[idx - 1];
+    dspChainOrder[idx - 1] = dspChainOrder[idx];
+    dspChainOrder[idx] = temp;
+    rewireDspChain(dspChainOrder, false);
+  }
+}
+
+function shiftPedalRight(key) {
+  const idx = dspChainOrder.indexOf(key);
+  if (idx >= 0 && idx < dspChainOrder.length - 1) {
+    const temp = dspChainOrder[idx + 1];
+    dspChainOrder[idx + 1] = dspChainOrder[idx];
+    dspChainOrder[idx] = temp;
+    rewireDspChain(dspChainOrder, false);
+  }
+}
+
+function randomizeDspChain() {
+  const shuffled = ['FILTER', 'DELAY', 'SPACE'].sort(() => Math.random() - 0.5);
+  rewireDspChain(shuffled, false);
+}
+
+function resetDspChain() {
+  rewireDspChain(['FILTER', 'DELAY', 'SPACE'], false);
+}
+
+function togglePedalBypass(key) {
+  pedalBypassState[key] = !pedalBypassState[key];
+  const isBypassed = pedalBypassState[key];
+  const card = document.getElementById("pedalCard_" + key);
+  const led = document.getElementById("pedalLed_" + key);
+  const btn = document.getElementById("stompBtn_" + key);
+
+  if (card) card.classList.toggle("bypassed", isBypassed);
+  if (led) led.classList.toggle("active", !isBypassed);
+  if (btn) btn.classList.toggle("active", !isBypassed);
+
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+
+  if (key === 'FILTER') {
+    if (filterModuleInput && filterModuleOutput) {
+      if (masterFilter1 && masterFilter2) {
+        masterFilter1.frequency.setTargetAtTime(isBypassed ? 20000 : masterBaseCutoff, now, 0.05);
+        masterFilter2.frequency.setTargetAtTime(isBypassed ? 20000 : masterBaseCutoff, now, 0.05);
+        masterFilter1.Q.setTargetAtTime(isBypassed ? 0.5 : masterResonance, now, 0.05);
+        masterFilter2.Q.setTargetAtTime(isBypassed ? 0.5 : masterResonance, now, 0.05);
+      }
+    }
+  } else if (key === 'DELAY') {
+    if (delayWetGain && delayDryGain) {
+      delayWetGain.gain.setTargetAtTime(isBypassed ? 0.0001 : delayMixVal * 0.85, now, 0.05);
+      delayDryGain.gain.setTargetAtTime(isBypassed ? 1.0 : (1.0 - (delayMixVal * 0.45)), now, 0.05);
+    }
+  } else if (key === 'SPACE') {
+    if (spaceDryGain && reverbSend && chorusWetGain) {
+      reverbSend.gain.setTargetAtTime(isBypassed ? 0.0001 : (weatherVal * reverbMixVal), now, 0.05);
+      chorusWetGain.gain.setTargetAtTime(isBypassed ? 0.0001 : chorusMixVal, now, 0.05);
+      spaceDryGain.gain.setTargetAtTime(isBypassed ? 1.0 : 0.88, now, 0.05);
+    }
+  }
+}
+
+// Drag & drop handlers
+let draggedPedalKey = null;
+
+function initPedalDragAndDrop() {
+  const cards = document.querySelectorAll(".pedal-chassis");
+  cards.forEach(card => {
+    card.addEventListener("dragstart", (e) => {
+      draggedPedalKey = card.getAttribute("data-module");
+      card.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", draggedPedalKey);
+    });
+
+    card.addEventListener("dragend", () => {
+      card.classList.remove("dragging");
+      cards.forEach(c => c.classList.remove("drag-over"));
+      draggedPedalKey = null;
+    });
+
+    card.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      card.classList.add("drag-over");
+    });
+
+    card.addEventListener("dragleave", () => {
+      card.classList.remove("drag-over");
+    });
+
+    card.addEventListener("drop", (e) => {
+      e.preventDefault();
+      card.classList.remove("drag-over");
+      const targetKey = card.getAttribute("data-module");
+      if (draggedPedalKey && targetKey && draggedPedalKey !== targetKey) {
+        const fromIdx = dspChainOrder.indexOf(draggedPedalKey);
+        const toIdx = dspChainOrder.indexOf(targetKey);
+        if (fromIdx !== -1 && toIdx !== -1) {
+          dspChainOrder.splice(fromIdx, 1);
+          dspChainOrder.splice(toIdx, 0, draggedPedalKey);
+          rewireDspChain(dspChainOrder, false);
+        }
+      }
+    });
+  });
+}
+
+// Bidirectional parameter synchronization
+function syncFromPedal(targetId, val) {
+  const consoleEl = document.getElementById(targetId);
+  if (!consoleEl) return;
+
+  if (consoleEl.type === "checkbox") {
+    consoleEl.checked = (val === true || val === "true");
+  } else {
+    consoleEl.value = val;
+  }
+  consoleEl.dispatchEvent(new Event("input", { bubbles: true }));
+  consoleEl.dispatchEvent(new Event("change", { bubbles: true }));
+  updateAudioParams();
+  syncPedalControlsFromConsole();
+}
+
+function syncPedalControlsFromConsole() {
+  // Filter controls
+  const fCut = document.getElementById("knobMasterCutoff");
+  if (fCut) {
+    const p = document.getElementById("pedal_knobMasterCutoff");
+    if (p && p.value !== fCut.value) p.value = fCut.value;
+    const lbl = document.getElementById("lblPedalCutoff");
+    const clbl = document.getElementById("lblMasterCutoff");
+    if (lbl && clbl) lbl.textContent = clbl.textContent;
+  }
+
+  const fRes = document.getElementById("knobMasterRes");
+  if (fRes) {
+    const p = document.getElementById("pedal_knobMasterRes");
+    if (p && p.value !== fRes.value) p.value = fRes.value;
+    const lbl = document.getElementById("lblPedalRes");
+    const clbl = document.getElementById("lblMasterRes");
+    if (lbl && clbl) lbl.textContent = clbl.textContent;
+  }
+
+  const fAtk = document.getElementById("knobFilterAttack");
+  const fDec = document.getElementById("knobFilterDecay");
+  if (fAtk && fDec) {
+    const pa = document.getElementById("pedal_knobFilterAttack");
+    const pd = document.getElementById("pedal_knobFilterDecay");
+    if (pa && pa.value !== fAtk.value) pa.value = fAtk.value;
+    if (pd && pd.value !== fDec.value) pd.value = fDec.value;
+    const lbl = document.getElementById("lblPedalEnvTimes");
+    if (lbl) lbl.textContent = fAtk.value + " ms / " + fDec.value + " ms";
+  }
+
+  const fEnvDep = document.getElementById("knobFilterEnvDepth");
+  if (fEnvDep) {
+    const p = document.getElementById("pedal_knobFilterEnvDepth");
+    if (p && p.value !== fEnvDep.value) p.value = fEnvDep.value;
+    const lbl = document.getElementById("lblPedalEnvDepth");
+    const clbl = document.getElementById("lblFilterEnvDepth");
+    if (lbl && clbl) lbl.textContent = clbl.textContent;
+  }
+
+  const fLfoRate = document.getElementById("knobFilterLfoRate");
+  const fLfoDepth = document.getElementById("knobFilterLfoDepth");
+  if (fLfoRate && fLfoDepth) {
+    const pr = document.getElementById("pedal_knobFilterLfoRate");
+    const pd = document.getElementById("pedal_knobFilterLfoDepth");
+    if (pr && pr.value !== fLfoRate.value) pr.value = fLfoRate.value;
+    if (pd && pd.value !== fLfoDepth.value) pd.value = fLfoDepth.value;
+    const lbl = document.getElementById("lblPedalLfoValues");
+    const clblR = document.getElementById("lblFilterLfoRate");
+    const clblD = document.getElementById("lblFilterLfoDepth");
+    if (lbl && clblR && clblD) lbl.textContent = clblR.textContent + " / " + clblD.textContent;
+  }
+
+  // Delay controls
+  const dDiv = document.getElementById("selDelayNoteDivision");
+  if (dDiv) {
+    const p = document.getElementById("pedal_selDelayNoteDivision");
+    if (p && p.value !== dDiv.value) p.value = dDiv.value;
+  }
+
+  const dSync = document.getElementById("chkDelayTempoSync");
+  if (dSync) {
+    const p = document.getElementById("pedal_chkDelayTempoSync");
+    if (p && p.checked !== dSync.checked) p.checked = dSync.checked;
+  }
+
+  const dTime = document.getElementById("knobDelayTime");
+  if (dTime) {
+    const p = document.getElementById("pedal_knobDelayTime");
+    if (p && p.value !== dTime.value) p.value = dTime.value;
+    const lbl = document.getElementById("lblPedalDelayTime");
+    const clbl = document.getElementById("lblDelayTime");
+    if (lbl && clbl) lbl.textContent = clbl.textContent;
+  }
+
+  const dFb = document.getElementById("knobDelayFeedback");
+  if (dFb) {
+    const p = document.getElementById("pedal_knobDelayFeedback");
+    if (p && p.value !== dFb.value) p.value = dFb.value;
+    const lbl = document.getElementById("lblPedalDelayFeedback");
+    const clbl = document.getElementById("lblDelayFeedback");
+    if (lbl && clbl) lbl.textContent = clbl.textContent;
+  }
+
+  const dTone = document.getElementById("knobDelayTone");
+  if (dTone) {
+    const p = document.getElementById("pedal_knobDelayTone");
+    if (p && p.value !== dTone.value) p.value = dTone.value;
+    const lbl = document.getElementById("lblPedalDelayTone");
+    const clbl = document.getElementById("lblDelayTone");
+    if (lbl && clbl) lbl.textContent = clbl.textContent;
+  }
+
+  const dFlt = document.getElementById("knobDelayFlutter");
+  const dMix = document.getElementById("knobDelayMix");
+  if (dFlt && dMix) {
+    const pf = document.getElementById("pedal_knobDelayFlutter");
+    const pm = document.getElementById("pedal_knobDelayMix");
+    if (pf && pf.value !== dFlt.value) pf.value = dFlt.value;
+    if (pm && pm.value !== dMix.value) pm.value = dMix.value;
+    const lbl = document.getElementById("lblPedalDelayFlutter");
+    if (lbl) lbl.textContent = dFlt.value + "% flt / " + dMix.value + "% mix";
+  }
+
+  // Space controls
+  const rMode = document.getElementById("selReverbMode");
+  if (rMode) {
+    const p = document.getElementById("pedal_selReverbMode");
+    if (p && p.value !== rMode.value) p.value = rMode.value;
+  }
+
+  const rMix = document.getElementById("knobReverbMix");
+  if (rMix) {
+    const p = document.getElementById("pedal_knobReverbMix");
+    if (p && p.value !== rMix.value) p.value = rMix.value;
+    const lbl = document.getElementById("lblPedalReverbMix");
+    const clbl = document.getElementById("lblReverbMix");
+    if (lbl && clbl) lbl.textContent = clbl.textContent;
+  }
+
+  const rTone = document.getElementById("knobReverbTone");
+  if (rTone) {
+    const p = document.getElementById("pedal_knobReverbTone");
+    if (p && p.value !== rTone.value) p.value = rTone.value;
+    const lbl = document.getElementById("lblPedalReverbTone");
+    const clbl = document.getElementById("lblReverbTone");
+    if (lbl && clbl) lbl.textContent = clbl.textContent;
+  }
+
+  const cMode = document.getElementById("selChorusMode");
+  if (cMode) {
+    const p = document.getElementById("pedal_selChorusMode");
+    if (p && p.value !== cMode.value) p.value = cMode.value;
+  }
+
+  const cRate = document.getElementById("knobChorusRate");
+  if (cRate) {
+    const p = document.getElementById("pedal_knobChorusRate");
+    if (p && p.value !== cRate.value) p.value = cRate.value;
+    const lbl = document.getElementById("lblPedalChorusRate");
+    const clbl = document.getElementById("lblChorusRate");
+    if (lbl && clbl) lbl.textContent = clbl.textContent;
+  }
+
+  const cDepth = document.getElementById("knobChorusDepth");
+  const cMix = document.getElementById("knobChorusMix");
+  if (cDepth && cMix) {
+    const pd = document.getElementById("pedal_knobChorusDepth");
+    const pm = document.getElementById("pedal_knobChorusMix");
+    if (pd && pd.value !== cDepth.value) pd.value = cDepth.value;
+    if (pm && pm.value !== cMix.value) pm.value = cMix.value;
+    const lbl = document.getElementById("lblPedalChorusDepthMix");
+    if (lbl) lbl.textContent = cDepth.value + "% d / " + cMix.value + "% m";
+  }
 }
 
 // Three reverb "modes" -- distinct pre-baked impulse responses rather than a
@@ -7081,6 +8171,10 @@ function updateAudioParams() {
   if (reverbSend) reverbSend.gain.setTargetAtTime(weatherVal * reverbMixVal, audioCtx.currentTime, 0.1);
   if (reverbToneFilter) reverbToneFilter.frequency.setTargetAtTime(reverbToneHz, audioCtx.currentTime, 0.08);
   if (chorusWetGain) chorusWetGain.gain.setTargetAtTime(chorusMixVal, audioCtx.currentTime, 0.08);
+
+  if (typeof syncPedalControlsFromConsole === 'function') {
+    syncPedalControlsFromConsole();
+  }
 }
 
 // Sweet-spot bounds for randomizers so automatic randomization prioritizes
@@ -8881,6 +9975,9 @@ function initOrbitalConstellation() {
     if (e.key === "Escape" && expandedOrbId) closeOrbitalModal();
   });
 
+  if (typeof initPedalDragAndDrop === 'function') initPedalDragAndDrop();
+  if (typeof updatePedalsOrderUI === 'function') updatePedalsOrderUI();
+  if (typeof syncPedalControlsFromConsole === 'function') syncPedalControlsFromConsole();
   setModuleView(activeModuleView);
   requestAnimationFrame(loopOrbitalPhysics);
 }
@@ -8980,24 +10077,45 @@ function setModuleView(mode) {
   activeModuleView = mode;
   const btnOrb = document.getElementById("btnViewOrbital");
   const btnCon = document.getElementById("btnViewConsole");
+  const btnPed = document.getElementById("btnViewPedals");
   const arena = document.getElementById("orbitalArenaWrapper");
   const lowerRack = document.querySelector(".lower-deck");
   const masterRack = document.querySelector(".master-chain-deck");
+  const pedalsRack = document.getElementById("pedalsContainer");
   const floatControls = document.getElementById("orbitalFloatControls");
 
   if (btnOrb) btnOrb.classList.toggle("active", mode === "orbital");
   if (btnCon) btnCon.classList.toggle("active", mode === "console");
+  if (btnPed) btnPed.classList.toggle("active", mode === "pedals");
 
   if (mode === "orbital") {
     if (arena) arena.style.display = "block";
     if (lowerRack) lowerRack.classList.add("view-grid-hidden");
     if (masterRack) masterRack.classList.add("view-grid-hidden");
+    if (pedalsRack) pedalsRack.classList.add("view-grid-hidden");
     if (floatControls) floatControls.style.display = "flex";
+  } else if (mode === "pedals") {
+    if (floatControls) floatControls.style.display = "none";
+    if (arena) arena.style.display = "none";
+    if (lowerRack) lowerRack.classList.remove("view-grid-hidden");
+    if (masterRack) masterRack.classList.add("view-grid-hidden");
+    if (pedalsRack) pedalsRack.classList.remove("view-grid-hidden");
+    const panel = document.getElementById("orbitalSidePanel");
+    if (panel) panel.classList.remove("active");
+    expandedOrbId = null;
+    orbitalPanelActive = false;
+    const hint = document.getElementById("orbitalHint");
+    if (hint) hint.classList.remove("hidden-by-panel");
+    restoreStripsToRack();
+    updatePedalsOrderUI();
+    syncPedalControlsFromConsole();
   } else {
+    // Console mode
     if (floatControls) floatControls.style.display = "none";
     if (arena) arena.style.display = "none";
     if (lowerRack) lowerRack.classList.remove("view-grid-hidden");
     if (masterRack) masterRack.classList.remove("view-grid-hidden");
+    if (pedalsRack) pedalsRack.classList.add("view-grid-hidden");
     const panel = document.getElementById("orbitalSidePanel");
     if (panel) panel.classList.remove("active");
     expandedOrbId = null;
