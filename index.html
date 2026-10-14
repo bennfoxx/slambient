@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Slambient — Generative Ambient Instrument</title>
+<!-- The UI leans on Mac-only system fonts (ui-monospace/SFMono-Regular/Menlo) for
+     almost every label. They look right on the machine this was built on, but a
+     friend on Windows/Linux/Android has none of them installed and falls back to
+     whatever generic "monospace"/"sans-serif" their browser ships -- visibly
+     different metrics, weight, and character. Loading the same two families as
+     real webfonts (first in each stack, system fonts still listed as fallback)
+     makes the page look identical everywhere instead of only on macOS/Safari. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #07080c;
@@ -62,7 +72,7 @@
       linear-gradient(90deg, rgba(0, 229, 255, 0.025) 1px, transparent 1px);
     background-size: 32px 32px;
     color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     min-height: calc(100vh / 0.75);
     height: auto;
     overflow-y: auto;
@@ -193,7 +203,7 @@
     font-weight: 900;
     text-transform: uppercase;
     color: #ffffff;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     text-shadow: 0 0 14px rgba(0, 229, 255, 0.5), 0 0 28px rgba(0, 229, 255, 0.25);
     line-height: 1;
   }
@@ -205,7 +215,7 @@
     font-size: 13px;
     font-weight: 800;
     color: var(--accent);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     text-shadow: 0 0 8px rgba(254, 211, 48, 0.4);
     line-height: 1;
     border: 1px solid rgba(254, 211, 48, 0.4);
@@ -227,7 +237,7 @@
     text-transform: uppercase;
     letter-spacing: 1.2px;
     color: var(--accent);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     white-space: nowrap;
     line-height: 1;
   }
@@ -268,7 +278,7 @@
     font-weight: 800;
     letter-spacing: 0.8px;
     text-transform: uppercase;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     cursor: var(--cursor-pointer) !important;
     transition: all 0.12s ease;
     display: inline-flex;
@@ -296,7 +306,7 @@
     font-weight: 700;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     cursor: pointer;
     transition: all 0.12s ease;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
@@ -350,7 +360,7 @@
     letter-spacing: 1px;
     text-transform: uppercase;
     cursor: pointer;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     box-shadow: 0 0 8px rgba(46, 213, 115, 0.25), inset 0 1px 0 rgba(255,255,255,0.08);
     transition: all 0.15s ease;
   }
@@ -395,7 +405,7 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     transition: all 0.15s ease;
   }
   .btn-record:hover { color: #fff; border-color: var(--border-bright); background: #161c2c; }
@@ -489,7 +499,7 @@
     font-size: 11px;
     font-weight: 800;
     color: var(--accent);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     min-width: 52px;
     text-align: right;
     letter-spacing: 0.5px;
@@ -500,7 +510,7 @@
     font-weight: 800;
     color: var(--accent);
     letter-spacing: 0.8px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     line-height: 1;
     white-space: nowrap;
   }
@@ -521,7 +531,7 @@
     font-size: 11px;
     font-weight: 700;
     border-radius: 3px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     outline: none;
     cursor: pointer;
     line-height: 22px;
@@ -549,7 +559,7 @@
     justify-content: center;
     border-radius: 4px;
     cursor: pointer;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     transition: all 0.12s ease;
   }
   .btn-meter-cycle:hover {
@@ -585,7 +595,7 @@
     padding-top: 6px;
     margin-top: 2px;
     border-top: 1px solid rgba(255, 255, 255, 0.04);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 10px;
     color: var(--text-tertiary);
   }
@@ -798,7 +808,7 @@
     line-height: 1;
     text-transform: uppercase;
     color: var(--text-primary);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     display: inline-flex;
     align-items: center;
     height: 22px;
@@ -813,7 +823,7 @@
     padding: 2px 7px;
     border-radius: 3px;
     border: 1px solid var(--border-light);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   }
 
   .scope-layer-toggles {
@@ -939,7 +949,7 @@
     background: #0d0f17;
     color: var(--text-tertiary);
     cursor: pointer;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     transition: all 0.12s ease;
   }
   .btn-mute:hover, .btn-solo:hover, .btn-power:hover { border-color: var(--border-bright); color: #fff; }
@@ -957,7 +967,7 @@
     background: #0d0f17;
     color: var(--text-tertiary);
     cursor: pointer;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     transition: all 0.12s ease;
   }
   .btn-power.active {
@@ -999,7 +1009,7 @@
     font-weight: 800;
     letter-spacing: 0.5px;
     color: var(--text-secondary);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     white-space: nowrap;
     flex-shrink: 0;
   }
@@ -1052,7 +1062,7 @@
     font-weight: 800;
     color: #ffffff;
     letter-spacing: 0.5px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     line-height: 1;
     text-shadow: 0 0 12px rgba(254, 211, 48, 0.6);
   }
@@ -1062,7 +1072,7 @@
     color: var(--color-chord);
     letter-spacing: 0.8px;
     text-transform: uppercase;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     line-height: 1;
     text-shadow: 0 0 10px rgba(254, 211, 48, 0.4);
   }
@@ -1096,10 +1106,10 @@
     letter-spacing: 0.6px;
     white-space: nowrap;
     flex-shrink: 0;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   }
   .telem-v {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 10px;
     color: var(--color-chord);
     font-weight: 700;
@@ -1125,7 +1135,7 @@
     font-size: 8px;
     font-weight: 800;
     letter-spacing: 0.6px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   }
   .act-bar-bg {
     width: 100%;
@@ -1199,7 +1209,7 @@
     font-weight: 800;
     border-radius: 3px;
     cursor: pointer;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   }
   .btn-oct:hover { border-color: var(--border-bright); color: #fff; }
 
@@ -1325,7 +1335,7 @@
   }
 
   .key-label {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 9.5px;
     font-weight: 700;
     color: #838a9e;
@@ -1338,7 +1348,7 @@
     justify-content: center;
   }
   .black-key-label {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 8px;
     font-weight: 700;
     color: #7a8296;
@@ -1351,7 +1361,7 @@
     justify-content: center;
   }
   .key-shortcut {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 7.5px;
     color: #4e5366;
     letter-spacing: 0.2px;
@@ -1417,7 +1427,7 @@
     background: transparent;
     color: var(--text-tertiary);
     cursor: pointer;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     transition: all 0.15s ease;
   }
   .btn-view-mode:hover { color: #ffffff; }
@@ -1455,7 +1465,7 @@
     font-size: 9.5px;
     font-weight: 800;
     letter-spacing: 0.8px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     color: var(--text-tertiary);
     text-transform: uppercase;
   }
@@ -1515,7 +1525,7 @@
     border: 1px solid var(--border-light);
     border-radius: 4px;
     color: var(--text-secondary);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.8px;
@@ -1566,7 +1576,7 @@
     font-weight: 700;
     letter-spacing: 0.8px;
     color: var(--text-tertiary);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     pointer-events: none;
     z-index: 2;
     text-transform: uppercase;
@@ -1624,7 +1634,7 @@
     letter-spacing: 1.5px;
     text-transform: uppercase;
     color: var(--modal-accent-color, #ffffff);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1652,7 +1662,7 @@
     color: var(--modal-accent-color, var(--text-secondary));
     font-size: 12px;
     cursor: pointer;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     transition: all 0.15s ease;
   }
   .orbital-modal-close:hover {
@@ -1865,7 +1875,7 @@
     letter-spacing: 0.3px;
   }
   .control-val {
-    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
     font-size: 11px;
     color: var(--accent);
     font-weight: 700;
@@ -2059,7 +2069,7 @@
     width: 100%;
     color: var(--text-primary);
     outline: none;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
   select {
     -webkit-appearance: none;
@@ -2089,7 +2099,7 @@
   select option {
     background: #090b12;
     color: #e6ebf5;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
   input[type="range"] {
@@ -2209,14 +2219,14 @@
     font-weight: 800;
     letter-spacing: 1.2px;
     color: #ffffff;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     text-transform: uppercase;
   }
 
   .pedals-deck-sub {
     font-size: 10px;
     color: var(--text-tertiary);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
   .pedals-routing-stream {
@@ -2227,7 +2237,7 @@
     border: 1px solid var(--border);
     border-radius: 4px;
     padding: 6px 12px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
   .routing-node-badge {
@@ -2284,7 +2294,7 @@
     font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.8px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     cursor: pointer;
     transition: all 0.12s ease;
   }
@@ -2427,7 +2437,7 @@
     background: #090b12;
     border: 1px solid var(--border-light);
     color: var(--text-secondary);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     white-space: nowrap;
   }
 
@@ -2512,14 +2522,14 @@
     font-size: 9.5px;
     font-weight: 700;
     color: var(--text-secondary);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     letter-spacing: 0.5px;
   }
   .pedal-controls-body .control-sublabel {
     font-size: 8.5px;
     font-weight: 700;
     color: var(--text-tertiary);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     margin-bottom: 2px;
   }
   .pedal-controls-body .control-val {
@@ -2535,7 +2545,7 @@
     border-radius: 3px;
     padding: 0 8px;
     font-size: 10px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
   .pedal-chassis.bypassed {
@@ -2549,7 +2559,7 @@
     position: relative;
     display: inline-flex;
     user-select: none;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     box-sizing: border-box;
     min-width: 0;
   }
@@ -2718,7 +2728,7 @@
     letter-spacing: 0.8px;
     color: var(--text-tertiary);
     text-transform: uppercase;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   }
   .btn-aux-toggle {
     display: inline-flex;
@@ -2733,7 +2743,7 @@
     border: 1px solid var(--border-light);
     background: #080a11;
     color: var(--text-tertiary);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     cursor: var(--cursor-pointer) !important;
     transition: all 0.12s ease;
     margin-left: 6px;
@@ -2785,7 +2795,7 @@
     border: 1px solid rgba(255, 56, 56, 0.45);
     background: rgba(255, 56, 56, 0.08);
     color: var(--color-drum);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     cursor: var(--cursor-pointer) !important;
     transition: all 0.12s ease;
   }
@@ -2812,7 +2822,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 10px;
     color: var(--text-tertiary);
     padding: 4px 6px;
@@ -2844,7 +2854,7 @@
     font-weight: 800;
     letter-spacing: 1.2px;
     color: var(--text-tertiary);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     text-transform: uppercase;
   }
   .master-vol-slider-wrap {
@@ -2894,7 +2904,7 @@
     cursor: pointer;
   }
   .master-vol-val {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 11px;
     font-weight: 800;
     color: var(--accent);
@@ -2909,7 +2919,7 @@
     color: var(--text-secondary);
     font-size: 10px;
     font-weight: 800;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     cursor: pointer;
     transition: all 0.12s ease;
   }
@@ -2964,7 +2974,7 @@
     letter-spacing: 0.6px;
     color: #2ed573;
     text-shadow: 0 0 4px rgba(46, 213, 115, 0.9), 0 0 8px rgba(46, 213, 115, 0.5);
-    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
     z-index: 4;
     pointer-events: none;
     text-transform: uppercase;
@@ -3001,7 +3011,7 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   }
   .eno-sub {
     font-size: 10.5px;
@@ -3010,7 +3020,7 @@
     display: block;
     width: 100%;
     text-align: center;
-    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
     overflow: hidden;
@@ -3042,7 +3052,7 @@
     font-weight: 800;
     color: var(--text-tertiary);
     letter-spacing: 0.8px;
-    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
     text-align: center;
     flex-shrink: 0;
   }
@@ -3064,7 +3074,7 @@
     border: 1px solid transparent;
     border-radius: 5px;
     color: var(--text-tertiary);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 1px;
@@ -3115,7 +3125,7 @@
     border: 1px solid var(--border-light);
     color: var(--text-tertiary);
     background: #090a10;
-    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
     transition: all 0.15s ease;
     white-space: nowrap;
     flex-shrink: 0;
