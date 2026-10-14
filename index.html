@@ -2259,7 +2259,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    cursor: grab !important;
+    cursor: var(--cursor-grab) !important;
     background: #0d0f17;
     border: 1px solid var(--border-light);
     border-radius: 4px;
@@ -2276,7 +2276,10 @@
     box-shadow: 0 0 8px var(--accent-dim);
   }
   .pedal-drag-handle:active {
-    cursor: grabbing !important;
+    cursor: var(--cursor-grabbing) !important;
+  }
+  .pedal-chassis.dragging {
+    cursor: var(--cursor-grabbing) !important;
   }
 
   .btn-pedal-shift {
