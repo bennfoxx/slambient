@@ -180,3 +180,46 @@ preceding existence check, and confirm the id it names is still real in the HTML
 Verified clean (zero console errors) across: page load, preset cycling (all 9), Start/Stop with
 drone gain tracking, orbital module expand/drag, DSP chain shuffle/reorder, Master EQ/drive
 controls, and 1920/1024/640px layouts.
+
+## Update — 2026-10-14/15 (Claude: pedal redesign, roadmap Phase 1/2 audit, dead code removed)
+
+A few intentional design decisions from this pass, so they don't read as regressions if you're
+diffing against the stompbox-pedal commits above:
+
+- **The pedal cards are no longer "vintage stompbox" styled.** The chassis screws, brand banner
+  (`KANKYŌ DSP` / `TIME DRIFT BBD` / `DIFFUSION LAB`), big footswitch dial, and LED pod are gone.
+  Each pedal now uses the same `panel-header` + `control-row` convention as every other module
+  panel (Sub & Drone, Drums, etc.) — title, a `panel-header-actions` row of compact 24px icon
+  buttons (shift arrows, drag handle, bypass toggle), and a border-top color accent instead of a
+  full colored border + drop shadow. This was an explicit user request for visual harmony across
+  modules, not an oversight — don't re-add the LED pod or footswitch graphic without checking first.
+- **Pedal title numbers are fixed (5/6/7), not chain-position-based.** They identify the module
+  (Filter=5, Delay=6, Reverb=7, matching "8. Master EQ & Out"), the same way the other panels are
+  numbered 1-4. The `pedal-slot-badge` (IN / INSERT / OUT) is what reflects live position.
+  (There was a brief detour where the title numbers *did* update live to 1/2/3 on reorder —
+  reverted; if you see any `pedalNum_FILTER`-shaped id in old history, it's gone now.)
+- **Reordering the pedal chain now also rewires the orbital view's connection lines.**
+  `getOrbitalConnectionChain()` (defined right after `ORBITAL_MODULES`) rebuilds the 8-orb
+  constellation chain every draw frame, with the Filter/Delay/Reverb segment (orbs 5-7) following
+  live `dspChainOrder` instead of the fixed array order. If you touch the orbital connection-drawing
+  loop, use this helper instead of iterating `ORBITAL_MODULES` directly, or the visual chain will
+  drift out of sync with the actual DSP graph again.
+- **The pedal chassis is deliberately NOT `draggable="true"`.** It was, briefly, and that hijacked
+  every click-drag on a slider anywhere on the card into a native HTML5 drag of the whole pedal —
+  sliders were completely unusable. Reordering works entirely through the pointer-capture listener
+  on `.pedal-drag-handle` (`initPedalDragAndDrop()`). Don't add `draggable="true"` back to
+  `.pedal-chassis`.
+- **Dead code removed**: `syncFromPedal()` / `syncPedalControlsFromConsole()` (never-populated
+  `pedal_*`-prefixed ids that don't exist in the HTML — pure no-ops on every call) and the
+  `pedalLed_FILTER/DELAY/SPACE` lookups in `togglePedalBypass()` (elements removed in the redesign
+  above, lookup was already silently failing). None of this did anything functional — console/pedal
+  state "sync" works because the pedal view reuses the exact same DOM elements as the console rack
+  (e.g. `#knobMasterCutoff` lives inside `#pedalCard_FILTER`), not through a copy-between-elements
+  sync function. If you ever do split them into genuinely separate elements, you'll need to build
+  real two-way sync from scratch — it doesn't currently exist despite the function names above.
+- **Audited Phase 1 & 2 of the roadmap against the actual code**: anti-click envelopes, drone
+  portamento (`setTargetAtTime`, ~0.45s constant), the 48% feedback ceiling (enforced at the HTML
+  slider `max`, the parameter-read clamp, AND the ramp-application clamp — three independent
+  layers), and `rewireDspChain()`'s real `AudioNode.disconnect()`/`.connect()` graph rewiring are
+  all genuinely implemented, not stubs. Phase 2's Console/Pedals merge (one unified view, not three
+  separate Orbital/Console/Pedals modes) is confirmed as the intended final design, not a gap.

@@ -4667,11 +4667,9 @@ function togglePedalBypass(key) {
   pedalBypassState[key] = !pedalBypassState[key];
   const isBypassed = pedalBypassState[key];
   const card = document.getElementById("pedalCard_" + key);
-  const led = document.getElementById("pedalLed_" + key);
   const btn = document.getElementById("stompBtn_" + key);
 
   if (card) card.classList.toggle("bypassed", isBypassed);
-  if (led) led.classList.toggle("active", !isBypassed);
   if (btn) btn.classList.toggle("active", !isBypassed);
 
   if (!audioCtx) return;
@@ -4787,177 +4785,6 @@ function initPedalDragAndDrop() {
 }
 
 // Bidirectional parameter synchronization
-function syncFromPedal(targetId, val) {
-  const consoleEl = document.getElementById(targetId);
-  if (!consoleEl) return;
-
-  if (consoleEl.type === "checkbox") {
-    consoleEl.checked = (val === true || val === "true");
-  } else {
-    consoleEl.value = val;
-  }
-  consoleEl.dispatchEvent(new Event("input", { bubbles: true }));
-  consoleEl.dispatchEvent(new Event("change", { bubbles: true }));
-  updateAudioParams();
-  syncPedalControlsFromConsole();
-}
-
-function syncPedalControlsFromConsole() {
-  // If console inputs and pedal inputs share IDs directly in the merged deck, keep them in sync
-  const fCut = document.getElementById("knobMasterCutoff");
-  if (fCut) {
-    const p = document.getElementById("pedal_knobMasterCutoff");
-    if (p && p.value !== fCut.value) p.value = fCut.value;
-    const lbl = document.getElementById("lblPedalCutoff") || document.getElementById("lblMasterCutoff");
-    const clbl = document.getElementById("lblMasterCutoff");
-    if (lbl && clbl) lbl.textContent = clbl.textContent;
-  }
-
-  const fRes = document.getElementById("knobMasterRes");
-  if (fRes) {
-    const p = document.getElementById("pedal_knobMasterRes");
-    if (p && p.value !== fRes.value) p.value = fRes.value;
-    const lbl = document.getElementById("lblPedalRes");
-    const clbl = document.getElementById("lblMasterRes");
-    if (lbl && clbl) lbl.textContent = clbl.textContent;
-  }
-
-  const fAtk = document.getElementById("knobFilterAttack");
-  const fDec = document.getElementById("knobFilterDecay");
-  if (fAtk && fDec) {
-    const pa = document.getElementById("pedal_knobFilterAttack");
-    const pd = document.getElementById("pedal_knobFilterDecay");
-    if (pa && pa.value !== fAtk.value) pa.value = fAtk.value;
-    if (pd && pd.value !== fDec.value) pd.value = fDec.value;
-    const lbl = document.getElementById("lblPedalEnvTimes");
-    if (lbl) lbl.textContent = fAtk.value + " ms / " + fDec.value + " ms";
-  }
-
-  const fEnvDep = document.getElementById("knobFilterEnvDepth");
-  if (fEnvDep) {
-    const p = document.getElementById("pedal_knobFilterEnvDepth");
-    if (p && p.value !== fEnvDep.value) p.value = fEnvDep.value;
-    const lbl = document.getElementById("lblPedalEnvDepth");
-    const clbl = document.getElementById("lblFilterEnvDepth");
-    if (lbl && clbl) lbl.textContent = clbl.textContent;
-  }
-
-  const fLfoRate = document.getElementById("knobFilterLfoRate");
-  const fLfoDepth = document.getElementById("knobFilterLfoDepth");
-  if (fLfoRate && fLfoDepth) {
-    const pr = document.getElementById("pedal_knobFilterLfoRate");
-    const pd = document.getElementById("pedal_knobFilterLfoDepth");
-    if (pr && pr.value !== fLfoRate.value) pr.value = fLfoRate.value;
-    if (pd && pd.value !== fLfoDepth.value) pd.value = fLfoDepth.value;
-    const lbl = document.getElementById("lblPedalLfoValues");
-    const clblR = document.getElementById("lblFilterLfoRate");
-    const clblD = document.getElementById("lblFilterLfoDepth");
-    if (lbl && clblR && clblD) lbl.textContent = clblR.textContent + " / " + clblD.textContent;
-  }
-
-  // Delay controls
-  const dDiv = document.getElementById("selDelayNoteDivision");
-  if (dDiv) {
-    const p = document.getElementById("pedal_selDelayNoteDivision");
-    if (p && p.value !== dDiv.value) p.value = dDiv.value;
-  }
-
-  const dSync = document.getElementById("chkDelayTempoSync");
-  if (dSync) {
-    const p = document.getElementById("pedal_chkDelayTempoSync");
-    if (p && p.checked !== dSync.checked) p.checked = dSync.checked;
-  }
-
-  const dTime = document.getElementById("knobDelayTime");
-  if (dTime) {
-    const p = document.getElementById("pedal_knobDelayTime");
-    if (p && p.value !== dTime.value) p.value = dTime.value;
-    const lbl = document.getElementById("lblPedalDelayTime");
-    const clbl = document.getElementById("lblDelayTime");
-    if (lbl && clbl) lbl.textContent = clbl.textContent;
-  }
-
-  const dFb = document.getElementById("knobDelayFeedback");
-  if (dFb) {
-    const p = document.getElementById("pedal_knobDelayFeedback");
-    if (p && p.value !== dFb.value) p.value = dFb.value;
-    const lbl = document.getElementById("lblPedalDelayFeedback");
-    const clbl = document.getElementById("lblDelayFeedback");
-    if (lbl && clbl) lbl.textContent = clbl.textContent;
-  }
-
-  const dTone = document.getElementById("knobDelayTone");
-  if (dTone) {
-    const p = document.getElementById("pedal_knobDelayTone");
-    if (p && p.value !== dTone.value) p.value = dTone.value;
-    const lbl = document.getElementById("lblPedalDelayTone");
-    const clbl = document.getElementById("lblDelayTone");
-    if (lbl && clbl) lbl.textContent = clbl.textContent;
-  }
-
-  const dFlt = document.getElementById("knobDelayFlutter");
-  const dMix = document.getElementById("knobDelayMix");
-  if (dFlt && dMix) {
-    const pf = document.getElementById("pedal_knobDelayFlutter");
-    const pm = document.getElementById("pedal_knobDelayMix");
-    if (pf && pf.value !== dFlt.value) pf.value = dFlt.value;
-    if (pm && pm.value !== dMix.value) pm.value = dMix.value;
-    const lbl = document.getElementById("lblPedalDelayFlutter");
-    if (lbl) lbl.textContent = dFlt.value + "% flt / " + dMix.value + "% mix";
-  }
-
-  // Space controls
-  const rMode = document.getElementById("selReverbMode");
-  if (rMode) {
-    const p = document.getElementById("pedal_selReverbMode");
-    if (p && p.value !== rMode.value) p.value = rMode.value;
-  }
-
-  const rMix = document.getElementById("knobReverbMix");
-  if (rMix) {
-    const p = document.getElementById("pedal_knobReverbMix");
-    if (p && p.value !== rMix.value) p.value = rMix.value;
-    const lbl = document.getElementById("lblPedalReverbMix");
-    const clbl = document.getElementById("lblReverbMix");
-    if (lbl && clbl) lbl.textContent = clbl.textContent;
-  }
-
-  const rTone = document.getElementById("knobReverbTone");
-  if (rTone) {
-    const p = document.getElementById("pedal_knobReverbTone");
-    if (p && p.value !== rTone.value) p.value = rTone.value;
-    const lbl = document.getElementById("lblPedalReverbTone");
-    const clbl = document.getElementById("lblReverbTone");
-    if (lbl && clbl) lbl.textContent = clbl.textContent;
-  }
-
-  const cMode = document.getElementById("selChorusMode");
-  if (cMode) {
-    const p = document.getElementById("pedal_selChorusMode");
-    if (p && p.value !== cMode.value) p.value = cMode.value;
-  }
-
-  const cRate = document.getElementById("knobChorusRate");
-  if (cRate) {
-    const p = document.getElementById("pedal_knobChorusRate");
-    if (p && p.value !== cRate.value) p.value = cRate.value;
-    const lbl = document.getElementById("lblPedalChorusRate");
-    const clbl = document.getElementById("lblChorusRate");
-    if (lbl && clbl) lbl.textContent = clbl.textContent;
-  }
-
-  const cDepth = document.getElementById("knobChorusDepth");
-  const cMix = document.getElementById("knobChorusMix");
-  if (cDepth && cMix) {
-    const pd = document.getElementById("pedal_knobChorusDepth");
-    const pm = document.getElementById("pedal_knobChorusMix");
-    if (pd && pd.value !== cDepth.value) pd.value = cDepth.value;
-    if (pm && pm.value !== cMix.value) pm.value = cMix.value;
-    const lbl = document.getElementById("lblPedalChorusDepthMix");
-    if (lbl) lbl.textContent = cDepth.value + "% d / " + cMix.value + "% m";
-  }
-}
-
 // Three reverb "modes" -- distinct pre-baked impulse responses rather than a
 // knob that regenerates the IR on every drag (expensive / clicky). Switching
 // modes just swaps the convolver's buffer, which is instant.
@@ -7988,10 +7815,6 @@ function updateAudioParams() {
       masterDriveNode.curve = c;
     }
   }
-
-  if (typeof syncPedalControlsFromConsole === 'function') {
-    syncPedalControlsFromConsole();
-  }
 }
 
 // Sweet-spot bounds for randomizers so automatic randomization prioritizes
@@ -9903,7 +9726,6 @@ function initOrbitalConstellation() {
 
   if (typeof initPedalDragAndDrop === 'function') initPedalDragAndDrop();
   if (typeof updatePedalsOrderUI === 'function') updatePedalsOrderUI();
-  if (typeof syncPedalControlsFromConsole === 'function') syncPedalControlsFromConsole();
   setModuleView(activeModuleView);
   requestAnimationFrame(loopOrbitalPhysics);
 }
@@ -10033,7 +9855,6 @@ function setModuleView(mode) {
     if (hint) hint.classList.remove("hidden-by-panel");
     restoreStripsToRack();
     updatePedalsOrderUI();
-    syncPedalControlsFromConsole();
   }
 }
 
