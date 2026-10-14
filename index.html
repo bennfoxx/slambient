@@ -3328,7 +3328,7 @@
 
     <div class="master-deck-unified" id="masterDeckUnified">
       <!-- 1. FILTER PEDAL -->
-      <div class="pedal-chassis pedal-filter" id="pedalCard_FILTER" draggable="true" data-module="FILTER">
+      <div class="pedal-chassis pedal-filter" id="pedalCard_FILTER" data-module="FILTER">
         <div class="panel-header">
           <span><span class="pedal-order-num" id="pedalNum_FILTER">1</span>. Filter &amp; Env</span>
           <div class="panel-header-actions">
@@ -3383,7 +3383,7 @@
       </div>
 
       <!-- 2. DELAY PEDAL -->
-      <div class="pedal-chassis pedal-delay" id="pedalCard_DELAY" draggable="true" data-module="DELAY">
+      <div class="pedal-chassis pedal-delay" id="pedalCard_DELAY" data-module="DELAY">
         <div class="panel-header">
           <span><span class="pedal-order-num" id="pedalNum_DELAY">2</span>. Analog Delay</span>
           <div class="panel-header-actions">
@@ -3445,7 +3445,7 @@
       </div>
 
       <!-- 3. REVERB & CHORUS PEDAL (Pink) -->
-      <div class="pedal-chassis pedal-space pedal-reverb" id="pedalCard_SPACE" draggable="true" data-module="SPACE">
+      <div class="pedal-chassis pedal-space pedal-reverb" id="pedalCard_SPACE" data-module="SPACE">
         <div class="panel-header">
           <span><span class="pedal-order-num" id="pedalNum_SPACE">3</span>. Reverb &amp; Chorus</span>
           <div class="panel-header-actions">
@@ -4724,40 +4724,10 @@ function initPedalDragAndDrop() {
   const cards = document.querySelectorAll(".pedal-chassis");
   const handles = document.querySelectorAll(".pedal-drag-handle");
 
-  // Allow dragging via dedicated handle or entire chassis
-  cards.forEach(card => {
-    card.addEventListener("dragstart", (e) => {
-      draggedPedalKey = card.getAttribute("data-module");
-      card.classList.add("dragging");
-      if (e.dataTransfer) {
-        e.dataTransfer.effectAllowed = "move";
-        e.dataTransfer.setData("text/plain", draggedPedalKey);
-      }
-    });
-
-    card.addEventListener("dragend", () => {
-      card.classList.remove("dragging");
-      cards.forEach(c => c.classList.remove("drag-over"));
-      draggedPedalKey = null;
-    });
-
-    card.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
-      card.classList.add("drag-over");
-    });
-
-    card.addEventListener("dragleave", () => {
-      card.classList.remove("drag-over");
-    });
-
-    card.addEventListener("drop", (e) => {
-      e.preventDefault();
-      card.classList.remove("drag-over");
-      const targetKey = card.getAttribute("data-module");
-      reorderDspChainModules(draggedPedalKey, targetKey);
-    });
-  });
+  // Reordering only happens via the dedicated drag handle (pointer events
+  // below) -- the chassis itself is deliberately NOT draggable="true" so
+  // that clicking/dragging a slider or other control anywhere on the pedal
+  // doesn't get hijacked into a native HTML5 drag of the whole card.
 
   // Pointer-event drag-and-drop on drag handles (reliable in all desktop/tablet viewports)
   handles.forEach(handle => {
@@ -8865,18 +8835,25 @@ function applyPreset(idx) {
     document.getElementById("knobDrumVol").value = 0;
 
     document.getElementById("knobStrum").value = 85;
-    document.getElementById("selChordTimbre").value = "ACOUSTIC_PIANO";
+    // ACOUSTIC_PIANO isn't a real option (silently no-ops, leaving the
+    // default WARM_PAD) -- PURE_SINE_GLASS is the closest match to Eno's
+    // treated, glassy tape-piano on Music for Airports.
+    document.getElementById("selChordTimbre").value = "PURE_SINE_GLASS";
     document.getElementById("knobChordFx").value = 88;
 
-    document.getElementById("selDroneOctave").value = "C2";
+    // "C2" isn't a real selDroneOctave option (only D0/D1/D2 exist).
+    document.getElementById("selDroneOctave").value = "D2";
     document.getElementById("knobDrone").value = 55;
     document.getElementById("knobDroneFilter").value = 240;
     document.getElementById("knobDroneDetune").value = 3;
     document.getElementById("knobDroneWander").value = 20;
     document.getElementById("knobDroneFx").value = 40;
 
-    document.getElementById("selArpPattern").value = "WANDER";
-    document.getElementById("selArpTimbre").value = "GLASS_BELL";
+    // WANDER / GLASS_BELL aren't real options either -- PENDULUM (slow
+    // up/down) with a high rest% approximates the random drifting piano
+    // notes, and SINE_CRYSTAL is the closest glassy-bell timbre available.
+    document.getElementById("selArpPattern").value = "PENDULUM";
+    document.getElementById("selArpTimbre").value = "SINE_CRYSTAL";
     document.getElementById("knobArpGate").value = 260;
     document.getElementById("knobArpRest").value = 50;
     document.getElementById("knobArpOctaves").value = 2;
@@ -8898,10 +8875,13 @@ function applyPreset(idx) {
     document.getElementById("knobDelayFlutter").value = 40;
     document.getElementById("knobDelayMix").value = 45;
 
-    document.getElementById("selReverbMode").value = "SHIMMER";
+    // SHIMMER / DIMENSION aren't real selReverbMode / selChorusMode
+    // options -- CATHEDRAL gives the same vast, washed-out space, and
+    // ENSEMBLE the same lush, wide chorus.
+    document.getElementById("selReverbMode").value = "CATHEDRAL";
     document.getElementById("knobReverbMix").value = 50;
     document.getElementById("knobReverbTone").value = 5000;
-    document.getElementById("selChorusMode").value = "DIMENSION";
+    document.getElementById("selChorusMode").value = "ENSEMBLE";
     document.getElementById("knobChorusRate").value = 0.12;
     document.getElementById("knobChorusDepth").value = 40;
     document.getElementById("knobChorusMix").value = 28;
