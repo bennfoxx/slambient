@@ -2085,9 +2085,9 @@
     color: var(--color-delay);
   }
   .routing-pill.pill-mod3 {
-    background: rgba(75, 123, 236, 0.15);
-    border: 1px solid rgba(75, 123, 236, 0.5);
-    color: var(--color-space);
+    background: rgba(255, 95, 196, 0.15);
+    border: 1px solid rgba(255, 95, 196, 0.5);
+    color: var(--color-reverb);
   }
 
   .pedals-header-actions {
@@ -2184,13 +2184,15 @@
     box-shadow: 0 12px 34px rgba(0, 0, 0, 0.8), 0 0 16px rgba(255, 121, 63, 0.25);
   }
 
-  .pedal-chassis.pedal-space {
-    border-color: rgba(75, 123, 236, 0.4);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), inset 0 2px 0 rgba(75, 123, 236, 0.4);
+  .pedal-chassis.pedal-space,
+  .pedal-chassis.pedal-reverb {
+    border-color: rgba(255, 95, 196, 0.4);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), inset 0 2px 0 rgba(255, 95, 196, 0.4);
   }
-  .pedal-chassis.pedal-space:hover {
-    border-color: rgba(75, 123, 236, 0.75);
-    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.8), 0 0 16px rgba(75, 123, 236, 0.25);
+  .pedal-chassis.pedal-space:hover,
+  .pedal-chassis.pedal-reverb:hover {
+    border-color: rgba(255, 95, 196, 0.75);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.8), 0 0 16px rgba(255, 95, 196, 0.25);
   }
 
   /* Chassis Screws */
@@ -2345,7 +2347,7 @@
   }
   .pedal-filter .pedal-model { color: var(--color-filter); text-shadow: 0 0 10px rgba(46, 213, 115, 0.3); }
   .pedal-delay .pedal-model { color: var(--color-delay); text-shadow: 0 0 10px rgba(255, 121, 63, 0.3); }
-  .pedal-space .pedal-model { color: var(--color-space); text-shadow: 0 0 10px rgba(75, 123, 236, 0.3); }
+  .pedal-space .pedal-model, .pedal-reverb .pedal-model { color: var(--color-reverb); text-shadow: 0 0 10px rgba(255, 95, 196, 0.3); }
 
   /* Controls Body */
   .pedal-controls-body {
@@ -3437,172 +3439,11 @@
     </div>
   </div>
 
-  <div class="master-chain-deck view-grid-hidden" style="margin-top: 14px;">
-    <div class="strip-channel filter-ch">
-      <div class="panel-header">
-        <span>5. Filter & Env</span>
-        <button class="badge-tag" style="color: var(--color-filter); border-color: rgba(46,213,115,0.3);" onclick="randomizeFilter()" title="Randomize this module">⟲</button>
-      </div>
-      <div class="control-row">
-        <div class="control-label"><span>Cutoff Frequency</span><span class="control-val filter-val" id="lblMasterCutoff">2400 Hz</span></div>
-        <input type="range" id="knobMasterCutoff" min="0" max="100" step="0.1" value="64.4" title="Log-scaled" oninput="updateAudioParams()">
-      </div>
-      <div class="control-row">
-        <div class="control-label"><span>Resonance (Q)</span><span class="control-val filter-val" id="lblMasterRes">2.8</span></div>
-        <input type="range" id="knobMasterRes" min="0.5" max="12.0" step="0.1" value="2.8" oninput="updateAudioParams()">
-      </div>
-      <div class="control-row">
-        <div class="control-label"><span>Envelope Attack / Decay</span><span class="control-val filter-val" id="lblFilterEnvTimes">45 ms / 650 ms</span></div>
-        <div style="display: flex; gap: 8px;">
-          <div style="flex: 1;">
-            <div class="control-sublabel">Attack</div>
-            <input type="range" id="knobFilterAttack" min="5" max="1200" value="45" title="Attack" oninput="updateAudioParams()">
-          </div>
-          <div style="flex: 1;">
-            <div class="control-sublabel">Decay</div>
-            <input type="range" id="knobFilterDecay" min="50" max="3200" value="650" title="Decay" oninput="updateAudioParams()">
-          </div>
-        </div>
-      </div>
-      <div class="control-row">
-        <div class="control-label"><span>Filter Env Depth</span><span class="control-val filter-val" id="lblFilterEnvDepth">60%</span></div>
-        <input type="range" id="knobFilterEnvDepth" min="0" max="100" value="60" oninput="updateAudioParams()">
-      </div>
-      <div class="control-row">
-        <div class="control-label"><span>LFO Rate</span><span class="control-val filter-val" id="lblFilterLfoRate">0.08 Hz</span></div>
-        <input type="range" id="knobFilterLfoRate" min="0.02" max="2" step="0.01" value="0.08" oninput="updateAudioParams()">
-      </div>
-      <div class="control-row">
-        <div class="control-label"><span>LFO Depth</span><span class="control-val filter-val" id="lblFilterLfoDepth">25%</span></div>
-        <input type="range" id="knobFilterLfoDepth" min="0" max="100" value="25" oninput="updateAudioParams()">
-      </div>
-    </div>
-
-    <div class="strip-channel delay-ch">
-      <div class="panel-header">
-        <span>6. Analog Delay</span>
-        <button class="badge-tag" style="color: var(--color-delay); border-color: rgba(225,112,85,0.3);" onclick="randomizeDelay()" title="Randomize this module">⟲</button>
-      </div>
-      <div class="control-row">
-        <div class="control-label"><span>Delay Time</span><span class="control-val delay-val" id="lblDelayTime">360 ms</span></div>
-        <input type="range" id="knobDelayTime" min="60" max="1100" value="360" oninput="updateAudioParams()">
-      </div>
-      <div class="control-row">
-        <div class="control-label">
-          <span>Tempo Sync</span>
-          <label class="toggle-switch" title="Lock delay time to the song's tempo (like a DL4 MkII's MIDI-clock-synced delay) instead of a raw millisecond value -- echoes stay rhythmically in time and follow tempo changes automatically.">
-            <input type="checkbox" id="chkDelayTempoSync" onchange="updateAudioParams()">
-            <span class="toggle-track"></span>
-          </label>
-        </div>
-        <select id="selDelayNoteDivision" onchange="updateAudioParams()">
-          <option value="0.25">1/16</option>
-          <option value="0.3333333333">1/8 Triplet</option>
-          <option value="0.5" selected>1/8</option>
-          <option value="0.75">1/8 Dotted</option>
-          <option value="0.6666666667">1/4 Triplet</option>
-          <option value="1">1/4</option>
-          <option value="1.5">1/4 Dotted</option>
-          <option value="2">1/2</option>
-          <option value="4">1/1 (Whole)</option>
-        </select>
-      </div>
-      <div class="control-row">
-        <div class="control-label"><span>Feedback (Repeats)</span><span class="control-val delay-val" id="lblDelayFeedback">35%</span></div>
-        <input type="range" id="knobDelayFeedback" min="0" max="48" value="35" oninput="updateAudioParams()">
-      </div>
-      <div class="control-row">
-        <div class="control-label"><span>BBD Dark Damping (Tone)</span><span class="control-val delay-val" id="lblDelayTone">1900 Hz</span></div>
-        <input type="range" id="knobDelayTone" min="400" max="4800" value="1900" oninput="updateAudioParams()">
-      </div>
-      <div class="control-row">
-        <div class="control-label"><span>Wow/Flutter & Wet Mix</span><span class="control-val delay-val" id="lblDelayMix">35% flt / 42% mix</span></div>
-        <div style="display: flex; gap: 8px;">
-          <div style="flex: 1;">
-            <div class="control-sublabel">Flutter</div>
-            <input type="range" id="knobDelayFlutter" min="0" max="100" value="35" oninput="updateAudioParams()">
-          </div>
-          <div style="flex: 1;">
-            <div class="control-sublabel">Wet Mix</div>
-            <input type="range" id="knobDelayMix" min="0" max="100" value="42" oninput="updateAudioParams()">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="strip-channel reverb-ch">
-      <div class="panel-header">
-        <span>7. Reverb & Chorus</span>
-        <button class="badge-tag" style="color: var(--color-reverb); border-color: rgba(255,95,196,0.3);" onclick="randomizeReverbChorus()" title="Randomize this module">⟲</button>
-      </div>
-      <div class="control-row">
-        <div class="control-label">Reverb Mode</div>
-        <select id="selReverbMode" onchange="updateAudioParams()">
-          <option value="PLATE">Plate (Bright & Tight)</option>
-          <option value="HALL" selected>Hall (Warm & Wide)</option>
-          <option value="CATHEDRAL">Cathedral (Infinite Space)</option>
-        </select>
-      </div>
-      <div class="control-row">
-        <div class="control-label"><span>Reverb Mix</span><span class="control-val reverb-val" id="lblReverbMix">35%</span></div>
-        <input type="range" id="knobReverbMix" min="0" max="100" value="35" oninput="updateAudioParams()">
-      </div>
-      <div class="control-row">
-        <div class="control-label"><span>Reverb Tone (Damping)</span><span class="control-val reverb-val" id="lblReverbTone">5200 Hz</span></div>
-        <input type="range" id="knobReverbTone" min="600" max="12000" value="5200" oninput="updateAudioParams()">
-      </div>
-      <div class="control-row">
-        <div class="control-label">Chorus Mode</div>
-        <select id="selChorusMode" onchange="updateAudioParams()">
-          <option value="CLASSIC" selected>Classic (2-Voice)</option>
-          <option value="ENSEMBLE">Ensemble (3-Voice Lush)</option>
-          <option value="VIBRATO">Vibrato (Pure Wobble)</option>
-        </select>
-      </div>
-      <div class="control-row">
-        <div class="control-label"><span>Chorus Rate</span><span class="control-val reverb-val" id="lblChorusRate">0.45 Hz</span></div>
-        <input type="range" id="knobChorusRate" min="0.05" max="3" step="0.01" value="0.45" oninput="updateAudioParams()">
-      </div>
-      <div class="control-row">
-        <div class="control-label"><span>Chorus Depth / Mix</span><span class="control-val reverb-val" id="lblChorusDepth">40% / 30%</span></div>
-        <div style="display: flex; gap: 8px;">
-          <div style="flex: 1;">
-            <div class="control-sublabel">Depth</div>
-            <input type="range" id="knobChorusDepth" min="0" max="100" value="40" oninput="updateAudioParams()">
-          </div>
-          <div style="flex: 1;">
-            <div class="control-sublabel">Mix</div>
-            <input type="range" id="knobChorusMix" min="0" max="100" value="30" oninput="updateAudioParams()">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="strip-channel space-ch">
-      <div class="panel-header">
-        <span>8. Space & Out</span>
-        <button class="badge-tag" style="color: var(--color-space); border-color: rgba(75,123,236,0.3);" onclick="randomizeSpace()" title="Randomize this module">⟲</button>
-      </div>
-      <div class="control-row">
-        <div class="control-label">Hardware MIDI Output</div>
-        <select id="selMidiOut"><option value="">No Hardware Device Connected</option></select>
-      </div>
-      <div class="control-row">
-        <div class="control-label"><span>Master Tempo (BPM)</span><span class="control-val space-val" id="lblBpm">72 BPM</span></div>
-        <input type="range" id="knobBpm" min="45" max="115" value="72" oninput="updateBpm(this)">
-      </div>
-      <div class="control-row">
-        <div class="control-label"><span>Diffusion Reverb Space</span><span class="control-val space-val" id="lblWeather">45%</span></div>
-        <input type="range" id="knobWeather" min="0" max="100" value="45" oninput="updateAudioParams()">
-      </div>
-    </div>
-  </div>
-
-  <!-- PEDALS VIEW: Dedicated 3-Stompbox Insert Pedalboard & Routing Matrix -->
+    <!-- UNIFIED MASTER DECK: 3 Insert Pedals + Master EQ & Out Strip -->
   <div class="pedals-deck view-grid-hidden" id="pedalsContainer" style="margin-top: 14px;">
     <div class="pedals-routing-header">
       <div class="pedals-header-left">
-        <span class="pedals-deck-title">DSP INSERT PEDALBOARD // LIVE REWIRING MATRIX</span>
+        <span class="pedals-deck-title">DSP INSERT CHAIN // LIVE REWIRING MATRIX</span>
         <span class="pedals-deck-sub">Drag &amp; drop pedals or click shift arrows to dynamically rewire Web Audio API graph in real-time</span>
       </div>
       <div class="pedals-routing-stream" id="pedalsRoutingStream">
@@ -3612,17 +3453,17 @@
         <span class="routing-arrow">➔</span>
         <span class="routing-pill pill-mod2" id="routeBadge2">2: DELAY</span>
         <span class="routing-arrow">➔</span>
-        <span class="routing-pill pill-mod3" id="routeBadge3">3: SPACE</span>
+        <span class="routing-pill pill-mod3" id="routeBadge3">3: REVERB</span>
         <span class="routing-arrow">➔</span>
-        <span class="routing-node-badge">BUS POST</span>
+        <span class="routing-node-badge" style="color: var(--color-space); border-color: rgba(75, 123, 236, 0.4);">MASTER EQ &amp; OUT</span>
       </div>
       <div class="pedals-header-actions">
         <button class="btn-pedal-action" onclick="randomizeDspChain()" title="Randomly shuffle pedal insert order">⟲ SHUFFLE</button>
-        <button class="btn-pedal-action" onclick="resetDspChain()" title="Reset order to Filter ➔ Delay ➔ Space">RESET (F-D-S)</button>
+        <button class="btn-pedal-action" onclick="resetDspChain()" title="Reset order to Filter ➔ Delay ➔ Reverb">RESET (F-D-R)</button>
       </div>
     </div>
 
-    <div class="pedals-grid" id="pedalsGrid">
+    <div class="master-deck-unified" id="masterDeckUnified">
       <!-- 1. FILTER PEDAL -->
       <div class="pedal-chassis pedal-filter" id="pedalCard_FILTER" draggable="true" data-module="FILTER">
         <div class="chassis-screw screw-tl"></div>
@@ -3650,40 +3491,40 @@
 
         <div class="pedal-controls-body">
           <div class="control-row">
-            <div class="control-label"><span>Cutoff Frequency</span><span class="control-val filter-val" id="lblPedalCutoff">2400 Hz</span></div>
-            <input type="range" id="pedal_knobMasterCutoff" min="0" max="100" step="0.1" value="64.4" oninput="syncFromPedal('knobMasterCutoff', this.value)">
+            <div class="control-label"><span>Cutoff Frequency</span><span class="control-val filter-val" id="lblMasterCutoff">2400 Hz</span></div>
+            <input type="range" id="knobMasterCutoff" min="0" max="100" step="0.1" value="64.4" oninput="updateAudioParams()">
           </div>
           <div class="control-row">
-            <div class="control-label"><span>Resonance (Q)</span><span class="control-val filter-val" id="lblPedalRes">1.8</span></div>
-            <input type="range" id="pedal_knobMasterRes" min="0.5" max="9.0" step="0.1" value="1.8" oninput="syncFromPedal('knobMasterRes', this.value)">
+            <div class="control-label"><span>Resonance (Q)</span><span class="control-val filter-val" id="lblMasterRes">2.8</span></div>
+            <input type="range" id="knobMasterRes" min="0.5" max="12.0" step="0.1" value="2.8" oninput="updateAudioParams()">
           </div>
           <div class="control-row">
-            <div class="control-label"><span>Attack / Decay</span><span class="control-val filter-val" id="lblPedalEnvTimes">80 ms / 700 ms</span></div>
+            <div class="control-label"><span>Attack / Decay</span><span class="control-val filter-val" id="lblFilterEnvTimes">45 ms / 650 ms</span></div>
             <div style="display: flex; gap: 8px;">
               <div style="flex: 1;">
                 <div class="control-sublabel">Attack</div>
-                <input type="range" id="pedal_knobFilterAttack" min="5" max="300" value="80" oninput="syncFromPedal('knobFilterAttack', this.value)">
+                <input type="range" id="knobFilterAttack" min="5" max="1200" value="45" oninput="updateAudioParams()">
               </div>
               <div style="flex: 1;">
                 <div class="control-sublabel">Decay</div>
-                <input type="range" id="pedal_knobFilterDecay" min="50" max="2000" value="700" oninput="syncFromPedal('knobFilterDecay', this.value)">
+                <input type="range" id="knobFilterDecay" min="50" max="3200" value="650" oninput="updateAudioParams()">
               </div>
             </div>
           </div>
           <div class="control-row">
-            <div class="control-label"><span>Envelope Depth</span><span class="control-val filter-val" id="lblPedalEnvDepth">35%</span></div>
-            <input type="range" id="pedal_knobFilterEnvDepth" min="-100" max="100" value="35" oninput="syncFromPedal('knobFilterEnvDepth', this.value)">
+            <div class="control-label"><span>Envelope Depth</span><span class="control-val filter-val" id="lblFilterEnvDepth">60%</span></div>
+            <input type="range" id="knobFilterEnvDepth" min="0" max="100" value="60" oninput="updateAudioParams()">
           </div>
           <div class="control-row">
-            <div class="control-label"><span>LFO Rate / Depth</span><span class="control-val filter-val" id="lblPedalLfoRate">0.12 Hz / 20%</span></div>
+            <div class="control-label"><span>LFO Rate / Depth</span><span class="control-val filter-val" id="lblFilterLfoValues">0.08 Hz / 25%</span></div>
             <div style="display: flex; gap: 8px;">
               <div style="flex: 1;">
                 <div class="control-sublabel">Rate</div>
-                <input type="range" id="pedal_knobFilterLfoRate" min="0.01" max="2" step="0.01" value="0.12" oninput="syncFromPedal('knobFilterLfoRate', this.value)">
+                <input type="range" id="knobFilterLfoRate" min="0.02" max="2" step="0.01" value="0.08" oninput="updateAudioParams()">
               </div>
               <div style="flex: 1;">
                 <div class="control-sublabel">Depth</div>
-                <input type="range" id="pedal_knobFilterLfoDepth" min="0" max="100" value="20" oninput="syncFromPedal('knobFilterLfoDepth', this.value)">
+                <input type="range" id="knobFilterLfoDepth" min="0" max="100" value="25" oninput="updateAudioParams()">
               </div>
             </div>
           </div>
@@ -3730,45 +3571,45 @@
           <div class="control-row">
             <div class="control-label">
               <span>Delay Time</span>
-              <span class="control-val delay-val" id="lblPedalDelayTime">375 ms</span>
+              <span class="control-val delay-val" id="lblDelayTime">360 ms</span>
             </div>
             <div class="select-with-toggle" style="margin-bottom: 6px;">
-              <select id="pedal_selDelayNoteDivision" onchange="syncFromPedal('selDelayNoteDivision', this.value)">
+              <select id="selDelayNoteDivision" onchange="updateAudioParams()">
                 <option value="0.25">1/16 Note</option>
-                <option value="0.375">1/16 Dotted</option>
-                <option value="0.5">1/8 Note</option>
-                <option value="0.75" selected>1/8 Dotted (Dub Skip)</option>
+                <option value="0.3333333333">1/8 Triplet</option>
+                <option value="0.5" selected>1/8 Note</option>
+                <option value="0.75">1/8 Dotted (Dub Skip)</option>
+                <option value="0.6666666667">1/4 Triplet</option>
                 <option value="1">1/4 (Quarter Beat)</option>
                 <option value="1.5">1/4 Dotted</option>
                 <option value="2">1/2 (Half Measure)</option>
-                <option value="3">3/4 Measure</option>
                 <option value="4">1/1 (Whole Measure)</option>
               </select>
               <label class="toggle-switch" title="Lock delay time to master tempo grid">
-                <input type="checkbox" id="pedal_chkDelayTempoSync" onchange="syncFromPedal('chkDelayTempoSync', this.checked)">
+                <input type="checkbox" id="chkDelayTempoSync" onchange="updateAudioParams()">
                 <span class="toggle-track"></span>
               </label>
             </div>
-            <input type="range" id="pedal_knobDelayTime" min="40" max="1400" value="375" oninput="syncFromPedal('knobDelayTime', this.value)">
+            <input type="range" id="knobDelayTime" min="60" max="1100" value="360" oninput="updateAudioParams()">
           </div>
           <div class="control-row">
-            <div class="control-label"><span>Feedback (Max 48% Safe)</span><span class="control-val delay-val" id="lblPedalDelayFeedback">35%</span></div>
-            <input type="range" id="pedal_knobDelayFeedback" min="0" max="48" value="35" oninput="syncFromPedal('knobDelayFeedback', this.value)">
+            <div class="control-label"><span>Feedback (Repeats / 48% Safe)</span><span class="control-val delay-val" id="lblDelayFeedback">35%</span></div>
+            <input type="range" id="knobDelayFeedback" min="0" max="48" value="35" oninput="updateAudioParams()">
           </div>
           <div class="control-row">
-            <div class="control-label"><span>BBD Dark Damping (Tone)</span><span class="control-val delay-val" id="lblPedalDelayTone">1900 Hz</span></div>
-            <input type="range" id="pedal_knobDelayTone" min="400" max="4800" value="1900" oninput="syncFromPedal('knobDelayTone', this.value)">
+            <div class="control-label"><span>BBD Dark Damping (Tone)</span><span class="control-val delay-val" id="lblDelayTone">1900 Hz</span></div>
+            <input type="range" id="knobDelayTone" min="400" max="4800" value="1900" oninput="updateAudioParams()">
           </div>
           <div class="control-row">
-            <div class="control-label"><span>Tape Flutter / Wet Mix</span><span class="control-val delay-val" id="lblPedalDelayFlutter">18% flt / 35% mix</span></div>
+            <div class="control-label"><span>Tape Flutter / Wet Mix</span><span class="control-val delay-val" id="lblDelayMix">35% flt / 42% mix</span></div>
             <div style="display: flex; gap: 8px;">
               <div style="flex: 1;">
                 <div class="control-sublabel">Flutter</div>
-                <input type="range" id="pedal_knobDelayFlutter" min="0" max="100" value="18" oninput="syncFromPedal('knobDelayFlutter', this.value)">
+                <input type="range" id="knobDelayFlutter" min="0" max="100" value="35" oninput="updateAudioParams()">
               </div>
               <div style="flex: 1;">
                 <div class="control-sublabel">Mix</div>
-                <input type="range" id="pedal_knobDelayMix" min="0" max="100" value="35" oninput="syncFromPedal('knobDelayMix', this.value)">
+                <input type="range" id="knobDelayMix" min="0" max="100" value="42" oninput="updateAudioParams()">
               </div>
             </div>
           </div>
@@ -3786,8 +3627,8 @@
         </div>
       </div>
 
-      <!-- 3. SPACE PEDAL -->
-      <div class="pedal-chassis pedal-space" id="pedalCard_SPACE" draggable="true" data-module="SPACE">
+      <!-- 3. REVERB & CHORUS PEDAL (Pink) -->
+      <div class="pedal-chassis pedal-space pedal-reverb" id="pedalCard_SPACE" draggable="true" data-module="SPACE">
         <div class="chassis-screw screw-tl"></div>
         <div class="chassis-screw screw-tr"></div>
         <div class="chassis-screw screw-bl"></div>
@@ -3807,54 +3648,54 @@
         </div>
 
         <div class="pedal-brand-banner">
-          <span class="pedal-mfr">COSMIC SPACE</span>
-          <span class="pedal-model">DIFFUSION REVERB &amp; JUNO CHORUS</span>
+          <span class="pedal-mfr" style="color: rgba(255, 95, 196, 0.75);">DIFFUSION LAB</span>
+          <span class="pedal-model">REVERB &amp; JUNO CHORUS</span>
         </div>
 
         <div class="pedal-controls-body">
           <div class="control-row">
             <div class="control-label">Reverb Architecture</div>
-            <select id="pedal_selReverbMode" onchange="syncFromPedal('selReverbMode', this.value)">
-              <option value="PLATE">Plate (Dense / Shimmer)</option>
-              <option value="HALL" selected>Hall (Warm Ambient Space)</option>
+            <select id="selReverbMode" onchange="updateAudioParams()">
+              <option value="PLATE">Plate (Dense &amp; Shimmer)</option>
+              <option value="HALL" selected>Hall (Warm &amp; Wide Space)</option>
               <option value="CATHEDRAL">Cathedral (Infinite Cavern)</option>
             </select>
           </div>
           <div class="control-row">
-            <div class="control-label"><span>Reverb Mix / Tone</span><span class="control-val reverb-val" id="lblPedalReverbMix">45% / 4200 Hz</span></div>
+            <div class="control-label"><span>Reverb Mix / Tone</span><span class="control-val reverb-val" id="lblReverbMix">35% / 5200 Hz</span></div>
             <div style="display: flex; gap: 8px;">
               <div style="flex: 1;">
                 <div class="control-sublabel">Mix</div>
-                <input type="range" id="pedal_knobReverbMix" min="0" max="100" value="45" oninput="syncFromPedal('knobReverbMix', this.value)">
+                <input type="range" id="knobReverbMix" min="0" max="100" value="35" oninput="updateAudioParams()">
               </div>
               <div style="flex: 1;">
                 <div class="control-sublabel">Tone</div>
-                <input type="range" id="pedal_knobReverbTone" min="600" max="8000" value="4200" oninput="syncFromPedal('knobReverbTone', this.value)">
+                <input type="range" id="knobReverbTone" min="600" max="12000" value="5200" oninput="updateAudioParams()">
               </div>
             </div>
           </div>
           <div class="control-row">
             <div class="control-label">Stereo Chorus Mode</div>
-            <select id="pedal_selChorusMode" onchange="syncFromPedal('selChorusMode', this.value)">
+            <select id="selChorusMode" onchange="updateAudioParams()">
               <option value="CLASSIC" selected>Classic (2-Voice Dimension)</option>
               <option value="ENSEMBLE">Ensemble (3-Voice Lush Juno)</option>
               <option value="VIBRATO">Vibrato (Pure Wobble)</option>
             </select>
           </div>
           <div class="control-row">
-            <div class="control-label"><span>Chorus Rate</span><span class="control-val reverb-val" id="lblPedalChorusRate">0.45 Hz</span></div>
-            <input type="range" id="pedal_knobChorusRate" min="0.05" max="3" step="0.01" value="0.45" oninput="syncFromPedal('knobChorusRate', this.value)">
+            <div class="control-label"><span>Chorus Rate</span><span class="control-val reverb-val" id="lblChorusRate">0.45 Hz</span></div>
+            <input type="range" id="knobChorusRate" min="0.05" max="3" step="0.01" value="0.45" oninput="updateAudioParams()">
           </div>
           <div class="control-row">
-            <div class="control-label"><span>Chorus Depth / Mix</span><span class="control-val reverb-val" id="lblPedalChorusDepth">40% / 30%</span></div>
+            <div class="control-label"><span>Chorus Depth / Mix</span><span class="control-val reverb-val" id="lblChorusDepth">40% / 30%</span></div>
             <div style="display: flex; gap: 8px;">
               <div style="flex: 1;">
                 <div class="control-sublabel">Depth</div>
-                <input type="range" id="pedal_knobChorusDepth" min="0" max="100" value="40" oninput="syncFromPedal('knobChorusDepth', this.value)">
+                <input type="range" id="knobChorusDepth" min="0" max="100" value="40" oninput="updateAudioParams()">
               </div>
               <div style="flex: 1;">
                 <div class="control-sublabel">Mix</div>
-                <input type="range" id="pedal_knobChorusMix" min="0" max="100" value="30" oninput="syncFromPedal('knobChorusMix', this.value)">
+                <input type="range" id="knobChorusMix" min="0" max="100" value="30" oninput="updateAudioParams()">
               </div>
             </div>
           </div>
@@ -3862,13 +3703,54 @@
 
         <div class="pedal-stomp-bay">
           <div class="pedal-led-pod">
-            <div class="pedal-led active" id="pedalLed_SPACE" style="color: #4b7bec;"></div>
-            <span class="pedal-led-label">ENGAGED</span>
+            <div class="pedal-led active" id="pedalLed_SPACE" style="color: #ff5fc4;"></div>
+            <span class="pedal-led-label" style="color: rgba(255, 95, 196, 0.9);">ENGAGED</span>
           </div>
-          <button class="stomp-footswitch active" id="stompBtn_SPACE" onclick="togglePedalBypass('SPACE')" title="Stomp to bypass/engage Space">
+          <button class="stomp-footswitch active" id="stompBtn_SPACE" onclick="togglePedalBypass('SPACE')" title="Stomp to bypass/engage Reverb & Chorus">
             <div class="stomp-bezel"><div class="stomp-cap"></div></div>
           </button>
           <span class="stomp-action-label">BYPASS / ENGAGE</span>
+        </div>
+      </div>
+
+      <!-- 4. FINAL ELEMENT: MASTER EQ & OUT -->
+      <div class="strip-channel master-eq-ch space-ch" id="masterEqOutStrip">
+        <div class="panel-header">
+          <span>8. Master EQ &amp; Out</span>
+          <button class="badge-tag" style="color: var(--color-space); border-color: rgba(75,123,236,0.3);" onclick="randomizeSpace()" title="Randomize Master EQ & Out">⟲</button>
+        </div>
+        <div class="control-row">
+          <div class="control-label">Hardware MIDI Output</div>
+          <select id="selMidiOut"><option value="">No Hardware Device Connected</option></select>
+        </div>
+        <div class="control-row">
+          <div class="control-label"><span>Master Tempo (BPM)</span><span class="control-val space-val" id="lblBpm">72 BPM</span></div>
+          <input type="range" id="knobBpm" min="45" max="115" value="72" oninput="updateBpm(this)">
+        </div>
+        <div class="control-row">
+          <div class="control-label"><span>Diffusion Master Space</span><span class="control-val space-val" id="lblWeather">45%</span></div>
+          <input type="range" id="knobWeather" min="0" max="100" value="45" oninput="updateAudioParams()">
+        </div>
+        <div class="control-row">
+          <div class="control-label"><span>Master 3-Band EQ (Low / Mid / High)</span><span class="control-val eq-val" id="lblEqSummary">100Hz / 1kHz / 4.5kHz</span></div>
+          <div style="display: flex; gap: 6px;">
+            <div style="flex: 1;">
+              <div class="control-sublabel">Low <span id="lblEqLow" style="color: var(--color-space);">0.0 dB</span></div>
+              <input type="range" id="knobEqLow" min="-12" max="12" step="0.5" value="0" oninput="updateAudioParams()">
+            </div>
+            <div style="flex: 1;">
+              <div class="control-sublabel">Mid <span id="lblEqMid" style="color: var(--color-space);">0.0 dB</span></div>
+              <input type="range" id="knobEqMid" min="-12" max="12" step="0.5" value="0" oninput="updateAudioParams()">
+            </div>
+            <div style="flex: 1;">
+              <div class="control-sublabel">High <span id="lblEqHigh" style="color: var(--color-space);">0.0 dB</span></div>
+              <input type="range" id="knobEqHigh" min="-12" max="12" step="0.5" value="0" oninput="updateAudioParams()">
+            </div>
+          </div>
+        </div>
+        <div class="control-row">
+          <div class="control-label"><span>Master Tape Saturation / Drive</span><span class="control-val space-val" id="lblMasterDrive">10%</span></div>
+          <input type="range" id="knobMasterDrive" min="0" max="100" value="10" oninput="updateAudioParams()">
         </div>
       </div>
     </div>
@@ -4498,6 +4380,8 @@ function updateMusicalConfig(triggerSound = false) {
 
 let audioCtx = null;
 let masterBusPre, masterBusPost, masterGain, chordBusGain, limiterNode, saturationNode, reverbNode, reverbSend;
+let masterEqLow, masterEqMid, masterEqHigh, masterDriveNode, masterWidthNode;
+let masterEqLowVal = 0, masterEqMidVal = 0, masterEqHighVal = 0, masterDriveVal = 10;
 let reverbToneFilter, chorusInputGain, chorusWetGain, chorusVoices = [];
 let masterVolumeGain;
 let masterVolumeVal = 0.85;
@@ -4797,12 +4681,43 @@ function initAudio() {
   // Connect initial serial topology via Live Web Audio API rewire manager
   rewireDspChain(dspChainOrder, true);
 
+  // Master 3-Band Parametric EQ & Out Processing Chain
+  masterEqLow = audioCtx.createBiquadFilter();
+  masterEqLow.type = "lowshelf";
+  masterEqLow.frequency.value = 100; // 100 Hz bass shelf
+  masterEqLow.gain.value = masterEqLowVal;
+
+  masterEqMid = audioCtx.createBiquadFilter();
+  masterEqMid.type = "peaking";
+  masterEqMid.frequency.value = 1000; // 1 kHz mid bell
+  masterEqMid.Q.value = 1.0;
+  masterEqMid.gain.value = masterEqMidVal;
+
+  masterEqHigh = audioCtx.createBiquadFilter();
+  masterEqHigh.type = "highshelf";
+  masterEqHigh.frequency.value = 4500; // 4.5 kHz air / presence shelf
+  masterEqHigh.gain.value = masterEqHighVal;
+
+  masterDriveNode = audioCtx.createWaveShaper();
+  const driveSamples = 512, driveCurve = new Float32Array(driveSamples);
+  for (let i = 0; i < driveSamples; ++i) {
+    let x = (i * 2) / driveSamples - 1;
+    driveCurve[i] = Math.tanh(x * 1.2);
+  }
+  masterDriveNode.curve = driveCurve;
+
   saturationNode = audioCtx.createWaveShaper(); saturationNode.curve = curve;
   limiterNode = audioCtx.createDynamicsCompressor();
   limiterNode.threshold.value = -1.0; limiterNode.knee.value = 0;
   limiterNode.ratio.value = 20; limiterNode.attack.value = 0.002; limiterNode.release.value = 0.08;
 
-  masterBusPost.connect(saturationNode); saturationNode.connect(limiterNode);
+  // Signal Flow: masterBusPost -> EQ Low -> EQ Mid -> EQ High -> Drive -> Saturation -> Limiter -> Master Volume -> Destination
+  masterBusPost.connect(masterEqLow);
+  masterEqLow.connect(masterEqMid);
+  masterEqMid.connect(masterEqHigh);
+  masterEqHigh.connect(masterDriveNode);
+  masterDriveNode.connect(saturationNode);
+  saturationNode.connect(limiterNode);
   masterBusPost.connect(masterAnalyser);
 
   masterVolumeGain = audioCtx.createGain();
@@ -4835,7 +4750,8 @@ function rewireDspChain(newOrder, immediate = false) {
       const modules = {
         FILTER: { in: filterModuleInput, out: filterModuleOutput },
         DELAY:  { in: delayModuleInput,  out: delayModuleOutput },
-        SPACE:  { in: spaceModuleInput,  out: spaceModuleOutput }
+        SPACE:  { in: spaceModuleInput,  out: spaceModuleOutput },
+        REVERB: { in: spaceModuleInput,  out: spaceModuleOutput }
       };
 
       let prevNode = masterBusPre;
@@ -4890,9 +4806,10 @@ const pedalBypassState = {
 };
 
 function updatePedalsOrderUI() {
-  const container = document.getElementById("pedalsGrid");
+  const container = document.getElementById("masterDeckUnified") || document.getElementById("pedalsGrid");
   if (!container) return;
 
+  // Append each pedal in current dspChainOrder, keeping masterEqOutStrip at the end
   dspChainOrder.forEach((key, idx) => {
     const el = document.getElementById("pedalCard_" + key);
     if (el) container.appendChild(el);
@@ -4911,10 +4828,16 @@ function updatePedalsOrderUI() {
 
     const routeBadge = document.getElementById("routeBadge" + (idx + 1));
     if (routeBadge) {
-      routeBadge.textContent = (idx + 1) + ": " + key;
+      const displayName = (key === "SPACE" ? "REVERB" : key);
+      routeBadge.textContent = (idx + 1) + ": " + displayName;
       routeBadge.className = "routing-pill pill-mod" + (key === "FILTER" ? "1" : key === "DELAY" ? "2" : "3");
     }
   });
+
+  const eqStrip = document.getElementById("masterEqOutStrip");
+  if (eqStrip && container) {
+    container.appendChild(eqStrip);
+  }
 }
 
 function shiftPedalLeft(key) {
@@ -5114,12 +5037,12 @@ function syncFromPedal(targetId, val) {
 }
 
 function syncPedalControlsFromConsole() {
-  // Filter controls
+  // If console inputs and pedal inputs share IDs directly in the merged deck, keep them in sync
   const fCut = document.getElementById("knobMasterCutoff");
   if (fCut) {
     const p = document.getElementById("pedal_knobMasterCutoff");
     if (p && p.value !== fCut.value) p.value = fCut.value;
-    const lbl = document.getElementById("lblPedalCutoff");
+    const lbl = document.getElementById("lblPedalCutoff") || document.getElementById("lblMasterCutoff");
     const clbl = document.getElementById("lblMasterCutoff");
     if (lbl && clbl) lbl.textContent = clbl.textContent;
   }
@@ -8259,6 +8182,36 @@ function updateAudioParams() {
   if (reverbToneFilter) reverbToneFilter.frequency.setTargetAtTime(reverbToneHz, audioCtx.currentTime, 0.08);
   if (chorusWetGain) chorusWetGain.gain.setTargetAtTime(chorusMixVal, audioCtx.currentTime, 0.08);
 
+  // Master EQ & Out Parameters
+  if (document.getElementById("knobEqLow")) {
+    masterEqLowVal = parseFloat(document.getElementById("knobEqLow").value);
+    document.getElementById("lblEqLow").textContent = (masterEqLowVal > 0 ? "+" : "") + masterEqLowVal.toFixed(1) + " dB";
+    if (masterEqLow && audioCtx) masterEqLow.gain.setTargetAtTime(masterEqLowVal, audioCtx.currentTime, 0.05);
+  }
+  if (document.getElementById("knobEqMid")) {
+    masterEqMidVal = parseFloat(document.getElementById("knobEqMid").value);
+    document.getElementById("lblEqMid").textContent = (masterEqMidVal > 0 ? "+" : "") + masterEqMidVal.toFixed(1) + " dB";
+    if (masterEqMid && audioCtx) masterEqMid.gain.setTargetAtTime(masterEqMidVal, audioCtx.currentTime, 0.05);
+  }
+  if (document.getElementById("knobEqHigh")) {
+    masterEqHighVal = parseFloat(document.getElementById("knobEqHigh").value);
+    document.getElementById("lblEqHigh").textContent = (masterEqHighVal > 0 ? "+" : "") + masterEqHighVal.toFixed(1) + " dB";
+    if (masterEqHigh && audioCtx) masterEqHigh.gain.setTargetAtTime(masterEqHighVal, audioCtx.currentTime, 0.05);
+  }
+  if (document.getElementById("knobMasterDrive")) {
+    masterDriveVal = parseFloat(document.getElementById("knobMasterDrive").value);
+    document.getElementById("lblMasterDrive").textContent = Math.round(masterDriveVal) + "%";
+    if (masterDriveNode && audioCtx) {
+      const k = 1.0 + (masterDriveVal / 100) * 2.5;
+      const n_s = 512, c = new Float32Array(n_s);
+      for (let i = 0; i < n_s; ++i) {
+        let x = (i * 2) / n_s - 1;
+        c[i] = Math.tanh(x * k);
+      }
+      masterDriveNode.curve = c;
+    }
+  }
+
   if (typeof syncPedalControlsFromConsole === 'function') {
     syncPedalControlsFromConsole();
   }
@@ -8294,7 +8247,11 @@ const RANDOM_SWEET_SPOTS = {
   knobChorusRate:    [0.15, 0.85],
   knobChorusDepth:   [15, 50],
   knobChorusMix:     [12, 38],
-  knobBpm:           [56, 92]
+  knobBpm:           [56, 92],
+  knobEqLow:         [-3.0, 4.0],
+  knobEqMid:         [-2.5, 3.0],
+  knobEqHigh:        [-3.0, 4.0],
+  masterDriveVal:    [5, 30]
 };
 
 function randomizeRange(id) {
@@ -8458,6 +8415,10 @@ function randomizeReverbChorus() {
 function randomizeSpace() {
   randomizeRange("knobBpm");
   randomizeRange("knobWeather");
+  if (document.getElementById("knobEqLow")) randomizeRange("knobEqLow");
+  if (document.getElementById("knobEqMid")) randomizeRange("knobEqMid");
+  if (document.getElementById("knobEqHigh")) randomizeRange("knobEqHigh");
+  if (document.getElementById("knobMasterDrive")) randomizeRange("knobMasterDrive");
   updateBpm();
   updateAudioParams();
 }
@@ -10026,7 +9987,7 @@ const ORBITAL_MODULES = [
   { id: "filter", name: "FILTER & ENV",num: "5", color: "#2ed573", rgb: [46, 213, 115], baseR: 37, x: 0, y: 0, vx: 0.14,  vy: 0.17,  chClass: "filter-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
   { id: "delay",  name: "ANALOG DELAY", num: "6", color: "#ff793f", rgb: [255, 121, 63], baseR: 35, x: 0, y: 0, vx: -0.18, vy: 0.12,  chClass: "delay-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 },
   { id: "reverb", name: "REVERB & CHORUS", num: "7", color: "#ff5fc4", rgb: [255, 95, 196], baseR: 38, x: 0, y: 0, vx: 0.17,  vy: 0.13,  chClass: "reverb-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
-  { id: "space",  name: "SPACE & OUT",  num: "8", color: "#4b7bec", rgb: [75, 123, 236], baseR: 37, x: 0, y: 0, vx: 0.12,  vy: -0.16, chClass: "space-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 }
+  { id: "space",  name: "MASTER EQ & OUT", num: "8", color: "#4b7bec", rgb: [75, 123, 236], baseR: 37, x: 0, y: 0, vx: 0.12,  vy: -0.16, chClass: "space-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 }
 ];
 
 function initOrbitalConstellation() {
@@ -10278,8 +10239,12 @@ function restoreStripsToRack() {
   ORBITAL_MODULES.forEach(orb => {
     const strip = document.querySelector(`.strip-channel.${orb.chClass}`);
     if (!strip) return;
-    const targetRack = ORBITAL_LOWER_DECK_IDS.includes(orb.id) ? lowerRack : masterRack;
-    if (targetRack) targetRack.appendChild(strip);
+    if (ORBITAL_LOWER_DECK_IDS.includes(orb.id)) {
+      if (lowerRack) lowerRack.appendChild(strip);
+    } else if (orb.id === "space") {
+      const unifiedMaster = document.getElementById("masterDeckUnified");
+      if (unifiedMaster) unifiedMaster.appendChild(strip);
+    }
   });
 }
 
