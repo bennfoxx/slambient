@@ -422,6 +422,30 @@ arcade still shares; `fractalTheta` and `zoomPulse` are gone).
 - Verified in headless Chromium over 25s of playback: all 4 shapes and all 10 colors appeared,
   0 spawns while stopped, no console errors.
 
+## Update — 2026-10-14 (Claude: Phase 7 started — Enter play/pause, MP3 recording)
+
+- **Enter is the universal play/pause key** (`bindGlobalTransportKeys()`, right before
+  `toggleMasterMute()`). **Space is intentionally NOT bound** to transport: Ben's call, since
+  Slambient Invaders uses Space to fire and a focused button would also "click" on Space. Enter is
+  ignored while typing in a text/number field or a contenteditable, and while a custom dropdown is
+  open; it calls `preventDefault()` so a focused button doesn't also activate. The arcade no longer
+  captures Enter (it starts/restarts on Space or tap only), so Enter toggles the music even
+  mid-game.
+- **Record now saves a 320 kbps stereo MP3** instead of `.webm`. The MediaRecorder path is gone
+  (`mediaRecorder` / `recordDest` / `recordedChunks` removed). `toggleRecord()` taps the same point
+  as before (`limiterNode`, post-limiter / pre master volume) with a `ScriptProcessorNode` into
+  Float32 chunks — raw PCM, so there's no Opus→MP3 double lossy step — then `finishRecording()`
+  encodes with **lamejs 1.2.1**, lazy-loaded from jsDelivr (cdnjs as backup) the first time you
+  hit Record, so the page stays dependency-free until then. Encoding yields every ~5s of audio
+  and shows progress on the button and in `#footerStatus`. **If lamejs can't load (offline), the
+  take is saved as a 16-bit WAV instead** — a recording is never lost. Files are named
+  `slambient-YYYYMMDD-HHMMSS.mp3`. ScriptProcessor (not AudioWorklet) on purpose: worklet modules
+  can't be loaded from blob/`file://` URLs in every browser, and this page is opened by
+  double-clicking `index.html`.
+- Verified in headless Chromium: Enter starts/stops playback (also inside the arcade, where it no
+  longer starts the game); a 6s take saved as a valid 320 kbps MP3 with real audio (mean −9.7 dB);
+  with the CDN blocked the same take saved as a valid stereo WAV.
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE
@@ -468,7 +492,8 @@ arcade still shares; `fractalTheta` and `zoomPulse` are gone).
 - [x] Space Invaders audio-reactive arcade minigame inside the primary visualizer canvas
 - [x] Side-view orb click debouncing (250ms debounce to close active tab on click without double-click flicker)
 
-### Phase 7: Global Shortcuts, Custom Theming & Final Polish — ⬜ NEXT UP
-- [ ] Keyboard playback bindings (`Spacebar` and `Enter` toggle play/pause)
+### Phase 7: Global Shortcuts, Custom Theming & Final Polish — 🟡 IN PROGRESS
+- [x] Keyboard playback binding (`Enter` toggles play/pause everywhere; Space reserved for Slambient Invaders)
+- [x] MP3 recording export (320 kbps via lazy-loaded lamejs, WAV fallback offline)
 - [ ] Modular color palette picker (custom color assignments per instrument, effect, and noise module)
 

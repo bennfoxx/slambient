@@ -3243,7 +3243,7 @@
             <span id="btnPlayLabel">Start</span>
           </button>
 
-          <button class="btn-record" id="btnRecord" onclick="toggleRecord()">
+          <button class="btn-record" id="btnRecord" onclick="toggleRecord()" title="Record the master output; saves a 320 kbps MP3 when you stop">
             <div class="rec-dot"></div>
             <span id="btnRecordLabel">Record</span>
           </button>
@@ -4212,9 +4212,6 @@
    ========================================================================== */
 let isRecording = false;
 let midiOutput = null;
-let mediaRecorder = null;
-let recordDest = null;
-let recordedChunks = [];
 
 /* ==========================================================================
    1. DETERMINISTIC SEED & MATH
@@ -8396,7 +8393,8 @@ function drawFractalVisualizer(w, h, ts) {
      - A louder instrument's row fires more often
      - Each hit plays a scale-locked blip in that instrument's register,
        routed into masterBusPre so it picks up the pedal chain's delay/reverb
-   Controls: ← / → move, Space fire, Enter/Space start, Esc quit. Touch or
+   Controls: ← / → move, Space fire/start, Esc quit (Enter stays the global
+   play/pause key, see bindGlobalTransportKeys). Touch or
    mouse: press on the canvas to steer toward the pointer and fire. Only the
    game's own keys are captured; QWERTY note keys still play the keyboard.
    ========================================================================== */
@@ -8538,7 +8536,7 @@ window.addEventListener("keydown", (e) => {
   let handled = true;
   if (e.key === "ArrowLeft") arcade.keys.left = true;
   else if (e.key === "ArrowRight") arcade.keys.right = true;
-  else if (e.code === "Space" || e.key === "Enter") { if (!e.repeat) arcadeHandleFire(arcade); }
+  else if (e.code === "Space") { if (!e.repeat) arcadeHandleFire(arcade); }
   else if (e.key === "Escape") toggleArcadeGame(false);
   else handled = false;
   if (handled) { e.preventDefault(); e.stopImmediatePropagation(); }
@@ -8548,7 +8546,7 @@ window.addEventListener("keyup", (e) => {
   if (!arcadeActive || !arcade) return;
   if (e.key === "ArrowLeft") arcade.keys.left = false;
   else if (e.key === "ArrowRight") arcade.keys.right = false;
-  else if (e.code !== "Space" && e.key !== "Enter") return;
+  else if (e.code !== "Space") return;
   e.preventDefault(); e.stopImmediatePropagation();
 }, { capture: true });
 
@@ -11772,6 +11770,23 @@ function updateMasterVolume(val) {
   applyMasterVolumeToAudio();
 }
 
+// Enter is the universal play/pause key (Phase 7). Space is deliberately left
+// alone: Slambient Invaders uses it to fire, and a focused button would also
+// "click" on Space. Skipped while typing in a text field or while a custom
+// dropdown is open; preventDefault stops a focused button from also firing.
+(function bindGlobalTransportKeys() {
+  window.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" || e.repeat || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+    const t = e.target;
+    if (t && t.isContentEditable) return;
+    if (t && t.tagName === "TEXTAREA") return;
+    if (t && t.tagName === "INPUT" && !["range", "checkbox", "radio", "button"].includes(t.type)) return;
+    if (document.querySelector(".custom-dropdown-menu.open")) return;
+    e.preventDefault();
+    togglePlay();
+  });
+})();
+
 function toggleMasterMute() {
   masterMuted = !masterMuted;
   const btn = document.getElementById("btnMasterMute");
@@ -11779,7 +11794,154 @@ function toggleMasterMute() {
   applyMasterVolumeToAudio();
 }
 
+/* ==========================================================================
+   RECORDING -> MP3 (Phase 7)
+   Records the master output (post-limiter, pre master volume -- same tap
+   point the old MediaRecorder/.webm path used) as raw PCM, then encodes a
+   320 kbps stereo MP3 when you stop. Capturing PCM directly instead of
+   transcoding MediaRecorder's Opus/WebM avoids stacking two lossy codecs.
+   The encoder (lamejs, ~150 KB) is fetched from a CDN the first time you hit
+   Record, so the page stays a single dependency-free file until then. If it
+   can't load (offline), the take is saved as a lossless .wav instead, so a
+   recording is never lost.
+   ========================================================================== */
+const LAMEJS_URLS = [
+  "https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js",
+  "https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"
+];
+const MP3_KBPS = 320;
+let lameLoadPromise = null;
+let recordTap = null;
+let recordSilentOut = null;
+let recordChunksL = [];
+let recordChunksR = [];
+let recordEncoding = false;
+
+function loadLameJs() {
+  if (window.lamejs) return Promise.resolve(window.lamejs);
+  if (lameLoadPromise) return lameLoadPromise;
+  lameLoadPromise = LAMEJS_URLS.reduce((prev, url) => prev.catch(() => new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = url;
+    s.async = true;
+    s.onload = () => window.lamejs ? resolve(window.lamejs) : reject(new Error("lamejs missing"));
+    s.onerror = () => { s.remove(); reject(new Error("load failed: " + url)); };
+    document.head.appendChild(s);
+  })), Promise.reject(new Error("start")));
+  // Let a later Record press retry if every CDN failed this time.
+  lameLoadPromise.catch(() => { lameLoadPromise = null; });
+  return lameLoadPromise;
+}
+
+function setRecordStatus(text) {
+  const el = document.getElementById("footerStatus");
+  if (el) el.textContent = text;
+}
+
+function recordingFileName(ext) {
+  const d = new Date();
+  const p = n => String(n).padStart(2, "0");
+  return `slambient-${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}.${ext}`;
+}
+
+function downloadBlob(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.style.display = "none"; a.href = url; a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+}
+
+function mergeChunks(chunks) {
+  const total = chunks.reduce((n, c) => n + c.length, 0);
+  const out = new Float32Array(total);
+  let off = 0;
+  chunks.forEach(c => { out.set(c, off); off += c.length; });
+  return out;
+}
+
+function floatToInt16(src, start, end) {
+  const out = new Int16Array(end - start);
+  for (let i = start; i < end; i++) {
+    const s = Math.max(-1, Math.min(1, src[i]));
+    out[i - start] = s < 0 ? s * 0x8000 : s * 0x7fff;
+  }
+  return out;
+}
+
+async function encodeMp3(left, right, sampleRate, onProgress) {
+  const lame = await loadLameJs();
+  const enc = new lame.Mp3Encoder(2, sampleRate, MP3_KBPS);
+  const parts = [];
+  const BLOCK = 1152;
+  for (let i = 0; i < left.length; i += BLOCK) {
+    const end = Math.min(left.length, i + BLOCK);
+    const buf = enc.encodeBuffer(floatToInt16(left, i, end), floatToInt16(right, i, end));
+    if (buf.length) parts.push(new Uint8Array(buf));
+    // Yield every ~200 frames (~5s of audio) so the UI and the music keep
+    // running while a long take encodes.
+    if ((i / BLOCK) % 200 === 199) {
+      onProgress(i / left.length);
+      await new Promise(r => setTimeout(r, 0));
+    }
+  }
+  const tail = enc.flush();
+  if (tail.length) parts.push(new Uint8Array(tail));
+  return new Blob(parts, { type: "audio/mpeg" });
+}
+
+function encodeWav(left, right, sampleRate) {
+  const n = left.length;
+  const buf = new ArrayBuffer(44 + n * 4);
+  const v = new DataView(buf);
+  const str = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  str(0, "RIFF"); v.setUint32(4, 36 + n * 4, true); str(8, "WAVE");
+  str(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 2, true);
+  v.setUint32(24, sampleRate, true); v.setUint32(28, sampleRate * 4, true);
+  v.setUint16(32, 4, true); v.setUint16(34, 16, true);
+  str(36, "data"); v.setUint32(40, n * 4, true);
+  let o = 44;
+  for (let i = 0; i < n; i++) {
+    const l = Math.max(-1, Math.min(1, left[i])), r = Math.max(-1, Math.min(1, right[i]));
+    v.setInt16(o, l < 0 ? l * 0x8000 : l * 0x7fff, true); o += 2;
+    v.setInt16(o, r < 0 ? r * 0x8000 : r * 0x7fff, true); o += 2;
+  }
+  return new Blob([buf], { type: "audio/wav" });
+}
+
+async function finishRecording(left, right, sampleRate) {
+  const btn = document.getElementById("btnRecord");
+  const lbl = document.getElementById("btnRecordLabel");
+  recordEncoding = true;
+  if (btn) btn.disabled = true;
+  if (lbl) lbl.textContent = "Encoding…";
+  const secs = (left.length / sampleRate).toFixed(1);
+  try {
+    if (!left.length) { setRecordStatus("Recording was empty -- nothing saved"); return; }
+    setRecordStatus(`Encoding ${secs}s take to MP3…`);
+    let blob, name;
+    try {
+      blob = await encodeMp3(left, right, sampleRate, p => {
+        setRecordStatus(`Encoding ${secs}s take to MP3… ${Math.round(p * 100)}%`);
+        if (lbl) lbl.textContent = `MP3 ${Math.round(p * 100)}%`;
+      });
+      name = recordingFileName("mp3");
+    } catch (err) {
+      blob = encodeWav(left, right, sampleRate);
+      name = recordingFileName("wav");
+      setRecordStatus("MP3 encoder couldn't load (offline?) -- saved as WAV instead");
+    }
+    downloadBlob(blob, name);
+    if (name.endsWith(".mp3")) setRecordStatus(`Saved ${name} (${(blob.size / 1048576).toFixed(1)} MB)`);
+  } finally {
+    recordEncoding = false;
+    if (btn) btn.disabled = false;
+    if (lbl) lbl.textContent = "Record";
+  }
+}
+
 function toggleRecord() {
+  if (recordEncoding) return;
   if (!audioCtx) initAudio();
   if (audioCtx.state === 'suspended') audioCtx.resume();
 
@@ -11787,26 +11949,39 @@ function toggleRecord() {
   const lbl = document.getElementById("btnRecordLabel");
 
   if (!isRecording) {
-    if (typeof MediaRecorder === 'undefined') { document.getElementById("footerStatus").textContent = "Recording not supported in this browser"; return; }
-    recordDest = audioCtx.createMediaStreamDestination(); limiterNode.connect(recordDest);
-    recordedChunks = []; mediaRecorder = new MediaRecorder(recordDest.stream);
-
-    mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(recordedChunks, { type: "audio/webm" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.style.display = "none"; a.href = url; a.download = `slambient-${Date.now()}.webm`;
-      document.body.appendChild(a); a.click();
-      setTimeout(() => { document.body.removeChild(a); window.URL.revokeObjectURL(url); }, 100);
+    loadLameJs().catch(() => {}); // warm up the encoder while recording
+    recordChunksL = []; recordChunksR = [];
+    // ScriptProcessor rather than an AudioWorklet: a worklet module can't be
+    // loaded from a blob/file:// URL in every browser, and this page is
+    // meant to run by double-clicking index.html.
+    recordTap = audioCtx.createScriptProcessor(4096, 2, 2);
+    recordTap.channelCount = 2;
+    recordTap.channelCountMode = "explicit";
+    recordTap.onaudioprocess = (e) => {
+      if (!isRecording) return;
+      recordChunksL.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+      recordChunksR.push(new Float32Array(e.inputBuffer.getChannelData(1)));
     };
+    // A ScriptProcessor only runs while connected to the destination; route
+    // it through a silent gain so it adds nothing to what you hear.
+    recordSilentOut = audioCtx.createGain();
+    recordSilentOut.gain.value = 0;
+    limiterNode.connect(recordTap);
+    recordTap.connect(recordSilentOut);
+    recordSilentOut.connect(audioCtx.destination);
 
-    mediaRecorder.start(); isRecording = true;
+    isRecording = true;
     btn.classList.add("recording"); lbl.textContent = "Stop & Save";
+    setRecordStatus("Recording…");
   } else {
-    mediaRecorder.stop(); isRecording = false;
-    try { limiterNode.disconnect(recordDest); } catch (e) {} recordDest = null;
-    btn.classList.remove("recording"); lbl.textContent = "Record";
+    isRecording = false;
+    try { limiterNode.disconnect(recordTap); } catch (e) {}
+    try { recordTap.disconnect(); recordSilentOut.disconnect(); } catch (e) {}
+    recordTap = null; recordSilentOut = null;
+    btn.classList.remove("recording");
+    const left = mergeChunks(recordChunksL), right = mergeChunks(recordChunksR);
+    recordChunksL = []; recordChunksR = [];
+    finishRecording(left, right, audioCtx.sampleRate);
   }
 }
 
