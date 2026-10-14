@@ -357,6 +357,29 @@ All items outlined in Phase 3 of the Technical Specification and Implementation 
   expected lower on real hardware. If it ever drops frames, lower `FRACTAL_MAX_BUFFER_W` or
   `FRACTAL_MAX_ITER` first.
 
+## Update — 2026-10-14 (Claude: Phase 6 — Slambient Invaders arcade easter egg)
+
+- **Space Invaders inside the visualizer canvas.** New invader-icon button in the visualizer
+  toolbar (`#btnToggleArcade`, `.layer-arcade` — a launcher, so it doesn't get the dimmed inactive
+  layer look). `toggleArcadeGame()` swaps `drawScope()` over to `drawArcadeGame()`; the landscape,
+  fractal and rings are skipped while it's up, and the music keeps playing.
+- **Audio-reactive rules**: one 8-invader row per instrument (arp / chords / drums / drone, top to
+  bottom, in their colors) glowing with live energy (reuses `updateFractalEnergy()` /
+  `fractalEnergy`). The formation marches **one step per beat** from `bpm` (8ths below half, 16ths
+  below 15%), so tempo changes change difficulty. A louder row fires more. Each kill plays a
+  scale-locked blip (`arcadeScaleMidi()` from `activeScaleKey` + `rootNote`) in that instrument's
+  octave, routed into `masterBusPre` so it goes through the pedal chain's delay/reverb. 3 lives,
+  waves start lower each time, session hi-score.
+- **Input**: ← / → move, Space fire, Enter/Space start, Esc quit; pointer/touch on the canvas steers
+  and fires. The game's keydown/keyup listeners are `capture: true` + `stopImmediatePropagation()`
+  for **only** its own keys, so Space/Esc don't reach the scope-fullscreen or (Phase 7) play-toggle
+  handlers while playing, but QWERTY note keys (A/W/S/…) still play the keyboard. **Phase 7 note:**
+  when you add the Spacebar/Enter play toggle, keep it a normal (non-capture) listener and it will
+  automatically yield to the game. The scope's double-click-to-fullscreen is suppressed while the
+  game is up (fast taps were triggering it).
+- Verified in headless Chromium: title → play → kills score → life loss → game over → restart →
+  wave clear → wave 2 → Esc exits; music kept playing throughout; no new console errors.
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE
@@ -397,13 +420,13 @@ All items outlined in Phase 3 of the Technical Specification and Implementation 
   - `William Basinski` (Tape decay mechanics in 3/4, pitch drift, continuous vinyl/tape hiss, `SPACE ➔ DELAY ➔ FILTER` routing feeding dark low-pass filter to muffle repeat tails)
   - `Lo-Fi Chillhop` (Boom-bap swing, dusty Rhodes chords, window rain gusts, `FILTER ➔ DELAY ➔ SPACE` signal chain for warm tape saturation)
 
-### Phase 6: Visualizers, Easter Eggs & Interaction Polishing — 🟡 IN PROGRESS
+### Phase 6: Visualizers, Easter Eggs & Interaction Polishing — ✅ DONE
 - [x] Audio-gated 3D floating shapes fix (prevent idle blue spheres when stopped + increase sphere density 60%–95% scaling)
 - [x] Fractal visualizer mode (`FRACTAL` Julia/Mandelbrot option + updated visualizer control icons)
-- [ ] Space Invaders audio-reactive arcade minigame inside the primary visualizer canvas
+- [x] Space Invaders audio-reactive arcade minigame inside the primary visualizer canvas
 - [x] Side-view orb click debouncing (250ms debounce to close active tab on click without double-click flicker)
 
-### Phase 7: Global Shortcuts, Custom Theming & Final Polish — ⬜ PENDING
+### Phase 7: Global Shortcuts, Custom Theming & Final Polish — ⬜ NEXT UP
 - [ ] Keyboard playback bindings (`Spacebar` and `Enter` toggle play/pause)
 - [ ] Modular color palette picker (custom color assignments per instrument, effect, and noise module)
 

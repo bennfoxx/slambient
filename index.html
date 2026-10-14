@@ -902,6 +902,17 @@
     border-color: rgba(255, 121, 63, 0.65);
     box-shadow: 0 0 8px rgba(255, 121, 63, 0.35);
   }
+  /* The arcade button is a launcher, not a layer: it stays at full strength
+     when inactive instead of picking up the dimmed :not(.active) look. */
+  .btn-layer-toggle.layer-arcade:not(.active) {
+    opacity: 0.7;
+    filter: none;
+  }
+  .btn-layer-toggle.layer-arcade.active {
+    background: rgba(46, 213, 115, 0.14);
+    border-color: rgba(46, 213, 115, 0.7);
+    box-shadow: 0 0 8px rgba(46, 213, 115, 0.4);
+  }
   .btn-layer-toggle.layer-fractal.active {
     background: rgba(140, 110, 255, 0.14);
     border-color: rgba(140, 110, 255, 0.7);
@@ -3384,6 +3395,14 @@
               </svg>
             </button>
 
+            <button class="btn-layer-toggle layer-arcade" id="btnToggleArcade" onclick="toggleArcadeGame()" title="Arcade: Space Invaders (← → move, Space fire, Esc quit)">
+              <svg width="18" height="15" viewBox="0 0 18 15" fill="none">
+                <rect x="0.5" y="0.5" width="17" height="14" rx="2" stroke="rgba(46,213,115,0.5)" stroke-width="1"/>
+                <path d="M6 3h1v1h-1zM11 3h1v1h-1zM7 4h4v1h-4zM6 5h6v1h-6zM5 6h2v1h-2zM8 6h2v1h-2zM11 6h2v1h-2zM4 7h10v1h-10zM4 8h1v1h-1zM6 8h6v1h-6zM13 8h1v1h-1zM4 9h1v1h-1zM6 9h1v1h-1zM11 9h1v1h-1zM13 9h1v1h-1zM7 10h1v1h-1zM10 10h1v1h-1z" fill="#2ed573"/>
+                <rect x="8.5" y="12" width="1" height="1.6" fill="#fed330"/>
+              </svg>
+            </button>
+
             <button class="btn-layer-toggle layer-rings active" id="btnToggleRings" onclick="toggleOscilloscopeRings()" title="Toggle Concentric Oscilloscope Rings">
               <svg width="18" height="15" viewBox="0 0 18 15" fill="none">
                 <rect x="0.5" y="0.5" width="17" height="14" rx="2" stroke="rgba(0,229,255,0.5)" stroke-width="1"/>
@@ -3403,7 +3422,7 @@
         </div>
       </div>
 
-      <div class="scope-left-viz" ondblclick="toggleScopeFullscreen()" title="Double-click to toggle fullscreen">
+      <div class="scope-left-viz" ondblclick="if (!arcadeActive) toggleScopeFullscreen()" title="Double-click to toggle fullscreen">
         <canvas id="scopeCanvas"></canvas>
       </div>
     </div>
@@ -8307,6 +8326,401 @@ function drawFractalVisualizer(w, h, ts) {
   scopeCtx.restore();
 }
 
+/* ==========================================================================
+   ARCADE: SLAMBIENT INVADERS (Phase 6 easter egg)
+   Space Invaders played inside the visualizer canvas while the music keeps
+   going. Launched from the invader button in the visualizer toolbar.
+     - One row of invaders per instrument (arp / chords / drums / drone, top
+       to bottom), drawn in that instrument's color and glowing with its live
+       energy (shared with Fractal Mode via updateFractalEnergy())
+     - The formation marches one step per beat (8th notes once half are
+       gone, 16ths near the end), so the game is locked to the tempo
+     - A louder instrument's row fires more often
+     - Each hit plays a scale-locked blip in that instrument's register,
+       routed into masterBusPre so it picks up the pedal chain's delay/reverb
+   Controls: ← / → move, Space fire, Enter/Space start, Esc quit. Touch or
+   mouse: press on the canvas to steer toward the pointer and fire. Only the
+   game's own keys are captured; QWERTY note keys still play the keyboard.
+   ========================================================================== */
+let arcadeActive = false;
+let arcade = null;
+
+const ARCADE_ROWS = [
+  { id: "arp",   rgb: [125, 95, 255], octave: 6, points: 40, sprite: 0 },
+  { id: "chord", rgb: [254, 211, 48], octave: 5, points: 30, sprite: 1 },
+  { id: "drum",  rgb: [255, 56, 56],  octave: 4, points: 20, sprite: 1 },
+  { id: "drone", rgb: [0, 229, 255],  octave: 3, points: 10, sprite: 2 }
+];
+const ARCADE_COLS = 8;
+
+// 11x8 sprites, two animation frames each ("1" = lit pixel).
+const ARCADE_SPRITES = [
+  [["00001100000", "00011110000", "00111111000", "01101101100", "01111111100", "00010010000", "00101101000", "01010010100"],
+   ["00001100000", "00011110000", "00111111000", "01101101100", "01111111100", "00101101000", "01000000100", "00100001000"]],
+  [["00100000100", "00010001000", "00111111100", "01101110110", "11111111111", "10111111101", "10100000101", "00011011000"],
+   ["00100000100", "10010001001", "10111111101", "11101110111", "11111111111", "01111111110", "00100000100", "01000000010"]],
+  [["00011111000", "01111111110", "11111111111", "11100100111", "11111111111", "00110001100", "01101110110", "11000000011"],
+   ["00011111000", "01111111110", "11111111111", "11100100111", "11111111111", "00111011100", "01100000110", "00110001100"]]
+];
+const ARCADE_PLAYER_SPRITE = ["00000100000", "00001110000", "00001110000", "01111111110", "11111111111", "11111111111", "11111111111"];
+
+function toggleArcadeGame(forceState) {
+  arcadeActive = (typeof forceState === "boolean") ? forceState : !arcadeActive;
+  const btn = document.getElementById("btnToggleArcade");
+  if (btn) {
+    btn.classList.toggle("active", arcadeActive);
+    // Otherwise the focused button would "click" again on the first Space.
+    btn.blur();
+  }
+  if (arcadeActive) {
+    arcade = newArcadeState();
+  } else {
+    arcade = null;
+  }
+}
+
+function newArcadeState() {
+  return {
+    phase: "title",           // title | playing | dying | gameover | cleared
+    score: 0,
+    hiScore: arcade ? arcade.hiScore : 0,
+    lives: 3,
+    wave: 1,
+    keys: { left: false, right: false },
+    pointerX: null,
+    playerX: 0.5,              // 0..1 across the canvas
+    invaders: [],
+    formX: 0, formY: 0, dir: 1,
+    lastStepTs: 0,
+    frame: 0,
+    shot: null,                // player's bullet (one at a time, classic rules)
+    enemyShots: [],
+    sparks: [],
+    invulnUntil: 0,
+    phaseUntil: 0,
+    lastTs: null
+  };
+}
+
+function arcadeSpawnWave(g) {
+  g.invaders = [];
+  ARCADE_ROWS.forEach((row, r) => {
+    for (let c = 0; c < ARCADE_COLS; c++) g.invaders.push({ r, c, alive: true });
+  });
+  g.formX = 0;
+  g.formY = Math.min(3, g.wave - 1); // later waves start lower, in row-drop units
+  g.dir = 1;
+  g.shot = null;
+  g.enemyShots = [];
+}
+
+function arcadeBlip(midi, type, dur, peak) {
+  if (!audioCtx || !masterBusPre) return;
+  const t = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(440 * Math.pow(2, (midi - 69) / 12), t);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(peak, t + 0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  osc.connect(g); g.connect(masterBusPre);
+  osc.start(t); osc.stop(t + dur + 0.02);
+}
+
+function arcadeScaleMidi(octave, degree) {
+  const scale = SCALES[activeScaleKey] || SCALES.DORIAN;
+  const len = scale.length;
+  return 12 * (octave + 1) + rootNote + scale[((degree % len) + len) % len] + 12 * Math.floor(degree / len);
+}
+
+function arcadeLayout(w, h) {
+  const px = Math.max(2, Math.floor(Math.min(w / 150, h / 95)));
+  const cellW = 16 * px, cellH = 12 * px;
+  const gridW = ARCADE_COLS * cellW;
+  const left = (w - gridW) / 2;
+  const top = 26 + px * 4;
+  return { px, cellW, cellH, gridW, left, top, rowDrop: cellH * 0.5, playerY: h - 14 * px, stepPx: px * 2 };
+}
+
+function arcadeDrawSprite(rows, x, y, px, rgb, alpha) {
+  scopeCtx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha.toFixed(3)})`;
+  for (let j = 0; j < rows.length; j++) {
+    const line = rows[j];
+    for (let i = 0; i < line.length; i++) {
+      if (line.charCodeAt(i) === 49) scopeCtx.fillRect(x + i * px, y + j * px, px, px);
+    }
+  }
+}
+
+function arcadeInvaderPos(g, inv, L) {
+  return {
+    x: L.left + g.formX + inv.c * L.cellW + 2.5 * L.px,
+    y: L.top + g.formY * L.rowDrop + inv.r * L.cellH
+  };
+}
+
+function arcadeHandleFire(g) {
+  if (g.phase === "title" || g.phase === "gameover") {
+    const hi = Math.max(g.hiScore, g.score);
+    Object.assign(g, newArcadeState(), { hiScore: hi, phase: "playing" });
+    arcadeSpawnWave(g);
+    return;
+  }
+  if (g.phase === "playing" && !g.shot) {
+    g.shot = { x: g.playerX, y: null };
+    arcadeBlip(arcadeScaleMidi(5, 4), "triangle", 0.09, 0.05);
+  }
+}
+
+window.addEventListener("keydown", (e) => {
+  if (!arcadeActive || !arcade) return;
+  const tag = e.target.tagName;
+  if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+  let handled = true;
+  if (e.key === "ArrowLeft") arcade.keys.left = true;
+  else if (e.key === "ArrowRight") arcade.keys.right = true;
+  else if (e.code === "Space" || e.key === "Enter") { if (!e.repeat) arcadeHandleFire(arcade); }
+  else if (e.key === "Escape") toggleArcadeGame(false);
+  else handled = false;
+  if (handled) { e.preventDefault(); e.stopImmediatePropagation(); }
+}, { capture: true });
+
+window.addEventListener("keyup", (e) => {
+  if (!arcadeActive || !arcade) return;
+  if (e.key === "ArrowLeft") arcade.keys.left = false;
+  else if (e.key === "ArrowRight") arcade.keys.right = false;
+  else if (e.code !== "Space" && e.key !== "Enter") return;
+  e.preventDefault(); e.stopImmediatePropagation();
+}, { capture: true });
+
+(function bindArcadePointer() {
+  const toX = (e) => {
+    const rect = scopeCanvas.getBoundingClientRect();
+    return Math.max(0, Math.min(1, (e.clientX - rect.left) / Math.max(1, rect.width)));
+  };
+  scopeCanvas.addEventListener("pointerdown", (e) => {
+    if (!arcadeActive || !arcade) return;
+    arcade.pointerX = toX(e);
+    try { scopeCanvas.setPointerCapture(e.pointerId); } catch (err) {}
+    arcadeHandleFire(arcade);
+    e.preventDefault();
+  });
+  scopeCanvas.addEventListener("pointermove", (e) => {
+    if (arcadeActive && arcade && arcade.pointerX !== null) arcade.pointerX = toX(e);
+  });
+  const release = () => { if (arcade) arcade.pointerX = null; };
+  scopeCanvas.addEventListener("pointerup", release);
+  scopeCanvas.addEventListener("pointercancel", release);
+})();
+
+function arcadeUpdate(g, w, h, L, ts, dtSec) {
+  const e = fractalEnergy;
+  if (g.phase === "dying" && ts > g.phaseUntil) g.phase = g.lives > 0 ? "playing" : "gameover";
+  if (g.phase === "cleared" && ts > g.phaseUntil) { g.wave++; arcadeSpawnWave(g); g.phase = "playing"; }
+
+  // Sparks animate in every phase.
+  for (let i = g.sparks.length - 1; i >= 0; i--) {
+    const s = g.sparks[i];
+    s.x += s.vx * dtSec; s.y += s.vy * dtSec; s.life -= dtSec * 1.8;
+    if (s.life <= 0) g.sparks.splice(i, 1);
+  }
+  if (g.phase !== "playing") return;
+
+  // Player movement (keys, or steer toward the pointer).
+  const speed = 0.55 * dtSec;
+  if (g.pointerX !== null) {
+    const d = g.pointerX - g.playerX;
+    g.playerX += Math.sign(d) * Math.min(Math.abs(d), speed * 1.4);
+  } else {
+    if (g.keys.left) g.playerX -= speed;
+    if (g.keys.right) g.playerX += speed;
+  }
+  const margin = (6 * L.px) / w;
+  g.playerX = Math.max(margin, Math.min(1 - margin, g.playerX));
+
+  // Formation march, locked to the beat.
+  const alive = g.invaders.filter(v => v.alive);
+  const frac = alive.length / g.invaders.length;
+  const beatMs = 60000 / Math.max(30, bpm);
+  const stepMs = beatMs / (frac < 0.15 ? 4 : frac < 0.5 ? 2 : 1);
+  if (ts - g.lastStepTs >= stepMs) {
+    g.lastStepTs = ts;
+    g.frame ^= 1;
+    let minX = Infinity, maxX = -Infinity;
+    alive.forEach(v => {
+      const p = arcadeInvaderPos(g, v, L);
+      minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x + 11 * L.px);
+    });
+    if ((g.dir > 0 && maxX + L.stepPx > w - 6) || (g.dir < 0 && minX - L.stepPx < 6)) {
+      g.dir = -g.dir;
+      g.formY += 1;
+    } else {
+      g.formX += g.dir * L.stepPx;
+    }
+
+    // Enemy fire: a louder instrument's row shoots more often.
+    const maxShots = 2 + Math.min(4, g.wave);
+    if (g.enemyShots.length < maxShots && alive.length) {
+      const cols = {};
+      alive.forEach(v => { if (!cols[v.c] || cols[v.c].r < v.r) cols[v.c] = v; });
+      const shooters = Object.values(cols);
+      const v = shooters[Math.floor(Math.random() * shooters.length)];
+      const rowEnergy = e[ARCADE_ROWS[v.r].id] || 0;
+      if (Math.random() < 0.18 + rowEnergy * 0.6 + g.wave * 0.03) {
+        const p = arcadeInvaderPos(g, v, L);
+        g.enemyShots.push({ x: p.x + 5.5 * L.px, y: p.y + 8 * L.px, rgb: ARCADE_ROWS[v.r].rgb });
+      }
+    }
+  }
+
+  // Player bullet.
+  if (g.shot) {
+    if (g.shot.y === null) g.shot.y = L.playerY;
+    g.shot.y -= h * 1.25 * dtSec;
+    if (g.shot.y < 0) g.shot = null;
+  }
+  if (g.shot) {
+    const sx = g.shot.x * w;
+    for (const v of alive) {
+      const p = arcadeInvaderPos(g, v, L);
+      if (sx >= p.x && sx <= p.x + 11 * L.px && g.shot.y >= p.y && g.shot.y <= p.y + 8 * L.px) {
+        v.alive = false;
+        g.shot = null;
+        const row = ARCADE_ROWS[v.r];
+        g.score += row.points * g.wave;
+        arcadeBlip(arcadeScaleMidi(row.octave, v.c), row.id === "drone" ? "sine" : "triangle", 0.35, 0.07);
+        for (let k = 0; k < 10; k++) {
+          const a = Math.random() * Math.PI * 2, sp = 40 + Math.random() * 90;
+          g.sparks.push({ x: p.x + 5.5 * L.px, y: p.y + 4 * L.px, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 1, rgb: row.rgb });
+        }
+        if (alive.length === 1) {
+          g.phase = "cleared";
+          g.phaseUntil = ts + 1800;
+          [0, 2, 4, 7].forEach((deg, k) => setTimeout(() => arcadeBlip(arcadeScaleMidi(5, deg), "triangle", 0.4, 0.05), k * 110));
+        }
+        break;
+      }
+    }
+  }
+
+  // Enemy bullets.
+  const playerPx = g.playerX * w;
+  for (let i = g.enemyShots.length - 1; i >= 0; i--) {
+    const s = g.enemyShots[i];
+    s.y += h * (0.42 + g.wave * 0.04) * dtSec;
+    if (s.y > h) { g.enemyShots.splice(i, 1); continue; }
+    if (ts > g.invulnUntil && s.y >= L.playerY && s.y <= L.playerY + 7 * L.px && Math.abs(s.x - playerPx) <= 5.5 * L.px) {
+      g.enemyShots.splice(i, 1);
+      arcadeLoseLife(g, L, w, ts);
+    }
+  }
+
+  // Invaders reaching the player's line ends the game outright.
+  if (g.phase === "playing" && alive.some(v => arcadeInvaderPos(g, v, L).y + 8 * L.px >= L.playerY)) {
+    g.lives = 1;
+    arcadeLoseLife(g, L, w, ts);
+  }
+}
+
+function arcadeLoseLife(g, L, w, ts) {
+  g.lives--;
+  g.phase = "dying";
+  g.phaseUntil = ts + 1400;
+  g.invulnUntil = ts + 1400 + 1500;
+  g.enemyShots = [];
+  g.shot = null;
+  arcadeBlip(arcadeScaleMidi(2, 0), "sawtooth", 0.6, 0.06);
+  for (let k = 0; k < 24; k++) {
+    const a = Math.random() * Math.PI * 2, sp = 30 + Math.random() * 140;
+    g.sparks.push({ x: g.playerX * w, y: L.playerY + 3 * L.px, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 1.3, rgb: [46, 213, 115] });
+  }
+  if (g.lives <= 0) g.hiScore = Math.max(g.hiScore, g.score);
+}
+
+function drawArcadeGame(w, h, ts) {
+  const g = arcade;
+  if (!g) return;
+  if (g.lastTs === null) g.lastTs = ts;
+  const dtSec = Math.max(0, Math.min(0.05, (ts - g.lastTs) / 1000));
+  g.lastTs = ts;
+  updateFractalEnergy(dtSec);
+  const L = arcadeLayout(w, h);
+  arcadeUpdate(g, w, h, L, ts, dtSec);
+
+  scopeCtx.save();
+  scopeCtx.shadowBlur = 0;
+
+  // Faint CRT scanlines.
+  scopeCtx.fillStyle = "rgba(255, 255, 255, 0.025)";
+  for (let y = 0; y < h; y += 3) scopeCtx.fillRect(0, y, w, 1);
+
+  // Invaders, glowing with their instrument's live energy.
+  if (g.phase !== "title") {
+    g.invaders.forEach(v => {
+      if (!v.alive) return;
+      const row = ARCADE_ROWS[v.r];
+      const en = fractalEnergy[row.id] || 0;
+      const p = arcadeInvaderPos(g, v, L);
+      scopeCtx.shadowColor = `rgb(${row.rgb.join(",")})`;
+      scopeCtx.shadowBlur = 2 + en * 14;
+      arcadeDrawSprite(ARCADE_SPRITES[row.sprite][g.frame], p.x, p.y, L.px, row.rgb, 0.55 + en * 0.45);
+    });
+    scopeCtx.shadowBlur = 0;
+  }
+
+  // Player (blinks while invulnerable, hidden while exploding).
+  const blink = ts < g.invulnUntil && Math.floor(ts / 120) % 2 === 0;
+  if ((g.phase === "playing" || g.phase === "cleared") && !blink) {
+    arcadeDrawSprite(ARCADE_PLAYER_SPRITE, g.playerX * w - 5.5 * L.px, L.playerY, L.px, [46, 213, 115], 0.95);
+  }
+
+  if (g.shot && g.shot.y !== null) {
+    scopeCtx.fillStyle = "#fed330";
+    scopeCtx.fillRect(g.shot.x * w - L.px / 2, g.shot.y, L.px, 4 * L.px);
+  }
+  g.enemyShots.forEach(s => {
+    scopeCtx.fillStyle = `rgb(${s.rgb.join(",")})`;
+    const zig = (Math.floor(s.y / (2 * L.px)) % 2) * L.px;
+    scopeCtx.fillRect(s.x - L.px / 2 + zig - L.px / 2, s.y, L.px, 3 * L.px);
+  });
+  g.sparks.forEach(s => {
+    scopeCtx.fillStyle = `rgba(${s.rgb.join(",")}, ${Math.max(0, Math.min(1, s.life)).toFixed(3)})`;
+    scopeCtx.fillRect(s.x, s.y, L.px, L.px);
+  });
+
+  // Ground line.
+  scopeCtx.fillStyle = "rgba(46, 213, 115, 0.45)";
+  scopeCtx.fillRect(8, L.playerY + 9 * L.px, w - 16, 1);
+
+  // HUD.
+  const fs = Math.max(10, Math.round(L.px * 4.5));
+  scopeCtx.font = `600 ${fs}px "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace`;
+  scopeCtx.textBaseline = "top";
+  scopeCtx.fillStyle = "rgba(230, 236, 255, 0.85)";
+  scopeCtx.textAlign = "left";
+  scopeCtx.fillText(`SCORE ${String(g.score).padStart(5, "0")}`, 10, 8);
+  scopeCtx.textAlign = "center";
+  scopeCtx.fillText(`HI ${String(Math.max(g.hiScore, g.score)).padStart(5, "0")}  ·  WAVE ${g.wave}`, w / 2, 8);
+  scopeCtx.textAlign = "right";
+  scopeCtx.fillText(`${"▲".repeat(Math.max(0, g.lives))}`, w - 10, 8);
+
+  const centerMsg = (lines) => {
+    scopeCtx.textAlign = "center";
+    scopeCtx.textBaseline = "middle";
+    lines.forEach((ln, i) => {
+      scopeCtx.font = `${i === 0 ? 800 : 500} ${i === 0 ? fs * 1.6 : fs}px "JetBrains Mono", ui-monospace, monospace`;
+      scopeCtx.fillStyle = i === 0 ? "#2ed573" : "rgba(230, 236, 255, 0.8)";
+      scopeCtx.fillText(ln, w / 2, h / 2 + (i - (lines.length - 1) / 2) * fs * 2);
+    });
+  };
+  if (g.phase === "title") centerMsg(["SLAMBIENT INVADERS", "SPACE / TAP TO START", "← → MOVE · SPACE FIRE · ESC QUIT"]);
+  else if (g.phase === "gameover") centerMsg(["GAME OVER", `SCORE ${g.score}`, "SPACE / TAP TO PLAY AGAIN"]);
+  else if (g.phase === "cleared") centerMsg([`WAVE ${g.wave} CLEAR`]);
+
+  scopeCtx.restore();
+}
+
 function toggleScopeFullscreen(forceState) {
   scopeFullscreen = (typeof forceState === 'boolean') ? forceState : !scopeFullscreen;
   const panel = document.getElementById('scopePanel');
@@ -9014,7 +9428,9 @@ function drawScope(ts) {
   const { w, h, cx, cy } = updateCanvasDimensions();
   scopeCtx.fillStyle = "#0c0d11"; scopeCtx.fillRect(0, 0, w, h);
 
-  if (fractalModeEnabled) {
+  if (arcadeActive) {
+    drawArcadeGame(w, h, ts || performance.now());
+  } else if (fractalModeEnabled) {
     drawFractalVisualizer(w, h, ts || performance.now());
   } else {
     drawWaterfallSpectrogram(w, h);
@@ -9033,7 +9449,7 @@ function drawScope(ts) {
   const revolutionBeats = 480; // one full 360 deg turn every 480 beats -- slow, "slight" rotation
   scopeRotationAngle += dtSec * beatsPerSec * (Math.PI * 2 / revolutionBeats) * (isPlaying ? 1 : 0.15);
 
-  if (oscilloscopeRingsEnabled) {
+  if (oscilloscopeRingsEnabled && !arcadeActive) {
     // Capped at 2.3x -- uncapped, a large/HiDPI fullscreen viewport scaled
     // the rings (and their shadowBlur glow, the single most expensive
     // canvas op here) up 4x+, which is what made fullscreen choppy: blur
