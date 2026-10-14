@@ -2468,96 +2468,144 @@
   }
 
 
-  /* SMART CUSTOM DROPDOWN COMPONENT */
+  /* ABLETON LIVE STYLE SMART DROPDOWN COMPONENT */
   .custom-dropdown-wrap {
     position: relative;
-    display: inline-block;
+    display: inline-flex;
     user-select: none;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    box-sizing: border-box;
+    min-width: 0;
+  }
+  .control-row > .custom-dropdown-wrap,
+  .select-with-toggle > .custom-dropdown-wrap {
+    width: 100%;
+    flex: 1 1 auto;
   }
   .custom-dropdown-trigger {
+    width: 100%;
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
     height: 24px;
     box-sizing: border-box;
-    background-color: #10131e;
-    color: #ffffff;
-    border: 1px solid var(--border);
+    background-color: #12151f;
+    color: #e6ebf5;
+    border: 1px solid #282e42;
     padding: 0 8px;
     font-size: 11px;
     font-weight: 700;
-    border-radius: 3px;
-    cursor: pointer !important;
-    gap: 6px;
-    transition: all 0.12s ease;
+    border-radius: 2px;
+    cursor: var(--cursor-pointer) !important;
+    gap: 8px;
+    transition: background-color 0.08s ease, border-color 0.08s ease, color 0.08s ease;
     white-space: nowrap;
+    overflow: hidden;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+  .custom-dropdown-trigger .trigger-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
   }
   .custom-dropdown-trigger:hover {
-    border-color: var(--border-bright);
-    background-color: #151a28;
+    border-color: #4b5574;
+    background-color: #191d2b;
+    color: #ffffff;
   }
   .custom-dropdown-trigger.open {
-    border-color: var(--accent);
-    box-shadow: 0 0 8px var(--accent-dim);
+    background-color: var(--dd-accent, var(--accent));
+    color: #07080c !important;
+    border-color: var(--dd-accent, var(--accent));
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   }
   .custom-dropdown-trigger svg {
     color: var(--text-secondary);
-    transition: transform 0.15s ease;
+    transition: transform 0.12s ease;
     flex-shrink: 0;
   }
   .custom-dropdown-trigger.open svg {
     transform: rotate(180deg);
-    color: var(--accent);
+    color: #07080c !important;
   }
   .custom-dropdown-menu {
     position: absolute;
-    top: calc(100% + 4px);
+    top: calc(100% + 2px);
     left: 0;
     min-width: 100%;
-    max-height: 280px;
+    width: max-content;
+    max-width: 340px;
+    max-height: 290px;
     overflow-y: auto;
-    background: #0b0e17;
-    border: 1px solid var(--border-bright);
-    border-radius: 4px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9), 0 0 12px rgba(254, 211, 48, 0.15);
-    z-index: 1000;
+    background: #11141d;
+    border: 1px solid var(--dd-accent, var(--border-bright));
+    border-radius: 2px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.92), 0 2px 6px rgba(0, 0, 0, 0.8);
+    z-index: 2500;
     display: none;
-    padding: 4px;
+    padding: 2px;
   }
   .custom-dropdown-menu.open {
     display: block;
   }
+  .custom-dropdown-menu.drop-up {
+    top: auto;
+    bottom: calc(100% + 2px);
+  }
   .custom-dropdown-item {
-    padding: 5px 8px;
+    padding: 5px 9px;
     font-size: 10.5px;
     font-weight: 600;
-    color: var(--text-secondary);
-    border-radius: 3px;
-    cursor: pointer !important;
-    transition: all 0.1s ease;
+    color: #c8d1e6;
+    border-radius: 1px;
+    cursor: var(--cursor-pointer) !important;
+    transition: background-color 0.06s ease, color 0.06s ease;
     white-space: nowrap;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 12px;
+    border-left: 2px solid transparent;
   }
-  .custom-dropdown-item:hover {
-    background: rgba(254, 211, 48, 0.12);
-    color: #ffffff;
+  .custom-dropdown-item .item-main {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
-  .custom-dropdown-item.selected {
-    background: rgba(254, 211, 48, 0.18);
-    color: var(--accent);
-    font-weight: 800;
+  .custom-dropdown-item .item-check {
+    width: 10px;
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 900;
+    opacity: 0;
+  }
+  .custom-dropdown-item.selected .item-check {
+    opacity: 1;
   }
   .custom-dropdown-item .item-sub {
     font-size: 9.5px;
-    color: var(--text-tertiary);
+    color: #6c7793;
     font-weight: 500;
   }
-  .custom-dropdown-item:hover .item-sub {
-    color: var(--text-secondary);
+  /* Ableton-style solid bar highlight on hover & active selection */
+  .custom-dropdown-item:hover {
+    background-color: var(--dd-accent, var(--accent));
+    color: #07080c !important;
+  }
+  .custom-dropdown-item:hover .item-sub,
+  .custom-dropdown-item:hover .item-check {
+    color: rgba(7, 8, 12, 0.78) !important;
+  }
+  .custom-dropdown-item.selected {
+    background-color: rgba(255, 255, 255, 0.06);
+    color: var(--dd-accent, var(--accent));
+    border-left-color: var(--dd-accent, var(--accent));
+    font-weight: 800;
+  }
+  .custom-dropdown-item.selected:hover {
+    background-color: var(--dd-accent, var(--accent));
+    color: #07080c !important;
   }
 
   /* UNIFIED CHANNEL STRIP MASTER VOLUME & AUX ROUTING */
@@ -8220,6 +8268,9 @@ function updateAudioParams() {
       masterDriveNode.curve = c;
     }
   }
+  if (typeof syncAllSmartDropdowns === 'function') {
+    syncAllSmartDropdowns();
+  }
 }
 
 // Sweet-spot bounds for randomizers so automatic randomization prioritizes
@@ -10146,23 +10197,42 @@ function initOrbitalConstellation() {
   if (typeof initPedalDragAndDrop === 'function') initPedalDragAndDrop();
 
 /* ==========================================================================
-   SMART COMPONENT-BASED DROPDOWNS (SCALE & METER SELECTORS)
+   ABLETON-STYLE SMART COMPONENT DROPDOWNS (ALL SELECT MENUS)
    ========================================================================== */
-function initSmartDropdowns() {
-  const selectsToUpgrade = [
-    { id: "topScaleMode", mode: "scale" },
-    { id: "selTimeSig", mode: "meter" }
-  ];
+const smartDropdownUpdaters = [];
 
-  selectsToUpgrade.forEach(({ id, mode }) => {
-    const sel = document.getElementById(id);
+function syncAllSmartDropdowns() {
+  smartDropdownUpdaters.forEach(fn => fn());
+}
+
+function getDropdownAccentColor(sel) {
+  if (sel.closest(".drone-ch")) return "var(--color-drone)";
+  if (sel.closest(".drum-ch")) return "var(--color-drum)";
+  if (sel.closest(".chord-ch")) return "var(--color-chord)";
+  if (sel.closest(".arp-ch")) return "var(--color-arp)";
+  if (sel.closest(".pedal-filter") || sel.closest(".filter-ch")) return "var(--color-filter)";
+  if (sel.closest(".pedal-delay") || sel.closest(".delay-ch")) return "var(--color-delay)";
+  if (sel.closest(".pedal-reverb") || sel.closest(".reverb-ch")) return "var(--color-reverb)";
+  if (sel.closest(".space-ch")) return "var(--color-space)";
+  return "var(--accent)";
+}
+
+function initSmartDropdowns() {
+  const allSelects = document.querySelectorAll("select");
+
+  allSelects.forEach((sel) => {
     if (!sel || sel.dataset.smartUpgraded) return;
     sel.dataset.smartUpgraded = "true";
+
+    const id = sel.id || ("sel_" + Math.random().toString(36).slice(2, 7));
+    const isMeter = (id === "selTimeSig");
+    const isRootKey = (id === "topRootKey");
 
     // Create wrapper
     const wrap = document.createElement("div");
     wrap.className = "custom-dropdown-wrap";
     wrap.id = "wrap_" + id;
+    wrap.style.setProperty("--dd-accent", getDropdownAccentColor(sel));
 
     // Trigger button
     const trigger = document.createElement("button");
@@ -10175,11 +10245,11 @@ function initSmartDropdowns() {
     trigger.appendChild(labelSpan);
 
     const arrowSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    arrowSvg.setAttribute("width", "10");
-    arrowSvg.setAttribute("height", "7");
+    arrowSvg.setAttribute("width", "9");
+    arrowSvg.setAttribute("height", "6");
     arrowSvg.setAttribute("viewBox", "0 0 10 7");
     arrowSvg.setAttribute("fill", "none");
-    arrowSvg.innerHTML = '<path d="M1 1.5L5 5.5L9 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>';
+    arrowSvg.innerHTML = '<path d="M1.5 1.5L5 5L8.5 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/>';
     trigger.appendChild(arrowSvg);
 
     // Menu list
@@ -10187,90 +10257,132 @@ function initSmartDropdowns() {
     menu.className = "custom-dropdown-menu";
     menu.id = "menu_" + id;
 
-    // Helper to format collapsed vs expanded labels
+    // Smart truncation: hide parenthetical details or meter labels when collapsed, show full split details when expanded
     function formatLabel(optionText, isCollapsed) {
-      if (mode === "scale") {
-        // e.g. "Hirajoshi (Japanese Kankyō)" -> collapsed: "Hirajoshi", expanded: "Hirajoshi" + "(Japanese Kankyō)"
-        const match = optionText.match(/^([^(]+)(?:\s*\((.*)\))?$/);
-        if (!match) return { main: optionText, sub: "" };
-        const main = match[1].trim();
-        const sub = match[2] ? `(${match[2].trim()})` : "";
-        return isCollapsed ? { main, sub: "" } : { main, sub };
-      } else if (mode === "meter") {
-        // e.g. "7/4 Odd Quarter" -> collapsed: "7/4", expanded: "7/4" + "Odd Quarter"
-        const parts = optionText.split(" ");
-        const main = parts[0];
+      const clean = (optionText || "").trim();
+      if (isRootKey) {
+        return { main: clean, sub: "" };
+      }
+      if (isMeter) {
+        // e.g. "7/4 Odd Quarter" -> collapsed: "7/4", expanded: main "7/4", sub "Odd Quarter"
+        const parts = clean.split(/\s+/);
+        const main = parts[0] || clean;
         const sub = parts.slice(1).join(" ");
         return isCollapsed ? { main, sub: "" } : { main, sub };
       }
-      return { main: optionText, sub: "" };
+      // General parenthetical split: e.g. "Hirajoshi (Japanese Kankyō)" or "Sub Octave (D1 / 36.7 Hz)"
+      const match = clean.match(/^([^(]+)(?:\s*\((.*)\))?$/);
+      if (match) {
+        const main = match[1].trim();
+        const sub = match[2] ? `(${match[2].trim()})` : "";
+        return isCollapsed ? { main, sub: "" } : { main, sub };
+      }
+      return { main: clean, sub: "" };
     }
 
-    function updateTriggerLabel() {
-      const selectedOpt = sel.options[sel.selectedIndex];
+    function rebuildMenuOptions() {
+      menu.innerHTML = "";
+      [...sel.options].forEach((opt, idx) => {
+        const item = document.createElement("div");
+        item.className = "custom-dropdown-item";
+        item.dataset.value = opt.value;
+        if (idx === sel.selectedIndex) item.classList.add("selected");
+
+        const { main, sub } = formatLabel(opt.textContent, false);
+        item.innerHTML = `<span class="item-main"><span class="item-check">▸</span><span>${main}</span></span>${sub ? `<span class="item-sub">${sub}</span>` : ""}`;
+
+        item.addEventListener("click", (e) => {
+          e.stopPropagation();
+          sel.value = opt.value;
+          sel.dispatchEvent(new Event("change", { bubbles: true }));
+          if (typeof sel.onchange === "function") {
+            sel.onchange.call(sel, new Event("change"));
+          }
+          syncUI();
+          closeDropdown();
+        });
+
+        menu.appendChild(item);
+      });
+    }
+
+    function syncUI() {
+      const selectedOpt = sel.options[sel.selectedIndex] || sel.options[0];
       if (!selectedOpt) return;
       const { main } = formatLabel(selectedOpt.textContent, true);
       labelSpan.textContent = main;
+      menu.querySelectorAll(".custom-dropdown-item").forEach(i => {
+        i.classList.toggle("selected", i.dataset.value === sel.value);
+      });
     }
 
-    // Populate menu items
-    [...sel.options].forEach((opt, idx) => {
-      const item = document.createElement("div");
-      item.className = "custom-dropdown-item";
-      item.dataset.value = opt.value;
-      if (idx === sel.selectedIndex) item.classList.add("selected");
+    rebuildMenuOptions();
 
-      const { main, sub } = formatLabel(opt.textContent, false);
-      item.innerHTML = `<span>${main}</span>${sub ? `<span class="item-sub">${sub}</span>` : ""}`;
-
-      item.addEventListener("click", (e) => {
-        e.stopPropagation();
-        sel.value = opt.value;
-        sel.dispatchEvent(new Event("change", { bubbles: true }));
-        updateTriggerLabel();
-        menu.querySelectorAll(".custom-dropdown-item").forEach(i => i.classList.remove("selected"));
-        item.classList.add("selected");
-        closeDropdown();
+    // Intercept programmatic .value assignments on the <select> element so preset loads & randomizers auto-sync
+    const proto = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value");
+    if (proto && proto.set && proto.get) {
+      Object.defineProperty(sel, "value", {
+        get() {
+          return proto.get.call(this);
+        },
+        set(newVal) {
+          proto.set.call(this, newVal);
+          syncUI();
+        },
+        configurable: true
       });
-
-      menu.appendChild(item);
-    });
+    }
 
     function toggleDropdown(e) {
       e.stopPropagation();
       const isOpen = menu.classList.contains("open");
-      document.querySelectorAll(".custom-dropdown-menu.open").forEach(m => m.classList.remove("open"));
+      document.querySelectorAll(".custom-dropdown-menu.open").forEach(m => m.classList.remove("open", "drop-up"));
       document.querySelectorAll(".custom-dropdown-trigger.open").forEach(t => t.classList.remove("open"));
       if (!isOpen) {
+        // Re-build if dynamic options changed (like MIDI devices)
+        if (menu.children.length !== sel.options.length) {
+          rebuildMenuOptions();
+        }
+        syncUI();
         menu.classList.add("open");
         trigger.classList.add("open");
+        // Check viewport bottom collision to flip menu upward if needed
+        const rect = menu.getBoundingClientRect();
+        if (rect.bottom > window.innerHeight - 12) {
+          menu.classList.add("drop-up");
+        }
       }
     }
 
     function closeDropdown() {
-      menu.classList.remove("open");
+      menu.classList.remove("open", "drop-up");
       trigger.classList.remove("open");
     }
 
     trigger.addEventListener("click", toggleDropdown);
-    document.addEventListener("click", closeDropdown);
+    sel.addEventListener("change", syncUI);
 
-    // Keep trigger updated when native select changes programmatically (e.g. presets, randomizers)
-    sel.addEventListener("change", () => {
-      updateTriggerLabel();
-      menu.querySelectorAll(".custom-dropdown-item").forEach(i => {
-        i.classList.toggle("selected", i.dataset.value === sel.value);
-      });
-    });
-
-    // Replace native select in visual DOM while keeping native select hidden for forms/events
+    // Replace native select in visual DOM while keeping native select hidden
     sel.style.display = "none";
     sel.parentNode.insertBefore(wrap, sel);
     wrap.appendChild(trigger);
     wrap.appendChild(menu);
     wrap.appendChild(sel);
 
-    updateTriggerLabel();
+    syncUI();
+    smartDropdownUpdaters.push(syncUI);
+  });
+
+  // Global click and Escape key close
+  document.addEventListener("click", () => {
+    document.querySelectorAll(".custom-dropdown-menu.open").forEach(m => m.classList.remove("open", "drop-up"));
+    document.querySelectorAll(".custom-dropdown-trigger.open").forEach(t => t.classList.remove("open"));
+  });
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      document.querySelectorAll(".custom-dropdown-menu.open").forEach(m => m.classList.remove("open", "drop-up"));
+      document.querySelectorAll(".custom-dropdown-trigger.open").forEach(t => t.classList.remove("open"));
+    }
   });
 }
 
