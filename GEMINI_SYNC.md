@@ -158,3 +158,25 @@ The roadmap implementation has advanced through Phase 1, Phase 2, and subsequent
 - `52433cd` — Fix Pedals view: allow pre-playback DSP chain reordering, add pointer-event drag and drop, and ensure shift arrow hit testing
 - `eaecf1b` — Merge Console Rack and Pedals View into a unified view mode
 - `d1a5a87` — Replace master effect modules with tactile pedals, set Reverb & Chorus to pink, and add Master EQ & Out final chain strip
+
+## Update — 2026-10-14 (Claude: fixed a whole-page crash from the pedal rework)
+
+The pedal/label consolidation above (Filter LFO Rate+Depth and Reverb Mix+Tone each merged into
+one combined `"X / Y"` label) left `updateAudioParams()` with two **unguarded** writes to the old,
+now-deleted separate label ids (`lblFilterLfoRate`, `lblFilterLfoDepth`, `lblReverbTone`). Since
+`updateAudioParams()` runs via `setupRandomInitialState()` at the literal top level of the script
+(not inside a try/catch or event handler), that `null.textContent` crash aborted the rest of the
+**entire script's** top-level execution on every page load -- anything declared or initialized
+after that call point (e.g. `const ENO_PHOSPHORS`) never ran. That's why so much looked broken at
+once from a two-line bug.
+
+**Fixed in `26a97c7`**: both spots now read each knob's value unconditionally guarded on its own
+existence, then write the combined string to the one label that actually exists, matching the
+HTML's own format. Swept the whole file for the same `getElementById(missing-id).property` pattern
+afterward -- those were the only two instances. If you add another combined/consolidated label like
+this, grep for `document.getElementById(` chained directly to `.textContent`/`.value`/etc. without a
+preceding existence check, and confirm the id it names is still real in the HTML.
+
+Verified clean (zero console errors) across: page load, preset cycling (all 9), Start/Stop with
+drone gain tracking, orbital module expand/drag, DSP chain shuffle/reorder, Master EQ/drive
+controls, and 1920/1024/640px layouts.
