@@ -2277,6 +2277,20 @@
     gap: 4px;
   }
 
+  .pedal-top-bar {
+    position: relative;
+    z-index: 10;
+  }
+  .pedal-shift-ctrls {
+    position: relative;
+    z-index: 12;
+  }
+  .pedal-drag-handle {
+    position: relative;
+    z-index: 12;
+    touch-action: none;
+    user-select: none;
+  }
   .btn-pedal-shift {
     width: 22px;
     height: 20px;
@@ -2290,6 +2304,9 @@
     font-size: 9px;
     cursor: pointer;
     transition: all 0.12s ease;
+    position: relative;
+    z-index: 15;
+    pointer-events: auto !important;
   }
   .btn-pedal-shift:hover:not(:disabled) {
     background: #192033;
@@ -4801,9 +4818,12 @@ function initAudio() {
 
 // Dynamic Web Audio API live node rewire manager for PEDALS & routing matrix
 function rewireDspChain(newOrder, immediate = false) {
-  if (!audioCtx || !masterBusPre || !masterBusPost) return;
   if (newOrder && Array.isArray(newOrder) && newOrder.length === 3) {
     dspChainOrder = [...newOrder];
+  }
+  if (!audioCtx || !masterBusPre || !masterBusPost) {
+    if (typeof updatePedalsOrderUI === 'function') updatePedalsOrderUI();
+    return;
   }
 
   const performConnect = () => {
@@ -4964,17 +4984,33 @@ function togglePedalBypass(key) {
   }
 }
 
-// Drag & drop handlers
+// Drag & drop handlers with unified Pointer Events + HTML5 drag fallback
 let draggedPedalKey = null;
+
+function reorderDspChainModules(sourceKey, targetKey) {
+  if (!sourceKey || !targetKey || sourceKey === targetKey) return;
+  const fromIdx = dspChainOrder.indexOf(sourceKey);
+  const toIdx = dspChainOrder.indexOf(targetKey);
+  if (fromIdx !== -1 && toIdx !== -1) {
+    dspChainOrder.splice(fromIdx, 1);
+    dspChainOrder.splice(toIdx, 0, sourceKey);
+    rewireDspChain(dspChainOrder, false);
+  }
+}
 
 function initPedalDragAndDrop() {
   const cards = document.querySelectorAll(".pedal-chassis");
+  const handles = document.querySelectorAll(".pedal-drag-handle");
+
+  // Allow dragging via dedicated handle or entire chassis
   cards.forEach(card => {
     card.addEventListener("dragstart", (e) => {
       draggedPedalKey = card.getAttribute("data-module");
       card.classList.add("dragging");
-      e.dataTransfer.effectAllowed = "move";
-      e.dataTransfer.setData("text/plain", draggedPedalKey);
+      if (e.dataTransfer) {
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", draggedPedalKey);
+      }
     });
 
     card.addEventListener("dragend", () => {
@@ -4985,7 +5021,7 @@ function initPedalDragAndDrop() {
 
     card.addEventListener("dragover", (e) => {
       e.preventDefault();
-      e.dataTransfer.dropEffect = "move";
+      if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
       card.classList.add("drag-over");
     });
 
@@ -4997,15 +5033,67 @@ function initPedalDragAndDrop() {
       e.preventDefault();
       card.classList.remove("drag-over");
       const targetKey = card.getAttribute("data-module");
-      if (draggedPedalKey && targetKey && draggedPedalKey !== targetKey) {
-        const fromIdx = dspChainOrder.indexOf(draggedPedalKey);
-        const toIdx = dspChainOrder.indexOf(targetKey);
-        if (fromIdx !== -1 && toIdx !== -1) {
-          dspChainOrder.splice(fromIdx, 1);
-          dspChainOrder.splice(toIdx, 0, draggedPedalKey);
-          rewireDspChain(dspChainOrder, false);
+      reorderDspChainModules(draggedPedalKey, targetKey);
+    });
+  });
+
+  // Pointer-event drag-and-drop on drag handles (reliable in all desktop/tablet viewports)
+  handles.forEach(handle => {
+    let pointerOriginX = 0;
+    let activeCard = null;
+    let activeModule = null;
+
+    handle.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activeCard = handle.closest(".pedal-chassis");
+      if (!activeCard) return;
+      activeModule = activeCard.getAttribute("data-module");
+      draggedPedalKey = activeModule;
+      pointerOriginX = e.clientX;
+      activeCard.classList.add("dragging");
+      handle.setPointerCapture(e.pointerId);
+
+      const onPointerMove = (ev) => {
+        // Find which pedal card is under the cursor
+        cards.forEach(c => {
+          const rect = c.getBoundingClientRect();
+          if (ev.clientX >= rect.left && ev.clientX <= rect.right &&
+              ev.clientY >= rect.top && ev.clientY <= rect.bottom) {
+            c.classList.add("drag-over");
+          } else {
+            c.classList.remove("drag-over");
+          }
+        });
+      };
+
+      const onPointerUp = (ev) => {
+        handle.releasePointerCapture(ev.pointerId);
+        window.removeEventListener("pointermove", onPointerMove);
+        window.removeEventListener("pointerup", onPointerUp);
+        window.removeEventListener("pointercancel", onPointerUp);
+
+        activeCard.classList.remove("dragging");
+        let dropTarget = null;
+        cards.forEach(c => {
+          c.classList.remove("drag-over");
+          const rect = c.getBoundingClientRect();
+          if (ev.clientX >= rect.left && ev.clientX <= rect.right &&
+              ev.clientY >= rect.top && ev.clientY <= rect.bottom) {
+            dropTarget = c.getAttribute("data-module");
+          }
+        });
+
+        if (dropTarget && dropTarget !== activeModule) {
+          reorderDspChainModules(activeModule, dropTarget);
         }
-      }
+        draggedPedalKey = null;
+        activeCard = null;
+      };
+
+      window.addEventListener("pointermove", onPointerMove);
+      window.addEventListener("pointerup", onPointerUp);
+      window.addEventListener("pointercancel", onPointerUp);
     });
   });
 }
