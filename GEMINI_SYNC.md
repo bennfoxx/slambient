@@ -446,6 +446,40 @@ arcade still shares; `fractalTheta` and `zoomPulse` are gone).
   longer starts the game); a 6s take saved as a valid 320 kbps MP3 with real audio (mean −9.7 dB);
   with the CDN blocked the same take saved as a valid stereo WAV.
 
+## Update — 2026-10-14 (Claude: header at 150% zoom, app fullscreen, Invaders rework)
+
+- **Header no longer breaks at 150% browser zoom.** Root cause: `.preset-bar` used
+  `repeat(5, 1fr)`; a bare `1fr` track can't shrink below its `nowrap` label, so the grid overflowed
+  under the BANK buttons. Now `repeat(5, minmax(0, 1fr))`, chips ellipsize (`display:block`,
+  `text-overflow: ellipsis`; the full name is always in the chip's `title` via
+  `initPresetChipTitles()`), and **below 1100px wide** the preset grid drops onto its own
+  full-width line under the brand (`flex-wrap` on `.brand-row`), with BANK staying top-right.
+  Also fixed the ≤1440px media rule that gave chips `padding: 5px 8px`, which pushed the label
+  down and clipped it. Checked at 1512 and 1920 px at 100% and 150%, and at 1280 px at 150%.
+- **New whole-app Full Screen button** (`#btnAppFullscreen`, `.header-utils` at the right end of
+  the transport row, filling the dead space Ben noted). `toggleAppFullscreen()` uses the real
+  Fullscreen API on `document.documentElement` (with the webkit prefix), so Esc works too; the
+  button state follows `fullscreenchange` (`syncAppFullscreenButton()`). Collapses to icon-only
+  below 1200px. Separate from the visualizer-only fullscreen. No letter shortcut, because A–; are
+  all QWERTY note keys.
+- **Slambient Invaders reworked so every wave is different** (whole `ARCADE` block replaced;
+  `ARCADE_ROWS` / `ARCADE_COLS` are gone, replaced by `ARCADE_TYPES` / `ARCADE_FORMATIONS`):
+  - Wave 1 is a block; each later wave picks a different formation (chevron, diamond, checker,
+    towers, stagger, ring), announced with a "WAVE n · NAME" banner. The formation sways.
+  - Enemy types are **mixed through the formation** (weighted random), one per instrument with its
+    own behavior: drone = armored (2 hits, flashes white, dims when damaged, heavy shots); drum =
+    **divers** that peel off, swoop at the player, fire once, loop off the bottom and drop back
+    into their slot (louder drums mean more dives, double points when shot mid-dive, ramming you
+    costs a life); chord = 3-way spread shot; arp = fast shots aimed at the player, with a jittery
+    animation.
+  - **Mothership**: a pink saucer crosses the top every ~15–30s for 100–300 × wave bonus and plays
+    a pentatonic run when hit.
+  - Still beat-locked (march step per beat) and energy-glowing as before. `arcadeInvaderPos()`
+    now takes `ts` (sway); `arcadeSlotPos()` is the formation slot, ignoring dives.
+- Verified in headless Chromium: header screenshots at the sizes above; bot-played Invaders for
+  ~15s plus forced waves 2–8 (all formations render, divers dive and return or ram, UFO hit
+  scores, armored drone takes 2 hits, spread/aimed/heavy shots fire); no console errors.
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE
@@ -495,5 +529,7 @@ arcade still shares; `fractalTheta` and `zoomPulse` are gone).
 ### Phase 7: Global Shortcuts, Custom Theming & Final Polish — 🟡 IN PROGRESS
 - [x] Keyboard playback binding (`Enter` toggles play/pause everywhere; Space reserved for Slambient Invaders)
 - [x] MP3 recording export (320 kbps via lazy-loaded lamejs, WAV fallback offline)
+- [x] Whole-app fullscreen button in header
+- [x] Header layout holds at 150% browser zoom
 - [ ] Modular color palette picker (custom color assignments per instrument, effect, and noise module)
 
