@@ -22,6 +22,7 @@
     --color-drum: #ff3838;
     --color-chord: #fed330;
     --color-arp: #7d5fff;
+    --color-noise: #1dd1a1;
     --color-filter: #2ed573;
     --color-delay: #ff793f;
     --color-reverb: #ff5fc4;
@@ -1702,8 +1703,12 @@
   }
   .lower-deck {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 14px;
+    align-items: stretch;
+  }
+  @media (max-width: 1440px) {
+    .lower-deck { grid-template-columns: repeat(3, 1fr); }
   }
   @media (max-width: 1024px) {
     .lower-deck { grid-template-columns: repeat(2, 1fr); }
@@ -1744,6 +1749,11 @@
     border-color: rgba(125, 95, 255, 0.38);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(125, 95, 255, 0.16);
   }
+  .strip-channel.noise-ch  {
+    border-top: 3px solid var(--color-noise);
+    border-color: rgba(29, 209, 161, 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(29, 209, 161, 0.16);
+  }
   .strip-channel.filter-ch {
     border-top: 3px solid var(--color-filter);
     border-color: rgba(46, 213, 115, 0.38);
@@ -1773,6 +1783,7 @@
   .strip-channel.drum-ch   .panel-header { border-bottom-color: rgba(255, 56, 56, 0.25); }
   .strip-channel.chord-ch  .panel-header { border-bottom-color: rgba(254, 211, 48, 0.25); }
   .strip-channel.arp-ch    .panel-header { border-bottom-color: rgba(125, 95, 255, 0.25); }
+  .strip-channel.noise-ch  .panel-header { border-bottom-color: rgba(29, 209, 161, 0.25); }
   .strip-channel.filter-ch .panel-header { border-bottom-color: rgba(46, 213, 115, 0.25); }
   .strip-channel.delay-ch  .panel-header { border-bottom-color: rgba(255, 121, 63, 0.25); }
   .strip-channel.reverb-ch .panel-header { border-bottom-color: rgba(255, 95, 196, 0.25); }
@@ -1787,6 +1798,7 @@
   .strip-channel.drum-ch   .panel-header > span:first-child { color: var(--color-drum);   text-shadow: 0 0 8px rgba(255, 56, 56, 0.35); }
   .strip-channel.chord-ch  .panel-header > span:first-child { color: var(--color-chord);  text-shadow: 0 0 8px rgba(254, 211, 48, 0.35); }
   .strip-channel.arp-ch    .panel-header > span:first-child { color: var(--color-arp);    text-shadow: 0 0 8px rgba(125, 95, 255, 0.35); }
+  .strip-channel.noise-ch  .panel-header > span:first-child { color: var(--color-noise);  text-shadow: 0 0 8px rgba(29, 209, 161, 0.35); }
   .strip-channel.filter-ch .panel-header > span:first-child { color: var(--color-filter); text-shadow: 0 0 8px rgba(46, 213, 115, 0.35); }
   .strip-channel.delay-ch  .panel-header > span:first-child { color: var(--color-delay);  text-shadow: 0 0 8px rgba(255, 121, 63, 0.35); }
   .strip-channel.reverb-ch .panel-header > span:first-child { color: var(--color-reverb); text-shadow: 0 0 8px rgba(255, 95, 196, 0.35); }
@@ -1815,6 +1827,7 @@
   .control-val.drum-val   { color: var(--color-drum); }
   .control-val.chord-val  { color: var(--color-chord); }
   .control-val.arp-val    { color: var(--color-arp); }
+  .control-val.noise-val  { color: var(--color-noise); }
   .control-val.filter-val { color: var(--color-filter); }
   .control-val.delay-val  { color: var(--color-delay); }
   .control-val.reverb-val { color: var(--color-reverb); }
@@ -1941,6 +1954,19 @@
   }
   .arp-ch .toggle-switch:hover .toggle-track {
     border-color: rgba(125, 95, 255, 0.6);
+  }
+
+  .noise-ch .toggle-switch input:checked + .toggle-track {
+    background: rgba(29, 209, 161, 0.22);
+    border-color: var(--color-noise);
+    box-shadow: 0 0 8px rgba(29, 209, 161, 0.4);
+  }
+  .noise-ch .toggle-switch input:checked + .toggle-track::before {
+    background: var(--color-noise);
+    box-shadow: 0 0 6px var(--color-noise);
+  }
+  .noise-ch .toggle-switch:hover .toggle-track {
+    border-color: rgba(29, 209, 161, 0.6);
   }
 
   .filter-ch .toggle-switch input:checked + .toggle-track {
@@ -2085,6 +2111,7 @@
   .drum-ch input[type="range"]::-webkit-slider-thumb:hover  { border-color: var(--color-drum); box-shadow: 0 0 8px var(--color-drum); }
   .chord-ch input[type="range"]::-webkit-slider-thumb:hover { border-color: var(--color-chord); box-shadow: 0 0 8px var(--color-chord); }
   .arp-ch input[type="range"]::-webkit-slider-thumb:hover   { border-color: var(--color-arp); box-shadow: 0 0 8px var(--color-arp); }
+  .noise-ch input[type="range"]::-webkit-slider-thumb:hover { border-color: var(--color-noise); box-shadow: 0 0 8px var(--color-noise); }
   .filter-ch input[type="range"]::-webkit-slider-thumb:hover{ border-color: var(--color-filter); box-shadow: 0 0 8px var(--color-filter); }
   .delay-ch input[type="range"]::-webkit-slider-thumb:hover { border-color: var(--color-delay); box-shadow: 0 0 8px var(--color-delay); }
   .reverb-ch input[type="range"]::-webkit-slider-thumb:hover { border-color: var(--color-reverb); box-shadow: 0 0 8px var(--color-reverb); }
@@ -2645,6 +2672,93 @@
     color: var(--text-tertiary);
     text-transform: uppercase;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  .btn-aux-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 16px;
+    padding: 0 5px;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    border-radius: 3px;
+    border: 1px solid var(--border-light);
+    background: #080a11;
+    color: var(--text-tertiary);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    cursor: var(--cursor-pointer) !important;
+    transition: all 0.12s ease;
+    margin-left: 6px;
+  }
+  .btn-aux-toggle:hover {
+    border-color: var(--border-bright);
+    color: #fff;
+  }
+  .drone-ch .btn-aux-toggle.active, .drone-ch .btn-power.active {
+    background: rgba(0, 229, 255, 0.18);
+    border-color: var(--color-drone);
+    color: var(--color-drone);
+    box-shadow: 0 0 6px rgba(0, 229, 255, 0.35);
+  }
+  .drum-ch .btn-aux-toggle.active, .drum-ch .btn-power.active {
+    background: rgba(255, 56, 56, 0.18);
+    border-color: var(--color-drum);
+    color: var(--color-drum);
+    box-shadow: 0 0 6px rgba(255, 56, 56, 0.35);
+  }
+  .chord-ch .btn-aux-toggle.active, .chord-ch .btn-power.active {
+    background: rgba(254, 211, 48, 0.18);
+    border-color: var(--color-chord);
+    color: var(--color-chord);
+    box-shadow: 0 0 6px rgba(254, 211, 48, 0.35);
+  }
+  .arp-ch .btn-aux-toggle.active, .arp-ch .btn-power.active {
+    background: rgba(125, 95, 255, 0.20);
+    border-color: var(--color-arp);
+    color: var(--color-arp);
+    box-shadow: 0 0 6px rgba(125, 95, 255, 0.35);
+  }
+  .noise-ch .btn-aux-toggle.active, .noise-ch .btn-power.active {
+    background: rgba(29, 209, 161, 0.18);
+    border-color: var(--color-noise);
+    color: var(--color-noise);
+    box-shadow: 0 0 6px rgba(29, 209, 161, 0.35);
+  }
+  .btn-drum-fill {
+    height: 24px;
+    padding: 0 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.7px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 56, 56, 0.45);
+    background: rgba(255, 56, 56, 0.08);
+    color: var(--color-drum);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    cursor: var(--cursor-pointer) !important;
+    transition: all 0.12s ease;
+  }
+  .btn-drum-fill:hover {
+    background: rgba(255, 56, 56, 0.22);
+    border-color: var(--color-drum);
+    box-shadow: 0 0 8px rgba(255, 56, 56, 0.45);
+    color: #fff;
+  }
+  .btn-drum-fill.filling, .btn-drum-fill:active {
+    background: var(--color-drum);
+    color: #07080c !important;
+    border-color: var(--color-drum);
+    box-shadow: 0 0 12px rgba(255, 56, 56, 0.8);
+    transform: scale(0.96);
+  }
+  .strip-channel > .control-row:last-child {
+    margin-top: auto;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
   }
 
   footer.app-footer {
@@ -3357,9 +3471,9 @@
   <div class="lower-deck view-grid-hidden">
     <div class="strip-channel drone-ch">
       <div class="panel-header">
-        <span>1. Sub & Drone</span>
+        <span>1. Sub &amp; Drone</span>
         <div class="panel-header-actions">
-          <button class="btn-power active" id="btnPower_drone" onclick="toggleDronePower()" title="Toggle Sub-Drone Power (On / Off)">PWR</button>
+          <button class="btn-power active" id="btnPower_drone" onclick="toggleChannelPower('drone')" title="Toggle Sub-Drone Power (On / Off)">PWR</button>
           <button class="btn-mute" id="btnMute_drone" onclick="toggleMute('drone')" title="Mute Sub-Drone">M</button>
           <button class="btn-solo" id="btnSolo_drone" onclick="toggleSolo('drone')" title="Solo Sub-Drone">S</button>
           <button class="badge-tag" style="color: var(--color-drone); border-color: rgba(0,206,201,0.3);" onclick="randomizeDrone()" title="Randomize this module"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
@@ -3426,7 +3540,10 @@
         <input type="range" id="knobDroneWander" min="0" max="100" value="20" title="Occasional drift to a nearby in-scale note before resolving back to the root" oninput="updateAudioParams()">
       </div>
       <div class="control-row">
-        <div class="control-label"><span>FX Send (Filter/Delay)</span><span class="control-val drone-val" id="lblDroneFx">35%</span></div>
+        <div class="control-label">
+          <span>FX Send (Filter/Delay)</span>
+          <span style="display:inline-flex;align-items:center;"><span class="control-val drone-val" id="lblDroneFx">35%</span><button type="button" class="btn-aux-toggle active" id="btnAux_drone" onclick="toggleChannelAux('drone')" title="Toggle Aux FX Bus Routing for Sub & Drone">AUX</button></span>
+        </div>
         <input type="range" id="knobDroneFx" min="0" max="100" value="35" oninput="updateAudioParams()">
       </div>
       <div class="control-row">
@@ -3439,7 +3556,8 @@
       <div class="panel-header">
         <span>2. Drums</span>
         <div class="panel-header-actions">
-          <button class="btn-power active" id="btnPower_drum" onclick="toggleMute('drum')" title="Toggle Drum Power (On / Off)">PWR</button>
+          <button class="btn-drum-fill" id="btnDrumFill" onclick="triggerDrumFill(true)" title="Trigger an immediate rhythmic drum fill">FILL</button>
+          <button class="btn-power active" id="btnPower_drum" onclick="toggleChannelPower('drum')" title="Toggle Drum Power (On / Off)">PWR</button>
           <button class="btn-mute" id="btnMute_drum" onclick="toggleMute('drum')" title="Mute Drums">M</button>
           <button class="btn-solo" id="btnSolo_drum" onclick="toggleSolo('drum')" title="Solo Drums">S</button>
           <button class="badge-tag" style="color: var(--color-drum); border-color: rgba(255,71,87,0.3);" onclick="randomizeDrums()" title="Randomize this module"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
@@ -3448,15 +3566,15 @@
       <div class="control-row">
         <div class="control-label">Groove Algorithm</div>
         <div class="select-with-toggle">
-          <select id="selDrumStyle" onchange="updateAudioParams()">
-          <option value="ORGANIC" selected>Four Tet Woodblock & Glitch</option>
+          <select id="selDrumStyle" onchange="onDrumStyleChange()">
+          <option value="ORGANIC" selected>Four Tet Woodblock &amp; Glitch</option>
           <option value="TABLA_GROOVE">Classical Indian Tabla (Teental / Rupak)</option>
           <option value="INDUSTRIAL_DRIVE">Industrial 909 Heavy Drive (Hard)</option>
           <option value="BREAKBEAT_POCKET">Fat Breakbeat Pocket (Full/Hard)</option>
           <option value="FOUR_ON_FLOOR">Four-on-the-Floor Club Drive (Full)</option>
-          <option value="HEARTBEAT">Sub Heartbeat & Rim</option>
+          <option value="HEARTBEAT">Sub Heartbeat &amp; Rim</option>
           <option value="DUB_TAPE">Polyrhythmic Tape Dub (7/11)</option>
-          <option value="MINIMAL_CLICK">Vinyl Clicks & Dust</option>
+          <option value="MINIMAL_CLICK">Vinyl Clicks &amp; Dust</option>
           <option value="MUTED">Muted</option>
           </select>
           <label class="toggle-switch" title="Auto-Evolve: on each chord change, there's a chance the groove algorithm also shifts">
@@ -3464,6 +3582,15 @@
             <span class="toggle-track"></span>
           </label>
         </div>
+      </div>
+      <div class="control-row">
+        <div class="control-label">Drum Kit &amp; Character</div>
+        <select id="selDrumKit" onchange="updateAudioParams()">
+          <option value="ORGANIC_KIT" selected>Organic Wood &amp; Brush (Warm)</option>
+          <option value="ANALOG_CRUNCH">Analog 808 / 909 (Punchy)</option>
+          <option value="TAPE_DUST">Lo-Fi Tape &amp; Vinyl (Dusty)</option>
+          <option value="ACOUSTIC_CHAMBER">Chamber Percussion (Crisp)</option>
+        </select>
       </div>
       <div class="control-row">
         <div class="control-label"><span>Evolution Chance</span><span class="control-val drum-val" id="lblDrumEvolveChance">25%</span></div>
@@ -3478,7 +3605,10 @@
         <input type="range" id="knobDrumDensity" min="0" max="100" value="65" oninput="updateAudioParams()">
       </div>
       <div class="control-row">
-        <div class="control-label"><span>FX Send (Filter/Delay)</span><span class="control-val drum-val" id="lblDrumFx">40%</span></div>
+        <div class="control-label">
+          <span>FX Send (Filter/Delay)</span>
+          <span style="display:inline-flex;align-items:center;"><span class="control-val drum-val" id="lblDrumFx">40%</span><button type="button" class="btn-aux-toggle active" id="btnAux_drum" onclick="toggleChannelAux('drum')" title="Toggle Aux FX Bus Routing for Drums">AUX</button></span>
+        </div>
         <input type="range" id="knobDrumFx" min="0" max="100" value="40" oninput="updateAudioParams()">
       </div>
       <div class="control-row">
@@ -3489,9 +3619,9 @@
 
     <div class="strip-channel chord-ch">
       <div class="panel-header">
-        <span>3. Chords & Voicing</span>
+        <span>3. Chords &amp; Voicing</span>
         <div class="panel-header-actions">
-          <button class="btn-power active" id="btnPower_chord" onclick="toggleMute('chord')" title="Toggle Chord Voice Power (On / Off)">PWR</button>
+          <button class="btn-power active" id="btnPower_chord" onclick="toggleChannelPower('chord')" title="Toggle Chord Voice Power (On / Off)">PWR</button>
           <button class="btn-mute" id="btnMute_chord" onclick="toggleMute('chord')" title="Mute Chords">M</button>
           <button class="btn-solo" id="btnSolo_chord" onclick="toggleSolo('chord')" title="Solo Chords">S</button>
           <button class="badge-tag" style="color: var(--color-chord); border-color: rgba(255,165,2,0.3);" onclick="randomizeChords()" title="Randomize this module"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
@@ -3501,16 +3631,34 @@
         <div class="control-label">Chord Instrument</div>
         <select id="selChordTimbre" onchange="updateAudioParams()">
           <option value="WARM_PAD" selected>Warm Analog Pad (Eno / BOC)</option>
-          <option value="SITAR_STRINGS">Maihar Sitar Strings (Resonant Jawari & Meend)</option>
+          <option value="SITAR_STRINGS">Maihar Sitar Strings (Resonant Jawari &amp; Meend)</option>
           <option value="PURE_SINE_GLASS">Pure Mineral Glass (Yoshimura / Budd)</option>
-          <option value="CHAMBER_WOODS">Chamber Woods & Flute (Pastoral Mellotron)</option>
+          <option value="CHAMBER_WOODS">Chamber Woods &amp; Flute (Pastoral Mellotron)</option>
           <option value="CELESTIAL_ORGAN">Celestial Flute Organ (Cathedral / Frahm)</option>
-          <option value="VIBES_CELESTE">Vibraphone & Celesta (Acoustic Chime)</option>
+          <option value="VIBES_CELESTE">Vibraphone &amp; Celesta (Acoustic Chime)</option>
           <option value="RHODES">Rhodes Electric Piano (Tine Bark + Tremolo)</option>
           <option value="GLASS_EP">DX7 Electric Piano (Glass Tines)</option>
           <option value="LOFI_KEYS">Lofi Wobbly Tape Keys (Vintage)</option>
           <option value="DIGITAL_STRINGS">Solina Digital Strings (Shimmer)</option>
           <option value="SAW_SYNTH">Juno Saw Synth (Biting 80s)</option>
+        </select>
+      </div>
+      <div class="control-row">
+        <div class="control-label">Chord Voicing Shape</div>
+        <select id="selChordVoicing" onchange="onChordVoicingSelectChange()">
+          <option value="AUTO" selected>Auto-Meander (Generative Drift)</option>
+          <option value="0">Warm 9th (I-III-V-IX)</option>
+          <option value="1">Dream 11th (Suspended Cloud)</option>
+          <option value="2">Floating 6/9 (Pastoral Pentatonic)</option>
+          <option value="3">Sus2 Spread (Open Fifths)</option>
+          <option value="4">Lydian Ether (Raised #11)</option>
+          <option value="5">Fifth Stack (Quintal Pillar)</option>
+          <option value="6">Quartal Stack (McCoy Fourths)</option>
+          <option value="7">Prism Maj9 (Glass Voicing)</option>
+          <option value="8">Octave Bloom (Wide Overtone)</option>
+          <option value="9">Velvet Add9 (Warm Cluster)</option>
+          <option value="10">Deep Minor 11 (Nocturnal)</option>
+          <option value="11">Ghost Dyad (Hollow Fifth)</option>
         </select>
       </div>
       <div class="control-row">
@@ -3530,7 +3678,10 @@
         <input type="range" id="knobChordSustain" min="50" max="200" value="100" title="Scales how long each chord/lead note rings out -- longer for atmospheric swells, shorter for a more rhythmic feel" oninput="updateAudioParams()">
       </div>
       <div class="control-row">
-        <div class="control-label"><span>FX Send (Filter/Delay)</span><span class="control-val chord-val" id="lblChordFx">90%</span></div>
+        <div class="control-label">
+          <span>FX Send (Filter/Delay)</span>
+          <span style="display:inline-flex;align-items:center;"><span class="control-val chord-val" id="lblChordFx">90%</span><button type="button" class="btn-aux-toggle active" id="btnAux_chord" onclick="toggleChannelAux('chord')" title="Toggle Aux FX Bus Routing for Chords">AUX</button></span>
+        </div>
         <input type="range" id="knobChordFx" min="0" max="100" value="90" oninput="updateAudioParams()">
       </div>
       <div class="control-row">
@@ -3543,7 +3694,7 @@
       <div class="panel-header">
         <span>4. Shimmer Arp</span>
         <div class="panel-header-actions">
-          <button class="btn-power active" id="btnPower_arp" onclick="toggleMute('arp')" title="Toggle Shimmer Arp Power (On / Off)">PWR</button>
+          <button class="btn-power active" id="btnPower_arp" onclick="toggleChannelPower('arp')" title="Toggle Shimmer Arp Power (On / Off)">PWR</button>
           <button class="btn-mute" id="btnMute_arp" onclick="toggleMute('arp')" title="Mute Shimmer Arp">M</button>
           <button class="btn-solo" id="btnSolo_arp" onclick="toggleSolo('arp')" title="Solo Shimmer Arp">S</button>
           <button class="badge-tag" style="color: var(--color-arp); border-color: rgba(162,155,254,0.3);" onclick="randomizeArp()" title="Randomize this module"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
@@ -3555,7 +3706,7 @@
           <select id="selArpPattern" onchange="updateAudioParams()">
             <option value="SHIMMER" selected>Granular Shimmer (Four Tet)</option>
             <option value="UP">Ascending Run</option>
-            <option value="PENDULUM">Pendulum (Up & Down)</option>
+            <option value="PENDULUM">Pendulum (Up &amp; Down)</option>
             <option value="RAGA_TAAN">Raga Taan (Breathy Beat-Locked Phrase)</option>
             <option value="CHORD_BURST">11-Step Coprime Burst</option>
             <option value="OFF">Disabled</option>
@@ -3603,12 +3754,77 @@
         <input type="range" id="knobArpOctaves" min="1" max="4" step="1" value="2" title="How many octaves the arp pool spans above the chord" oninput="updateAudioParams()">
       </div>
       <div class="control-row">
-        <div class="control-label"><span>FX Send (Filter/Delay)</span><span class="control-val arp-val" id="lblArpFx">100%</span></div>
+        <div class="control-label">
+          <span>FX Send (Filter/Delay)</span>
+          <span style="display:inline-flex;align-items:center;"><span class="control-val arp-val" id="lblArpFx">100%</span><button type="button" class="btn-aux-toggle active" id="btnAux_arp" onclick="toggleChannelAux('arp')" title="Toggle Aux FX Bus Routing for Shimmer Arp">AUX</button></span>
+        </div>
         <input type="range" id="knobArpFx" min="0" max="100" value="100" oninput="updateAudioParams()">
       </div>
       <div class="control-row">
         <div class="control-label"><span>Arp Master Volume</span><span class="control-val arp-val" id="lblArpVol">85%</span></div>
         <input type="range" id="knobArpVol" min="0" max="100" value="85" oninput="updateAudioParams()">
+      </div>
+    </div>
+
+    <div class="strip-channel noise-ch">
+      <div class="panel-header">
+        <span>5. Atmosphere &amp; Noise</span>
+        <div class="panel-header-actions">
+          <button class="btn-power active" id="btnPower_noise" onclick="toggleChannelPower('noise')" title="Toggle Atmosphere & Noise Power (On / Off)">PWR</button>
+          <button class="btn-mute" id="btnMute_noise" onclick="toggleMute('noise')" title="Mute Atmosphere & Noise">M</button>
+          <button class="btn-solo" id="btnSolo_noise" onclick="toggleSolo('noise')" title="Solo Atmosphere & Noise">S</button>
+          <button class="badge-tag" style="color: var(--color-noise); border-color: rgba(29,209,161,0.35);" onclick="randomizeNoise()" title="Randomize this module"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
+        </div>
+      </div>
+      <div class="control-row">
+        <div class="control-label">Soundscape Profile</div>
+        <select id="selNoiseProfile" onchange="updateAudioParams()">
+          <option value="RAIN" selected>Rain (Gentle Rainfall &amp; Drops)</option>
+          <option value="THUNDER">Thunder (Distant Rolling Storm)</option>
+          <option value="WHITE_TAPE">Tape Noise (Warm Analog Hiss)</option>
+          <option value="BROOK">Bubbling Brook (Mountain Stream)</option>
+          <option value="CRICKETS">Crickets (Nocturnal Field Chorus)</option>
+          <option value="WIND">Alpine Wind (Resonant Gusts)</option>
+        </select>
+      </div>
+      <div class="control-row">
+        <div class="control-label">Trigger &amp; Density Mode</div>
+        <div class="select-with-toggle">
+          <select id="selNoiseMode" onchange="updateAudioParams()">
+            <option value="GUSTS" selected>Organic Gusts (Breathing Swells)</option>
+            <option value="CONTINUOUS">Continuous Bed (Steady Texture)</option>
+            <option value="SPARSE">Sparse Events (Scattered Accents)</option>
+            <option value="RHYTHMIC">Rhythmic Pulse (Tempo-Locked)</option>
+            <option value="STORM_SWELL">Storm Swell (Slow Macro Surge)</option>
+          </select>
+          <label class="toggle-switch" title="Auto-Evolve: on each chord change, there's a chance the environmental profile or trigger mode shifts">
+            <input type="checkbox" id="chkAutoEvolveNoise" checked onchange="updateAudioParams()">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+      </div>
+      <div class="control-row">
+        <div class="control-label"><span>Texture / Tone Color</span><span class="control-val noise-val" id="lblNoiseColor">55%</span></div>
+        <input type="range" id="knobNoiseColor" min="0" max="100" value="55" title="Spectral brightness and formant resonance of the environmental generator" oninput="updateAudioParams()">
+      </div>
+      <div class="control-row">
+        <div class="control-label"><span>Event Trigger Rate</span><span class="control-val noise-val" id="lblNoiseRate">45%</span></div>
+        <input type="range" id="knobNoiseRate" min="0" max="100" value="45" title="Frequency of randomized raindrops, thunder rumbles, water bubbles, or cricket chirps" oninput="updateAudioParams()">
+      </div>
+      <div class="control-row">
+        <div class="control-label"><span>Spatial Drift / Swell</span><span class="control-val noise-val" id="lblNoiseDrift">60%</span></div>
+        <input type="range" id="knobNoiseDrift" min="0" max="100" value="60" title="Stereo panning width and organic LFO breathing depth" oninput="updateAudioParams()">
+      </div>
+      <div class="control-row">
+        <div class="control-label">
+          <span>FX Send (Filter/Delay)</span>
+          <span style="display:inline-flex;align-items:center;"><span class="control-val noise-val" id="lblNoiseFx">65%</span><button type="button" class="btn-aux-toggle active" id="btnAux_noise" onclick="toggleChannelAux('noise')" title="Toggle Aux FX Bus Routing for Atmosphere & Noise">AUX</button></span>
+        </div>
+        <input type="range" id="knobNoiseFx" min="0" max="100" value="65" oninput="updateAudioParams()">
+      </div>
+      <div class="control-row">
+        <div class="control-label"><span>Noise Master Volume</span><span class="control-val noise-val" id="lblNoiseVol">32%</span></div>
+        <input type="range" id="knobNoiseVol" min="0" max="100" value="32" oninput="updateAudioParams()">
       </div>
     </div>
   </div>
@@ -3641,7 +3857,7 @@
       <!-- 1. FILTER PEDAL -->
       <div class="pedal-chassis pedal-filter" id="pedalCard_FILTER" data-module="FILTER">
         <div class="panel-header">
-          <span id="pedalTitle_FILTER">5. Filter &amp; Env</span>
+          <span id="pedalTitle_FILTER">6. Filter &amp; Env</span>
           <div class="panel-header-actions">
             <span class="pedal-slot-badge" id="slotBadge_FILTER">IN</span>
             <button class="btn-pedal-shift" onclick="shiftPedalLeft('FILTER')" id="shiftLeft_FILTER" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
@@ -3696,7 +3912,7 @@
       <!-- 2. DELAY PEDAL -->
       <div class="pedal-chassis pedal-delay" id="pedalCard_DELAY" data-module="DELAY">
         <div class="panel-header">
-          <span id="pedalTitle_DELAY">6. Analog Delay</span>
+          <span id="pedalTitle_DELAY">7. Analog Delay</span>
           <div class="panel-header-actions">
             <span class="pedal-slot-badge" id="slotBadge_DELAY">INSERT</span>
             <button class="btn-pedal-shift" onclick="shiftPedalLeft('DELAY')" id="shiftLeft_DELAY" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
@@ -3758,7 +3974,7 @@
       <!-- 3. REVERB & CHORUS PEDAL (Pink) -->
       <div class="pedal-chassis pedal-space pedal-reverb" id="pedalCard_SPACE" data-module="SPACE">
         <div class="panel-header">
-          <span id="pedalTitle_SPACE">7. Reverb &amp; Chorus</span>
+          <span id="pedalTitle_SPACE">8. Reverb &amp; Chorus</span>
           <div class="panel-header-actions">
             <span class="pedal-slot-badge" id="slotBadge_SPACE">OUT</span>
             <button class="btn-pedal-shift" onclick="shiftPedalLeft('SPACE')" id="shiftLeft_SPACE" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
@@ -3821,7 +4037,7 @@
       <!-- 4. FINAL ELEMENT: MASTER EQ & OUT -->
       <div class="strip-channel master-eq-ch space-ch" id="masterEqOutStrip">
         <div class="panel-header">
-          <span>8. Master EQ &amp; Out</span>
+          <span>9. Master EQ &amp; Out</span>
           <button class="badge-tag" style="color: var(--color-space); border-color: rgba(75,123,236,0.3);" onclick="randomizeSpace()" title="Randomize Master EQ & Out"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
         </div>
         <div class="control-row">
@@ -3998,6 +4214,9 @@ function pickDifferentFrom(pool, current) {
   return next;
 }
 
+const AUTO_EVOLVE_NOISE_PROFILES = ["RAIN", "THUNDER", "WHITE_TAPE", "BROOK", "CRICKETS", "WIND"];
+const AUTO_EVOLVE_NOISE_MODES = ["GUSTS", "CONTINUOUS", "SPARSE", "RHYTHMIC", "STORM_SWELL"];
+
 function maybeAutoEvolve() {
   if ((autoEvolveArpPattern || autoEvolveArpTimbre) && randFloat() < autoEvolveArpChance) {
     if (autoEvolveArpPattern) {
@@ -4010,8 +4229,22 @@ function maybeAutoEvolve() {
     }
   }
   if (autoEvolveDrumGroove && randFloat() < autoEvolveDrumChance) {
+    const prevStyle = drumStyle;
     drumStyle = pickDifferentFrom(AUTO_EVOLVE_DRUM_STYLES, drumStyle);
     const selDrum = document.getElementById("selDrumStyle"); if (selDrum) selDrum.value = drumStyle;
+    if (prevStyle !== drumStyle && typeof triggerDrumFill === "function") {
+      triggerDrumFill(false);
+    }
+  }
+  if (autoEvolveNoise && randFloat() < 0.25) {
+    if (randFloat() < 0.65) {
+      noiseProfile = pickDifferentFrom(AUTO_EVOLVE_NOISE_PROFILES, noiseProfile);
+      const selNP = document.getElementById("selNoiseProfile"); if (selNP) selNP.value = noiseProfile;
+    } else {
+      noiseMode = pickDifferentFrom(AUTO_EVOLVE_NOISE_MODES, noiseMode);
+      const selNM = document.getElementById("selNoiseMode"); if (selNM) selNM.value = noiseMode;
+    }
+    if (typeof updateNoiseEngineParams === "function") updateNoiseEngineParams();
   }
 }
 
@@ -4032,6 +4265,18 @@ let tanpuraTuning = "PA";
 let tanpuraStep = 0;
 let tanpuraBusGain = null;
 let drumStyle = "ORGANIC";
+let drumKit = "ORGANIC_KIT";
+
+let chordVoicingMode = "AUTO"; // "AUTO" or "0".."11"
+
+let noiseProfile = "RAIN";
+let noiseMode = "GUSTS";
+let autoEvolveNoise = true;
+let noiseColorVal = 0.55;
+let noiseRateVal = 0.45;
+let noiseDriftVal = 0.60;
+let noiseVol = 0.32;
+let noiseFxSend = 0.65;
 
 let arpPattern = "SHIMMER";
 let arpTimbre = "GLASS_FM";
@@ -4491,7 +4736,10 @@ let reverbToneFilter, chorusInputGain, chorusWetGain, chorusVoices = [];
 let masterVolumeGain;
 let masterVolumeVal = 0.85;
 let masterMuted = false;
-let drumBusGain, arpBusGain;
+let drumBusGain, arpBusGain, noiseBusGain;
+let noiseDryGain, noiseFxSendGain, noiseAnalyser;
+let noiseBedSource, noiseBedFilter1, noiseBedFilter2, noiseBedPan, noiseBedGain;
+let noiseGustLFO, noiseGustLFOGain, noiseSweepLFO, noiseSweepLFOGain, noisePanLFO, noisePanLFOGain;
 let droneOsc1, droneOsc2, droneGain, droneFilter;
 // Digeridoo buzz layer: dedicated lip-reed-style oscillators (not a reuse
 // of droneOsc1/2) feeding a distortion stage, a 3-formant resonance bank,
@@ -4505,7 +4753,7 @@ let droneGrowlLFO, droneGrowlLFOGain;
 let droneFormantLFO, droneFormantLFOGain;
 
 let drumAnalyser, chordAnalyser, arpAnalyser, droneAnalyser, masterAnalyser;
-let masterFilter1, masterFilter2;
+let masterFilter1, masterFilter2, masterFilterCompGain;
 let analogDelayNode, delayFeedbackGain, delayDampingFilter, delaySaturationNode;
 let delayDryGain, delayWetGain, delayLFO, delayLFOGain;
 
@@ -4515,6 +4763,39 @@ let delayModuleInput, delayModuleOutput;
 let spaceModuleInput, spaceModuleOutput;
 let spaceDryGain;
 let dspChainOrder = ['FILTER', 'DELAY', 'SPACE'];
+
+// Asymmetric warm analog tape saturation curve (even + odd harmonic enrichment)
+function makeAnalogTapeCurve(drivePct = 15, n_samples = 1024) {
+  const curve = new Float32Array(n_samples);
+  const k = 1.0 + (Math.max(0, Math.min(100, drivePct)) / 100) * 3.1;
+  const asym = 0.08 * (drivePct / 100);
+  const norm = Math.tanh(k);
+  for (let i = 0; i < n_samples; ++i) {
+    const x = (i * 2) / n_samples - 1;
+    // Slight DC bias before tanh adds warm 2nd-harmonic tube/tape character
+    const shifted = Math.tanh((x + asym) * k) - Math.tanh(asym * k);
+    curve[i] = Math.max(-0.98, Math.min(0.98, shifted / (norm || 1)));
+  }
+  return curve;
+}
+
+// Jawari curved bone/ebony bridge grazing curve for Maihar Sitar physical model
+let jawariCurveCache = null;
+function getJawariCurve(buzzAmount = 0.7) {
+  const n = 1024;
+  const curve = new Float32Array(n);
+  const k = 1.8 + buzzAmount * 3.4;
+  for (let i = 0; i < n; i++) {
+    const x = (i * 2) / n - 1;
+    // Parabolic grazing asymmetry: positive half-wave grazes the curved bridge face
+    if (x >= 0) {
+      curve[i] = Math.tanh(x * k) + 0.18 * Math.sin(x * Math.PI * 3.0) * buzzAmount;
+    } else {
+      curve[i] = Math.tanh(x * (k * 0.72));
+    }
+  }
+  return curve;
+}
 
 // A real didgeridoo's buzz comes from lip-reed excitation against the bore
 // -- harmonically dense and slightly irregular, not a clean built-in
@@ -4541,11 +4822,13 @@ function initAudio() {
   chordAnalyser = audioCtx.createAnalyser(); chordAnalyser.fftSize = 512;
   arpAnalyser = audioCtx.createAnalyser(); arpAnalyser.fftSize = 512;
   droneAnalyser = audioCtx.createAnalyser(); droneAnalyser.fftSize = 512;
+  noiseAnalyser = audioCtx.createAnalyser(); noiseAnalyser.fftSize = 512;
   masterAnalyser = audioCtx.createAnalyser(); masterAnalyser.fftSize = 1024;
 
   masterGain = audioCtx.createGain(); masterGain.gain.value = 0.75;
   drumBusGain = audioCtx.createGain(); drumBusGain.gain.value = drumVol * 0.78;
   arpBusGain = audioCtx.createGain(); arpBusGain.gain.value = arpVol * 0.90;
+  noiseBusGain = audioCtx.createGain(); noiseBusGain.gain.value = 0.0001; // soft startup gated until play
 
   chordBusGain = audioCtx.createGain(); chordBusGain.gain.value = chordVol;
   chordBusGain.connect(masterGain);
@@ -4658,6 +4941,60 @@ function initAudio() {
   tanpuraBusGain.gain.value = 0.0001; // soft startup: gated until transport engagement
   tanpuraBusGain.connect(droneAnalyser);
 
+  // 5. ATMOSPHERE & NOISE Continuous Bed Engine
+  noiseBedSource = audioCtx.createBufferSource();
+  noiseBedSource.buffer = getPinkNoiseBuffer();
+  noiseBedSource.loop = true;
+
+  noiseBedFilter1 = audioCtx.createBiquadFilter();
+  noiseBedFilter1.type = "bandpass";
+  noiseBedFilter1.frequency.value = 900;
+  noiseBedFilter1.Q.value = 1.2;
+
+  noiseBedFilter2 = audioCtx.createBiquadFilter();
+  noiseBedFilter2.type = "lowpass";
+  noiseBedFilter2.frequency.value = 2400;
+  noiseBedFilter2.Q.value = 0.8;
+
+  noiseBedGain = audioCtx.createGain();
+  noiseBedGain.gain.value = 0.28;
+
+  noiseBedPan = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : null;
+
+  noiseGustLFO = audioCtx.createOscillator(); noiseGustLFO.type = "sine";
+  noiseGustLFO.frequency.value = 0.14;
+  noiseGustLFOGain = audioCtx.createGain(); noiseGustLFOGain.gain.value = 0.12;
+  noiseGustLFO.connect(noiseGustLFOGain);
+  noiseGustLFOGain.connect(noiseBedGain.gain);
+  noiseGustLFO.start();
+
+  noiseSweepLFO = audioCtx.createOscillator(); noiseSweepLFO.type = "sine";
+  noiseSweepLFO.frequency.value = 0.09;
+  noiseSweepLFOGain = audioCtx.createGain(); noiseSweepLFOGain.gain.value = 280;
+  noiseSweepLFO.connect(noiseSweepLFOGain);
+  noiseSweepLFOGain.connect(noiseBedFilter1.frequency);
+  noiseSweepLFO.start();
+
+  if (noiseBedPan) {
+    noisePanLFO = audioCtx.createOscillator(); noisePanLFO.type = "sine";
+    noisePanLFO.frequency.value = 0.06;
+    noisePanLFOGain = audioCtx.createGain(); noisePanLFOGain.gain.value = 0.45;
+    noisePanLFO.connect(noisePanLFOGain);
+    noisePanLFOGain.connect(noiseBedPan.pan);
+    noisePanLFO.start();
+  }
+
+  noiseBedSource.connect(noiseBedFilter1);
+  noiseBedFilter1.connect(noiseBedFilter2);
+  noiseBedFilter2.connect(noiseBedGain);
+  if (noiseBedPan) {
+    noiseBedGain.connect(noiseBedPan);
+    noiseBedPan.connect(noiseBusGain);
+  } else {
+    noiseBedGain.connect(noiseBusGain);
+  }
+  noiseBedSource.start();
+
   masterBusPre = audioCtx.createGain(); masterBusPre.gain.value = 1.0;
   masterBusPost = audioCtx.createGain(); masterBusPost.gain.value = 1.0;
 
@@ -4681,21 +5018,29 @@ function initAudio() {
   arpDryGain.connect(masterBusPost); arpAnalyser.connect(arpFxSendGain);
   arpFxSendGain.connect(masterBusPre);
 
-  // 1. FILTER Module boundary & internal wiring
+  noiseDryGain = audioCtx.createGain(); noiseFxSendGain = audioCtx.createGain();
+  noiseBusGain.connect(noiseAnalyser); noiseAnalyser.connect(noiseDryGain);
+  noiseDryGain.connect(masterBusPost); noiseAnalyser.connect(noiseFxSendGain);
+  noiseFxSendGain.connect(masterBusPre);
+
+  // 1. FILTER Module boundary & internal wiring (staggered Q + resonance gain compensation)
   filterModuleInput = audioCtx.createGain();
   filterModuleOutput = audioCtx.createGain();
   masterFilter1 = audioCtx.createBiquadFilter(); masterFilter1.type = "lowpass";
   masterFilter1.frequency.value = masterBaseCutoff; masterFilter1.Q.value = masterResonance;
   masterFilter2 = audioCtx.createBiquadFilter(); masterFilter2.type = "lowpass";
-  masterFilter2.frequency.value = masterBaseCutoff; masterFilter2.Q.value = masterResonance;
+  masterFilter2.frequency.value = masterBaseCutoff; masterFilter2.Q.value = Math.max(0.5, masterResonance * 0.72);
+  masterFilterCompGain = audioCtx.createGain();
+  masterFilterCompGain.gain.value = 1.0 + Math.min(0.45, Math.max(0, (masterResonance - 1.0) * 0.04));
   filterModuleInput.connect(masterFilter1);
   masterFilter1.connect(masterFilter2);
-  masterFilter2.connect(filterModuleOutput);
+  masterFilter2.connect(masterFilterCompGain);
+  masterFilterCompGain.connect(filterModuleOutput);
 
   filterLFO = audioCtx.createOscillator(); filterLFO.type = "sine";
   filterLFO.frequency.value = filterLfoRateHz;
   filterLFODepthGain = audioCtx.createGain();
-  filterLFODepthGain.gain.value = masterBaseCutoff * filterLfoDepth * 0.5;
+  filterLFODepthGain.gain.value = masterBaseCutoff * filterLfoDepth * 0.68;
   filterLFO.connect(filterLFODepthGain);
   filterLFODepthGain.connect(masterFilter1.frequency);
   filterLFODepthGain.connect(masterFilter2.frequency);
@@ -4711,12 +5056,7 @@ function initAudio() {
   delayDampingFilter.frequency.value = delayToneHz;
 
   delaySaturationNode = audioCtx.createWaveShaper();
-  const n_samples = 512, curve = new Float32Array(n_samples);
-  for (let i = 0; i < n_samples; ++i) {
-    let x = (i * 2) / n_samples - 1;
-    curve[i] = Math.tanh(x * 1.6);
-  }
-  delaySaturationNode.curve = curve;
+  delaySaturationNode.curve = makeAnalogTapeCurve(28, 512);
 
   delayLFO = audioCtx.createOscillator(); delayLFOGain = audioCtx.createGain();
   delayLFO.frequency.value = 0.35;
@@ -4804,14 +5144,13 @@ function initAudio() {
   masterEqHigh.gain.value = masterEqHighVal;
 
   masterDriveNode = audioCtx.createWaveShaper();
-  const driveSamples = 512, driveCurve = new Float32Array(driveSamples);
-  for (let i = 0; i < driveSamples; ++i) {
-    let x = (i * 2) / driveSamples - 1;
-    driveCurve[i] = Math.tanh(x * 1.2);
-  }
-  masterDriveNode.curve = driveCurve;
+  masterDriveNode.curve = makeAnalogTapeCurve(masterDriveVal, 1024);
+  masterDriveNode.oversample = "2x";
 
-  saturationNode = audioCtx.createWaveShaper(); saturationNode.curve = curve;
+  saturationNode = audioCtx.createWaveShaper();
+  saturationNode.curve = makeAnalogTapeCurve(18, 1024);
+  saturationNode.oversample = "2x";
+
   limiterNode = audioCtx.createDynamicsCompressor();
   limiterNode.threshold.value = -1.0; limiterNode.knee.value = 0;
   limiterNode.ratio.value = 20; limiterNode.attack.value = 0.002; limiterNode.release.value = 0.08;
@@ -4920,12 +5259,12 @@ function updatePedalsOrderUI() {
   const container = document.getElementById("masterDeckUnified") || document.getElementById("pedalsGrid");
   if (!container) return;
 
-  // Append each pedal in current dspChainOrder, updating dynamic numbers (5, 6, 7)
+  // Append each pedal in current dspChainOrder, updating dynamic numbers (6, 7, 8 after 5. Atmosphere & Noise)
   dspChainOrder.forEach((key, idx) => {
     const el = document.getElementById("pedalCard_" + key);
     if (el) container.appendChild(el);
 
-    const chainNum = 5 + idx; // Slot 0 -> 5, Slot 1 -> 6, Slot 2 -> 7
+    const chainNum = 6 + idx; // Slot 0 -> 6, Slot 1 -> 7, Slot 2 -> 8
 
     // Update pedal card header title
     const titleEl = document.getElementById("pedalTitle_" + key) || (el ? el.querySelector(".panel-header > span:first-child") : null);
@@ -5649,8 +5988,12 @@ function startNoteLive(midi, vel = 90) {
     osc1.frequency.exponentialRampToValueAtTime(baseFreq, now + 0.065);
     osc2.frequency.setValueAtTime(baseFreq * 2.0, now);
     osc2.detune.setValueAtTime(12, now);
-    voiceFilter.frequency.setValueAtTime(Math.min(2600, baseFreq * 5.2), now);
-    attackTime = 0.018; sustainVol *= 0.82; releaseSec = 0.65;
+    voiceFilter.frequency.setValueAtTime(Math.min(3100, baseFreq * 5.8), now);
+    voiceFilter.Q.setValueAtTime(2.2, now);
+    attackTime = 0.014; sustainVol *= 0.84; releaseSec = 0.75;
+    if (typeof triggerSympatheticStrings === "function") {
+      triggerSympatheticStrings(midi, now, vel, targetBus);
+    }
   } else if (chordTimbre === "WARM_PAD") {
     osc1.type = "triangle"; osc2.type = "sine";
     osc1.frequency.setValueAtTime(baseFreq, now);
@@ -5669,11 +6012,26 @@ function startNoteLive(midi, vel = 90) {
   gain.gain.setValueAtTime(0.0001, now);
   gain.gain.linearRampToValueAtTime(sustainVol, now + attackTime);
 
-  osc1.connect(voiceFilter);
-  if (chordTimbre !== "GLASS_EP" && chordTimbre !== "RHODES" && chordTimbre !== "VIBES_CELESTE") {
-    osc2.connect(voiceFilter);
+  if (chordTimbre === "SITAR_STRINGS") {
+    const jawariShaper = audioCtx.createWaveShaper();
+    jawariShaper.curve = getJawariCurve(0.65);
+    const formantHi = audioCtx.createBiquadFilter();
+    formantHi.type = "peaking";
+    formantHi.frequency.setValueAtTime(2650, now);
+    formantHi.Q.setValueAtTime(3.2, now);
+    formantHi.gain.setValueAtTime(5.5, now);
+    osc1.connect(jawariShaper);
+    osc2.connect(jawariShaper);
+    jawariShaper.connect(formantHi);
+    formantHi.connect(voiceFilter);
+    voiceFilter.connect(gain);
+  } else {
+    osc1.connect(voiceFilter);
+    if (chordTimbre !== "GLASS_EP" && chordTimbre !== "RHODES" && chordTimbre !== "VIBES_CELESTE") {
+      osc2.connect(voiceFilter);
+    }
+    voiceFilter.connect(gain);
   }
-  voiceFilter.connect(gain);
 
   if (tremGain) {
     gain.connect(tremGain);
@@ -5740,6 +6098,46 @@ function stopNoteLive(midi, instant = false) {
   if (midiOutput) {
     try { midiOutput.send([0x80, midi, 0]); } catch(e){}
   }
+}
+
+// Sympathetic string resonance bank (Taraf strings) for Maihar Sitar physical model
+function triggerSympatheticStrings(pluckedMidi, startTime, vel, targetBus) {
+  if (!audioCtx || !targetBus) return;
+  const scale = SCALES[activeScaleKey] || SCALES.BILAWAL || SCALES.DORIAN;
+  const rootBase = 60 + (rootNote % 12); // C4-B4 taraf resonance register
+  const degOffsets = [0, Math.min(4, scale.length - 1), randRange(1, scale.length - 1)];
+  degOffsets.forEach((deg, idx) => {
+    const semi = scale[deg % scale.length] + (idx === 2 ? 12 : 0);
+    const sympMidi = rootBase + semi;
+    const sympFreq = midiToFreq(sympMidi);
+    const delaySec = 0.035 + idx * 0.045 + randFloat() * 0.02;
+    const t0 = startTime + delaySec;
+    const ringDur = 1.9 + randFloat() * 0.8;
+
+    const osc = audioCtx.createOscillator();
+    const filter = audioCtx.createBiquadFilter();
+    const g = audioCtx.createGain();
+
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(sympFreq, t0);
+    osc.detune.setValueAtTime((idx - 1) * 3.5, t0);
+
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(sympFreq * 2.0, t0);
+    filter.Q.setValueAtTime(6.5, t0);
+
+    const peak = (vel / 127) * 0.028 * (1 - idx * 0.16);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.linearRampToValueAtTime(peak, t0 + 0.18);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + ringDur);
+
+    osc.connect(filter);
+    filter.connect(g);
+    g.connect(targetBus);
+
+    osc.start(t0);
+    osc.stop(t0 + ringDur + 0.05);
+  });
 }
 
 function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0, sourceTag = "CHORD") {
@@ -5870,17 +6268,18 @@ function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0,
     baseVolume *= 0.94;
   } else if (chordTimbre === "SITAR_STRINGS") {
     osc1.type = "sawtooth"; osc2.type = "triangle";
-    const bendDepth = isLead ? (0.91 + randFloat() * 0.05) : (0.95 + randFloat() * 0.03);
+    const bendDepth = isLead ? (0.90 + randFloat() * 0.05) : (0.95 + randFloat() * 0.03);
     const bendTime = isLead ? (0.14 + randFloat() * 0.10) : 0.07;
     osc1.frequency.setValueAtTime(freq * bendDepth, now);
     osc1.frequency.exponentialRampToValueAtTime(freq, now + bendTime);
 
     osc2.frequency.setValueAtTime(freq * 2.0, now);
     osc2.detune.setValueAtTime(isLead ? 12 : 9, now);
-    voiceFilter.frequency.setValueAtTime(Math.min(2500, freq * 5.0), now);
+    voiceFilter.frequency.setValueAtTime(Math.min(3100, freq * 5.6), now);
+    voiceFilter.Q.setValueAtTime(2.1, now);
 
-    attackTime = 0.018;
-    baseVolume *= 0.82;
+    attackTime = 0.015;
+    baseVolume *= 0.84;
   } else {
     osc1.type = "triangle";
     osc2.type = "sine";
@@ -5893,10 +6292,39 @@ function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0,
   gain.gain.linearRampToValueAtTime(baseVolume, now + attackTime);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
-  osc1.connect(voiceFilter);
-  if (chordTimbre !== "GLASS_EP" && chordTimbre !== "RHODES" && chordTimbre !== "VIBES_CELESTE") osc2.connect(voiceFilter);
-  voiceFilter.connect(gain);
   const busTarget = sourceTag === "LIVE" ? masterGain : chordBusGain;
+
+  if (chordTimbre === "SITAR_STRINGS") {
+    const jawariShaper = audioCtx.createWaveShaper();
+    jawariShaper.curve = getJawariCurve(isLead ? 0.75 : 0.55);
+    const formantBody = audioCtx.createBiquadFilter();
+    formantBody.type = "peaking";
+    formantBody.frequency.setValueAtTime(920, now);
+    formantBody.Q.setValueAtTime(2.4, now);
+    formantBody.gain.setValueAtTime(3.5, now);
+
+    const formantBuzz = audioCtx.createBiquadFilter();
+    formantBuzz.type = "peaking";
+    formantBuzz.frequency.setValueAtTime(2750, now);
+    formantBuzz.Q.setValueAtTime(3.4, now);
+    formantBuzz.gain.setValueAtTime(5.0, now);
+
+    osc1.connect(jawariShaper);
+    osc2.connect(jawariShaper);
+    jawariShaper.connect(formantBody);
+    formantBody.connect(formantBuzz);
+    formantBuzz.connect(voiceFilter);
+    voiceFilter.connect(gain);
+
+    if (isLead || randFloat() < 0.55) {
+      triggerSympatheticStrings(midi, now, vel, busTarget);
+    }
+  } else {
+    osc1.connect(voiceFilter);
+    if (chordTimbre !== "GLASS_EP" && chordTimbre !== "RHODES" && chordTimbre !== "VIBES_CELESTE") osc2.connect(voiceFilter);
+    voiceFilter.connect(gain);
+  }
+
   if (tremGain) { gain.connect(tremGain); tremGain.connect(busTarget); }
   else { gain.connect(busTarget); }
 
@@ -5914,7 +6342,28 @@ function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0,
   }
 }
 
+function onChordVoicingSelectChange() {
+  const sel = document.getElementById("selChordVoicing");
+  if (!sel) return;
+  chordVoicingMode = sel.value;
+  if (chordVoicingMode !== "AUTO") {
+    const idx = parseInt(chordVoicingMode, 10);
+    if (!isNaN(idx) && idx >= 0 && idx < CHORD_LIBRARY.length) {
+      currentChordVoicing = idx;
+      updateChordHud();
+      if (isPlaying) triggerCurrentChord();
+    }
+  }
+  updateAudioParams();
+}
+
 function triggerCurrentChord() {
+  if (chordVoicingMode !== "AUTO") {
+    const lockedIdx = parseInt(chordVoicingMode, 10);
+    if (!isNaN(lockedIdx) && lockedIdx >= 0 && lockedIdx < CHORD_LIBRARY.length) {
+      currentChordVoicing = lockedIdx;
+    }
+  }
   const voicing = CHORD_LIBRARY[currentChordVoicing];
   const scale = SCALES[activeScaleKey];
   const intervals = getVoicingIntervals(voicing, scale, currentChordRootStep);
@@ -6168,27 +6617,36 @@ function getArpNotesPool() {
   return Array.from(new Set(fullPool)).sort((a,b) => a - b);
 }
 
+function getDrumKitModifiers() {
+  if (drumKit === "ANALOG_CRUNCH") return { pitchMult: 0.92, decayMult: 0.85, noiseCutoff: 0.72, drive: 1.35 };
+  if (drumKit === "TAPE_DUST")     return { pitchMult: 0.86, decayMult: 1.15, noiseCutoff: 0.52, drive: 0.92 };
+  if (drumKit === "ACOUSTIC_CHAMBER") return { pitchMult: 1.08, decayMult: 1.30, noiseCutoff: 1.25, drive: 1.05 };
+  return { pitchMult: 1.0, decayMult: 1.0, noiseCutoff: 1.0, drive: 1.0 };
+}
+
 function playKick(drive = 1.0) {
   if (!audioCtx || drumVol <= 0.01) return;
   const now = audioCtx.currentTime;
+  const kit = getDrumKitModifiers();
+  const effDrive = drive * kit.drive;
 
   const clickOsc = audioCtx.createOscillator(); const clickGain = audioCtx.createGain();
-  clickOsc.type = "triangle"; clickOsc.frequency.setValueAtTime(340, now);
-  clickOsc.frequency.exponentialRampToValueAtTime(42, now + 0.02);
-  clickGain.gain.setValueAtTime(0.60 * drumVol * drive, now);
-  clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+  clickOsc.type = "triangle"; clickOsc.frequency.setValueAtTime(340 * kit.pitchMult, now);
+  clickOsc.frequency.exponentialRampToValueAtTime(42 * kit.pitchMult, now + 0.02);
+  clickGain.gain.setValueAtTime(0.60 * drumVol * effDrive, now);
+  clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035 * kit.decayMult);
   clickOsc.connect(clickGain); clickGain.connect(drumBusGain);
-  clickOsc.start(now); clickOsc.stop(now + 0.04);
+  clickOsc.start(now); clickOsc.stop(now + 0.04 * kit.decayMult);
 
   const subOsc = audioCtx.createOscillator(); const subGain = audioCtx.createGain();
-  subOsc.type = "sine"; subOsc.frequency.setValueAtTime(165, now);
-  subOsc.frequency.exponentialRampToValueAtTime(36, now + 0.11);
+  subOsc.type = "sine"; subOsc.frequency.setValueAtTime(165 * kit.pitchMult, now);
+  subOsc.frequency.exponentialRampToValueAtTime(36 * kit.pitchMult, now + 0.11);
 
-  const vol = (0.90 + drumPunch * 0.60) * drumVol * drive;
+  const vol = (0.90 + drumPunch * 0.60) * drumVol * effDrive;
   subGain.gain.setValueAtTime(vol, now);
-  subGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+  subGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35 * kit.decayMult);
   subOsc.connect(subGain); subGain.connect(drumBusGain);
-  subOsc.start(now); subOsc.stop(now + 0.38);
+  subOsc.start(now); subOsc.stop(now + 0.38 * kit.decayMult);
 
   if (ringDynamics.drum) {
     ringDynamics.drum.impulse = Math.min(2.5, ringDynamics.drum.impulse + 1.6 * drive);
@@ -6214,28 +6672,51 @@ function getNoiseBuffer() {
   return noiseBufferCache;
 }
 
+let pinkNoiseBufferCache = null;
+function getPinkNoiseBuffer() {
+  if (!pinkNoiseBufferCache || pinkNoiseBufferCache.sampleRate !== audioCtx.sampleRate) {
+    const len = Math.floor(audioCtx.sampleRate * 2.0);
+    pinkNoiseBufferCache = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+    const d = pinkNoiseBufferCache.getChannelData(0);
+    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+    for (let i = 0; i < len; i++) {
+      const white = Math.random() * 2 - 1;
+      b0 = 0.99886 * b0 + white * 0.0555179;
+      b1 = 0.99332 * b1 + white * 0.0750759;
+      b2 = 0.96900 * b2 + white * 0.1538520;
+      b3 = 0.86650 * b3 + white * 0.3104856;
+      b4 = 0.55000 * b4 + white * 0.5329522;
+      b5 = -0.7616 * b5 - white * 0.0168980;
+      d[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+      b6 = white * 0.115926;
+    }
+  }
+  return pinkNoiseBufferCache;
+}
+
 function playSnare(hard = false) {
   if (!audioCtx || drumVol <= 0.01) return;
   const now = audioCtx.currentTime;
+  const kit = getDrumKitModifiers();
 
   const bodyOsc = audioCtx.createOscillator(); const bodyGain = audioCtx.createGain();
-  bodyOsc.type = "triangle"; bodyOsc.frequency.setValueAtTime(hard ? 220 : 185, now);
-  bodyOsc.frequency.exponentialRampToValueAtTime(75, now + 0.08);
-  bodyGain.gain.setValueAtTime((hard ? 0.68 : 0.45) * drumVol, now);
-  bodyGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+  bodyOsc.type = "triangle"; bodyOsc.frequency.setValueAtTime((hard ? 220 : 185) * kit.pitchMult, now);
+  bodyOsc.frequency.exponentialRampToValueAtTime(75 * kit.pitchMult, now + 0.08);
+  bodyGain.gain.setValueAtTime((hard ? 0.68 : 0.45) * drumVol * kit.drive, now);
+  bodyGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12 * kit.decayMult);
   bodyOsc.connect(bodyGain); bodyGain.connect(drumBusGain);
-  bodyOsc.start(now); bodyOsc.stop(now + 0.14);
+  bodyOsc.start(now); bodyOsc.stop(now + 0.14 * kit.decayMult);
 
   const whiteNoise = audioCtx.createBufferSource(); whiteNoise.buffer = getNoiseBuffer();
   const filter = audioCtx.createBiquadFilter();
-  filter.type = "bandpass"; filter.frequency.value = hard ? 2400 : 1700; filter.Q.value = 1.4;
+  filter.type = "bandpass"; filter.frequency.value = (hard ? 2400 : 1700) * kit.noiseCutoff; filter.Q.value = 1.4;
 
   const noiseGain = audioCtx.createGain();
-  noiseGain.gain.setValueAtTime((hard ? 0.65 : 0.44) * drumVol, now);
-  noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + (hard ? 0.22 : 0.16));
+  noiseGain.gain.setValueAtTime((hard ? 0.65 : 0.44) * drumVol * kit.drive, now);
+  noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + (hard ? 0.22 : 0.16) * kit.decayMult);
 
   whiteNoise.connect(filter); filter.connect(noiseGain); noiseGain.connect(drumBusGain);
-  whiteNoise.start(now, Math.random() * 0.7); whiteNoise.stop(now + 0.25);
+  whiteNoise.start(now, Math.random() * 0.7); whiteNoise.stop(now + 0.25 * kit.decayMult);
 
   if (ringDynamics.drum) {
     ringDynamics.drum.impulse = Math.min(2.2, ringDynamics.drum.impulse + (hard ? 1.4 : 1.0));
@@ -6245,14 +6726,15 @@ function playSnare(hard = false) {
 function playWoodblock(pitchMult = 1.0) {
   if (!audioCtx || drumVol <= 0.01) return;
   const now = audioCtx.currentTime;
+  const kit = getDrumKitModifiers();
 
   const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-  osc.type = "triangle"; osc.frequency.setValueAtTime(760 * pitchMult, now);
-  osc.frequency.exponentialRampToValueAtTime(410 * pitchMult, now + 0.035);
-  gain.gain.setValueAtTime(0.50 * drumVol, now);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.065);
+  osc.type = "triangle"; osc.frequency.setValueAtTime(760 * pitchMult * kit.pitchMult, now);
+  osc.frequency.exponentialRampToValueAtTime(410 * pitchMult * kit.pitchMult, now + 0.035);
+  gain.gain.setValueAtTime(0.50 * drumVol * kit.drive, now);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.065 * kit.decayMult);
   osc.connect(gain); gain.connect(drumBusGain);
-  osc.start(now); osc.stop(now + 0.075);
+  osc.start(now); osc.stop(now + 0.075 * kit.decayMult);
 
   if (ringDynamics.drum) {
     ringDynamics.drum.impulse = Math.min(1.8, ringDynamics.drum.impulse + 0.8);
@@ -6262,24 +6744,29 @@ function playWoodblock(pitchMult = 1.0) {
 function playHiHat(accent = false) {
   if (!audioCtx || drumVol <= 0.01) return;
   const now = audioCtx.currentTime;
+  const kit = getDrumKitModifiers();
 
   const source = audioCtx.createBufferSource(); source.buffer = getNoiseBuffer();
   const filter = audioCtx.createBiquadFilter();
-  filter.type = "highpass"; filter.frequency.value = 6500;
+  filter.type = "highpass"; filter.frequency.value = Math.max(2400, 6500 * kit.noiseCutoff);
 
   const gain = audioCtx.createGain();
-  const hatVol = (accent ? 0.32 : 0.16) * drumVol;
+  const hatVol = (accent ? 0.32 : 0.16) * drumVol * kit.drive;
   gain.gain.setValueAtTime(hatVol, now);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + (accent ? 0.06 : 0.04));
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + (accent ? 0.06 : 0.04) * kit.decayMult);
 
   source.connect(filter); filter.connect(gain); gain.connect(drumBusGain);
-  source.start(now, Math.random() * 0.7); source.stop(now + 0.07);
+  source.start(now, Math.random() * 0.7); source.stop(now + 0.07 * kit.decayMult);
 }
 
+// Phase 4: Expanded Tabla Articulations (Ge / Na / Tin / Ti / Re / Ki / Dha)
+// Models the wooden Dayan (right-hand treble drum tuned to the active tonic)
+// and metal/clay Bayan (left-hand bass drum with palm-heel pressure meend).
 function playDayan(stroke = "TUN", hard = 1.0) {
   if (!audioCtx || drumVol <= 0.01) return;
   const now = audioCtx.currentTime;
-  const baseFreq = midiToFreq(48 + rootNote);
+  const kit = getDrumKitModifiers();
+  const baseFreq = midiToFreq(48 + rootNote) * kit.pitchMult;
   const tonicFreq = baseFreq < 180 ? baseFreq * 2 : baseFreq;
 
   const osc1 = audioCtx.createOscillator();
@@ -6287,65 +6774,99 @@ function playDayan(stroke = "TUN", hard = 1.0) {
 
   const isTin = (stroke === "TUN" || stroke === "TIN");
   const isNa = (stroke === "NA" || stroke === "TA");
+  const isTiRe = (stroke === "TI" || stroke === "RE" || stroke === "KI");
 
   if (isTin) {
-    // Open resonant bell-like tone on the siyahi (black paste)
+    // Open resonant bell-like tone on the sur/maidan (between siyahi and kinar)
+    // Tuned to fundamental + harmonic overtones (1.0x, 2.01x, 2.98x)
     const osc2 = audioCtx.createOscillator();
+    const osc3 = audioCtx.createOscillator();
     const filter = audioCtx.createBiquadFilter();
     osc1.type = "sine";
     osc2.type = "triangle";
-    osc1.frequency.setValueAtTime(tonicFreq, now);
-    osc2.frequency.setValueAtTime(tonicFreq * 2.89, now);
+    osc3.type = "sine";
+    osc1.frequency.setValueAtTime(tonicFreq * 1.015, now);
+    osc1.frequency.exponentialRampToValueAtTime(tonicFreq, now + 0.025);
+    osc2.frequency.setValueAtTime(tonicFreq * 2.01, now);
+    osc3.frequency.setValueAtTime(tonicFreq * 2.98, now);
 
     filter.type = "bandpass";
-    filter.frequency.setValueAtTime(tonicFreq * 1.5, now);
-    filter.Q.setValueAtTime(4.2, now);
+    filter.frequency.setValueAtTime(tonicFreq * 1.65, now);
+    filter.Q.setValueAtTime(3.6, now);
 
-    const decay = 0.32;
-    gain.gain.setValueAtTime(0.55 * drumVol * hard, now);
+    const decay = (stroke === "TUN" ? 0.38 : 0.30) * kit.decayMult;
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.58 * drumVol * hard * kit.drive, now + 0.003);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
 
+    const g3 = audioCtx.createGain();
+    g3.gain.value = 0.28;
     osc1.connect(filter); osc2.connect(filter);
+    osc3.connect(g3); g3.connect(filter);
     filter.connect(gain); gain.connect(drumBusGain);
 
-    osc1.start(now); osc2.start(now);
-    osc1.stop(now + decay + 0.05); osc2.stop(now + decay + 0.05);
+    osc1.start(now); osc2.start(now); osc3.start(now);
+    osc1.stop(now + decay + 0.05); osc2.stop(now + decay + 0.05); osc3.stop(now + decay + 0.05);
   } else if (isNa) {
-    // Crisp edge rim strike (kinar) with rapid decay
+    // Crisp metallic edge rim strike (kinar) with ring finger damping fundamental
     osc1.type = "triangle";
-    osc1.frequency.setValueAtTime(tonicFreq * 1.02, now);
-    osc1.frequency.exponentialRampToValueAtTime(tonicFreq, now + 0.03);
+    const osc2 = audioCtx.createOscillator();
+    osc2.type = "sine";
+    osc1.frequency.setValueAtTime(tonicFreq * 1.04, now);
+    osc1.frequency.exponentialRampToValueAtTime(tonicFreq, now + 0.022);
+    osc2.frequency.setValueAtTime(tonicFreq * 3.02, now);
 
     const noise = audioCtx.createBufferSource();
     noise.buffer = getNoiseBuffer();
     const noiseFilter = audioCtx.createBiquadFilter();
     noiseFilter.type = "bandpass";
-    noiseFilter.frequency.setValueAtTime(3800, now);
-    noiseFilter.Q.setValueAtTime(2.5, now);
+    noiseFilter.frequency.setValueAtTime(3950 * kit.noiseCutoff, now);
+    noiseFilter.Q.setValueAtTime(3.2, now);
 
     const noiseGain = audioCtx.createGain();
-    noiseGain.gain.setValueAtTime(0.48 * drumVol * hard, now);
-    noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+    noiseGain.gain.setValueAtTime(0.52 * drumVol * hard * kit.drive, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.048);
 
     noise.connect(noiseFilter); noiseFilter.connect(noiseGain);
     noiseGain.connect(drumBusGain);
-    noise.start(now, Math.random() * 0.5); noise.stop(now + 0.07);
+    noise.start(now, Math.random() * 0.5); noise.stop(now + 0.06);
 
-    const decay = 0.18;
-    gain.gain.setValueAtTime(0.42 * drumVol * hard, now);
+    const decay = 0.21 * kit.decayMult;
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.46 * drumVol * hard * kit.drive, now + 0.002);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
 
-    osc1.connect(gain); gain.connect(drumBusGain);
-    osc1.start(now); osc1.stop(now + decay + 0.05);
-  } else {
-    // Muted closed stroke (Ti / Te / Ke)
-    osc1.type = "sine";
-    osc1.frequency.setValueAtTime(tonicFreq * 0.85, now);
-    const decay = 0.05;
-    gain.gain.setValueAtTime(0.35 * drumVol * hard, now);
+    const g2 = audioCtx.createGain();
+    g2.gain.value = 0.35;
+    osc1.connect(gain); osc2.connect(g2); g2.connect(gain);
+    gain.connect(drumBusGain);
+    osc1.start(now); osc2.start(now);
+    osc1.stop(now + decay + 0.04); osc2.stop(now + decay + 0.04);
+  } else if (isTiRe) {
+    // Crisp closed siyahi finger strokes (Ti-Re-Ki-Ta) optimized for high-speed subdivisions
+    const pitchOffset = stroke === "RE" ? 0.94 : (stroke === "KI" ? 0.78 : 0.88);
+    osc1.type = "triangle";
+    osc1.frequency.setValueAtTime(tonicFreq * pitchOffset * 1.12, now);
+    osc1.frequency.exponentialRampToValueAtTime(tonicFreq * pitchOffset * 0.72, now + 0.028);
+    const decay = 0.042 * kit.decayMult;
+    gain.gain.setValueAtTime(0.38 * drumVol * hard * kit.drive, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
+
+    // Subtle skin slap transient
+    const slap = audioCtx.createBufferSource();
+    slap.buffer = getNoiseBuffer();
+    const slapF = audioCtx.createBiquadFilter();
+    slapF.type = "bandpass";
+    slapF.frequency.value = 2100 * kit.noiseCutoff;
+    slapF.Q.value = 1.8;
+    const slapG = audioCtx.createGain();
+    slapG.gain.setValueAtTime(0.24 * drumVol * hard, now);
+    slapG.gain.exponentialRampToValueAtTime(0.0001, now + 0.022);
+    slap.connect(slapF); slapF.connect(slapG); slapG.connect(drumBusGain);
+    slap.start(now, Math.random() * 0.5); slap.stop(now + 0.03);
+
     osc1.connect(gain); gain.connect(drumBusGain);
-    osc1.start(now); osc1.stop(now + decay + 0.02);
+    osc1.start(now); osc1.stop(now + decay + 0.015);
   }
 
   if (ringDynamics.drum) ringDynamics.drum.impulse = Math.min(2.0, ringDynamics.drum.impulse + 0.9 * hard);
@@ -6354,28 +6875,31 @@ function playDayan(stroke = "TUN", hard = 1.0) {
 function playBayan(stroke = "GHE", slide = true, hard = 1.0) {
   if (!audioCtx || drumVol <= 0.01) return;
   const now = audioCtx.currentTime;
+  const kit = getDrumKitModifiers();
 
   if (stroke === "KAT" || stroke === "KE") {
-    // Dry damped slap with palm heel
+    // Dry damped slap with flat palm
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = "triangle";
-    osc.frequency.setValueAtTime(120, now);
-    osc.frequency.exponentialRampToValueAtTime(50, now + 0.04);
-    gain.gain.setValueAtTime(0.50 * drumVol * hard, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.055);
+    osc.frequency.setValueAtTime(132 * kit.pitchMult, now);
+    osc.frequency.exponentialRampToValueAtTime(48 * kit.pitchMult, now + 0.038);
+    gain.gain.setValueAtTime(0.52 * drumVol * hard * kit.drive, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.052);
     osc.connect(gain); gain.connect(drumBusGain);
     osc.start(now); osc.stop(now + 0.06);
     return;
   }
 
-  // Open "Ghe": Deep undulating rubbery bubbly bass tone with expressive palm meend
+  // Open "Ge/Ghe": Deep undulating bass tone with tempo-adaptive palm meend
+  // Scales envelope duration cleanly with BPM so rapid drut-laya passages stay articulate
+  const tempoScale = Math.max(0.48, Math.min(1.15, 76 / Math.max(40, bpm)));
   const oscMain = audioCtx.createOscillator();
   const oscSub = audioCtx.createOscillator();
   const resonantFilter = audioCtx.createBiquadFilter();
   const gain = audioCtx.createGain();
 
-  const baseFreq = 58; // Deep fundamental
+  const baseFreq = 58 * kit.pitchMult;
   oscMain.type = "sine";
   oscSub.type = "sine";
 
@@ -6385,42 +6909,39 @@ function playBayan(stroke = "GHE", slide = true, hard = 1.0) {
   if (slide) {
     const oscMeendLFO = audioCtx.createOscillator();
     const lfoGain = audioCtx.createGain();
-    // Dynamic rubbery pitch swoop: 54 Hz -> 46 Hz (palm touch) -> 148 Hz (elastic snap) -> 82 Hz -> 58 Hz
-    const peakFreq = 135 + randFloat() * 35; // Up to 170 Hz (wide vocal rubbery bend)
-    oscMain.frequency.exponentialRampToValueAtTime(baseFreq * 0.82, now + 0.020); // Initial skin press dip
-    oscMain.frequency.exponentialRampToValueAtTime(peakFreq, now + 0.14); // Elastic rubbery snap up
-    oscMain.frequency.exponentialRampToValueAtTime(baseFreq * 1.42, now + 0.35); // Vocal settle
-    oscMain.frequency.exponentialRampToValueAtTime(baseFreq, now + 0.72); // Deep resonant ring
+    const peakFreq = (132 + randFloat() * 34) * kit.pitchMult;
+    oscMain.frequency.exponentialRampToValueAtTime(baseFreq * 0.84, now + 0.018 * tempoScale);
+    oscMain.frequency.exponentialRampToValueAtTime(peakFreq, now + 0.125 * tempoScale);
+    oscMain.frequency.exponentialRampToValueAtTime(baseFreq * 1.38, now + 0.32 * tempoScale);
+    oscMain.frequency.exponentialRampToValueAtTime(baseFreq, now + 0.65 * tempoScale);
 
     oscSub.frequency.setValueAtTime(baseFreq * 0.5, now);
-    oscSub.frequency.exponentialRampToValueAtTime(peakFreq * 0.5, now + 0.14);
-    oscSub.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, now + 0.65);
+    oscSub.frequency.exponentialRampToValueAtTime(peakFreq * 0.5, now + 0.125 * tempoScale);
+    oscSub.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, now + 0.60 * tempoScale);
 
-    // Undulating wrist flex / vibrato on the sustain (5.8 Hz)
     oscMeendLFO.frequency.setValueAtTime(5.8, now);
     lfoGain.gain.setValueAtTime(0.001, now);
-    lfoGain.gain.linearRampToValueAtTime(18.0, now + 0.22); // 18 Hz undulating wobble
-    lfoGain.gain.exponentialRampToValueAtTime(0.001, now + 0.72);
+    lfoGain.gain.linearRampToValueAtTime(16.0, now + 0.18 * tempoScale);
+    lfoGain.gain.exponentialRampToValueAtTime(0.001, now + 0.65 * tempoScale);
     oscMeendLFO.connect(lfoGain);
     lfoGain.connect(oscMain.frequency);
     oscMeendLFO.start(now);
-    oscMeendLFO.stop(now + 0.78);
+    oscMeendLFO.stop(now + 0.70 * tempoScale);
   }
 
-  // Rubbery Bubbly Resonant Filter: Sweeps Q=6.2 peak through mid-bass
   resonantFilter.type = "lowpass";
-  resonantFilter.Q.setValueAtTime(6.2, now); // Juicy, resonant liquid peak
-  const filterStart = 110;
-  const filterPeak = slide ? (320 + randFloat() * 70) : 140;
+  resonantFilter.Q.setValueAtTime(5.6, now);
+  const filterStart = 115;
+  const filterPeak = slide ? (310 + randFloat() * 65) : 145;
   resonantFilter.frequency.setValueAtTime(filterStart, now);
-  resonantFilter.frequency.exponentialRampToValueAtTime(filterPeak, now + 0.14);
-  resonantFilter.frequency.exponentialRampToValueAtTime(95, now + 0.70);
+  resonantFilter.frequency.exponentialRampToValueAtTime(filterPeak, now + 0.125 * tempoScale);
+  resonantFilter.frequency.exponentialRampToValueAtTime(95, now + 0.62 * tempoScale);
 
-  const vol = (1.05 + drumPunch * 0.70) * drumVol * hard;
-  const decay = 0.75;
+  const vol = (1.02 + drumPunch * 0.68) * drumVol * hard * kit.drive;
+  const decay = 0.68 * tempoScale * kit.decayMult;
   gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.linearRampToValueAtTime(vol, now + 0.015);
-  gain.gain.exponentialRampToValueAtTime(vol * 0.6, now + 0.18);
+  gain.gain.linearRampToValueAtTime(vol, now + 0.012);
+  gain.gain.exponentialRampToValueAtTime(vol * 0.58, now + 0.16 * tempoScale);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
 
   oscMain.connect(resonantFilter);
@@ -6430,8 +6951,8 @@ function playBayan(stroke = "GHE", slide = true, hard = 1.0) {
 
   oscMain.start(now);
   oscSub.start(now);
-  oscMain.stop(now + decay + 0.05);
-  oscSub.stop(now + decay + 0.05);
+  oscMain.stop(now + decay + 0.04);
+  oscSub.stop(now + decay + 0.04);
 
   if (ringDynamics.drum) ringDynamics.drum.impulse = Math.min(2.5, ringDynamics.drum.impulse + 1.8 * hard);
   if (slide || hard > 0.8) triggerMusical3DObject("drum");
@@ -6442,6 +6963,15 @@ function playBayan(stroke = "GHE", slide = true, hard = 1.0) {
     droneGain.gain.setValueAtTime(origDrone * (1.0 - drumPunch * 0.4), now);
     droneGain.gain.setTargetAtTime(origDrone, now + 0.07, 0.14);
   }
+}
+
+// Combined "Dha" / "Dhin" stroke: simultaneous Bayan Ge + Dayan Na/Tin with slight micro-humanization
+function playTablaDha(open = true, slide = true, hard = 1.0) {
+  playBayan("GHE", slide, hard);
+  const microOffsetMs = 3 + Math.random() * 6;
+  setTimeout(() => {
+    playDayan(open ? "NA" : "TUN", hard * 0.96);
+  }, microOffsetMs);
 }
 
 function playTablaGroove(measureTick, isDownbeat, ts) {
@@ -6462,27 +6992,22 @@ function playTablaGroove(measureTick, isDownbeat, ts) {
       } else if (currentBeat === 2) {
         playDayan("NA", 1.0);
       } else if (currentBeat === 3) {
-        playBayan("GHE", true, 1.15);
-        playDayan("TUN", 1.05);
+        playTablaDha(false, true, 1.12);
       } else if (currentBeat === 4) {
         playDayan("NA", 0.95);
       } else if (currentBeat === 5) {
-        playBayan("GHE", true, 1.1);
-        playDayan("TUN", 1.0);
+        playTablaDha(false, true, 1.08);
       } else if (currentBeat === 6) {
-        playBayan("GHE", true, 1.2);
-        playDayan("NA", 1.15);
+        playTablaDha(true, true, 1.2);
       }
     } else if (subTick === 2 && randFloat() < (0.45 + drumDensity * 0.45)) {
-      // Offbeat syncopation: add vocal rubbery Bayan modulation so bass undulates actively
       if (currentBeat === 6) {
-        playBayan("GHE", true, 0.85);
-        playDayan("NA", 0.75);
+        playTablaDha(true, true, 0.82);
       } else if (currentBeat === 3 || currentBeat === 5) {
         playBayan("GHE", true, 0.75);
         playDayan("TUN", 0.70);
       } else if (currentBeat === 2 || currentBeat === 4) {
-        playDayan("TI", 0.6);
+        playDayan("TI", 0.65);
       } else {
         playDayan("TUN", 0.65);
       }
@@ -6494,21 +7019,18 @@ function playTablaGroove(measureTick, isDownbeat, ts) {
 
     if (subTick === 0) {
       if (currentBeat === 0) {
-        playBayan("GHE", true, 1.25);
-        playDayan("NA", 1.2);
+        playTablaDha(true, true, 1.22);
       } else if (currentBeat === 1 || currentBeat === 2) {
         if (isKhali) {
           playDayan("TUN", 1.05);
         } else {
-          playBayan("GHE", true, 1.0);
-          playDayan("TUN", 1.0);
+          playTablaDha(false, true, 1.0);
         }
       } else if (currentBeat === 3) {
         if (isKhali) {
           playDayan("NA", 1.05);
         } else {
-          playBayan("GHE", true, 1.15);
-          playDayan("NA", 1.1);
+          playTablaDha(true, true, 1.12);
         }
       }
     } else if (subTick === 2 && randFloat() < (0.45 + drumDensity * 0.45)) {
@@ -6522,12 +7044,10 @@ function playTablaGroove(measureTick, isDownbeat, ts) {
   } else {
     // Adaptive tala for 5/8, 7/8, 5/4, etc.
     if (isDownbeat) {
-      playBayan("GHE", true, 1.2);
-      playDayan("NA", 1.15);
+      playTablaDha(true, true, 1.2);
     } else if (subTick === 0) {
       if (currentBeat % 2 === 1) {
-        playBayan("GHE", true, 0.95);
-        playDayan("TUN", 0.95);
+        playTablaDha(false, true, 0.95);
       } else {
         playDayan("TUN", 0.9);
       }
@@ -6536,18 +7056,296 @@ function playTablaGroove(measureTick, isDownbeat, ts) {
     }
   }
 
-  // Polyrhythmic high-register fill layer: crisp Dayan-only bols (never the
-  // deep Bayan pitch-bend/swoop) riding a free-running 7-cycle counter that's
-  // uncorrelated with the beat grid, so the extra hits land "across" the
-  // theka instead of lining up with it -- an improvised cross-rhythm layered
-  // over the steady pulse, the way bols get combined in performance.
+  // Rapid Ti-Re-Ki-Ta polyrhythmic embellishments & cross-rhythm bols
   if (!isDownbeat && subTick !== 0) {
     const polyPhase = (stepEuclid * 3) % 7;
-    if (polyPhase < 2 && randFloat() < (0.18 + drumDensity * 0.32)) {
-      const fillStrokes = ["TUN", "NA", "TI"];
+    if (polyPhase < 2 && randFloat() < (0.20 + drumDensity * 0.36)) {
+      const fillStrokes = ["TUN", "NA", "TI", "RE", "KI"];
       const stroke = fillStrokes[randRange(0, fillStrokes.length - 1)];
-      playDayan(stroke, 0.45 + randFloat() * 0.35);
+      playDayan(stroke, 0.48 + randFloat() * 0.35);
+      if (drumDensity > 0.55 && randFloat() < 0.42) {
+        const subMs = Math.max(42, ((60000 / bpm) / 8));
+        setTimeout(() => playDayan(stroke === "TI" ? "RE" : "KI", 0.42), subMs);
+      }
     }
+  }
+}
+
+// Phase 4: Drum Engine Fill Generator (Manual + Automatic on Groove Switch)
+let isDrumFillActive = false;
+function triggerDrumFill(manual = true) {
+  if (!audioCtx) initAudio();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  if (drumVol <= 0.01 || !isChannelAudible("drum")) return;
+
+  const btn = document.getElementById("btnDrumFill");
+  if (btn) {
+    btn.classList.add("filling");
+    setTimeout(() => btn.classList.remove("filling"), 620);
+  }
+  isDrumFillActive = true;
+  setTimeout(() => { isDrumFillActive = false; }, 620);
+
+  const stepMs = Math.max(52, Math.min(135, (60000 / Math.max(45, bpm)) / 4));
+  if (drumStyle === "TABLA_GROOVE") {
+    // Classical Tihai / Ti-Re-Ki-Ta-Tak-Dha cadence
+    const bolSeq = [
+      { fn: () => playDayan("TI", 0.85), t: 0 },
+      { fn: () => playDayan("RE", 0.82), t: stepMs * 0.65 },
+      { fn: () => playDayan("KI", 0.88), t: stepMs * 1.3 },
+      { fn: () => playDayan("NA", 0.95), t: stepMs * 2.0 },
+      { fn: () => playBayan("KAT", false, 0.92), t: stepMs * 2.65 },
+      { fn: () => playTablaDha(true, true, 1.28), t: stepMs * 3.4 }
+    ];
+    bolSeq.forEach(ev => setTimeout(ev.fn, ev.t));
+  } else {
+    // Syncopated break/tom/snare roll fill
+    const fillSteps = [
+      { fn: () => playWoodblock(1.32), t: 0 },
+      { fn: () => playSnare(false), t: stepMs * 0.75 },
+      { fn: () => playWoodblock(1.05), t: stepMs * 1.5 },
+      { fn: () => playKick(1.12), t: stepMs * 2.1 },
+      { fn: () => playSnare(true), t: stepMs * 2.8 },
+      { fn: () => { playKick(1.30); playHiHat(true); }, t: stepMs * 3.5 }
+    ];
+    fillSteps.forEach(ev => setTimeout(ev.fn, ev.t));
+  }
+}
+
+function onDrumStyleChange() {
+  const prevStyle = drumStyle;
+  updateAudioParams();
+  if (isPlaying && prevStyle !== drumStyle && drumStyle !== "MUTED") {
+    triggerDrumFill(false);
+  }
+}
+
+// Phase 4: Environmental Soundscape & Noise Instrument Engine
+function updateNoiseEngineParams() {
+  if (!audioCtx || !noiseBedFilter1 || !noiseBedFilter2 || !noiseBedGain) return;
+  const now = audioCtx.currentTime;
+  const audible = isPlaying && isChannelAudible("noise") && noiseMode !== "OFF" && noiseVol > 0.005;
+
+  // Profile-specific filter topologies and modulation depths
+  let f1Type = "bandpass", f2Type = "lowpass";
+  let f1Freq = 900, f1Q = 1.2, f2Freq = 2400, f2Q = 0.9;
+  let bedLevel = 0.28;
+  let gustRate = 0.14, sweepRate = 0.09, sweepSpan = 450;
+
+  const col = noiseColorVal; // 0..1
+  const rate = noiseRateVal; // 0..1
+  const drift = noiseDriftVal; // 0..1
+
+  if (noiseProfile === "RAIN") {
+    f1Type = "bandpass";
+    f1Freq = 650 + col * 2400;
+    f1Q = 0.75;
+    f2Type = "lowpass";
+    f2Freq = 1800 + col * 4200;
+    f2Q = 0.7;
+    bedLevel = 0.34;
+    gustRate = 0.08 + rate * 0.45;
+    sweepSpan = 350 + drift * 950;
+  } else if (noiseProfile === "THUNDER") {
+    f1Type = "lowpass";
+    f1Freq = 85 + col * 260;
+    f1Q = 2.4;
+    f2Type = "lowpass";
+    f2Freq = 180 + col * 420;
+    f2Q = 1.6;
+    bedLevel = 0.46;
+    gustRate = 0.05 + rate * 0.28;
+    sweepSpan = 60 + drift * 220;
+  } else if (noiseProfile === "WHITE_TAPE") {
+    f1Type = "bandpass";
+    f1Freq = 1100 + col * 3200;
+    f1Q = 0.65;
+    f2Type = "highpass";
+    f2Freq = 320 + col * 1200;
+    f2Q = 0.7;
+    bedLevel = 0.22;
+    gustRate = 0.12 + rate * 0.6;
+    sweepSpan = 280 + drift * 800;
+  } else if (noiseProfile === "BROOK") {
+    f1Type = "bandpass";
+    f1Freq = 480 + col * 1450;
+    f1Q = 3.8;
+    f2Type = "bandpass";
+    f2Freq = 920 + col * 2100;
+    f2Q = 2.9;
+    bedLevel = 0.36;
+    gustRate = 1.4 + rate * 4.5;
+    sweepRate = 0.8 + rate * 3.2;
+    sweepSpan = 380 + drift * 1100;
+  } else if (noiseProfile === "CRICKETS") {
+    f1Type = "bandpass";
+    f1Freq = 3600 + col * 2200;
+    f1Q = 9.5;
+    f2Type = "bandpass";
+    f2Freq = 3800 + col * 2400;
+    f2Q = 7.5;
+    bedLevel = 0.16;
+    gustRate = 2.5 + rate * 6.0;
+    sweepSpan = 180 + drift * 420;
+  } else if (noiseProfile === "WIND") {
+    f1Type = "bandpass";
+    f1Freq = 220 + col * 980;
+    f1Q = 4.6;
+    f2Type = "lowpass";
+    f2Freq = 540 + col * 1600;
+    f2Q = 2.2;
+    bedLevel = 0.42;
+    gustRate = 0.06 + rate * 0.38;
+    sweepRate = 0.05 + rate * 0.32;
+    sweepSpan = 260 + drift * 1100;
+  }
+
+  // Trigger mode scales continuous bed vs discrete stochastic bursts
+  let modeBedMult = 1.0;
+  if (noiseMode === "CONTINUOUS") modeBedMult = 1.15;
+  else if (noiseMode === "GUSTS") modeBedMult = 0.85;
+  else if (noiseMode === "SPARSE") modeBedMult = 0.38;
+  else if (noiseMode === "RHYTHMIC") modeBedMult = 0.45;
+  else if (noiseMode === "STORM_SWELL") modeBedMult = 0.95;
+
+  noiseBedFilter1.type = f1Type;
+  noiseBedFilter2.type = f2Type;
+  noiseBedFilter1.frequency.setTargetAtTime(f1Freq, now, 0.08);
+  noiseBedFilter1.Q.setTargetAtTime(f1Q, now, 0.08);
+  noiseBedFilter2.frequency.setTargetAtTime(f2Freq, now, 0.08);
+  noiseBedFilter2.Q.setTargetAtTime(f2Q, now, 0.08);
+
+  if (noiseGustLFO && noiseGustLFOGain) {
+    noiseGustLFO.frequency.setTargetAtTime(gustRate, now, 0.12);
+    const gustDepth = audible ? (bedLevel * modeBedMult * (0.18 + drift * 0.45)) : 0;
+    noiseGustLFOGain.gain.setTargetAtTime(gustDepth, now, 0.12);
+  }
+  if (noiseSweepLFO && noiseSweepLFOGain) {
+    noiseSweepLFO.frequency.setTargetAtTime(sweepRate, now, 0.12);
+    noiseSweepLFOGain.gain.setTargetAtTime(sweepSpan, now, 0.12);
+  }
+  if (noisePanLFO && noisePanLFOGain) {
+    noisePanLFO.frequency.setTargetAtTime(0.05 + rate * 0.25, now, 0.15);
+    noisePanLFOGain.gain.setTargetAtTime(0.15 + drift * 0.65, now, 0.15);
+  }
+
+  const targetBedGain = audible ? (bedLevel * modeBedMult) : 0.0001;
+  noiseBedGain.gain.cancelScheduledValues(now);
+  noiseBedGain.gain.setValueAtTime(noiseBedGain.gain.value, now);
+  noiseBedGain.gain.linearRampToValueAtTime(targetBedGain, now + 0.045);
+}
+
+// Stochastic & Clock-Driven Environmental Transients (Raindrops, Thunder Claps, Brook Bubbles, Cricket Chirps, Tape Crackle, Wind Gusts)
+function triggerNoiseEvent(intensity = 1.0) {
+  if (!audioCtx || !noiseBusGain || noiseMode === "OFF" || !isChannelAudible("noise") || noiseVol <= 0.01) return;
+  const now = audioCtx.currentTime;
+  const col = noiseColorVal;
+  const drift = noiseDriftVal;
+
+  if (noiseProfile === "CRICKETS") {
+    // Authentic dual-carrier stridulation chirp train (4.2 kHz - 5.4 kHz)
+    const pulses = 3 + randRange(0, 3);
+    const baseFreq = 3950 + col * 1650 + (randFloat() - 0.5) * 280 * drift;
+    const pulseSpacing = 0.026 + randFloat() * 0.012;
+    for (let p = 0; p < pulses; p++) {
+      const t0 = now + p * pulseSpacing;
+      const osc1 = audioCtx.createOscillator();
+      const osc2 = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      const pan = audioCtx.createStereoPanner();
+      osc1.type = "sine";
+      osc2.type = "triangle";
+      osc1.frequency.setValueAtTime(baseFreq, t0);
+      osc2.frequency.setValueAtTime(baseFreq * 1.018, t0);
+      pan.pan.value = (randFloat() * 1.6 - 0.8) * Math.max(0.25, drift);
+      const pk = 0.14 * intensity * (0.75 + 0.25 * Math.sin((p / pulses) * Math.PI));
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.linearRampToValueAtTime(pk, t0 + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.021);
+      osc1.connect(g); osc2.connect(g); g.connect(pan); pan.connect(noiseBusGain);
+      osc1.start(t0); osc2.start(t0);
+      osc1.stop(t0 + 0.024); osc2.stop(t0 + 0.024);
+    }
+  } else if (noiseProfile === "BROOK") {
+    // Liquid resonant water droplet / bubble pop (upward pitch-chirped sine + filtered splash)
+    const bubbles = 1 + (randFloat() < (0.35 + noiseRateVal * 0.45) ? 1 : 0);
+    for (let b = 0; b < bubbles; b++) {
+      const t0 = now + b * (0.04 + randFloat() * 0.06);
+      const startF = 380 + col * 920 + randFloat() * 520;
+      const endF = startF * (1.45 + randFloat() * 0.55);
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      const pan = audioCtx.createStereoPanner();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(startF, t0);
+      osc.frequency.exponentialRampToValueAtTime(endF, t0 + 0.042);
+      pan.pan.value = (randFloat() * 1.4 - 0.7) * Math.max(0.2, drift);
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.linearRampToValueAtTime(0.22 * intensity, t0 + 0.005);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.055);
+      osc.connect(g); g.connect(pan); pan.connect(noiseBusGain);
+      osc.start(t0); osc.stop(t0 + 0.062);
+    }
+  } else if (noiseProfile === "THUNDER") {
+    // Distant rolling thunder swell (low-passed pink noise + sub rumble)
+    const dur = 1.2 + randFloat() * 1.8 + drift * 1.2;
+    const src = audioCtx.createBufferSource();
+    src.buffer = getPinkNoiseBuffer();
+    src.loop = true;
+    const lp = audioCtx.createBiquadFilter();
+    lp.type = "lowpass";
+    const peakCut = 140 + col * 360 + randFloat() * 140;
+    lp.frequency.setValueAtTime(peakCut, now);
+    lp.frequency.exponentialRampToValueAtTime(55, now + dur);
+    lp.Q.value = 2.8;
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.linearRampToValueAtTime(0.55 * intensity, now + 0.08 + randFloat() * 0.18);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+    src.connect(lp); lp.connect(g); g.connect(noiseBusGain);
+    src.start(now, randFloat() * 1.2);
+    src.stop(now + dur + 0.05);
+  } else if (noiseProfile === "RAIN" || noiseProfile === "WHITE_TAPE") {
+    // Tactile raindrop / vinyl dust micro-crackle impulse
+    const drops = noiseProfile === "RAIN" ? (1 + randRange(0, 2)) : 1;
+    for (let d = 0; d < drops; d++) {
+      const t0 = now + d * (0.015 + randFloat() * 0.04);
+      const src = audioCtx.createBufferSource();
+      src.buffer = getNoiseBuffer();
+      const bp = audioCtx.createBiquadFilter();
+      bp.type = "bandpass";
+      bp.frequency.value = (noiseProfile === "RAIN" ? 1800 : 2800) + col * 3400 + (randFloat() - 0.5) * 900;
+      bp.Q.value = noiseProfile === "RAIN" ? 3.2 : 5.0;
+      const g = audioCtx.createGain();
+      const pan = audioCtx.createStereoPanner();
+      pan.pan.value = (randFloat() * 1.6 - 0.8) * Math.max(0.25, drift);
+      const dur = noiseProfile === "RAIN" ? 0.028 : 0.012;
+      g.gain.setValueAtTime(0.26 * intensity, t0);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      src.connect(bp); bp.connect(g); g.connect(pan); pan.connect(noiseBusGain);
+      src.start(t0, randFloat() * 0.8);
+      src.stop(t0 + dur + 0.01);
+    }
+  } else if (noiseProfile === "WIND") {
+    // Sweeping whistling wind gust
+    const dur = 0.65 + randFloat() * 0.95 + drift * 0.8;
+    const src = audioCtx.createBufferSource();
+    src.buffer = getPinkNoiseBuffer();
+    src.loop = true;
+    const bp = audioCtx.createBiquadFilter();
+    bp.type = "bandpass";
+    const startF = 240 + col * 780 + randFloat() * 220;
+    bp.frequency.setValueAtTime(startF, now);
+    bp.frequency.exponentialRampToValueAtTime(startF * (1.35 + drift * 0.5), now + dur * 0.45);
+    bp.frequency.exponentialRampToValueAtTime(startF * 0.78, now + dur);
+    bp.Q.value = 5.2;
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.linearRampToValueAtTime(0.32 * intensity, now + dur * 0.38);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+    src.connect(bp); bp.connect(g); g.connect(noiseBusGain);
+    src.start(now, randFloat() * 1.0);
+    src.stop(now + dur + 0.05);
   }
 }
 
@@ -6588,6 +7386,10 @@ function clockTick() {
 
   const isDownbeat = (measureTick === 0);
   if (drumStyle !== "MUTED") {
+    // Automatic turn-around drum fill on final beat of every 8th bar when Drum Evolve is active
+    if (autoEvolveDrumGroove && barCount > 0 && barCount % 8 === 7 && measureTick === totalMeasureTicks - ts.ticksPerBeat && randFloat() < (0.35 + autoEvolveDrumChance * 0.5)) {
+      triggerDrumFill(false);
+    }
     if (drumStyle === "INDUSTRIAL_DRIVE") {
       if (isDownbeat || (currentTimeSig === "7/4" && measureTick === 12) || (currentTimeSig === "4/4" && measureTick === 8)) playKick(1.35);
       if (measureTick === 4 || measureTick === 16 || (currentTimeSig === "4/4" && measureTick === 12)) playSnare(true);
@@ -6628,6 +7430,25 @@ function clockTick() {
     }
   }
 
+  // Phase 4: Environmental & Noise Instrument Clock Triggers
+  if (noiseMode !== "OFF" && isChannelAudible("noise") && noiseVol > 0.01) {
+    let trigProb = 0;
+    if (noiseMode === "RHYTHMIC") {
+      trigProb = (measureTick % 2 === 0) ? (0.35 + noiseRateVal * 0.55) : (0.12 * noiseRateVal);
+    } else if (noiseMode === "GUSTS") {
+      trigProb = 0.14 + noiseRateVal * 0.42;
+    } else if (noiseMode === "SPARSE") {
+      trigProb = 0.06 + noiseRateVal * 0.22;
+    } else if (noiseMode === "STORM_SWELL") {
+      trigProb = isDownbeat ? (0.55 + noiseRateVal * 0.40) : (0.12 + noiseRateVal * 0.28);
+    } else if (noiseMode === "CONTINUOUS") {
+      trigProb = 0.10 + noiseRateVal * 0.30;
+    }
+    if (randFloat() < trigProb) {
+      triggerNoiseEvent(0.70 + randFloat() * 0.45);
+    }
+  }
+
   if (isDownbeat) {
     if (isManualChordActive) {
       const barsElapsed = barCount - manualInputBar;
@@ -6655,7 +7476,14 @@ function clockTick() {
         currentChordStepIdx = pickNextChordStepIdx(currentChordStepIdx);
         currentChordRootStep = CHORD_STEP_POOL[currentChordStepIdx];
         currentChordDeg = degreeToSemitone(currentChordRootStep, scale);
-        currentChordVoicing = pickNextVoicingIdx(currentChordVoicing);
+        if (chordVoicingMode === "AUTO") {
+          currentChordVoicing = pickNextVoicingIdx(currentChordVoicing);
+        } else {
+          const lockedIdx = parseInt(chordVoicingMode, 10);
+          if (!isNaN(lockedIdx) && lockedIdx >= 0 && lockedIdx < CHORD_LIBRARY.length) {
+            currentChordVoicing = lockedIdx;
+          }
+        }
         updateDronePitches();
         maybeAutoEvolve();
       }
@@ -6706,11 +7534,6 @@ function clockTick() {
         else if (arpStepCounter <= 0) { arpDirection = 1; arpStepCounter = 0; }
         targetMidi = pool[arpStepCounter];
       } else if (arpPattern === "RAGA_TAAN") {
-        // Breathy melodic phrasing for Bansuri/sitar-style leads: only lands
-        // on beat-aligned ticks (with an occasional pushed eighth) instead of
-        // firing on every tick like PENDULUM does, so the phrase has room to
-        // breathe, and walks the scale with a mostly-stepwise, occasionally-
-        // skipping taan contour instead of a mechanical single-step bounce.
         const tpb = ts.ticksPerBeat || 4;
         const subTick = measureTick % tpb;
         if (subTick === 0 || (subTick === 2 && randFloat() < 0.35)) {
@@ -7973,10 +8796,39 @@ function updateAudioParams() {
   drumPunch = parseInt(document.getElementById("knobDrumPunch").value) / 100;
   drumDensity = parseInt(document.getElementById("knobDrumDensity").value) / 100;
   drumStyle = document.getElementById("selDrumStyle").value;
+  if (document.getElementById("selDrumKit")) {
+    drumKit = document.getElementById("selDrumKit").value;
+  }
   strumMs = parseInt(document.getElementById("knobStrum").value);
   droneVol = parseInt(document.getElementById("knobDrone").value) / 100;
 
   if (document.getElementById("selChordTimbre")) chordTimbre = document.getElementById("selChordTimbre").value;
+  if (document.getElementById("selChordVoicing")) chordVoicingMode = document.getElementById("selChordVoicing").value;
+
+  // 5. Atmosphere & Noise Instrument Parameters
+  if (document.getElementById("selNoiseProfile")) noiseProfile = document.getElementById("selNoiseProfile").value;
+  if (document.getElementById("selNoiseMode")) noiseMode = document.getElementById("selNoiseMode").value;
+  if (document.getElementById("chkAutoEvolveNoise")) autoEvolveNoise = document.getElementById("chkAutoEvolveNoise").checked;
+  if (document.getElementById("knobNoiseColor")) {
+    noiseColorVal = parseInt(document.getElementById("knobNoiseColor").value) / 100;
+    document.getElementById("lblNoiseColor").textContent = Math.round(noiseColorVal * 100) + "%";
+  }
+  if (document.getElementById("knobNoiseRate")) {
+    noiseRateVal = parseInt(document.getElementById("knobNoiseRate").value) / 100;
+    document.getElementById("lblNoiseRate").textContent = Math.round(noiseRateVal * 100) + "%";
+  }
+  if (document.getElementById("knobNoiseDrift")) {
+    noiseDriftVal = parseInt(document.getElementById("knobNoiseDrift").value) / 100;
+    document.getElementById("lblNoiseDrift").textContent = Math.round(noiseDriftVal * 100) + "%";
+  }
+  if (document.getElementById("knobNoiseFx")) {
+    noiseFxSend = parseInt(document.getElementById("knobNoiseFx").value) / 100;
+    document.getElementById("lblNoiseFx").textContent = Math.round(noiseFxSend * 100) + "%";
+  }
+  if (document.getElementById("knobNoiseVol")) {
+    noiseVol = parseInt(document.getElementById("knobNoiseVol").value) / 100;
+    document.getElementById("lblNoiseVol").textContent = Math.round(noiseVol * 100) + "%";
+  }
 
   if (document.getElementById("knobDroneFx")) {
     droneFxSend = parseInt(document.getElementById("knobDroneFx").value) / 100;
@@ -8042,8 +8894,6 @@ function updateAudioParams() {
   if (document.getElementById("selDroneTimbre")) {
     droneTimbre = document.getElementById("selDroneTimbre").value;
     const isDidgeridoo = (droneTimbre === "DIDGERIDOO");
-    // droneOsc1/2 stay triangle/sawtooth always -- the buzz layer uses its
-    // own dedicated oscillators, so the classic sub path never changes here.
     if (audioCtx && droneFormantGain) {
       const formantTarget = isDidgeridoo ? 0.85 : 0;
       droneFormantGain.gain.setTargetAtTime(formantTarget, audioCtx.currentTime, 0.3);
@@ -8090,12 +8940,6 @@ function updateAudioParams() {
   if (document.getElementById("knobFilterLfoDepth")) {
     filterLfoDepth = parseInt(document.getElementById("knobFilterLfoDepth").value) / 100;
   }
-  // Rate and Depth share one combined label now (lblFilterLfoRate/
-  // lblFilterLfoDepth no longer exist separately) -- this was throwing
-  // uncaught on every call, which silently aborted the rest of this
-  // function (and, via setupRandomInitialState() at the bottom of the
-  // script, the rest of the whole script's top-level execution) ever
-  // since the pedal-view label consolidation.
   if (document.getElementById("lblFilterLfoValues")) {
     document.getElementById("lblFilterLfoValues").textContent = filterLfoRateHz.toFixed(2) + " Hz / " + Math.round(filterLfoDepth * 100) + "%";
   }
@@ -8146,9 +8990,6 @@ function updateAudioParams() {
   if (document.getElementById("knobReverbTone")) {
     reverbToneHz = parseInt(document.getElementById("knobReverbTone").value);
   }
-  // Mix and Tone share one combined label now (lblReverbTone no longer
-  // exists separately) -- same uncaught-crash pattern as the filter LFO
-  // label above.
   if (document.getElementById("lblReverbMix")) {
     document.getElementById("lblReverbMix").textContent = Math.round(reverbMixVal * 100) + "% / " + reverbToneHz + " Hz";
   }
@@ -8181,13 +9022,11 @@ function updateAudioParams() {
   if (drumBusGain) drumBusGain.gain.setTargetAtTime(isChannelAudible('drum') ? drumVol * 0.78 : 0, audioCtx.currentTime, 0.05);
   if (arpBusGain) arpBusGain.gain.setTargetAtTime(isChannelAudible('arp') ? arpVol * 0.90 : 0, audioCtx.currentTime, 0.05);
   if (chordBusGain) chordBusGain.gain.setTargetAtTime(isChannelAudible('chord') ? chordVol : 0, audioCtx.currentTime, 0.05);
+  if (noiseBusGain) noiseBusGain.gain.setTargetAtTime(isChannelAudible('noise') ? noiseVol * 0.85 : 0, audioCtx.currentTime, 0.05);
   if (droneFilter) droneFilter.frequency.setTargetAtTime(droneFilterHz, audioCtx.currentTime, 0.08);
   if (droneOsc1) droneOsc1.detune.setTargetAtTime(-droneDetuneCents, audioCtx.currentTime, 0.08);
   if (droneOsc2) droneOsc2.detune.setTargetAtTime(+droneDetuneCents, audioCtx.currentTime, 0.08);
-  // Drum/chord/arp are note-triggered -- stopping the clock already silences
-  // them naturally since nothing new gets scheduled. The drone (and its
-  // Tanpura layer) is a continuous oscillator with no such natural gate, so
-  // Anti-click soft envelope smoothing: cancel and linear ramp over 35ms
+
   if (droneGain) {
     const targetDrone = (isPlaying && isChannelAudible('drone')) ? droneVol * 0.16 : 0.0001;
     droneGain.gain.cancelScheduledValues(audioCtx.currentTime);
@@ -8200,38 +9039,53 @@ function updateAudioParams() {
     tanpuraBusGain.gain.setValueAtTime(tanpuraBusGain.gain.value, audioCtx.currentTime);
     tanpuraBusGain.gain.linearRampToValueAtTime(targetTanpura, audioCtx.currentTime + 0.035);
   }
+  updateNoiseEngineParams();
 
-  // Drone/drum used a weaker 0.4 dry-bypass coefficient than chord/arp's 0.5,
-  // so even at 100% FX Send their dry (unfiltered) path never dropped below
-  // 60% -- meaning the two most constant, sonically dominant layers in the
-  // mix were structurally the least reachable by the Master Filter/Env no
-  // matter how hard you turned Cutoff/Resonance. Unified to 0.5 so the
-  // filter's maximum reach is consistent across every channel.
+  // Aux routing toggles (AUX buttons in bottom-right of each instrument module)
+  const effDroneFx = (channelAux.drone !== false) ? droneFxSend : 0;
+  const effDrumFx  = (channelAux.drum  !== false) ? drumFxSend  : 0;
+  const effChordFx = (channelAux.chord !== false) ? chordFxSend : 0;
+  const effArpFx   = (channelAux.arp   !== false) ? arpFxSend   : 0;
+  const effNoiseFx = (channelAux.noise !== false) ? noiseFxSend : 0;
+
   if (droneFxSendGain && droneDryGain) {
-    droneFxSendGain.gain.setTargetAtTime(droneFxSend, audioCtx.currentTime, 0.05);
-    droneDryGain.gain.setTargetAtTime(1.0 - (droneFxSend * 0.5), audioCtx.currentTime, 0.05);
+    droneFxSendGain.gain.setTargetAtTime(effDroneFx, audioCtx.currentTime, 0.05);
+    droneDryGain.gain.setTargetAtTime(1.0 - (effDroneFx * 0.5), audioCtx.currentTime, 0.05);
   }
   if (drumFxSendGain && drumDryGain) {
-    drumFxSendGain.gain.setTargetAtTime(drumFxSend, audioCtx.currentTime, 0.05);
-    drumDryGain.gain.setTargetAtTime(1.0 - (drumFxSend * 0.5), audioCtx.currentTime, 0.05);
+    drumFxSendGain.gain.setTargetAtTime(effDrumFx, audioCtx.currentTime, 0.05);
+    drumDryGain.gain.setTargetAtTime(1.0 - (effDrumFx * 0.5), audioCtx.currentTime, 0.05);
   }
   if (chordFxSendGain && chordDryGain) {
-    chordFxSendGain.gain.setTargetAtTime(chordFxSend, audioCtx.currentTime, 0.05);
-    chordDryGain.gain.setTargetAtTime(1.0 - (chordFxSend * 0.5), audioCtx.currentTime, 0.05);
+    chordFxSendGain.gain.setTargetAtTime(effChordFx, audioCtx.currentTime, 0.05);
+    chordDryGain.gain.setTargetAtTime(1.0 - (effChordFx * 0.5), audioCtx.currentTime, 0.05);
   }
   if (arpFxSendGain && arpDryGain) {
-    arpFxSendGain.gain.setTargetAtTime(arpFxSend, audioCtx.currentTime, 0.05);
-    arpDryGain.gain.setTargetAtTime(1.0 - (arpFxSend * 0.5), audioCtx.currentTime, 0.05);
+    arpFxSendGain.gain.setTargetAtTime(effArpFx, audioCtx.currentTime, 0.05);
+    arpDryGain.gain.setTargetAtTime(1.0 - (effArpFx * 0.5), audioCtx.currentTime, 0.05);
+  }
+  if (noiseFxSendGain && noiseDryGain) {
+    noiseFxSendGain.gain.setTargetAtTime(effNoiseFx, audioCtx.currentTime, 0.05);
+    noiseDryGain.gain.setTargetAtTime(1.0 - (effNoiseFx * 0.5), audioCtx.currentTime, 0.05);
   }
 
+  // Phase 4: Cascaded 24dB/oct Filter Fine-Tuning (staggered Q + automatic resonance headroom compensation)
   if (masterFilter1 && masterFilter2) {
-    [masterFilter1, masterFilter2].forEach(f => {
-      f.frequency.setTargetAtTime(masterBaseCutoff, audioCtx.currentTime, 0.04);
-      f.Q.setTargetAtTime(masterResonance, audioCtx.currentTime, 0.04);
-    });
+    masterFilter1.frequency.setTargetAtTime(masterBaseCutoff, audioCtx.currentTime, 0.04);
+    masterFilter2.frequency.setTargetAtTime(masterBaseCutoff, audioCtx.currentTime, 0.04);
+    masterFilter1.Q.setTargetAtTime(masterResonance, audioCtx.currentTime, 0.04);
+    masterFilter2.Q.setTargetAtTime(Math.max(0.5, masterResonance * 0.72), audioCtx.currentTime, 0.04);
+    if (masterFilterCompGain) {
+      const resExcess = Math.max(0, masterResonance - 1.5);
+      const compGain = 1.0 / (1.0 + resExcess * 0.058);
+      masterFilterCompGain.gain.setTargetAtTime(compGain, audioCtx.currentTime, 0.05);
+    }
   }
   if (filterLFO) filterLFO.frequency.setTargetAtTime(filterLfoRateHz, audioCtx.currentTime, 0.1);
-  if (filterLFODepthGain) filterLFODepthGain.gain.setTargetAtTime(masterBaseCutoff * filterLfoDepth * 0.5, audioCtx.currentTime, 0.1);
+  if (filterLFODepthGain) {
+    const safeLfoExcursion = Math.min(masterBaseCutoff * 0.78, masterBaseCutoff * filterLfoDepth * 0.55);
+    filterLFODepthGain.gain.setTargetAtTime(safeLfoExcursion, audioCtx.currentTime, 0.1);
+  }
 
   if (analogDelayNode) {
     const curDelay = analogDelayNode.delayTime.value;
@@ -8254,7 +9108,7 @@ function updateAudioParams() {
   if (reverbToneFilter) reverbToneFilter.frequency.setTargetAtTime(reverbToneHz, audioCtx.currentTime, 0.08);
   if (chorusWetGain) chorusWetGain.gain.setTargetAtTime(chorusMixVal, audioCtx.currentTime, 0.08);
 
-  // Master EQ & Out Parameters
+  // Master EQ & Out Parameters (with Phase 4 Asymmetric Analog Tape Saturation Curve)
   if (document.getElementById("knobEqLow")) {
     masterEqLowVal = parseFloat(document.getElementById("knobEqLow").value);
     document.getElementById("lblEqLow").textContent = (masterEqLowVal > 0 ? "+" : "") + masterEqLowVal.toFixed(1) + " dB";
@@ -8274,13 +9128,7 @@ function updateAudioParams() {
     masterDriveVal = parseFloat(document.getElementById("knobMasterDrive").value);
     document.getElementById("lblMasterDrive").textContent = Math.round(masterDriveVal) + "%";
     if (masterDriveNode && audioCtx) {
-      const k = 1.0 + (masterDriveVal / 100) * 2.5;
-      const n_s = 512, c = new Float32Array(n_s);
-      for (let i = 0; i < n_s; ++i) {
-        let x = (i * 2) / n_s - 1;
-        c[i] = Math.tanh(x * k);
-      }
-      masterDriveNode.curve = c;
+      masterDriveNode.curve = makeAnalogTapeCurve(masterDriveVal, 1024);
     }
   }
   if (typeof syncAllSmartDropdowns === 'function') {
@@ -8310,6 +9158,11 @@ const RANDOM_SWEET_SPOTS = {
   knobDrone:         [50, 82],
   knobDroneFilter:   [110, 220],
   knobDroneDetune:   [1.5, 5.5],
+  knobNoiseColor:    [25, 72],
+  knobNoiseRate:     [20, 68],
+  knobNoiseDrift:    [25, 75],
+  knobNoiseVol:      [18, 45],
+  knobNoiseFx:       [35, 80],
   knobDelayTone:     [1200, 2600],
   knobDelayFlutter:  [12, 45],
   knobDelayMix:      [25, 50],
@@ -8340,7 +9193,7 @@ function randomizeSelect(id) {
   const el = document.getElementById(id);
   if (!el || !el.options.length) return;
   if (id === "selChordTimbre") {
-    const pleasantChords = ["WARM_PAD", "PURE_SINE_GLASS", "CHAMBER_WOODS", "CELESTIAL_ORGAN", "RHODES", "LOFI_KEYS", "VIBES_CELESTE", "GLASS_EP", "DIGITAL_STRINGS"];
+    const pleasantChords = ["WARM_PAD", "PURE_SINE_GLASS", "CHAMBER_WOODS", "CELESTIAL_ORGAN", "RHODES", "LOFI_KEYS", "VIBES_CELESTE", "GLASS_EP", "DIGITAL_STRINGS", "SITAR_STRINGS"];
     el.value = pleasantChords[randRange(0, pleasantChords.length - 1)];
     return;
   }
@@ -8352,6 +9205,11 @@ function randomizeSelect(id) {
   if (id === "selDrumStyle") {
     const pleasantDrums = ["ORGANIC", "HEARTBEAT", "DUB_TAPE", "MINIMAL_CLICK", "TABLA_GROOVE", "FOUR_ON_FLOOR"];
     el.value = pleasantDrums[randRange(0, pleasantDrums.length - 1)];
+    return;
+  }
+  if (id === "selNoiseMode") {
+    const activeModes = ["GUSTS", "CONTINUOUS", "SPARSE", "RHYTHMIC", "STORM_SWELL"];
+    el.value = activeModes[randRange(0, activeModes.length - 1)];
     return;
   }
   el.value = el.options[randRange(0, el.options.length - 1)].value;
@@ -8378,6 +9236,7 @@ function randomizeDrone() {
 
 function randomizeDrums() {
   randomizeSelect("selDrumStyle");
+  randomizeSelect("selDrumKit");
   randomizeCheckbox("chkAutoEvolveDrums");
   randomizeRange("knobDrumEvolveChance");
   randomizeRange("knobDrumPunch");
@@ -8389,6 +9248,7 @@ function randomizeDrums() {
 
 function randomizeChords(triggerSound = true) {
   randomizeSelect("selChordTimbre");
+  randomizeSelect("selChordVoicing");
   randomizeRange("knobStrum");
   randomizeRange("knobMutation");
   randomizeRange("knobChordSustain");
@@ -8398,7 +9258,12 @@ function randomizeChords(triggerSound = true) {
 
   // Genuinely randomize the active chord voicing & progression step
   const scale = SCALES[activeScaleKey] || SCALES.DORIAN;
-  currentChordVoicing = randRange(0, CHORD_LIBRARY.length - 1);
+  const selVoicingEl = document.getElementById("selChordVoicing");
+  if (selVoicingEl && selVoicingEl.value !== "AUTO") {
+    currentChordVoicing = parseInt(selVoicingEl.value, 10) || 0;
+  } else {
+    currentChordVoicing = randRange(0, CHORD_LIBRARY.length - 1);
+  }
   currentChordStepIdx = randRange(0, CHORD_STEP_POOL.length - 1);
   currentChordRootStep = CHORD_STEP_POOL[currentChordStepIdx];
   currentChordDeg = degreeToSemitone(currentChordRootStep, scale);
@@ -8408,6 +9273,21 @@ function randomizeChords(triggerSound = true) {
   updateAudioParams();
   if (isPlaying && triggerSound) {
     setTimeout(() => { if (isPlaying) triggerCurrentChord(); }, 40);
+  }
+}
+
+function randomizeNoise() {
+  randomizeSelect("selNoiseProfile");
+  randomizeSelect("selNoiseMode");
+  randomizeCheckbox("chkAutoEvolveNoise");
+  randomizeRange("knobNoiseColor");
+  randomizeRange("knobNoiseRate");
+  randomizeRange("knobNoiseDrift");
+  randomizeRange("knobNoiseVol");
+  randomizeRange("knobNoiseFx");
+  updateAudioParams();
+  if (isPlaying && isChannelAudible("noise")) {
+    triggerNoiseEvent(0.85);
   }
 }
 
@@ -8465,7 +9345,7 @@ function randomizeDelay() {
   randomizeSelect("selDelayNoteDivision");
   randomizeRange("knobDelayFeedback");
   const fbEl = document.getElementById("knobDelayFeedback");
-  if (fbEl && parseFloat(fbEl.value) > 50) fbEl.value = 50;
+  if (fbEl && parseFloat(fbEl.value) > 48) fbEl.value = 48;
   randomizeRange("knobDelayTone");
   randomizeRange("knobDelayFlutter");
   randomizeRange("knobDelayMix");
@@ -8506,6 +9386,7 @@ function randomizeEverything() {
 
   // Fully randomize chord voicing, degree, and timbre
   randomizeSelect("selChordTimbre");
+  randomizeSelect("selChordVoicing");
   randomizeRange("knobStrum");
   randomizeRange("knobMutation");
   randomizeRange("knobChordSustain");
@@ -8522,6 +9403,7 @@ function randomizeEverything() {
   randomizeDrone();
   randomizeDrums();
   randomizeArp();
+  randomizeNoise();
   randomizeFilter();
   randomizeDelay();
   randomizeReverbChorus();
@@ -8537,42 +9419,55 @@ function randomizeEverything() {
   updateChordHud();
   updateDronePitches(true);
   updateAudioParams();
-
-  // Deliberately NOT forcing an immediate chord hit here: the previous
-  // chord's delay/reverb tail is often still ringing out when "Randomize
-  // All" is pressed, and firing a brand new chord right on top of it
-  // clashed with the old tail. Letting the next natural downbeat (already
-  // driven by the main sequencer clock) introduce the new material instead
-  // gives the old tail room to decay first.
 }
 
 let droneEnabled = true;
-let channelMute = { drone: false, drum: false, chord: false, arp: false };
-let channelSolo = { drone: false, drum: false, chord: false, arp: false };
+let channelPower = { drone: true, drum: true, chord: true, arp: true, noise: true };
+let channelAux   = { drone: true, drum: true, chord: true, arp: true, noise: true };
+let channelMute  = { drone: false, drum: false, chord: false, arp: false, noise: false };
+let channelSolo  = { drone: false, drum: false, chord: false, arp: false, noise: false };
 
 function isChannelAudible(ch) {
+  if (channelPower[ch] === false) return false;
   if (ch === 'drone' && !droneEnabled) return false;
   const anySolo = Object.values(channelSolo).some(v => v);
   if (anySolo) return channelSolo[ch] && !channelMute[ch];
   return !channelMute[ch];
 }
 
-function toggleDronePower() {
-  droneEnabled = !droneEnabled;
-  const pwrBtn = document.getElementById('btnPower_drone');
+function toggleChannelPower(ch) {
+  channelPower[ch] = !channelPower[ch];
+  if (ch === 'drone') droneEnabled = channelPower.drone;
+  const pwrBtn = document.getElementById('btnPower_' + ch);
   if (pwrBtn) {
-    pwrBtn.classList.toggle('active', droneEnabled);
-    pwrBtn.setAttribute('title', droneEnabled ? 'Sub-Drone Power (ON)' : 'Sub-Drone Power (OFF)');
+    pwrBtn.classList.toggle('active', channelPower[ch]);
+  }
+  updateAudioParams();
+}
+
+function toggleDronePower() {
+  toggleChannelPower('drone');
+}
+
+function toggleChannelAux(ch) {
+  channelAux[ch] = !channelAux[ch];
+  const auxBtn = document.getElementById('btnAux_' + ch);
+  if (auxBtn) {
+    auxBtn.classList.toggle('active', channelAux[ch]);
   }
   updateAudioParams();
 }
 
 function updateMuteSoloUI() {
-  ["drone", "drum", "chord", "arp"].forEach(ch => {
+  ["drone", "drum", "chord", "arp", "noise"].forEach(ch => {
     const mBtn = document.getElementById("btnMute_" + ch);
     const sBtn = document.getElementById("btnSolo_" + ch);
+    const pBtn = document.getElementById("btnPower_" + ch);
+    const aBtn = document.getElementById("btnAux_" + ch);
     if (mBtn) mBtn.classList.toggle("active", channelMute[ch]);
     if (sBtn) sBtn.classList.toggle("active", channelSolo[ch]);
+    if (pBtn) pBtn.classList.toggle("active", channelPower[ch] !== false);
+    if (aBtn) aBtn.classList.toggle("active", channelAux[ch] !== false);
   });
 }
 
@@ -8614,6 +9509,18 @@ function applyPreset(idx) {
   const selDroneTimbre = document.getElementById("selDroneTimbre");
   if (selDroneTimbre) selDroneTimbre.value = "SUB";
   if (document.getElementById("selDroneOctave")) document.getElementById("selDroneOctave").value = "D2";
+  if (document.getElementById("selDrumKit")) document.getElementById("selDrumKit").value = "ORGANIC_KIT";
+  if (document.getElementById("selChordVoicing")) document.getElementById("selChordVoicing").value = "AUTO";
+  if (document.getElementById("selNoiseProfile")) {
+    const presetProfiles = ["RAIN", "WHITE_TAPE", "WIND", "BROOK", "CRICKETS", "THUNDER", "BROOK", "WIND", "WHITE_TAPE", "WHITE_TAPE", "RAIN"];
+    document.getElementById("selNoiseProfile").value = presetProfiles[idx] || "RAIN";
+  }
+  if (document.getElementById("selNoiseMode")) {
+    const presetModes = ["GUSTS", "RHYTHMIC", "STORM_SWELL", "CONTINUOUS", "SPARSE", "STORM_SWELL", "CONTINUOUS", "SPARSE", "CONTINUOUS", "CONTINUOUS", "GUSTS"];
+    document.getElementById("selNoiseMode").value = presetModes[idx] || "GUSTS";
+  }
+  if (document.getElementById("knobNoiseVol")) document.getElementById("knobNoiseVol").value = 24;
+  if (document.getElementById("knobNoiseFx")) document.getElementById("knobNoiseFx").value = 60;
   if (document.getElementById("knobChordDynamics")) document.getElementById("knobChordDynamics").value = 90;
   if (document.getElementById("knobChordSustain")) document.getElementById("knobChordSustain").value = 100;
   if (document.getElementById("knobChordVol")) document.getElementById("knobChordVol").value = 82;
@@ -9490,11 +10397,15 @@ function setupRandomInitialState() {
   const arpTimbres = ["SINE_CRYSTAL", "CONCERT_HARP", "WATER_DROPLET", "MUSIC_BOX", "KALIMBA", "PIZZICATO_STRING", "GLASS_FM", "BANSURI_FLUTE"];
   const drumStyles = ["ORGANIC", "DUB_TAPE", "MINIMAL_CLICK", "HEARTBEAT", "TABLA_GROOVE"];
   const chordTimbres = ["WARM_PAD", "PURE_SINE_GLASS", "CHAMBER_WOODS", "CELESTIAL_ORGAN", "VIBES_CELESTE", "RHODES", "GLASS_EP", "LOFI_KEYS"];
+  const noiseProfiles = ["RAIN", "WHITE_TAPE", "BROOK", "CRICKETS", "WIND"];
+  const noiseModes = ["GUSTS", "CONTINUOUS", "SPARSE"];
 
   arpPattern = arpPatterns[randRange(0, arpPatterns.length - 1)];
   arpTimbre = arpTimbres[randRange(0, arpTimbres.length - 1)];
   drumStyle = drumStyles[randRange(0, drumStyles.length - 1)];
   chordTimbre = chordTimbres[randRange(0, chordTimbres.length - 1)];
+  noiseProfile = noiseProfiles[randRange(0, noiseProfiles.length - 1)];
+  noiseMode = noiseModes[randRange(0, noiseModes.length - 1)];
 
   // Random Tempo (62 - 82 BPM)
   bpm = randRange(62, 82);
@@ -9526,6 +10437,12 @@ function setupRandomInitialState() {
 
   const elChordTim = document.getElementById("selChordTimbre");
   if (elChordTim) elChordTim.value = chordTimbre;
+
+  const elNoiseProf = document.getElementById("selNoiseProfile");
+  if (elNoiseProf) elNoiseProf.value = noiseProfile;
+
+  const elNoiseMod = document.getElementById("selNoiseMode");
+  if (elNoiseMod) elNoiseMod.value = noiseMode;
 
   document.querySelectorAll(".preset-bar button").forEach(b => b.classList.remove("active"));
 
@@ -10129,14 +11046,15 @@ function drawStars(w, h) {
 }
 
 const ORBITAL_MODULES = [
-  { id: "drone",  name: "SUB & DRONE", num: "1", color: "#00e5ff", rgb: [0, 229, 255], baseR: 40, x: 0, y: 0, vx: 0.18,  vy: 0.14,  chClass: "drone-ch",  analyser: () => droneAnalyser,  pulse: 0, bump: 0 },
-  { id: "drum",   name: "DRUMS",        num: "2", color: "#ff3838", rgb: [255, 56, 56],  baseR: 44, x: 0, y: 0, vx: -0.20, vy: 0.16,  chClass: "drum-ch",   analyser: () => drumAnalyser,   pulse: 0, bump: 0 },
-  { id: "chord",  name: "CHORDS & VOICING",  num: "3", color: "#fed330", rgb: [254, 211, 48], baseR: 48, x: 0, y: 0, vx: 0.15,  vy: -0.19, chClass: "chord-ch",  analyser: () => chordAnalyser,  pulse: 0, bump: 0 },
-  { id: "arp",    name: "SHIMMER ARP",  num: "4", color: "#7d5fff", rgb: [125, 95, 255], baseR: 42, x: 0, y: 0, vx: -0.16, vy: -0.14, chClass: "arp-ch",    analyser: () => arpAnalyser,    pulse: 0, bump: 0 },
-  { id: "filter", name: "FILTER & ENV",num: "5", color: "#2ed573", rgb: [46, 213, 115], baseR: 37, x: 0, y: 0, vx: 0.14,  vy: 0.17,  chClass: "filter-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
-  { id: "delay",  name: "ANALOG DELAY", num: "6", color: "#ff793f", rgb: [255, 121, 63], baseR: 35, x: 0, y: 0, vx: -0.18, vy: 0.12,  chClass: "delay-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 },
-  { id: "reverb", name: "REVERB & CHORUS", num: "7", color: "#ff5fc4", rgb: [255, 95, 196], baseR: 38, x: 0, y: 0, vx: 0.17,  vy: 0.13,  chClass: "reverb-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
-  { id: "space",  name: "MASTER EQ & OUT", num: "8", color: "#4b7bec", rgb: [75, 123, 236], baseR: 37, x: 0, y: 0, vx: 0.12,  vy: -0.16, chClass: "space-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 }
+  { id: "drone",  name: "SUB & DRONE",       num: "1", color: "#00e5ff", rgb: [0, 229, 255],   baseR: 40, x: 0, y: 0, vx: 0.18,  vy: 0.14,  chClass: "drone-ch",  analyser: () => droneAnalyser,  pulse: 0, bump: 0 },
+  { id: "drum",   name: "DRUMS",             num: "2", color: "#ff3838", rgb: [255, 56, 56],   baseR: 44, x: 0, y: 0, vx: -0.20, vy: 0.16,  chClass: "drum-ch",   analyser: () => drumAnalyser,   pulse: 0, bump: 0 },
+  { id: "chord",  name: "CHORDS & VOICING",  num: "3", color: "#fed330", rgb: [254, 211, 48],  baseR: 48, x: 0, y: 0, vx: 0.15,  vy: -0.19, chClass: "chord-ch",  analyser: () => chordAnalyser,  pulse: 0, bump: 0 },
+  { id: "arp",    name: "SHIMMER ARP",       num: "4", color: "#7d5fff", rgb: [125, 95, 255],  baseR: 42, x: 0, y: 0, vx: -0.16, vy: -0.14, chClass: "arp-ch",    analyser: () => arpAnalyser,    pulse: 0, bump: 0 },
+  { id: "noise",  name: "ATMOSPHERE & NOISE",num: "5", color: "#1dd1a1", rgb: [29, 209, 161],  baseR: 40, x: 0, y: 0, vx: 0.16,  vy: -0.15, chClass: "noise-ch",  analyser: () => noiseAnalyser,  pulse: 0, bump: 0 },
+  { id: "filter", name: "FILTER & ENV",      num: "6", color: "#2ed573", rgb: [46, 213, 115],  baseR: 37, x: 0, y: 0, vx: 0.14,  vy: 0.17,  chClass: "filter-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
+  { id: "delay",  name: "ANALOG DELAY",      num: "7", color: "#ff793f", rgb: [255, 121, 63],  baseR: 35, x: 0, y: 0, vx: -0.18, vy: 0.12,  chClass: "delay-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 },
+  { id: "reverb", name: "REVERB & CHORUS",   num: "8", color: "#ff5fc4", rgb: [255, 95, 196],  baseR: 38, x: 0, y: 0, vx: 0.17,  vy: 0.13,  chClass: "reverb-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
+  { id: "space",  name: "MASTER EQ & OUT",   num: "9", color: "#4b7bec", rgb: [75, 123, 236],  baseR: 37, x: 0, y: 0, vx: 0.12,  vy: -0.16, chClass: "space-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 }
 ];
 
 // Maps a dspChainOrder pedal key to the orbital orb it corresponds to --
@@ -10225,6 +11143,7 @@ function getDropdownAccentColor(sel) {
   if (sel.closest(".drum-ch")) return "var(--color-drum)";
   if (sel.closest(".chord-ch")) return "var(--color-chord)";
   if (sel.closest(".arp-ch")) return "var(--color-arp)";
+  if (sel.closest(".noise-ch")) return "var(--color-noise)";
   if (sel.closest(".pedal-filter") || sel.closest(".filter-ch")) return "var(--color-filter)";
   if (sel.closest(".pedal-delay") || sel.closest(".delay-ch")) return "var(--color-delay)";
   if (sel.closest(".pedal-reverb") || sel.closest(".reverb-ch")) return "var(--color-reverb)";
@@ -10598,7 +11517,7 @@ function closeOrbitalModal() {
   setTimeout(restoreStripsToRack, 260);
 }
 
-const ORBITAL_LOWER_DECK_IDS = ["drone", "drum", "chord", "arp"];
+const ORBITAL_LOWER_DECK_IDS = ["drone", "drum", "chord", "arp", "noise"];
 
 function restoreStripsToRack() {
   const lowerRack = document.querySelector(".lower-deck");

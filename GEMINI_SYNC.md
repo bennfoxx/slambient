@@ -341,17 +341,17 @@ All items outlined in Phase 3 of the Technical Specification and Implementation 
 - [x] Transport cluster refinement (`⟲ ALL` beside Record, meter button → SVG refresh icon)
 - [x] Square `BIO-SCAN` Eno pod (matches header height, JS-enforced square)
 - [x] Upper visualizer row drag-reordering (`#scopePanel`, `#chordInfoPanel`, `#keyboardPanel`) preserving exact widths & circular cursors
-- [x] Unified channel strip anatomy (`PWR`/`M`/`S`/`⟲` header, FX send + master volume footer — modules 1–4)
-- [x] Smart truncated dropdowns (Ableton Live-style custom component across all 14 selects, floating & zero-scroll)
+- [x] Unified channel strip anatomy (`PWR`/`M`/`S`/`⟲` header, two top dropdowns per instrument module, bottom-right `AUX` routing toggle + FX send slider + horizontal Master Volume footer across all 5 instrument modules)
+- [x] Smart truncated dropdowns (Ableton Live-style custom component across all 18 selects, floating & zero-scroll)
 
-### Phase 4: Voice Synthesizer Expansions & Environmental Noise — ⬜ NEXT UP
-- [ ] Drum fill generator (manual `FILL` button in Drum module header + automatic algorithmic fills on groove switch)
-- [ ] Tabla articulation engine (`Ge`/`Na`/`Tin`/`Dha` modeled strokes, high-speed scoop pitch bends, polyrhythmic fills)
-- [ ] Sitar physical modeling (Jawari bridge harmonic profiles + sympathetic string resonance algorithms)
-- [ ] Environmental soundscape / Noise module (rain, thunder, white noise, bubbling brooks, crickets, wind with adjustable parameters & randomized triggers)
-- [ ] Filter & Output saturation refinement (filter resonance/cutoff/LFO tuning + master soft-clip tape saturation waveshaper)
+### Phase 4: Voice Synthesizer Expansions & Environmental Noise — ✅ DONE
+- [x] Drum fill generator (manual `FILL` button in Drum module header + automatic algorithmic fills on groove switch and 8-bar turnaround)
+- [x] Tabla articulation engine (`Ge`/`Na`/`Tin`/`Ti`/`Re`/`Ki`/`Dha` modeled strokes, tempo-adaptive Bayan scoop pitch bends, polyrhythmic `Ti-Re-Ki-Ta` fills)
+- [x] Sitar physical modeling (`getJawariCurve()` parabolic bridge harmonic waveshaper, dual gourd formant peaks at `920 Hz` & `2750 Hz`, and `triggerSympatheticStrings()` 3-string taraf sympathetic resonance)
+- [x] Environmental soundscape / Noise instrument module (`5. Atmosphere & Noise` panel in `.lower-deck` with `RAIN`, `THUNDER`, `WHITE_TAPE`, `BROOK`, `CRICKETS`, `WIND` profiles, `GUSTS`/`CONTINUOUS`/`SPARSE`/`RHYTHMIC`/`STORM_SWELL` modes, `Evolve` toggle, `randomizeNoise()`, and Orbital View orb #5)
+- [x] Filter & Output saturation refinement (staggered dual-biquad Q + `masterFilterCompGain` resonance compensation + 2x-oversampled `makeAnalogTapeCurve()` asymmetric analog tape saturation on `masterDriveNode` and `saturationNode`)
 
-### Phase 5: Preset Serialization & Signature Sound Profiles — ⬜ PENDING
+### Phase 5: Preset Serialization & Signature Sound Profiles — ⬜ NEXT UP
 - [ ] JSON export/import (`Save Bank` / `Load Bank` including serialized `dspChainOrder`)
 - [ ] Signature factory presets engineered for specific DSP chain topologies:
   - `Aphex Twin` (IDM rhythms, eerie ambient tones, delay-into-filter routing at 48% feedback)
@@ -368,6 +368,4 @@ All items outlined in Phase 3 of the Technical Specification and Implementation 
 ### Phase 7: Global Shortcuts, Custom Theming & Final Polish — ⬜ PENDING
 - [ ] Keyboard playback bindings (`Spacebar` and `Enter` toggle play/pause)
 - [ ] Modular color palette picker (custom color assignments per instrument, effect, and noise module)
-
-
 
