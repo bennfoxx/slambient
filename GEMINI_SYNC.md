@@ -117,3 +117,44 @@ manually-selected Digeridoo mode could silently persist into presets that expect
 Keep editing `index.html` in place at the canonical path. If you want to hand something back for
 review, say so explicitly and name what changed rather than sending a whole new file copy — that's
 exactly the pattern that caused the fragmentation this note is cleaning up.
+
+## Update — 2026-10-14 (Hand-off back to Claude)
+
+The roadmap implementation has advanced through Phase 1, Phase 2, and subsequent console architecture unification. All work was performed directly in `/Users/benfox/Documents/Development/slambient_dev/index.html` and committed locally to git (`master` branch).
+
+### 1. Slambient v0.2 Archive Snapshot
+- Archived snapshot created and saved to `_archive/old_snapshots/slambient_v0.2_index.html`.
+
+### 2. Audio Engine & Synthesis Priorities (Roadmap Phase 1)
+- **Anti-Click and Startup Smoothing**: Implemented soft attack (35ms) and soft release (40ms) amplitude envelopes on `droneGain` and `tanpuraBusGain` in `initAudio`, `togglePlay`, and `updateAudioParams`. Anchored oscillator frequencies using `setValueAtTime` in `updateDronePitches` to eliminate phase discontinuities, digital clicks, and speaker pops on startup, pause, and preset switching.
+- **Feedback Ceiling**: Enforced a hard safety ceiling of 48% (0.48) maximum feedback across all UI slider definitions (`max="48"`), parameter updates, `RANDOM_SWEET_SPOTS`, and factory presets to prevent runaway digital feedback loops.
+
+### 3. Merged Console Rack & Pedalboard Architecture (Roadmap Phase 2 + Merged Console)
+- **Unified 2-Way View Navigation**: The view switcher has been streamlined to two definitive modes: `Orbital View` and `Console Rack`. The separate "Pedals View" mode was merged directly into the Console Rack.
+- **Tactile Stompbox Pedals Replace Legacy Effect Channels**: The legacy duplicate channel strips (5. Filter & Env, 6. Analog Delay, 7. Reverb & Chorus, 8. Space & Out) have been superseded by 3 tactile stompbox insert pedals + 1 master channel strip inside a unified 4-column deck:
+  1. **FILTER Pedal** (`KANKYŌ DSP` / Dual VCF): Cutoff, Resonance, Attack/Decay, Envelope Depth, LFO modulation, mechanical footswitch & green LED jewel.
+  2. **DELAY Pedal** (`TIME DRIFT BBD` / Analog Tape Echo): Delay Time, Tempo Sync toggle, note division dropdown, Tone damping, Flutter/Mix, capped 48% feedback, footswitch & amber LED jewel.
+  3. **REVERB & CHORUS Pedal** (`DIFFUSION LAB` / Pink Theme `#ff5fc4`): Reverb Mode (Plate, Hall, Cathedral), Reverb Mix & Tone, Stereo Chorus Mode (Classic, Ensemble, Vibrato) with Rate, Depth, and Mix, footswitch & hot pink LED jewel.
+- **New 4th Master Channel Strip — "8. Master EQ & Out"**:
+  - Replaces legacy "Space & Out" as the anchored terminal element of the signal chain.
+  - Added a master 3-band parametric EQ:
+    - Low shelf: 100 Hz (`knobEqLow`, ±12 dB)
+    - Mid peaking bell: 1 kHz, Q=1.0 (`knobEqMid`, ±12 dB)
+    - High shelf: 4.5 kHz air/presence (`knobEqHigh`, ±12 dB)
+  - Added master analog tape saturation / drive (`knobMasterDrive`, 0-100%).
+  - Retains master BPM tempo, hardware MIDI output selection, and master diffusion space controls.
+- **Live Web Audio API Graph Rewiring**:
+  - Drag-and-drop chassis reordering (with dual support for Pointer Events via `setPointerCapture` on `⠿ DRAG` handles and HTML5 drag fallback) plus clickable shift arrows (◀ / ▶) dynamically rewire `AudioNode.connect()` topologies in real time via `rewireDspChain(dspChainOrder)`.
+  - Signal chain flow: `BUS PRE` ➔ `[Pedal 1]` ➔ `[Pedal 2]` ➔ `[Pedal 3]` ➔ `MASTER EQ (Low ➔ Mid ➔ High)` ➔ `MASTER DRIVE` ➔ `SATURATION` ➔ `LIMITER` ➔ `MASTER VOL` ➔ `DESTINATION`.
+  - Live reordering is active even prior to starting playback (retaining user-configured chain topology on startup).
+- **Cross-View Synchronization**:
+  - Parameter changes, preset selections, and randomization routines synchronize bidirectionally across controls.
+  - `randomizeEverything()` shuffles pedal order on execution, with manual `⟲ SHUFFLE` and `RESET (F-D-R)` buttons available on the routing header.
+  - Orbital constellation Module 8 is renamed to "MASTER EQ & OUT" with matching accent coloring and modal handling.
+
+### Recent Git Commits
+- `aae64ac` — Archive build as Slambient v0.2 and implement Phase 1: anti-click envelopes, 48% feedback ceiling, and dynamic Web Audio DSP graph rewiring
+- `65b7fd2` — Implement Phase 2: Multi-View Console & Pedals Architecture with live Web Audio API rewiring
+- `52433cd` — Fix Pedals view: allow pre-playback DSP chain reordering, add pointer-event drag and drop, and ensure shift arrow hit testing
+- `eaecf1b` — Merge Console Rack and Pedals View into a unified view mode
+- `d1a5a87` — Replace master effect modules with tactile pedals, set Reverb & Chorus to pink, and add Master EQ & Out final chain strip
