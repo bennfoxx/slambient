@@ -350,6 +350,11 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
+    /* Shrinkable so the Undo / ? / Full Screen group stays on this row when
+       the transport controls wrap at narrow widths, instead of dropping to
+       a third line of its own. */
+    flex: 1 1 0;
+    min-width: 0;
   }
 
   .btn-main-play {
@@ -632,6 +637,107 @@
     border-color: rgba(0, 229, 255, 0.6);
     box-shadow: 0 0 10px rgba(0, 229, 255, 0.25);
   }
+  .btn-header-util:disabled {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+  }
+  .btn-header-help {
+    width: 32px;
+    padding: 0;
+    font-size: 14px;
+  }
+  .btn-tap-tempo {
+    height: 20px;
+    padding: 0 7px;
+    margin-left: 2px;
+    background: #0d0f17;
+    color: var(--accent);
+    border: 1px solid rgba(254, 211, 48, 0.4);
+    border-radius: 3px;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    cursor: pointer;
+    transition: background 0.08s ease, box-shadow 0.08s ease;
+  }
+  .btn-tap-tempo:hover { border-color: var(--accent); }
+  .btn-tap-tempo.tapped {
+    background: rgba(254, 211, 48, 0.3);
+    box-shadow: 0 0 10px rgba(254, 211, 48, 0.5);
+  }
+  .shortcuts-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 12000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(4, 5, 8, 0.6);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+  .shortcuts-overlay.open { display: flex; }
+  .shortcuts-panel {
+    width: min(460px, calc(100vw - 32px));
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    background: var(--panel);
+    border: 1px solid rgba(0, 229, 255, 0.45);
+    border-radius: 6px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 18px rgba(0, 229, 255, 0.15);
+    padding: 16px 18px 14px;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    color: var(--text-secondary);
+  }
+  .shortcuts-panel h3 {
+    margin: 0 0 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--color-drone);
+  }
+  .shortcuts-panel h4 {
+    margin: 12px 0 6px;
+    font-size: 9.5px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .shortcuts-panel .sc-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 4px 0;
+    font-size: 11px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+  .shortcuts-panel kbd {
+    display: inline-block;
+    min-width: 18px;
+    padding: 1px 6px;
+    margin-left: 3px;
+    text-align: center;
+    background: #080a11;
+    border: 1px solid var(--border-light);
+    border-bottom-width: 2px;
+    border-radius: 3px;
+    font-family: inherit;
+    font-size: 10px;
+    color: #e6ecff;
+  }
+  .shortcuts-close {
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .shortcuts-close:hover { color: #fff; }
   .btn-header-util .icon-exit-fs { display: none; }
   .btn-header-util.active .icon-enter-fs { display: none; }
   .btn-header-util.active .icon-exit-fs { display: block; }
@@ -3240,6 +3346,7 @@
     .preset-group { order: 3; flex-basis: 100%; }
     .preset-bar { max-width: none; }
     .patch-bank-section { align-self: center; }
+    .header-utils { align-self: flex-end; }
   }
   @media (max-width: 900px) {
     .global-transport { gap: 6px; }
@@ -3371,10 +3478,16 @@
             <span class="tag">TEMPO</span>
             <input type="range" id="knobBpmHeader" min="45" max="115" value="72" oninput="updateBpm(this)" title="Master Tempo (BPM)">
             <span class="tempo-val" id="lblBpmHeader">72 BPM</span>
+            <button class="btn-tap-tempo" id="btnTapTempo" onclick="tapTempo()" title="Tap tempo: tap 3+ times in rhythm to set the BPM">TAP</button>
           </div>
         </div>
 
         <div class="header-utils">
+          <button class="btn-header-util" id="btnUndoPatch" onclick="undoPatchChange()" title="Undo the last randomize / preset / new seed (Ctrl/⌘+Z)" disabled>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.5 3.5L2 7L5.5 10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 7H10a4 4 0 0 1 0 8H7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <span>Undo</span>
+          </button>
+          <button class="btn-header-util btn-header-help" id="btnShortcuts" onclick="toggleShortcutsPanel()" title="Keyboard shortcuts (?)">?</button>
           <button class="btn-header-util" id="btnAppFullscreen" onclick="toggleAppFullscreen()" title="Full screen">
             <svg class="icon-enter-fs" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <svg class="icon-exit-fs" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -11828,6 +11941,99 @@ function savePresetBankJson() {
   }
 }
 
+// Restores a patch object (from serializeCurrentPatch) onto the console.
+// Shared by LOAD (JSON file) and UNDO. skipIds lets a caller leave some
+// controls alone (UNDO keeps your current master volume).
+function applyPatchData(data, skipIds) {
+  const skip = new Set(skipIds || []);
+  if (data.controls && typeof data.controls === "object") {
+    data = Object.assign({}, data, {
+      controls: Object.fromEntries(Object.entries(data.controls).filter(([id]) => !skip.has(id)))
+    });
+  }
+
+  // 1. Restore all DOM controls (<input>, <select>)
+  if (data.controls && typeof data.controls === "object") {
+    Object.entries(data.controls).forEach(([id, entry]) => {
+      const el = document.getElementById(id);
+      if (!el || !entry) return;
+      if (entry.type === "checkbox" || el.type === "checkbox") {
+        el.checked = !!entry.checked;
+      } else if (entry.value !== undefined) {
+        el.value = String(entry.value);
+      }
+    });
+  }
+
+  // 2. Restore core musical state
+  if (typeof data.seed === "number") {
+    seed = data.seed >>> 0;
+    const hex = "#" + seed.toString(16).toUpperCase().padStart(8, "0").slice(0, 4) + "-" + seed.toString(16).toUpperCase().padStart(8, "0").slice(4);
+    const hudSeedEl = document.getElementById("hudSeed");
+    if (hudSeedEl) hudSeedEl.textContent = hex;
+  }
+  if (typeof data.rootNote === "number") rootNote = data.rootNote;
+  if (typeof data.activeScaleKey === "string" && SCALES[data.activeScaleKey]) activeScaleKey = data.activeScaleKey;
+  if (typeof data.currentTimeSig === "string" && TIME_SIGNATURES[data.currentTimeSig]) {
+    currentTimeSig = data.currentTimeSig;
+    const selTs = document.getElementById("selTimeSig");
+    if (selTs) selTs.value = currentTimeSig;
+  }
+  if (typeof data.bpm === "number") {
+    bpm = data.bpm;
+    const kb = document.getElementById("knobBpm");
+    if (kb) kb.value = bpm;
+  }
+  if (typeof data.currentChordVoicing === "number") currentChordVoicing = data.currentChordVoicing;
+  if (typeof data.currentChordStepIdx === "number") currentChordStepIdx = data.currentChordStepIdx;
+
+  const scale = SCALES[activeScaleKey] || SCALES.DORIAN;
+  currentChordRootStep = CHORD_STEP_POOL[currentChordStepIdx] || 0;
+  currentChordDeg = degreeToSemitone(currentChordRootStep, scale);
+
+  const elRoot = document.getElementById("topRootKey");
+  if (elRoot) elRoot.value = String(rootNote);
+  const elScale = document.getElementById("topScaleMode");
+  if (elScale) elScale.value = activeScaleKey;
+
+  // 3. Restore channel power, aux, mute, solo
+  if (data.channelPower && typeof data.channelPower === "object") Object.assign(channelPower, data.channelPower);
+  if (data.channelAux && typeof data.channelAux === "object") Object.assign(channelAux, data.channelAux);
+  if (data.channelMute && typeof data.channelMute === "object") Object.assign(channelMute, data.channelMute);
+  if (data.channelSolo && typeof data.channelSolo === "object") Object.assign(channelSolo, data.channelSolo);
+  droneEnabled = channelPower.drone !== false;
+  updateMuteSoloUI();
+
+  // 4. Restore pedal bypass states and DSP chain routing topology
+  if (data.pedalBypass && typeof data.pedalBypass === "object" && typeof pedalBypassState !== "undefined") {
+    ["FILTER", "DELAY", "SPACE"].forEach(k => {
+      if (typeof data.pedalBypass[k] === "boolean") {
+        pedalBypassState[k] = data.pedalBypass[k];
+        const card = document.getElementById("pedalCard_" + k);
+        const btn = document.getElementById("stompBtn_" + k);
+        if (card) card.classList.toggle("bypassed", pedalBypassState[k]);
+        if (btn) btn.classList.toggle("active", !pedalBypassState[k]);
+      }
+    });
+  }
+  if (Array.isArray(data.dspChainOrder) && data.dspChainOrder.length === 3) {
+    rewireDspChain(data.dspChainOrder, false);
+  }
+
+  // Highlight matching preset chip if presetName matches
+  document.querySelectorAll(".preset-bar .btn-preset-chip").forEach(btn => {
+    btn.classList.toggle("active", data.presetName && btn.textContent.trim().toLowerCase() === data.presetName.trim().toLowerCase());
+  });
+
+  buildKeyboard();
+  updateChordHud();
+  updateDronePitches(true);
+  updateTimeSignature();
+  updateBpm();
+  updateMusicalConfig(false);
+  updateAudioParams();
+}
+
 function triggerLoadPresetBankJson() {
   const fileInput = document.getElementById("inputPresetJson");
   if (fileInput) {
@@ -11844,87 +12050,7 @@ function loadPresetBankJson(event) {
     try {
       const data = JSON.parse(e.target.result);
       if (!data || typeof data !== "object") throw new Error("Invalid JSON structure");
-
-      // 1. Restore all DOM controls (<input>, <select>)
-      if (data.controls && typeof data.controls === "object") {
-        Object.entries(data.controls).forEach(([id, entry]) => {
-          const el = document.getElementById(id);
-          if (!el || !entry) return;
-          if (entry.type === "checkbox" || el.type === "checkbox") {
-            el.checked = !!entry.checked;
-          } else if (entry.value !== undefined) {
-            el.value = String(entry.value);
-          }
-        });
-      }
-
-      // 2. Restore core musical state
-      if (typeof data.seed === "number") {
-        seed = data.seed >>> 0;
-        const hex = "#" + seed.toString(16).toUpperCase().padStart(8, "0").slice(0, 4) + "-" + seed.toString(16).toUpperCase().padStart(8, "0").slice(4);
-        const hudSeedEl = document.getElementById("hudSeed");
-        if (hudSeedEl) hudSeedEl.textContent = hex;
-      }
-      if (typeof data.rootNote === "number") rootNote = data.rootNote;
-      if (typeof data.activeScaleKey === "string" && SCALES[data.activeScaleKey]) activeScaleKey = data.activeScaleKey;
-      if (typeof data.currentTimeSig === "string" && TIME_SIGNATURES[data.currentTimeSig]) {
-        currentTimeSig = data.currentTimeSig;
-        const selTs = document.getElementById("selTimeSig");
-        if (selTs) selTs.value = currentTimeSig;
-      }
-      if (typeof data.bpm === "number") {
-        bpm = data.bpm;
-        const kb = document.getElementById("knobBpm");
-        if (kb) kb.value = bpm;
-      }
-      if (typeof data.currentChordVoicing === "number") currentChordVoicing = data.currentChordVoicing;
-      if (typeof data.currentChordStepIdx === "number") currentChordStepIdx = data.currentChordStepIdx;
-
-      const scale = SCALES[activeScaleKey] || SCALES.DORIAN;
-      currentChordRootStep = CHORD_STEP_POOL[currentChordStepIdx] || 0;
-      currentChordDeg = degreeToSemitone(currentChordRootStep, scale);
-
-      const elRoot = document.getElementById("topRootKey");
-      if (elRoot) elRoot.value = String(rootNote);
-      const elScale = document.getElementById("topScaleMode");
-      if (elScale) elScale.value = activeScaleKey;
-
-      // 3. Restore channel power, aux, mute, solo
-      if (data.channelPower && typeof data.channelPower === "object") Object.assign(channelPower, data.channelPower);
-      if (data.channelAux && typeof data.channelAux === "object") Object.assign(channelAux, data.channelAux);
-      if (data.channelMute && typeof data.channelMute === "object") Object.assign(channelMute, data.channelMute);
-      if (data.channelSolo && typeof data.channelSolo === "object") Object.assign(channelSolo, data.channelSolo);
-      droneEnabled = channelPower.drone !== false;
-      updateMuteSoloUI();
-
-      // 4. Restore pedal bypass states and DSP chain routing topology
-      if (data.pedalBypass && typeof data.pedalBypass === "object" && typeof pedalBypassState !== "undefined") {
-        ["FILTER", "DELAY", "SPACE"].forEach(k => {
-          if (typeof data.pedalBypass[k] === "boolean") {
-            pedalBypassState[k] = data.pedalBypass[k];
-            const card = document.getElementById("pedalCard_" + k);
-            const btn = document.getElementById("stompBtn_" + k);
-            if (card) card.classList.toggle("bypassed", pedalBypassState[k]);
-            if (btn) btn.classList.toggle("active", !pedalBypassState[k]);
-          }
-        });
-      }
-      if (Array.isArray(data.dspChainOrder) && data.dspChainOrder.length === 3) {
-        rewireDspChain(data.dspChainOrder, false);
-      }
-
-      // Highlight matching preset chip if presetName matches
-      document.querySelectorAll(".preset-bar .btn-preset-chip").forEach(btn => {
-        btn.classList.toggle("active", data.presetName && btn.textContent.trim().toLowerCase() === data.presetName.trim().toLowerCase());
-      });
-
-      buildKeyboard();
-      updateChordHud();
-      updateDronePitches(true);
-      updateTimeSignature();
-      updateBpm();
-      updateMusicalConfig(false);
-      updateAudioParams();
+      applyPatchData(data);
 
       const status = document.getElementById("footerStatus");
       if (status) status.textContent = `Loaded Patch: ${data.presetName || file.name} (${dspChainOrder.join(" ➔ ")})`;
@@ -12442,6 +12568,152 @@ function newSeed() {
 }
 
 setupRandomInitialState();
+
+/* ==========================================================================
+   HEADER UTILITIES (Phase 7): UNDO, TAP TEMPO, SHORTCUTS PANEL
+   ========================================================================== */
+
+// UNDO: snapshot the whole patch (serializeCurrentPatch, same format as the
+// BANK save) right before anything that rewrites it wholesale -- presets,
+// ⟲ ALL, new seed, and each module's own randomize button -- and restore it
+// with applyPatchData. Wrapping the globals (rather than editing each body)
+// also catches inline onclick calls; the depth counter means one click is one
+// undo step even when e.g. randomizeEverything calls the per-module
+// randomizers internally. Master volume is deliberately not undone.
+const UNDO_LIMIT = 30;
+const undoStack = [];
+let undoWrapDepth = 0;
+
+function refreshUndoButton() {
+  const btn = document.getElementById("btnUndoPatch");
+  if (!btn) return;
+  btn.disabled = undoStack.length === 0;
+  btn.title = undoStack.length
+    ? `Undo the last randomize / preset / new seed (Ctrl/⌘+Z), ${undoStack.length} step${undoStack.length === 1 ? "" : "s"} available`
+    : "Nothing to undo yet";
+}
+
+function pushUndoSnapshot() {
+  try {
+    undoStack.push(serializeCurrentPatch());
+    if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+  } catch (err) {
+    console.error("Undo snapshot failed:", err);
+  }
+  refreshUndoButton();
+}
+
+function undoPatchChange() {
+  const snap = undoStack.pop();
+  refreshUndoButton();
+  if (!snap) return;
+  try {
+    applyPatchData(snap, ["knobMasterVolume"]);
+    setRecordStatus(`Undo: restored ${snap.presetName || "previous patch"}`);
+  } catch (err) {
+    console.error("Undo failed:", err);
+  }
+}
+
+[
+  "applyPreset", "randomizeEverything", "newSeed", "randomizeDspChain",
+  "randomizeDrone", "randomizeDrums", "randomizeChords", "randomizeNoise",
+  "randomizeKeyScale", "randomizeArp", "randomizeFilter", "randomizeDelay",
+  "randomizeReverbChorus", "randomizeSpace", "randomizeMeter"
+].forEach(name => {
+  const orig = window[name];
+  if (typeof orig !== "function") return;
+  window[name] = function (...args) {
+    if (undoWrapDepth === 0) pushUndoSnapshot();
+    undoWrapDepth++;
+    try { return orig.apply(this, args); } finally { undoWrapDepth--; }
+  };
+});
+refreshUndoButton();
+
+// TAP TEMPO: average the last few intervals; a pause longer than 2s starts a
+// fresh count. Clamped to the tempo slider's own range.
+const tapTimes = [];
+function tapTempo() {
+  const now = performance.now();
+  if (tapTimes.length && now - tapTimes[tapTimes.length - 1] > 2000) tapTimes.length = 0;
+  tapTimes.push(now);
+  if (tapTimes.length > 6) tapTimes.shift();
+  const btn = document.getElementById("btnTapTempo");
+  if (btn) {
+    btn.classList.add("tapped");
+    setTimeout(() => btn.classList.remove("tapped"), 90);
+  }
+  if (tapTimes.length < 3) {
+    setRecordStatus(`Tap tempo: keep tapping (${tapTimes.length})`);
+    return;
+  }
+  const intervals = tapTimes.slice(1).map((t, i) => t - tapTimes[i]);
+  const avg = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+  const knob = document.getElementById("knobBpmHeader");
+  const lo = knob ? +knob.min : 45, hi = knob ? +knob.max : 115;
+  const tapped = Math.round(60000 / avg);
+  const next = Math.max(lo, Math.min(hi, tapped));
+  if (knob) knob.value = next;
+  updateBpm(knob);
+  setRecordStatus(tapped === next ? `Tap tempo: ${next} BPM` : `Tap tempo: ${tapped} BPM is out of range, set to ${next}`);
+}
+
+// SHORTCUTS PANEL
+function buildShortcutsPanel() {
+  const ov = document.createElement("div");
+  ov.className = "shortcuts-overlay";
+  ov.id = "shortcutsOverlay";
+  const row = (label, keys) => `<div class="sc-row"><span>${label}</span><span>${keys.map(k => `<kbd>${k}</kbd>`).join("")}</span></div>`;
+  ov.innerHTML = `
+    <div class="shortcuts-panel" role="dialog" aria-label="Keyboard shortcuts">
+      <h3>Keyboard Shortcuts <button class="shortcuts-close" onclick="toggleShortcutsPanel(false)" title="Close (Esc)">✕</button></h3>
+      <h4>Transport</h4>
+      ${row("Play / pause", ["Enter"])}
+      ${row("Undo last randomize / preset", ["Ctrl/⌘", "Z"])}
+      ${row("Show this panel", ["?"])}
+      ${row("Close panels / exit fullscreen", ["Esc"])}
+      <h4>Play notes (computer keyboard)</h4>
+      ${row("White keys", ["A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'"])}
+      ${row("Black keys", ["W", "E", "T", "Y", "U", "O", "P"])}
+      <h4>Visualizer</h4>
+      ${row("Visualizer fullscreen", ["Double-click"])}
+      <h4>Slambient Invaders</h4>
+      ${row("Move", ["←", "→"])}
+      ${row("Fire / start", ["Space"])}
+      ${row("Quit game", ["Esc"])}
+    </div>`;
+  ov.addEventListener("pointerdown", (e) => { if (e.target === ov) toggleShortcutsPanel(false); });
+  document.body.appendChild(ov);
+  return ov;
+}
+
+function toggleShortcutsPanel(force) {
+  const ov = document.getElementById("shortcutsOverlay") || buildShortcutsPanel();
+  const open = typeof force === "boolean" ? force : !ov.classList.contains("open");
+  ov.classList.toggle("open", open);
+  const btn = document.getElementById("btnShortcuts");
+  if (btn) { btn.classList.toggle("active", open); btn.blur(); }
+}
+
+window.addEventListener("keydown", (e) => {
+  const t = e.target;
+  const typing = t && (t.isContentEditable || t.tagName === "TEXTAREA" ||
+    (t.tagName === "INPUT" && !["range", "checkbox", "radio", "button"].includes(t.type)));
+  const ov = document.getElementById("shortcutsOverlay");
+  if (e.key === "Escape" && ov && ov.classList.contains("open")) {
+    toggleShortcutsPanel(false);
+    return;
+  }
+  if (typing) return;
+  if (e.key === "?" && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    e.preventDefault();
+    toggleShortcutsPanel();
+  } else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && e.code === "KeyZ") {
+    e.preventDefault();
+    undoPatchChange();
+  }
+});
 
 (function (root) {
   'use strict';

@@ -480,6 +480,33 @@ arcade still shares; `fractalTheta` and `zoomPulse` are gone).
   ~15s plus forced waves 2–8 (all formations render, divers dive and return or ram, UFO hit
   scores, armored drone takes 2 hits, spread/aimed/heavy shots fire); no console errors.
 
+## Update — 2026-10-14 (Claude: header Undo, Tap Tempo, Shortcuts panel)
+
+Ben approved all three suggested header buttons.
+
+- **UNDO** (`#btnUndoPatch` in `.header-utils`, plus Ctrl/⌘+Z): `pushUndoSnapshot()` stores a full
+  `serializeCurrentPatch()` (the same format BANK SAVE writes) before any wholesale patch change,
+  and `undoPatchChange()` restores it. Hooked by **wrapping the globals** right after the startup
+  `setupRandomInitialState()` call: `applyPreset`, `randomizeEverything`, `newSeed`,
+  `randomizeDspChain` and every per-module `randomize*`. An `undoWrapDepth` counter makes one click
+  one undo step even though ⟲ ALL calls the module randomizers internally. Holds 30 steps.
+  Master volume is deliberately excluded from undo. **If you add a new randomize function, add its
+  name to that list.**
+  - Refactor: LOAD's restore logic moved out of `loadPresetBankJson()` into
+    `applyPatchData(data, skipIds)`, now shared by LOAD and UNDO. Behavior is unchanged.
+- **TAP** button at the end of the header tempo control (`tapTempo()`): averages up to the last 5
+  intervals and needs 3+ taps; a gap over 2s starts over; the result is clamped to the slider's
+  45–115 range (status line says when it clamps).
+- **? Shortcuts panel** (`toggleShortcutsPanel()`, also opened with the `?` key; closed by Esc,
+  ✕ or clicking outside): lists Enter, Ctrl/⌘+Z, ?, Esc, the QWERTY note keys, double-click
+  visualizer fullscreen, and the Invaders controls. **Keep it in sync if shortcuts change.**
+- `.global-transport` is now `flex: 1 1 0` so the Undo / ? / Full Screen group stays on the
+  transport row when the controls wrap at narrow widths (≤1100px it bottom-aligns).
+- Verified in headless Chromium: preset → ⟲ ALL → Ctrl+Z → Undo click restored each prior state
+  exactly (bpm/scale/root/seed/chain/cutoff/preset highlight); ⟲ ALL counts as one step; taps set
+  the BPM; ? opens and Esc closes the panel; Enter still toggles play; header checked at
+  100%/150%; no console errors.
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE
@@ -531,5 +558,6 @@ arcade still shares; `fractalTheta` and `zoomPulse` are gone).
 - [x] MP3 recording export (320 kbps via lazy-loaded lamejs, WAV fallback offline)
 - [x] Whole-app fullscreen button in header
 - [x] Header layout holds at 150% browser zoom
+- [x] Header Undo (patch history), Tap Tempo, and Keyboard Shortcuts panel
 - [ ] Modular color palette picker (custom color assignments per instrument, effect, and noise module)
 
