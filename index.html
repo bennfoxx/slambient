@@ -2137,12 +2137,18 @@
   .master-deck-unified {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    align-items: start;
+    align-items: stretch;
     gap: 18px;
     width: 100%;
   }
+  .master-deck-unified .pedal-controls-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
   .master-deck-unified #masterEqOutStrip {
-    border-left: 3px solid var(--color-space);
+    justify-content: space-between;
   }
   @media (max-width: 1280px) {
     .master-deck-unified {
@@ -2157,26 +2163,17 @@
 
   /* STOMPBOX PEDAL CHASSIS */
   .pedal-chassis {
-    background: linear-gradient(180deg, #131722 0%, #0c0e16 100%);
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 18px 20px 18px;
+    background: var(--panel);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    padding: 12px 14px;
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    box-shadow:
-      0 10px 30px rgba(0, 0, 0, 0.75),
-      inset 0 1px 1px rgba(255, 255, 255, 0.1),
-      inset 0 -1px 1px rgba(0, 0, 0, 0.8);
-    transition: transform 0.18s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.18s ease, border-color 0.18s ease;
+    gap: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.18s cubic-bezier(0.2, 0, 0, 1);
     user-select: none;
-  }
-
-  .pedal-chassis:hover {
-    box-shadow:
-      0 14px 36px rgba(0, 0, 0, 0.85),
-      inset 0 1px 1px rgba(255, 255, 255, 0.15);
   }
 
   .pedal-chassis.drag-over {
@@ -2190,74 +2187,35 @@
     transform: scale(0.97);
   }
 
-  /* Pedal color accents */
+  /* Pedal color accents, matching the strip-channel.<x>-ch convention used
+     by the other module panels (border-top stripe + tinted glow). */
   .pedal-chassis.pedal-filter {
-    border-color: rgba(46, 213, 115, 0.4);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), inset 0 2px 0 rgba(46, 213, 115, 0.4);
+    border-top: 3px solid var(--color-filter);
+    border-color: rgba(46, 213, 115, 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(46, 213, 115, 0.16);
   }
-  .pedal-chassis.pedal-filter:hover {
-    border-color: rgba(46, 213, 115, 0.75);
-    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.8), 0 0 16px rgba(46, 213, 115, 0.25);
-  }
-
   .pedal-chassis.pedal-delay {
-    border-color: rgba(255, 121, 63, 0.4);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), inset 0 2px 0 rgba(255, 121, 63, 0.4);
+    border-top: 3px solid var(--color-delay);
+    border-color: rgba(255, 121, 63, 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 121, 63, 0.16);
   }
-  .pedal-chassis.pedal-delay:hover {
-    border-color: rgba(255, 121, 63, 0.75);
-    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.8), 0 0 16px rgba(255, 121, 63, 0.25);
-  }
-
   .pedal-chassis.pedal-space,
   .pedal-chassis.pedal-reverb {
-    border-color: rgba(255, 95, 196, 0.4);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), inset 0 2px 0 rgba(255, 95, 196, 0.4);
-  }
-  .pedal-chassis.pedal-space:hover,
-  .pedal-chassis.pedal-reverb:hover {
-    border-color: rgba(255, 95, 196, 0.75);
-    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.8), 0 0 16px rgba(255, 95, 196, 0.25);
+    border-top: 3px solid var(--color-reverb);
+    border-color: rgba(255, 95, 196, 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 95, 196, 0.16);
   }
 
-  /* Chassis Screws */
-  .chassis-screw {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: radial-gradient(circle, #555e75 30%, #202433 90%);
-    box-shadow: inset 0 1px 1px rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.8);
-    pointer-events: none;
-  }
-  .chassis-screw::after {
-    content: '';
-    position: absolute;
-    top: 3.5px;
-    left: 1.5px;
-    width: 5px;
-    height: 1px;
-    background: #11141c;
-  }
-  .chassis-screw.screw-tl { top: 7px; left: 8px; }
-  .chassis-screw.screw-tr { top: 7px; right: 8px; }
-  .chassis-screw.screw-bl { bottom: 7px; left: 8px; }
-  .chassis-screw.screw-br { bottom: 7px; right: 8px; }
-
-  /* Top Bar */
-  .pedal-top-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  }
+  /* Pedal title color accents, matching the panel-header > span:first-child
+     convention used by the other (strip-channel) module panels. */
+  .pedal-filter .panel-header > span:first-child { color: var(--color-filter); text-shadow: 0 0 8px rgba(46, 213, 115, 0.35); }
+  .pedal-delay .panel-header > span:first-child { color: var(--color-delay); text-shadow: 0 0 8px rgba(255, 121, 63, 0.35); }
+  .pedal-space .panel-header > span:first-child, .pedal-reverb .panel-header > span:first-child { color: var(--color-reverb); text-shadow: 0 0 8px rgba(255, 95, 196, 0.35); }
 
   .pedal-slot-badge {
-    font-size: 9px;
+    font-size: 8.5px;
     font-weight: 800;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
     padding: 2px 6px;
     border-radius: 3px;
     background: #090b12;
@@ -2267,26 +2225,21 @@
     white-space: nowrap;
   }
 
-  .pedal-jacks {
+  .pedal-drag-handle {
+    width: 24px;
+    height: 24px;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: 9px;
-    color: var(--text-tertiary);
-  }
-
-  .pedal-drag-handle {
+    justify-content: center;
     cursor: grab !important;
-    background: #171c2b;
+    background: #0d0f17;
     border: 1px solid var(--border-light);
-    border-radius: 3px;
-    padding: 2px 7px;
+    border-radius: 4px;
     color: var(--accent);
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: 0.6px;
+    font-size: 12px;
     transition: all 0.12s ease;
+    touch-action: none;
+    user-select: none;
   }
   .pedal-drag-handle:hover {
     background: var(--accent-dim);
@@ -2298,42 +2251,19 @@
     cursor: grabbing !important;
   }
 
-  .pedal-shift-ctrls {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .pedal-top-bar {
-    position: relative;
-    z-index: 10;
-  }
-  .pedal-shift-ctrls {
-    position: relative;
-    z-index: 12;
-  }
-  .pedal-drag-handle {
-    position: relative;
-    z-index: 12;
-    touch-action: none;
-    user-select: none;
-  }
   .btn-pedal-shift {
-    width: 22px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #0c0e17;
+    background: #0d0f17;
     border: 1px solid var(--border-light);
-    border-radius: 3px;
+    border-radius: 4px;
     color: var(--text-secondary);
-    font-size: 9px;
+    font-size: 10px;
     cursor: pointer;
     transition: all 0.12s ease;
-    position: relative;
-    z-index: 15;
-    pointer-events: auto !important;
   }
   .btn-pedal-shift:hover:not(:disabled) {
     background: #192033;
@@ -2344,35 +2274,6 @@
     opacity: 0.25;
     cursor: not-allowed !important;
   }
-
-  /* Branding */
-  .pedal-brand-banner {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    padding: 6px 10px;
-    border-radius: 4px;
-    background: #080a11;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  }
-  .pedal-mfr {
-    font-size: 8.5px;
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-  }
-  .pedal-model {
-    font-size: 11px;
-    font-weight: 900;
-    letter-spacing: 1px;
-    color: #ffffff;
-    text-transform: uppercase;
-  }
-  .pedal-filter .pedal-model { color: var(--color-filter); text-shadow: 0 0 10px rgba(46, 213, 115, 0.3); }
-  .pedal-delay .pedal-model { color: var(--color-delay); text-shadow: 0 0 10px rgba(255, 121, 63, 0.3); }
-  .pedal-space .pedal-model, .pedal-reverb .pedal-model { color: var(--color-reverb); text-shadow: 0 0 10px rgba(255, 95, 196, 0.3); }
 
   /* Controls Body */
   .pedal-controls-body {
@@ -2419,113 +2320,9 @@
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
-  /* Footswitch & Stomp Bay */
-  .pedal-stomp-bay {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding-top: 14px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    position: relative;
-  }
-
-  .pedal-led-pod {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: 8.5px;
-    font-weight: 800;
-    color: var(--text-tertiary);
-    letter-spacing: 1px;
-  }
-
-  .pedal-led {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #252834;
-    border: 1.5px solid #10121a;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
-    transition: all 0.15s ease;
-  }
-  .pedal-led.active {
-    background: currentColor;
-    box-shadow: 0 0 12px currentColor, 0 0 20px currentColor, inset 0 1px 2px rgba(255,255,255,0.8);
-  }
-
-  .stomp-footswitch {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: radial-gradient(circle, #383e52 20%, #151824 85%);
-    border: 3px solid #0d0f17;
-    box-shadow:
-      0 6px 14px rgba(0, 0, 0, 0.8),
-      inset 0 2px 2px rgba(255, 255, 255, 0.4),
-      inset 0 -2px 3px rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer !important;
-    position: relative;
-    padding: 0;
-    transition: transform 0.08s ease, box-shadow 0.08s ease;
-  }
-  .stomp-footswitch:hover {
-    box-shadow:
-      0 8px 18px rgba(0, 0, 0, 0.9),
-      inset 0 2px 3px rgba(255, 255, 255, 0.5),
-      inset 0 -2px 3px rgba(0, 0, 0, 0.8);
-  }
-  .stomp-footswitch:active {
-    transform: scale(0.92) translateY(2px);
-    box-shadow:
-      0 2px 6px rgba(0, 0, 0, 0.9),
-      inset 0 1px 1px rgba(255, 255, 255, 0.2),
-      inset 0 2px 4px rgba(0, 0, 0, 0.9);
-  }
-
-  .stomp-bezel {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: radial-gradient(circle, #252a3a 0%, #121520 100%);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .stomp-cap {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #8c97b2 0%, #3e465b 70%, #1e2230 100%);
-    border: 1px solid #1a1e2b;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.6);
-  }
-
-  .stomp-action-label {
-    font-size: 8px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    color: var(--text-tertiary);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    text-transform: uppercase;
-  }
-
   .pedal-chassis.bypassed {
     opacity: 0.65;
     filter: grayscale(0.4);
-  }
-  .pedal-chassis.bypassed .pedal-led {
-    background: #1c1f2a !important;
-    box-shadow: none !important;
-  }
-  .pedal-chassis.bypassed .pedal-led-label {
-    color: #4b5563;
   }
 
   footer.app-footer {
@@ -3491,27 +3288,15 @@
     <div class="master-deck-unified" id="masterDeckUnified">
       <!-- 1. FILTER PEDAL -->
       <div class="pedal-chassis pedal-filter" id="pedalCard_FILTER" draggable="true" data-module="FILTER">
-        <div class="chassis-screw screw-tl"></div>
-        <div class="chassis-screw screw-tr"></div>
-        <div class="chassis-screw screw-bl"></div>
-        <div class="chassis-screw screw-br"></div>
-
-        <div class="pedal-top-bar">
-          <span class="pedal-slot-badge" id="slotBadge_FILTER">SLOT 1 • IN</span>
-          <div class="pedal-jacks">
-            <span class="pedal-jack">IN ➔</span>
-            <span class="pedal-drag-handle" title="Drag to reorder">⠿ DRAG</span>
-            <span class="pedal-jack">➔ OUT</span>
-          </div>
-          <div class="pedal-shift-ctrls">
+        <div class="panel-header">
+          <span>5. Filter &amp; Env</span>
+          <div class="panel-header-actions">
+            <span class="pedal-slot-badge" id="slotBadge_FILTER">SLOT 1 • IN</span>
             <button class="btn-pedal-shift" onclick="shiftPedalLeft('FILTER')" id="shiftLeft_FILTER" title="Shift Left">◀</button>
             <button class="btn-pedal-shift" onclick="shiftPedalRight('FILTER')" id="shiftRight_FILTER" title="Shift Right">▶</button>
+            <span class="pedal-drag-handle" title="Drag to reorder">⠿</span>
+            <button class="btn-power active" id="stompBtn_FILTER" onclick="togglePedalBypass('FILTER')" title="Bypass/engage Filter & Envelope">⏻</button>
           </div>
-        </div>
-
-        <div class="pedal-brand-banner">
-          <span class="pedal-mfr">KANKYŌ DSP</span>
-          <span class="pedal-model">DUAL VCF // FILTER &amp; ENV</span>
         </div>
 
         <div class="pedal-controls-body">
@@ -3554,42 +3339,19 @@
             </div>
           </div>
         </div>
-
-        <div class="pedal-stomp-bay">
-          <div class="pedal-led-pod">
-            <div class="pedal-led active" id="pedalLed_FILTER" style="color: #2ed573;"></div>
-            <span class="pedal-led-label">ENGAGED</span>
-          </div>
-          <button class="stomp-footswitch active" id="stompBtn_FILTER" onclick="togglePedalBypass('FILTER')" title="Stomp to bypass/engage Filter">
-            <div class="stomp-bezel"><div class="stomp-cap"></div></div>
-          </button>
-          <span class="stomp-action-label">BYPASS / ENGAGE</span>
-        </div>
       </div>
 
       <!-- 2. DELAY PEDAL -->
       <div class="pedal-chassis pedal-delay" id="pedalCard_DELAY" draggable="true" data-module="DELAY">
-        <div class="chassis-screw screw-tl"></div>
-        <div class="chassis-screw screw-tr"></div>
-        <div class="chassis-screw screw-bl"></div>
-        <div class="chassis-screw screw-br"></div>
-
-        <div class="pedal-top-bar">
-          <span class="pedal-slot-badge" id="slotBadge_DELAY">SLOT 2 • INSERT</span>
-          <div class="pedal-jacks">
-            <span class="pedal-jack">IN ➔</span>
-            <span class="pedal-drag-handle" title="Drag to reorder">⠿ DRAG</span>
-            <span class="pedal-jack">➔ OUT</span>
-          </div>
-          <div class="pedal-shift-ctrls">
+        <div class="panel-header">
+          <span>6. Analog Delay</span>
+          <div class="panel-header-actions">
+            <span class="pedal-slot-badge" id="slotBadge_DELAY">SLOT 2 • INSERT</span>
             <button class="btn-pedal-shift" onclick="shiftPedalLeft('DELAY')" id="shiftLeft_DELAY" title="Shift Left">◀</button>
             <button class="btn-pedal-shift" onclick="shiftPedalRight('DELAY')" id="shiftRight_DELAY" title="Shift Right">▶</button>
+            <span class="pedal-drag-handle" title="Drag to reorder">⠿</span>
+            <button class="btn-power active" id="stompBtn_DELAY" onclick="togglePedalBypass('DELAY')" title="Bypass/engage Delay">⏻</button>
           </div>
-        </div>
-
-        <div class="pedal-brand-banner">
-          <span class="pedal-mfr">TIME DRIFT BBD</span>
-          <span class="pedal-model">ANALOG TAPE &amp; DUB ECHO</span>
         </div>
 
         <div class="pedal-controls-body">
@@ -3639,42 +3401,19 @@
             </div>
           </div>
         </div>
-
-        <div class="pedal-stomp-bay">
-          <div class="pedal-led-pod">
-            <div class="pedal-led active" id="pedalLed_DELAY" style="color: #ff793f;"></div>
-            <span class="pedal-led-label">ENGAGED</span>
-          </div>
-          <button class="stomp-footswitch active" id="stompBtn_DELAY" onclick="togglePedalBypass('DELAY')" title="Stomp to bypass/engage Delay">
-            <div class="stomp-bezel"><div class="stomp-cap"></div></div>
-          </button>
-          <span class="stomp-action-label">BYPASS / ENGAGE</span>
-        </div>
       </div>
 
       <!-- 3. REVERB & CHORUS PEDAL (Pink) -->
       <div class="pedal-chassis pedal-space pedal-reverb" id="pedalCard_SPACE" draggable="true" data-module="SPACE">
-        <div class="chassis-screw screw-tl"></div>
-        <div class="chassis-screw screw-tr"></div>
-        <div class="chassis-screw screw-bl"></div>
-        <div class="chassis-screw screw-br"></div>
-
-        <div class="pedal-top-bar">
-          <span class="pedal-slot-badge" id="slotBadge_SPACE">SLOT 3 • OUT</span>
-          <div class="pedal-jacks">
-            <span class="pedal-jack">IN ➔</span>
-            <span class="pedal-drag-handle" title="Drag to reorder">⠿ DRAG</span>
-            <span class="pedal-jack">➔ OUT</span>
-          </div>
-          <div class="pedal-shift-ctrls">
+        <div class="panel-header">
+          <span>7. Reverb &amp; Chorus</span>
+          <div class="panel-header-actions">
+            <span class="pedal-slot-badge" id="slotBadge_SPACE">SLOT 3 • OUT</span>
             <button class="btn-pedal-shift" onclick="shiftPedalLeft('SPACE')" id="shiftLeft_SPACE" title="Shift Left">◀</button>
             <button class="btn-pedal-shift" onclick="shiftPedalRight('SPACE')" id="shiftRight_SPACE" title="Shift Right">▶</button>
+            <span class="pedal-drag-handle" title="Drag to reorder">⠿</span>
+            <button class="btn-power active" id="stompBtn_SPACE" onclick="togglePedalBypass('SPACE')" title="Bypass/engage Reverb & Chorus">⏻</button>
           </div>
-        </div>
-
-        <div class="pedal-brand-banner">
-          <span class="pedal-mfr" style="color: rgba(255, 95, 196, 0.75);">DIFFUSION LAB</span>
-          <span class="pedal-model">REVERB &amp; JUNO CHORUS</span>
         </div>
 
         <div class="pedal-controls-body">
@@ -3724,17 +3463,6 @@
               </div>
             </div>
           </div>
-        </div>
-
-        <div class="pedal-stomp-bay">
-          <div class="pedal-led-pod">
-            <div class="pedal-led active" id="pedalLed_SPACE" style="color: #ff5fc4;"></div>
-            <span class="pedal-led-label" style="color: rgba(255, 95, 196, 0.9);">ENGAGED</span>
-          </div>
-          <button class="stomp-footswitch active" id="stompBtn_SPACE" onclick="togglePedalBypass('SPACE')" title="Stomp to bypass/engage Reverb & Chorus">
-            <div class="stomp-bezel"><div class="stomp-cap"></div></div>
-          </button>
-          <span class="stomp-action-label">BYPASS / ENGAGE</span>
         </div>
       </div>
 
