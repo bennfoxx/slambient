@@ -2130,6 +2130,31 @@
     }
   }
 
+  /* MASTER DECK -- pedals laid out left-to-right so the signal chain order
+     is readable at a glance; the Master EQ & Out strip always renders last
+     (see updatePedalsOrderUI) and is visually distinguished to show it isn't
+     reorderable like the other three. */
+  .master-deck-unified {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    align-items: start;
+    gap: 18px;
+    width: 100%;
+  }
+  .master-deck-unified #masterEqOutStrip {
+    border-left: 3px solid var(--color-space);
+  }
+  @media (max-width: 1280px) {
+    .master-deck-unified {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 640px) {
+    .master-deck-unified {
+      grid-template-columns: 1fr;
+    }
+  }
+
   /* STOMPBOX PEDAL CHASSIS */
   .pedal-chassis {
     background: linear-gradient(180deg, #131722 0%, #0c0e16 100%);
