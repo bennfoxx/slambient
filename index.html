@@ -485,15 +485,14 @@
     background: #101420;
     color: var(--color-drone);
     border: 1px solid rgba(0, 229, 255, 0.35);
+    width: 24px;
     height: 24px;
     box-sizing: border-box;
-    padding: 0 8px;
+    padding: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
-    font-weight: 700;
-    border-radius: 3px;
+    border-radius: 4px;
     cursor: pointer;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     transition: all 0.12s ease;
@@ -507,6 +506,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    width: auto;
     height: 32px;
     box-sizing: border-box;
     padding: 0 14px;
@@ -2765,6 +2765,8 @@
             <span id="btnRecordLabel">Record</span>
           </button>
 
+          <button class="btn-preset-chip btn-randomize-all" onclick="randomizeEverything()" title="Randomize every module">⟲ ALL</button>
+
           <div class="root-scale-ctrl">
             <span class="tag">KEY</span>
             <select id="topRootKey" onchange="syncRootKey(this.value)">
@@ -2812,7 +2814,7 @@
               <option value="11/8">11/8 Polyrhythmic</option>
               <option value="3/4">3/4 Ambient Waltz</option>
             </select>
-            <button class="btn-meter-cycle" onclick="cycleTimeSignature()" title="Change Time Signature">Change ⤾</button>
+            <button class="btn-meter-cycle" onclick="cycleTimeSignature()" title="Change Time Signature"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
           </div>
 
           <div class="tempo-ctrl">
@@ -2820,8 +2822,6 @@
             <input type="range" id="knobBpmHeader" min="45" max="115" value="72" oninput="updateBpm(this)" title="Master Tempo (BPM)">
             <span class="tempo-val" id="lblBpmHeader">72 BPM</span>
           </div>
-
-          <button class="btn-preset-chip btn-randomize-all" onclick="randomizeEverything()" title="Randomize every module">⟲ ALL</button>
         </div>
 
         <div class="sys-readout">
