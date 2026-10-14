@@ -10322,6 +10322,29 @@ if (document.readyState === "loading") {
   setTimeout(initOrbitalConstellation, 100);
 }
 
+// Flexbox's `aspect-ratio` + `align-items: stretch` interaction (deriving
+// the pod's width from its stretched height) is inconsistently resolved
+// across browsers -- in some it renders as a wide rectangle instead of a
+// square, with dead space down the sides inside the CRT vignette. Force it
+// with JS instead: measure the height stretch already gives it, then set
+// width to match exactly. Re-synced on load/resize since the header's
+// natural height (and therefore the pod's stretched height) can change
+// when the transport row wraps at narrower widths.
+function syncEnoPodSquare() {
+  const pod = document.querySelector(".eno-standalone-pod");
+  if (!pod) return;
+  pod.style.width = "auto";
+  const h = pod.offsetHeight;
+  if (h > 0) pod.style.width = h + "px";
+}
+window.addEventListener("load", syncEnoPodSquare);
+window.addEventListener("resize", syncEnoPodSquare);
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", syncEnoPodSquare);
+} else {
+  syncEnoPodSquare();
+}
+
 </script>
 </body>
 </html>
