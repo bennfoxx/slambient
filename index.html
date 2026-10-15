@@ -14030,6 +14030,52 @@ document.addEventListener("webkitfullscreenchange", syncAppFullscreenButton);
   });
 })();
 
+// Never ellipsize a preset name: if the longest one doesn't fit its chip
+// (narrow header, browser zoom, a wider fallback font), shrink the font on
+// every chip to the largest size at which they all fit (not below 7px), so
+// the grid stays uniform. Chips only ever shrink from their stylesheet size.
+// Skipped while the bar scrolls horizontally (phones), where chips size to
+// their text. Text is measured on a canvas (scrollWidth is unreliable under
+// the page's CSS zoom); chip box sizes come from layout in the same units.
+(function fitPresetChips() {
+  const bar = document.querySelector(".preset-bar");
+  if (!bar) return;
+  const chips = [...bar.querySelectorAll(".btn-preset-chip")];
+  const ctx = document.createElement("canvas").getContext("2d");
+  let raf = 0;
+  function fit() {
+    raf = 0;
+    // The chips transition `all`, so with the transition off, read the true
+    // stylesheet size (not a mid-animation value) and apply without animating.
+    chips.forEach(c => { c.style.transition = "none"; c.style.fontSize = ""; });
+    const done = () => { void bar.offsetWidth; chips.forEach(c => { c.style.transition = ""; }); };
+    if (bar.scrollWidth > bar.clientWidth + 1) return done();
+    const cs0 = getComputedStyle(chips[0]);
+    const natural = parseFloat(cs0.fontSize) || 10;
+    const ls = parseFloat(cs0.letterSpacing) || 0;
+    ctx.font = `${cs0.fontWeight} 100px ${cs0.fontFamily}`;
+    let best = natural;
+    chips.forEach(c => {
+      const cs = getComputedStyle(c);
+      const text = c.textContent.trim().toUpperCase();
+      const room = c.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 1;
+      const perPx = ctx.measureText(text).width / 100;
+      if (room > 0 && perPx > 0) best = Math.min(best, (room - ls * text.length) / perPx);
+    });
+    if (best < natural) {
+      const size = Math.max(7, Math.floor(best * 4) / 4);
+      chips.forEach(c => { c.style.fontSize = size + "px"; });
+    }
+    done();
+  }
+  const queue = () => { if (!raf) raf = requestAnimationFrame(fit); };
+  window.addEventListener("resize", queue);
+  window.addEventListener("load", queue);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(queue);
+  if (window.ResizeObserver) new ResizeObserver(queue).observe(bar);
+  queue();
+})();
+
 // Enter is the universal play/pause key (Phase 7). Space is deliberately left
 // alone: Slambient Invaders uses it to fire, and a focused button would also
 // "click" on Space. Skipped while typing in a text field or while a custom

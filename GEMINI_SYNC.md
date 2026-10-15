@@ -619,6 +619,10 @@ missing. Desktop and iPad are unchanged. The visualizer's own fullscreen button 
 
 **Palette menu.** The RANDOMIZE row showed a lowercase hint that wrapped to two lines and used a different weight. It now shows nine dashed placeholder swatches (`.pal-ghost`), same size as a real palette's, so the row has the same width and height as the others and the same uppercase mono look.
 
+## Update — 2026-10-15 (Claude: preset chip names no longer truncated)
+
+Ben: header preset chip names wrapped/ellipsized ("NOSTALGIC DR…"). The chips (a fixed 5×3 grid, `minmax(0, 1fr)`) ellipsized any name wider than the chip, which depends on the font actually rendered, browser zoom and window width. New `fitPresetChips()` (next to `initPresetChipTitles`) measures every name on a canvas and sets one shared font size on all chips, the largest at which every name fits (never above the stylesheet size, never below 7px), re-run on load, font load, resize and bar resize. Skipped on phones (the bar scrolls and chips size to their text). The chips transition `all`, so the fit turns transitions off while it reads the stylesheet size; `scrollWidth` can't be used for the check because of the page's CSS zoom.
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE
