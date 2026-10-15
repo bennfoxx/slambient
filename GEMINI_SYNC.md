@@ -689,9 +689,9 @@ The Hardware MIDI Output menu (module 9. OUT) now sends each instrument on its o
 - [x] JSON export/import (`SAVE` / `LOAD` buttons in header preset bank via `savePresetBankJson()` and `loadPresetBankJson()`, serializing all voice/effect controls, power/aux/mute/solo states, bypass states, and live `dspChainOrder`)
 - [x] Signature factory presets engineered for specific DSP chain topologies:
   - `Aphex Twin` (IDM rhythms in 7/8 Hirajoshi, eerie glass pads, `DELAY ➔ FILTER ➔ SPACE` routing at 48% feedback)
-  - `Tangerine Dream` (Berlin School Phrygian sequences, pulsing arpeggiators, `FILTER ➔ DELAY ➔ SPACE` sweeps feeding cathedral reverb)
-  - `William Basinski` (Tape decay mechanics in 3/4, pitch drift, continuous vinyl/tape hiss, `SPACE ➔ DELAY ➔ FILTER` routing feeding dark low-pass filter to muffle repeat tails)
-  - `Lo-Fi Chillhop` (Boom-bap swing, dusty Rhodes chords, window rain gusts, `FILTER ➔ DELAY ➔ SPACE` signal chain for warm tape saturation)
+  - `Tangerine Dream` (chip label "Tangerine"; Berlin School Phrygian sequences, pulsing arpeggiators, `FILTER ➔ DELAY ➔ SPACE` sweeps feeding cathedral reverb)
+  - `William Basinski` (chip label "Disintegration"; Tape decay mechanics in 3/4, pitch drift, continuous vinyl/tape hiss, `SPACE ➔ DELAY ➔ FILTER` routing feeding dark low-pass filter to muffle repeat tails)
+  - `Lo-Fi Chillhop` (shown on its header chip as just "Chillhop"; Boom-bap swing, dusty Rhodes chords, window rain gusts, `FILTER ➔ DELAY ➔ SPACE` signal chain for warm tape saturation)
 
 ### Phase 6: Visualizers, Easter Eggs & Interaction Polishing — ✅ DONE
 - [x] Audio-gated 3D floating shapes fix (prevent idle blue spheres when stopped + increase sphere density 60%–95% scaling)
@@ -707,3 +707,20 @@ The Hardware MIDI Output menu (module 9. OUT) now sends each instrument on its o
 - [x] Header Undo (patch history), Tap Tempo, and Keyboard Shortcuts panel
 - [x] Modular color palette picker (header Palette menu: 5 themes + Randomize, applied to every module color and visualizer; saved in localStorage)
 
+### After Phase 7 — 2026-10-15 changelog index (all pushed to GitHub main, newest first)
+Each item has its own `## Update — 2026-10-15` entry above with details.
+- `8303c8e` — MIDI out on four channels: 1 Sub, 2 Chords, 3 Arp, 4 Drums (for a DAW via the macOS IAC Driver)
+- `2f90720` — Web MIDI is opt-in ("Connect MIDI Device…" in OUT); no browser permission prompt on page load
+- `b0f7a9d` — Preset chips sized to their names and renamed (Shimmer / Tangerine / Disintegration / Chillhop); play, record and refresh icons matched in size and centering
+- `b38d28c` — Phrygian scale added; Tangerine Dream and Airports presets fixed (missing scale key, invalid drum style)
+- `75f5581` — iPhone Safari viewport lock (`minimum-scale=1`, `overflow-x: clip`) for the orb sheet cut off at the sides
+- `49cb6a3` — Larger refresh arrow on the ⟲ ALL button
+- `165dc33` — Audio plays with the iPhone silent switch on (media playback session)
+- `6cae841` — Header preset chip text fitted so names are never truncated (superseded by `b0f7a9d`'s content-sized chips)
+- `118c4cf` — Delay feedback runaway fixed; instrument meters fixed; phone orbs 65% with no "+"; Invaders touch pad; palette Randomize row
+- `6d41f32` — Full Screen button hidden on phones
+- `b93bf81` — Modules renamed SUB / DRUMS / CHORDS / ARP / NOISE / FILTER / DELAY / SPACE / OUT
+- `5563498` — Phone portrait layout
+- `cc617af` — Slambient Invaders hit-freeze fix
+
+Still unverified on a real iPhone: phone portrait layout, orb sheet width, silent-switch audio, preset chip widths in Safari, transport icons. Not yet tried in Logic: the 4-channel MIDI output.
