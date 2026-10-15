@@ -604,6 +604,19 @@
     font-size: 11px;
     font-weight: 800;
   }
+  /* The old "⟲" text glyph rendered tiny (and differently per device), so the
+     refresh arrow is an inline SVG, sized well above the label's cap height. */
+  .btn-randomize-all { gap: 6px; }
+  .btn-randomize-all .rand-all-icon {
+    width: 17px;
+    height: 17px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
   .btn-randomize-all:hover {
     border-color: rgba(255, 255, 255, 0.65);
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
@@ -3655,6 +3668,7 @@
       white-space: nowrap;
       overflow: hidden;
     }
+    .global-transport > .btn-randomize-all .rand-all-icon { width: 20px; height: 20px; }
     /* "Stop & Save" is the longest label; tighten it so the dot never clips */
     .global-transport > .btn-record.recording,
     .global-transport > .btn-record:disabled {
@@ -5078,7 +5092,7 @@
             <span id="btnRecordLabel">Record</span>
           </button>
 
-          <button class="btn-preset-chip btn-randomize-all" onclick="randomizeEverything()" title="Randomize every module">⟲ ALL</button>
+          <button class="btn-preset-chip btn-randomize-all" onclick="randomizeEverything()" title="Randomize every module"><svg class="rand-all-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20.5 3.5v5h-5"/></svg><span>ALL</span></button>
 
           <div class="root-scale-ctrl">
             <span class="tag">KEY</span>

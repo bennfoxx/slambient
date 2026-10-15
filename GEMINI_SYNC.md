@@ -627,6 +627,10 @@ Ben: header preset chip names wrapped/ellipsized ("NOSTALGIC DR…"). The chips 
 
 Ben: on iPhone the sound only played with the ringer on. Web Audio is "ambient" on iOS by default, so the ring/silent switch mutes it. New `enableMediaPlaybackSession()` (just above `initAudio`) sets `navigator.audioSession.type = "playback"` (Safari 16.4+) and, on iOS only, loops an inaudible generated 1 s WAV in an `<audio>` element so older iOS also treats the page as media. It runs from `initAudio()` and from the first touchend/click/keydown (must be inside a user gesture), and again when the page returns to the foreground, where a suspended/interrupted `audioCtx` is also resumed. Desktop browsers never create the audio element. Needs a real-iPhone check (the silent-switch behavior can't be emulated).
 
+## Update — 2026-10-15 (Claude: larger refresh arrow on the ⟲ ALL button)
+
+Ben: the refresh arrow in the Randomize-all button was too small to read. The "⟲" text glyph (tiny, and drawn from a different fallback font on each device) is replaced by an inline SVG circular arrow (`.rand-all-icon`, 17px on desktop, 20px in the phone transport row), stroked in `currentColor` so it keeps the button's white. Label, button height and the transport layout are unchanged apart from the wider button; the other ⟲ buttons (per-module randomize badges, pedal SHUFFLE) are untouched.
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE
