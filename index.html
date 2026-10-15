@@ -5129,7 +5129,7 @@
               <option value="HIRAJOSHI">Hirajoshi (Japanese Kankyō)</option>
               <option value="INSEN">Insen (Meditative Temple)</option>
               <option value="LYDIAN_DOM">Lydian Dominant (Astral Overtone)</option>
-              <option value="PHRYGIAN_AMB">Phrygian Ambient (Deep Mystery)</option>
+              <option value="PHRYGIAN">Phrygian (Deep Mystery)</option>
               <option value="WHOLE_TONE">Whole Tone (Dream Cloud)</option>
               <option value="MAJ_PENTATONIC">Major Pentatonic (Morning Light)</option>
               <option value="BILAWAL">Raga Bilawal (Indian Classical Major)</option>
@@ -6135,13 +6135,14 @@ const SCALES = {
   HIRAJOSHI:     [0, 2, 3, 7, 8],        // Japanese ambient pentatonic (Yoshimura / Sakamoto)
   INSEN:         [0, 1, 5, 7, 10],       // Meditative Japanese shakuhachi / temple scale
   LYDIAN_DOM:    [0, 2, 4, 6, 7, 9, 10], // Space ambient / overtone scale
-  PHRYGIAN_AMB:  [0, 1, 3, 5, 7, 8, 10], // Dark meditative drone (Steve Roach / Lustmord)
+  PHRYGIAN:      [0, 1, 3, 5, 7, 8, 10], // Phrygian mode: dark meditative drone (Steve Roach / Lustmord), Tangerine Dream preset
   WHOLE_TONE:    [0, 2, 4, 6, 8, 10],    // Dreamlike floating impressionism (Debussy / Eno)
   MAJ_PENTATONIC:[0, 2, 4, 7, 9],        // Pure pastoral bright peace
   BILAWAL:       [0, 2, 4, 5, 7, 9, 11], // Indian Classical Major Scale (Shuddha Swaras / Bilawal Thaat)
   BHAIRAV:       [0, 1, 4, 5, 7, 8, 11]  // Indian Classical morning raga (Maihar / Senia Gharana)
 };
 
+SCALES.PHRYGIAN_AMB = SCALES.PHRYGIAN;   // old key (same notes), kept so anything saved under it still resolves
 const NOTE_NAMES = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"];
 const CIRCLE_OF_FIFTHS = ["C", "G", "D", "A", "E", "B", "F#", "Db", "Ab", "Eb", "Bb", "F"];
 
@@ -13306,7 +13307,7 @@ function applyPreset(idx) {
     document.getElementById("knobWeather").value = 15;
     document.getElementById("knobMutation").value = 12;
 
-    document.getElementById("selDrumStyle").value = "OFF";
+    document.getElementById("selDrumStyle").value = "MUTED";
     document.getElementById("chkAutoEvolveDrums").checked = false;
     document.getElementById("knobDrumVol").value = 0;
 
