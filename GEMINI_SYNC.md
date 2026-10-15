@@ -738,3 +738,10 @@ Still unverified on a real iPhone: phone portrait layout, orb sheet width, silen
   - **Upper Visualizer Deck & Orbital Bar**: `.panel-title-text` at `15px`; `.telem-row` / `.telem-v` (locked to `white-space: nowrap`), `.keyboard-hint`, `.vert-mode-btn`, `.key-label`, `.telemetry-chip`, `.btn-telemetry-action` at `13px`; `.btn-view-mode` at `13.5px`.
   - **Console Rack, Pedals & Smart Dropdowns**: `.control-label` and `.control-val` at `13.5px`; `.custom-dropdown-trigger`, `.custom-dropdown-item`, and pedal labels at `13px`; tight micro-badges (`.btn-power`, `.btn-aux-toggle`, `.black-key-label`, `.key-shortcut`, `.vert-ctrl-label`, `.master-vol-title`) kept at `11px–11.5px` so fixed-width containers never overflow.
 - Added `"JetBrains Mono"` as the primary family in the `chordWheelCanvas` (`10.5px`/`9.5px`/`8.5px`) and `orbitalCanvas` (`17px` numbers / `13px` labels) 2D context `.font` strings so canvas text is crisp and identical across Chrome and Safari.
+
+## Update — 2026-10-15 (Phone Portrait Orbital Module Pop-up Border Alignment & Width Fix)
+
+- **Aligned `#orbitalSidePanel` borders 1:1 with `#orbitalArenaWrapper` on phones (`@media (max-width: 640px)`)**:
+  - Replaced `position: fixed; left: 0; right: 0; bottom: 0; border-right: 0; border-radius: 16px 16px 0 0;` with `position: absolute; inset: 0; width: 100%; max-width: 100%; height: 100%; max-height: 100%; border: 1.5px solid var(--modal-accent-color); border-radius: 7px;` inside `#orbitalArenaWrapper`.
+  - The pop-up module now sits directly inside `#orbitalArenaWrapper` so its top, bottom, left, and right borders overlay the arena card borders behind it and can never extend wider than the module or get cut off at the phone screen edges.
+  - Updated `updateAndDrawOrbitalCanvas()` so `leftPad` ignores the full-width phone overlay (`!window.matchMedia("(max-width: 640px)").matches`), and constrained `.preset-bar` (`width: calc(100% + 24px); max-width: calc(100% + 24px)`) + `.brand-row` (`max-width: 100%; min-width: 0`) on phone portrait so the `-12px` side margins on `.preset-bar` never shift the iOS Safari layout viewport.
