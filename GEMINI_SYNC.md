@@ -543,6 +543,21 @@ plus a full randomize.
   button colors, RING_CONFIGS and ORBITAL_MODULES; the choice survives a reload; screenshots of
   each theme look right; no console errors.
 
+## Update — 2026-10-15 (Claude: Slambient Invaders hit crash fix)
+
+Ben reported that getting hit in Slambient Invaders sometimes froze the visualizer.
+
+- Cause: in `drawArcadeGame`'s enemy-bullet loop, a hit calls `arcadeLoseLife()`, which replaces
+  `g.enemyShots` with an empty array. The loop then kept counting down its old index into the
+  new empty array, read `undefined.x`, threw, and the scope's animation loop died. It only
+  happened when other enemy shots were still on screen at the moment of the hit, which is why it
+  was intermittent.
+- Fix: `break` out of the bullet loop right after a hit. **Rule for the arcade code: anything that
+  resets or replaces an array must not happen inside a loop over that same array without exiting
+  the loop.**
+- Verified in headless Chromium: a hit with 3 other shots on screen threw before and now loses a
+  life cleanly with the visualizer still animating; desktop layout unchanged.
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE

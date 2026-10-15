@@ -9097,6 +9097,10 @@ function arcadeUpdate(g, w, h, L, ts, dtSec) {
     if (ts > g.invulnUntil && s.y >= L.playerY && s.y <= L.playerY + 7 * L.px && Math.abs(s.x - playerPx) <= hitR) {
       g.enemyShots.splice(i, 1);
       arcadeLoseLife(g, L, w, ts);
+      // arcadeLoseLife() empties g.enemyShots, so stop here: carrying on
+      // with the old index read undefined shots, threw, and froze the
+      // visualizer whenever other shots were still on screen.
+      break;
     }
   }
 
