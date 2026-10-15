@@ -146,7 +146,7 @@
   header.top-bar {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 10px;
     flex: 1;
     min-width: 0;
@@ -164,7 +164,7 @@
   .header-main {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 10px;
     flex: 1;
     min-width: 0;
@@ -3132,12 +3132,13 @@
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 5px;
     background: #090a10;
     border: 1px solid var(--eno-glow-border, var(--border-light));
     border-radius: 6px;
-    padding: 12px 10px;
+    padding: 8px 10px;
     width: 72px;
+    min-height: 0;
     box-sizing: border-box;
     flex-shrink: 0;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.8), 0 4px 16px rgba(0,0,0,0.6), var(--eno-glow-shadow, 0 0 16px rgba(var(--rgb-chord), 0.18));
@@ -3154,19 +3155,20 @@
   }
   .master-vol-slider-wrap {
     width: 36px;
-    height: 104px;
+    flex: 1 1 0;
+    min-height: 68px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
   }
   .master-vol-slider-wrap input[type="range"] {
-    width: 96px;
+    width: 78px;
     height: 16px;
     background: transparent;
     border: none;
     margin: 0;
     transform: rotate(-90deg);
+    flex-shrink: 0;
   }
   .master-vol-slider-wrap input[type="range"]::-webkit-slider-runnable-track {
     height: 4px;
@@ -3295,6 +3297,8 @@
     pointer-events: none;
   }
   #enoWidgetCanvas {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     display: block;
@@ -5090,18 +5094,18 @@
         <div class="preset-group">
           <span class="preset-label">PRESETS</span>
           <div class="preset-bar">
-            <button class="btn-preset-chip" onclick="applyPreset(0)">Nostalgic Drift</button>
+            <button class="btn-preset-chip" onclick="applyPreset(0)" title="Nostalgic Drift">Nostalgia</button>
             <button class="btn-preset-chip" onclick="applyPreset(1)">Organic</button>
             <button class="btn-preset-chip" onclick="applyPreset(2)">Shimmer</button>
             <button class="btn-preset-chip" onclick="applyPreset(3)">Hauntology</button>
-            <button class="btn-preset-chip" onclick="applyPreset(4)">Velvet Horizon</button>
+            <button class="btn-preset-chip" onclick="applyPreset(4)" title="Velvet Horizon">Velvet</button>
             <button class="btn-preset-chip" onclick="applyPreset(5)">Pale Bloom</button>
             <button class="btn-preset-chip" onclick="applyPreset(6)">Green</button>
-            <button class="btn-preset-chip" onclick="applyPreset(7)">Khan Lineage</button>
+            <button class="btn-preset-chip" onclick="applyPreset(7)" title="Khan Lineage — Indian Classical Raga">Lineage</button>
             <button class="btn-preset-chip" onclick="applyPreset(8)">After Hours</button>
             <button class="btn-preset-chip" onclick="applyPreset(9)">Airports</button>
             <button class="btn-preset-chip" onclick="applyPreset(10)">Twin Peaks</button>
-            <button class="btn-preset-chip" onclick="applyPreset(11)" title="IDM breakbeats, eerie glass pads, Delay ➔ Filter ➔ Space at 48% feedback">Aphex Twin</button>
+            <button class="btn-preset-chip" onclick="applyPreset(11)" title="Aphex Twin — IDM breakbeats, eerie glass pads, Delay ➔ Filter ➔ Space at 48% feedback">Twinning</button>
             <button class="btn-preset-chip" onclick="applyPreset(12)" title="Berlin School sequences, pulsing arpeggiators, Filter ➔ Delay ➔ Space cathedral sweeps">Tangerine</button>
             <button class="btn-preset-chip" onclick="applyPreset(13)" title="Disintegrating tape loops, pitch drift, Space ➔ Delay ➔ Filter dark low-pass repeats">Disintegration</button>
             <button class="btn-preset-chip" onclick="applyPreset(14)" title="Boom-bap swing, dusty Rhodes chords, rain/vinyl texture, Filter ➔ Delay ➔ Space warmth">Chillhop</button>
@@ -16202,9 +16206,28 @@ if (document.readyState === "loading") {
 function syncEnoPodSquare() {
   const pod = document.querySelector(".eno-standalone-pod");
   if (!pod) return;
-  pod.style.width = "auto";
-  const h = pod.offsetHeight;
-  if (h > 0) pod.style.width = h + "px";
+  if (window.matchMedia && window.matchMedia("(max-width: 640px)").matches) {
+    pod.style.width = "";
+    pod.style.height = "";
+    return;
+  }
+  const topBar = document.querySelector("header.top-bar");
+  if (topBar) {
+    pod.style.height = "0px";
+    pod.style.width = "0px";
+    const h = topBar.offsetHeight;
+    if (h > 0) {
+      pod.style.height = h + "px";
+      pod.style.width = h + "px";
+    } else {
+      pod.style.height = "";
+      pod.style.width = "";
+    }
+  } else {
+    pod.style.width = "auto";
+    const h = pod.offsetHeight;
+    if (h > 0) pod.style.width = h + "px";
+  }
 }
 window.addEventListener("load", syncEnoPodSquare);
 window.addEventListener("resize", syncEnoPodSquare);

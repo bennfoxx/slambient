@@ -745,3 +745,18 @@ Still unverified on a real iPhone: phone portrait layout, orb sheet width, silen
   - Replaced `position: fixed; left: 0; right: 0; bottom: 0; border-right: 0; border-radius: 16px 16px 0 0;` with `position: absolute; inset: 0; width: 100%; max-width: 100%; height: 100%; max-height: 100%; border: 1.5px solid var(--modal-accent-color); border-radius: 7px;` inside `#orbitalArenaWrapper`.
   - The pop-up module now sits directly inside `#orbitalArenaWrapper` so its top, bottom, left, and right borders overlay the arena card borders behind it and can never extend wider than the module or get cut off at the phone screen edges.
   - Updated `updateAndDrawOrbitalCanvas()` so `leftPad` ignores the full-width phone overlay (`!window.matchMedia("(max-width: 640px)").matches`), and constrained `.preset-bar` (`width: calc(100% + 24px); max-width: calc(100% + 24px)`) + `.brand-row` (`max-width: 100%; min-width: 0`) on phone portrait so the `-12px` side margins on `.preset-bar` never shift the iOS Safari layout viewport.
+
+## Update — 2026-10-15 (Chrome Header Dead-Space Fix & Shortened Preset Names)
+
+- **Eliminated vertical dead space beneath `.preset-bar` in `header.top-bar` on Chrome**:
+  - **Root cause**: `EnoHead.mount` sets `#enoWidgetCanvas`'s internal backing buffer to `256×256` (`size: 128 * dpr 2`). Because `#enoWidgetCanvas` was in normal document flow inside `.eno-crt-screen` and `.eno-standalone-pod` (`aspect-ratio: 1 / 1`), Chrome's Flexbox + `aspect-ratio` sizing used the canvas's `256px` intrinsic width when `syncEnoPodSquare()` set `pod.style.width = "auto"`, inflating `.eno-standalone-pod` (and `.header-bar-wrapper`) to `~260px` tall. Meanwhile, `header.top-bar` had `justify-content: space-between;` with only 2 direct children (`.brand-row` and `.transport-row`), dumping all `~55px` of stretched vertical height into an empty band directly beneath the presets.
+  - **Fix**:
+    - Positioned `#enoWidgetCanvas` with `position: absolute; inset: 0; width: 100%; height: 100%;` inside `.eno-crt-screen` so its `256×256` bitmap buffer never contributes intrinsic size to `.eno-standalone-pod`.
+    - Updated `syncEnoPodSquare()` on desktop (`> 640px`) to collapse `.eno-standalone-pod` to `0px`, measure `header.top-bar`'s natural `offsetHeight`, and lock `pod.style.height` and `pod.style.width` to `header.top-bar`'s exact height.
+    - Made `.master-vol-slider-wrap` flexible (`flex: 1 1 0; min-height: 68px;`) inside `.master-vol-pod` (`padding: 8px 10px; gap: 5px;`) so `.master-vol-pod` never forces `.header-bar-wrapper` taller than `header.top-bar`.
+    - Changed `header.top-bar` and `.header-main` from `justify-content: space-between;` to `justify-content: flex-start;` so `.brand-row` and `.transport-row` always sit at their tight `10px` gap.
+- **Shortened 4 preset chip labels**:
+  - `Nostalgic Drift` (`applyPreset(0)`) ➔ `Nostalgia`
+  - `Velvet Horizon` (`applyPreset(4)`) ➔ `Velvet`
+  - `Khan Lineage` (`applyPreset(7)`) ➔ `Lineage`
+  - `Aphex Twin` (`applyPreset(11)`) ➔ `Twinning`
