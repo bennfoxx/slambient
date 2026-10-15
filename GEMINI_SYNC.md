@@ -607,6 +607,18 @@ Ben: no need for the Full Screen button on phones. `#btnAppFullscreen` is now hi
 and on touch devices under 500px tall (phone landscape), always, not only when the Fullscreen API is
 missing. Desktop and iPad are unchanged. The visualizer's own fullscreen button is separate and stays.
 
+## Update — 2026-10-15 (Claude: delay feedback, instrument meters, phone orbs, Invaders touch pad, palette menu)
+
+**Delay feedback loop (all presets).** The delay loop (`analogDelayNode` → `delayDampingFilter` → `delaySaturationNode` → `delayFeedbackGain` → back) ran away at high feedback: the tape saturation curve was normalized to a ~0.98 peak, so its small-signal gain was `k/tanh(k)` ≈ 1.96. A 48% feedback slider was really a loop gain of ~0.94, so tails hung around (−12 dB, 20 s after pause) and Khan Lineage built up while playing. Fix: new `makeFeedbackTapeCurve()` (slope ≤ 1, still soft-clips) is used for the delay loop only (`makeAnalogTapeCurve` is unchanged for everything else), and the feedback gain goes through `delayLoopGain()` = `min(0.48, feedback) * DELAY_LOOP_GAIN_SCALE (1.4)`, so the slider's top end is a loop gain of ~0.67. Tails now fall to the noise floor in ~5–10 s; Khan Lineage stays stable while playing. Slider range, presets and the 0.48 cap are untouched.
+
+**Chord Analysis instrument meters.** The SUB/DRUMS/CHORDS/ARP bars read `ringDynamics[].energy`, which was only updated inside `drawSymmetricalRing` (rings layer on, Invaders off), so the bars froze at 0 with rings off or Invaders running. New `updateInstrumentMeters()` / `INSTRUMENT_METERS` read the analysers directly each frame (time-domain RMS + band average, smoothed). Rule: don't derive UI meters from state that only changes inside a draw routine that can be switched off.
+
+**Phone orbs.** Orb Size now defaults to 65% on phones in portrait and landscape (`PHONE_ORB_MQ`: max-width 640px, or touch with max-height 500px) and 100% elsewhere, until the slider is moved by hand (`applyDefaultOrbSize`, follows rotation). The old fixed phone scale (0.76–0.9) in the phone helpers is now 1 (the slider does the shrinking). On phones the orb centre "+" is no longer drawn (number and one-word name only); desktop still draws it. Phone labels use `PHONE_ORB_MQ` so landscape gets the compressed label too.
+
+**Slambient Invaders touch pad.** New `#arcadePad` under the playfield (inside `#scopePanel`, so it also shows in visualizer fullscreen), visible only while the game runs and only on phones / touch devices (`max-width: 640px` or `hover: none` + `pointer: coarse`): FIRE button, a slide-to-move track, FIRE button. The slider is relative (the ship never jumps to the finger), hold FIRE to auto-fire (~7/s), thumb mirrors the ship every frame via `syncArcadePad()`. Canvas tap/drag still works; desktop and keyboard play are unchanged. Title text on touch now says "SLIDE TO MOVE · FIRE TO SHOOT".
+
+**Palette menu.** The RANDOMIZE row showed a lowercase hint that wrapped to two lines and used a different weight. It now shows nine dashed placeholder swatches (`.pal-ghost`), same size as a real palette's, so the row has the same width and height as the others and the same uppercase mono look.
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE
