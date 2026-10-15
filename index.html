@@ -252,18 +252,23 @@
   }
   .preset-bar {
     display: grid;
-    flex: 1 1 auto;
+    /* The bar is as wide as its longest preset name needs: width: max-content
+       makes all five 1fr tracks equal to the widest chip, so every name shows
+       in full and the grid stays uniform. (Safari bumps text under ~9px up to
+       9px even inside the page's zoom 0.75, so names can render wider than the
+       zoomed layout predicts; a fixed 640px bar truncated them.) At narrow
+       widths the presets move to their own full-width line instead (see the
+       max-width: 1240px block). */
+    flex: 0 0 auto;
+    width: max-content;
     min-width: 0;
-    max-width: 640px;
-    /* minmax(0, 1fr), not 1fr: a bare 1fr track can't shrink below its
-       nowrap label's width, which is what pushed the grid under the BANK
-       buttons at 150% browser zoom. Labels ellipsize instead (full name in
-       each chip's title, see initPresetChipTitles). */
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    max-width: 100%;
+    grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(3, 1fr);
     gap: 5px;
     align-items: center;
   }
+  .preset-bar .btn-preset-chip { padding: 0 12px; }
   .patch-bank-section {
     margin-left: auto;
     display: flex;
@@ -397,15 +402,22 @@
     border-color: var(--color-filter);
     box-shadow: 0 0 18px rgba(var(--rgb-filter), 0.7);
   }
+  /* Start/Pause, Record and the randomize-all arrow share one icon slot
+     (--tr-icon square, same gap to the label, centred on the label's line) so
+     the three buttons read as a set. The slot is 16px on desktop, 18px in the
+     phone transport row and mini bar. */
+  .global-transport, .mini-transport { --tr-icon: 16px; --tr-gap: 7px; }
+  .btn-main-play, .btn-record, .btn-randomize-all { gap: var(--tr-gap, 7px); }
   .play-icon-wrap {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 10px;
-    height: 11px;
+    width: var(--tr-icon, 16px);
+    height: var(--tr-icon, 16px);
     color: currentColor;
     flex-shrink: 0;
   }
+  .play-icon-wrap svg { width: 100%; height: 100%; }
   .btn-main-play .icon-play { display: block; }
   .btn-main-play .icon-pause { display: none; }
   .btn-main-play.active .icon-play { display: none; }
@@ -427,7 +439,6 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     transition: all 0.15s ease;
   }
@@ -438,17 +449,31 @@
     color: var(--color-drum);
     box-shadow: 0 0 10px rgba(var(--rgb-drum), 0.5);
   }
+  /* The dot sits in the same square slot as the other transport icons, drawn
+     by ::before so the slot (not the dot) is what the button centres. */
   .rec-dot {
-    width: 6px;
-    height: 6px;
+    position: relative;
+    flex: none;
+    width: var(--tr-icon, 16px);
+    height: var(--tr-icon, 16px);
+  }
+  .rec-dot::before {
+    content: "";
+    position: absolute;
+    inset: 12.5%;
     border-radius: 50%;
     background: #525c74;
   }
-  .btn-record.recording .rec-dot {
+  .btn-record.recording .rec-dot::before {
     background: var(--color-drum);
     box-shadow: 0 0 6px var(--color-drum);
     animation: blinkRec 0.8s infinite;
   }
+  /* The last letter's trailing letter-spacing would push the icon + label
+     group left of centre; pull it back so the group is centred in the button. */
+  .btn-main-play > span:last-child,
+  .btn-record > span:last-child,
+  .btn-randomize-all > span:last-child { margin-right: -0.07em; }
   @keyframes blinkRec { 50% { opacity: 0.3; } }
 
   .root-scale-ctrl, .time-sig-ctrl, .tempo-ctrl {
@@ -606,10 +631,9 @@
   }
   /* The old "⟲" text glyph rendered tiny (and differently per device), so the
      refresh arrow is an inline SVG, sized well above the label's cap height. */
-  .btn-randomize-all { gap: 6px; }
   .btn-randomize-all .rand-all-icon {
-    width: 17px;
-    height: 17px;
+    width: var(--tr-icon, 16px);
+    height: var(--tr-icon, 16px);
     flex: none;
     fill: none;
     stroke: currentColor;
@@ -3419,13 +3443,20 @@
     .patch-bank-section { padding-left: 10px; gap: 6px; }
     .btn-preset-io { min-width: 0; padding: 0 8px; }
   }
-  /* ~150% browser zoom on a laptop and below: there isn't room for brand +
-     a 5-wide preset grid + BANK on one line, so the presets drop to their
-     own full-width line under the brand (BANK stays top-right). */
-  @media (max-width: 1100px) {
+  /* Narrower than ~1240px (or ~150% browser zoom): there isn't room for brand
+     + a 5-wide preset grid whose chips fit their full names + BANK on one
+     line, so the presets drop to their own full-width line under the brand
+     (BANK stays top-right), where the five columns share the whole width but
+     never get narrower than their longest name. */
+  @media (max-width: 1240px) {
     .brand-row { flex-wrap: wrap; row-gap: 10px; }
     .preset-group { order: 3; flex-basis: 100%; }
-    .preset-bar { max-width: none; }
+    .preset-bar {
+      width: auto;
+      flex: 1 1 auto;
+      max-width: none;
+      grid-template-columns: repeat(5, minmax(max-content, 1fr));
+    }
     .patch-bank-section { align-self: center; }
     .header-utils { align-self: flex-end; }
   }
@@ -3676,7 +3707,7 @@
       white-space: nowrap;
       overflow: hidden;
     }
-    .global-transport > .btn-randomize-all .rand-all-icon { width: 20px; height: 20px; }
+    .global-transport, .mini-transport { --tr-icon: 18px; }
     /* "Stop & Save" is the longest label; tighten it so the dot never clips */
     .global-transport > .btn-record.recording,
     .global-transport > .btn-record:disabled {
@@ -5048,7 +5079,7 @@
           <div class="preset-bar">
             <button class="btn-preset-chip" onclick="applyPreset(0)">Nostalgic Drift</button>
             <button class="btn-preset-chip" onclick="applyPreset(1)">Organic</button>
-            <button class="btn-preset-chip" onclick="applyPreset(2)">Shimmer Cascade</button>
+            <button class="btn-preset-chip" onclick="applyPreset(2)">Shimmer</button>
             <button class="btn-preset-chip" onclick="applyPreset(3)">Hauntology</button>
             <button class="btn-preset-chip" onclick="applyPreset(4)">Velvet Horizon</button>
             <button class="btn-preset-chip" onclick="applyPreset(5)">Pale Bloom</button>
@@ -5058,9 +5089,9 @@
             <button class="btn-preset-chip" onclick="applyPreset(9)">Airports</button>
             <button class="btn-preset-chip" onclick="applyPreset(10)">Twin Peaks</button>
             <button class="btn-preset-chip" onclick="applyPreset(11)" title="IDM breakbeats, eerie glass pads, Delay ➔ Filter ➔ Space at 48% feedback">Aphex Twin</button>
-            <button class="btn-preset-chip" onclick="applyPreset(12)" title="Berlin School sequences, pulsing arpeggiators, Filter ➔ Delay ➔ Space cathedral sweeps">Tangerine Dream</button>
-            <button class="btn-preset-chip" onclick="applyPreset(13)" title="Disintegrating tape loops, pitch drift, Space ➔ Delay ➔ Filter dark low-pass repeats">William Basinski</button>
-            <button class="btn-preset-chip" onclick="applyPreset(14)" title="Boom-bap swing, dusty Rhodes chords, rain/vinyl texture, Filter ➔ Delay ➔ Space warmth">Lo-Fi Chillhop</button>
+            <button class="btn-preset-chip" onclick="applyPreset(12)" title="Berlin School sequences, pulsing arpeggiators, Filter ➔ Delay ➔ Space cathedral sweeps">Tangerine</button>
+            <button class="btn-preset-chip" onclick="applyPreset(13)" title="Disintegrating tape loops, pitch drift, Space ➔ Delay ➔ Filter dark low-pass repeats">Disintegration</button>
+            <button class="btn-preset-chip" onclick="applyPreset(14)" title="Boom-bap swing, dusty Rhodes chords, rain/vinyl texture, Filter ➔ Delay ➔ Space warmth">Chillhop</button>
           </div>
         </div>
 
@@ -5084,12 +5115,12 @@
         <div class="global-transport">
           <button class="btn-main-play" id="btnPlay" onclick="togglePlay()">
             <span class="play-icon-wrap" id="btnPlayIcon">
-              <svg class="icon-play" width="10" height="11" viewBox="0 0 10 11" fill="currentColor">
-                <path d="M1 1.5L9 5.5L1 9.5V1.5Z" />
+              <svg class="icon-play" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M4.5 2.5L13 8L4.5 13.5V2.5Z" />
               </svg>
-              <svg class="icon-pause" width="10" height="11" viewBox="0 0 10 11" fill="currentColor">
-                <rect x="1" y="1.5" width="2.5" height="8" rx="0.5" />
-                <rect x="6.5" y="1.5" width="2.5" height="8" rx="0.5" />
+              <svg class="icon-pause" viewBox="0 0 16 16" fill="currentColor">
+                <rect x="3.5" y="2.5" width="3.2" height="11" rx="0.8" />
+                <rect x="9.3" y="2.5" width="3.2" height="11" rx="0.8" />
               </svg>
             </span>
             <span id="btnPlayLabel">Start</span>
@@ -14094,51 +14125,6 @@ document.addEventListener("webkitfullscreenchange", syncAppFullscreenButton);
   });
 })();
 
-// Never ellipsize a preset name: if the longest one doesn't fit its chip
-// (narrow header, browser zoom, a wider fallback font), shrink the font on
-// every chip to the largest size at which they all fit (not below 7px), so
-// the grid stays uniform. Chips only ever shrink from their stylesheet size.
-// Skipped while the bar scrolls horizontally (phones), where chips size to
-// their text. Text is measured on a canvas (scrollWidth is unreliable under
-// the page's CSS zoom); chip box sizes come from layout in the same units.
-(function fitPresetChips() {
-  const bar = document.querySelector(".preset-bar");
-  if (!bar) return;
-  const chips = [...bar.querySelectorAll(".btn-preset-chip")];
-  const ctx = document.createElement("canvas").getContext("2d");
-  let raf = 0;
-  function fit() {
-    raf = 0;
-    // The chips transition `all`, so with the transition off, read the true
-    // stylesheet size (not a mid-animation value) and apply without animating.
-    chips.forEach(c => { c.style.transition = "none"; c.style.fontSize = ""; });
-    const done = () => { void bar.offsetWidth; chips.forEach(c => { c.style.transition = ""; }); };
-    if (bar.scrollWidth > bar.clientWidth + 1) return done();
-    const cs0 = getComputedStyle(chips[0]);
-    const natural = parseFloat(cs0.fontSize) || 10;
-    const ls = parseFloat(cs0.letterSpacing) || 0;
-    ctx.font = `${cs0.fontWeight} 100px ${cs0.fontFamily}`;
-    let best = natural;
-    chips.forEach(c => {
-      const cs = getComputedStyle(c);
-      const text = c.textContent.trim().toUpperCase();
-      const room = c.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 1;
-      const perPx = ctx.measureText(text).width / 100;
-      if (room > 0 && perPx > 0) best = Math.min(best, (room - ls * text.length) / perPx);
-    });
-    if (best < natural) {
-      const size = Math.max(7, Math.floor(best * 4) / 4);
-      chips.forEach(c => { c.style.fontSize = size + "px"; });
-    }
-    done();
-  }
-  const queue = () => { if (!raf) raf = requestAnimationFrame(fit); };
-  window.addEventListener("resize", queue);
-  window.addEventListener("load", queue);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(queue);
-  if (window.ResizeObserver) new ResizeObserver(queue).observe(bar);
-  queue();
-})();
 
 // Enter is the universal play/pause key (Phase 7). Space is deliberately left
 // alone: Slambient Invaders uses it to fire, and a focused button would also
@@ -16385,8 +16371,8 @@ window.addEventListener("keydown", (e) => {
     bar.innerHTML =
       '<button type="button" class="btn-main-play" data-mt="play">' +
         '<span class="play-icon-wrap">' +
-          '<svg class="icon-play" width="10" height="11" viewBox="0 0 10 11" fill="currentColor"><path d="M1 1.5L9 5.5L1 9.5V1.5Z"/></svg>' +
-          '<svg class="icon-pause" width="10" height="11" viewBox="0 0 10 11" fill="currentColor"><rect x="1" y="1.5" width="2.5" height="8" rx="0.5"/><rect x="6.5" y="1.5" width="2.5" height="8" rx="0.5"/></svg>' +
+          '<svg class="icon-play" viewBox="0 0 16 16" fill="currentColor"><path d="M4.5 2.5L13 8L4.5 13.5V2.5Z"/></svg>' +
+          '<svg class="icon-pause" viewBox="0 0 16 16" fill="currentColor"><rect x="3.5" y="2.5" width="3.2" height="11" rx="0.8"/><rect x="9.3" y="2.5" width="3.2" height="11" rx="0.8"/></svg>' +
         '</span><span data-mt="play-label">Start</span>' +
       '</button>' +
       '<button type="button" class="btn-record" data-mt="rec"><div class="rec-dot"></div><span data-mt="rec-label">Record</span></button>' +
