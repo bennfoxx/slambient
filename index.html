@@ -5108,7 +5108,7 @@
           <span class="panel-title-text">Visualizer</span>
         </div>
         <div class="scope-legend">
-          <div class="legend-item"><div class="legend-dot" style="background: var(--color-drone);"></div><span>DRONE</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background: var(--color-drone);"></div><span>SUB</span></div>
           <div class="legend-item"><div class="legend-dot" style="background: var(--color-drum);"></div><span>DRUMS</span></div>
           <div class="legend-item"><div class="legend-dot" style="background: var(--color-chord);"></div><span>CHORDS</span></div>
           <div class="legend-item"><div class="legend-dot" style="background: var(--color-arp);"></div><span>ARP</span></div>
@@ -5222,7 +5222,7 @@
         </div>
         <div class="activity-meter-row">
           <div class="act-track-wrap">
-            <span class="act-tag" style="color: var(--color-drone);">DRN</span>
+            <span class="act-tag" style="color: var(--color-drone);">SUB</span>
             <div class="act-bar-bg"><div class="act-bar-fill" id="lvlDrone" style="background: var(--color-drone);"></div></div>
           </div>
           <div class="act-track-wrap">
@@ -5358,11 +5358,11 @@
   <div class="lower-deck view-grid-hidden">
     <div class="strip-channel drone-ch">
       <div class="panel-header">
-        <span>1. Sub &amp; Drone</span>
+        <span>1. SUB</span>
         <div class="panel-header-actions">
-          <button class="btn-power active" id="btnPower_drone" onclick="toggleChannelPower('drone')" title="Toggle Sub-Drone Power (On / Off)">PWR</button>
-          <button class="btn-mute" id="btnMute_drone" onclick="toggleMute('drone')" title="Mute Sub-Drone">M</button>
-          <button class="btn-solo" id="btnSolo_drone" onclick="toggleSolo('drone')" title="Solo Sub-Drone">S</button>
+          <button class="btn-power active" id="btnPower_drone" onclick="toggleChannelPower('drone')" title="Toggle Sub Power (On / Off)">PWR</button>
+          <button class="btn-mute" id="btnMute_drone" onclick="toggleMute('drone')" title="Mute Sub">M</button>
+          <button class="btn-solo" id="btnSolo_drone" onclick="toggleSolo('drone')" title="Solo Sub">S</button>
           <button class="badge-tag" style="color: var(--color-drone); border-color: rgba(0,206,201,0.3);" onclick="randomizeDrone()" title="Randomize this module"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
         </div>
       </div>
@@ -5429,7 +5429,7 @@
       <div class="control-row">
         <div class="control-label">
           <span>FX Send (Filter/Delay)</span>
-          <span style="display:inline-flex;align-items:center;"><span class="control-val drone-val" id="lblDroneFx">35%</span><button type="button" class="btn-aux-toggle active" id="btnAux_drone" onclick="toggleChannelAux('drone')" title="Toggle Aux FX Bus Routing for Sub & Drone">AUX</button></span>
+          <span style="display:inline-flex;align-items:center;"><span class="control-val drone-val" id="lblDroneFx">35%</span><button type="button" class="btn-aux-toggle active" id="btnAux_drone" onclick="toggleChannelAux('drone')" title="Toggle Aux FX Bus Routing for Sub">AUX</button></span>
         </div>
         <input type="range" id="knobDroneFx" min="0" max="100" value="35" oninput="updateAudioParams()">
       </div>
@@ -5441,7 +5441,7 @@
 
     <div class="strip-channel drum-ch">
       <div class="panel-header">
-        <span>2. Drums</span>
+        <span>2. DRUMS</span>
         <div class="panel-header-actions">
           <button class="btn-drum-fill" id="btnDrumFill" onclick="triggerDrumFill(true)" title="Trigger an immediate rhythmic drum fill">FILL</button>
           <button class="btn-power active" id="btnPower_drum" onclick="toggleChannelPower('drum')" title="Toggle Drum Power (On / Off)">PWR</button>
@@ -5506,7 +5506,7 @@
 
     <div class="strip-channel chord-ch">
       <div class="panel-header">
-        <span>3. Chords &amp; Voicing</span>
+        <span>3. CHORDS</span>
         <div class="panel-header-actions">
           <button class="btn-power active" id="btnPower_chord" onclick="toggleChannelPower('chord')" title="Toggle Chord Voice Power (On / Off)">PWR</button>
           <button class="btn-mute" id="btnMute_chord" onclick="toggleMute('chord')" title="Mute Chords">M</button>
@@ -5579,11 +5579,11 @@
 
     <div class="strip-channel arp-ch">
       <div class="panel-header">
-        <span>4. Shimmer Arp</span>
+        <span>4. ARP</span>
         <div class="panel-header-actions">
-          <button class="btn-power active" id="btnPower_arp" onclick="toggleChannelPower('arp')" title="Toggle Shimmer Arp Power (On / Off)">PWR</button>
-          <button class="btn-mute" id="btnMute_arp" onclick="toggleMute('arp')" title="Mute Shimmer Arp">M</button>
-          <button class="btn-solo" id="btnSolo_arp" onclick="toggleSolo('arp')" title="Solo Shimmer Arp">S</button>
+          <button class="btn-power active" id="btnPower_arp" onclick="toggleChannelPower('arp')" title="Toggle Arp Power (On / Off)">PWR</button>
+          <button class="btn-mute" id="btnMute_arp" onclick="toggleMute('arp')" title="Mute Arp">M</button>
+          <button class="btn-solo" id="btnSolo_arp" onclick="toggleSolo('arp')" title="Solo Arp">S</button>
           <button class="badge-tag" style="color: var(--color-arp); border-color: rgba(162,155,254,0.3);" onclick="randomizeArp()" title="Randomize this module"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
         </div>
       </div>
@@ -5643,7 +5643,7 @@
       <div class="control-row">
         <div class="control-label">
           <span>FX Send (Filter/Delay)</span>
-          <span style="display:inline-flex;align-items:center;"><span class="control-val arp-val" id="lblArpFx">100%</span><button type="button" class="btn-aux-toggle active" id="btnAux_arp" onclick="toggleChannelAux('arp')" title="Toggle Aux FX Bus Routing for Shimmer Arp">AUX</button></span>
+          <span style="display:inline-flex;align-items:center;"><span class="control-val arp-val" id="lblArpFx">100%</span><button type="button" class="btn-aux-toggle active" id="btnAux_arp" onclick="toggleChannelAux('arp')" title="Toggle Aux FX Bus Routing for Arp">AUX</button></span>
         </div>
         <input type="range" id="knobArpFx" min="0" max="100" value="100" oninput="updateAudioParams()">
       </div>
@@ -5655,11 +5655,11 @@
 
     <div class="strip-channel noise-ch">
       <div class="panel-header">
-        <span>5. Atmosphere &amp; Noise</span>
+        <span>5. NOISE</span>
         <div class="panel-header-actions">
-          <button class="btn-power active" id="btnPower_noise" onclick="toggleChannelPower('noise')" title="Toggle Atmosphere & Noise Power (On / Off)">PWR</button>
-          <button class="btn-mute" id="btnMute_noise" onclick="toggleMute('noise')" title="Mute Atmosphere & Noise">M</button>
-          <button class="btn-solo" id="btnSolo_noise" onclick="toggleSolo('noise')" title="Solo Atmosphere & Noise">S</button>
+          <button class="btn-power active" id="btnPower_noise" onclick="toggleChannelPower('noise')" title="Toggle Noise Power (On / Off)">PWR</button>
+          <button class="btn-mute" id="btnMute_noise" onclick="toggleMute('noise')" title="Mute Noise">M</button>
+          <button class="btn-solo" id="btnSolo_noise" onclick="toggleSolo('noise')" title="Solo Noise">S</button>
           <button class="badge-tag" style="color: var(--color-noise); border-color: rgba(29,209,161,0.35);" onclick="randomizeNoise()" title="Randomize this module"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
         </div>
       </div>
@@ -5705,7 +5705,7 @@
       <div class="control-row">
         <div class="control-label">
           <span>FX Send (Filter/Delay)</span>
-          <span style="display:inline-flex;align-items:center;"><span class="control-val noise-val" id="lblNoiseFx">65%</span><button type="button" class="btn-aux-toggle active" id="btnAux_noise" onclick="toggleChannelAux('noise')" title="Toggle Aux FX Bus Routing for Atmosphere & Noise">AUX</button></span>
+          <span style="display:inline-flex;align-items:center;"><span class="control-val noise-val" id="lblNoiseFx">65%</span><button type="button" class="btn-aux-toggle active" id="btnAux_noise" onclick="toggleChannelAux('noise')" title="Toggle Aux FX Bus Routing for Noise">AUX</button></span>
         </div>
         <input type="range" id="knobNoiseFx" min="0" max="100" value="65" oninput="updateAudioParams()">
       </div>
@@ -5730,13 +5730,13 @@
         <span class="routing-arrow">➔</span>
         <span class="routing-pill pill-mod2" id="routeBadge2">2: DELAY</span>
         <span class="routing-arrow">➔</span>
-        <span class="routing-pill pill-mod3" id="routeBadge3">3: REVERB</span>
+        <span class="routing-pill pill-mod3" id="routeBadge3">3: SPACE</span>
         <span class="routing-arrow">➔</span>
-        <span class="routing-node-badge" style="color: var(--color-space); border-color: rgba(75, 123, 236, 0.4);">MASTER EQ &amp; OUT</span>
+        <span class="routing-node-badge" style="color: var(--color-space); border-color: rgba(75, 123, 236, 0.4);">OUT</span>
       </div>
       <div class="pedals-header-actions">
         <button class="btn-pedal-action" onclick="randomizeDspChain()" title="Randomly shuffle pedal insert order">⟲ SHUFFLE</button>
-        <button class="btn-pedal-action" onclick="resetDspChain()" title="Reset order to Filter ➔ Delay ➔ Reverb">RESET (F-D-R)</button>
+        <button class="btn-pedal-action" onclick="resetDspChain()" title="Reset order to Filter ➔ Delay ➔ Space">RESET (F-D-S)</button>
       </div>
     </div>
 
@@ -5744,13 +5744,13 @@
       <!-- 1. FILTER PEDAL -->
       <div class="pedal-chassis pedal-filter" id="pedalCard_FILTER" data-module="FILTER">
         <div class="panel-header">
-          <span id="pedalTitle_FILTER">6. Filter &amp; Env</span>
+          <span id="pedalTitle_FILTER">6. FILTER</span>
           <div class="panel-header-actions">
             <span class="pedal-slot-badge" id="slotBadge_FILTER">IN</span>
             <button class="btn-pedal-shift" onclick="shiftPedalLeft('FILTER')" id="shiftLeft_FILTER" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
             <button class="btn-pedal-shift" onclick="shiftPedalRight('FILTER')" id="shiftRight_FILTER" title="Shift Right"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg></button>
             <span class="pedal-drag-handle" title="Drag to reorder"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg></span>
-            <button class="btn-power active" id="stompBtn_FILTER" onclick="togglePedalBypass('FILTER')" title="Bypass/engage Filter & Envelope"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="11"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/></svg></button>
+            <button class="btn-power active" id="stompBtn_FILTER" onclick="togglePedalBypass('FILTER')" title="Bypass/engage Filter"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="11"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/></svg></button>
           </div>
         </div>
 
@@ -5799,7 +5799,7 @@
       <!-- 2. DELAY PEDAL -->
       <div class="pedal-chassis pedal-delay" id="pedalCard_DELAY" data-module="DELAY">
         <div class="panel-header">
-          <span id="pedalTitle_DELAY">7. Analog Delay</span>
+          <span id="pedalTitle_DELAY">7. DELAY</span>
           <div class="panel-header-actions">
             <span class="pedal-slot-badge" id="slotBadge_DELAY">INSERT</span>
             <button class="btn-pedal-shift" onclick="shiftPedalLeft('DELAY')" id="shiftLeft_DELAY" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
@@ -5861,13 +5861,13 @@
       <!-- 3. REVERB & CHORUS PEDAL (Pink) -->
       <div class="pedal-chassis pedal-space pedal-reverb" id="pedalCard_SPACE" data-module="SPACE">
         <div class="panel-header">
-          <span id="pedalTitle_SPACE">8. Reverb &amp; Chorus</span>
+          <span id="pedalTitle_SPACE">8. SPACE</span>
           <div class="panel-header-actions">
             <span class="pedal-slot-badge" id="slotBadge_SPACE">OUT</span>
             <button class="btn-pedal-shift" onclick="shiftPedalLeft('SPACE')" id="shiftLeft_SPACE" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
             <button class="btn-pedal-shift" onclick="shiftPedalRight('SPACE')" id="shiftRight_SPACE" title="Shift Right"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg></button>
             <span class="pedal-drag-handle" title="Drag to reorder"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg></span>
-            <button class="btn-power active" id="stompBtn_SPACE" onclick="togglePedalBypass('SPACE')" title="Bypass/engage Reverb & Chorus"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="11"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/></svg></button>
+            <button class="btn-power active" id="stompBtn_SPACE" onclick="togglePedalBypass('SPACE')" title="Bypass/engage Space"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="11"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/></svg></button>
           </div>
         </div>
 
@@ -5924,8 +5924,8 @@
       <!-- 4. FINAL ELEMENT: MASTER EQ & OUT -->
       <div class="strip-channel master-eq-ch space-ch" id="masterEqOutStrip">
         <div class="panel-header">
-          <span>9. Master EQ &amp; Out</span>
-          <button class="badge-tag" style="color: var(--color-space); border-color: rgba(75,123,236,0.3);" onclick="randomizeSpace()" title="Randomize Master EQ & Out"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
+          <span>9. OUT</span>
+          <button class="badge-tag" style="color: var(--color-space); border-color: rgba(75,123,236,0.3);" onclick="randomizeSpace()" title="Randomize Out"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
         </div>
         <div class="control-row">
           <div class="control-label">Hardware MIDI Output</div>
@@ -7131,9 +7131,9 @@ const pedalBypassState = {
 };
 
 const PEDAL_BASE_NAMES = {
-  FILTER: "Filter & Env",
-  DELAY:  "Analog Delay",
-  SPACE:  "Reverb & Chorus"
+  FILTER: "FILTER",
+  DELAY:  "DELAY",
+  SPACE:  "SPACE"
 };
 
 function updatePedalsOrderUI() {
@@ -7174,8 +7174,7 @@ function updatePedalsOrderUI() {
 
     const routeBadge = document.getElementById("routeBadge" + (idx + 1));
     if (routeBadge) {
-      const displayName = (key === "SPACE" ? "REVERB" : key);
-      routeBadge.textContent = (idx + 1) + ": " + displayName;
+      routeBadge.textContent = (idx + 1) + ": " + key;
       routeBadge.className = "routing-pill pill-mod" + (key === "FILTER" ? "1" : key === "DELAY" ? "2" : "3");
     }
   });
@@ -14933,15 +14932,15 @@ function drawStars(w, h) {
 }
 
 const ORBITAL_MODULES = [
-  { id: "drone",  name: "SUB & DRONE",       num: "1", color: "#00e5ff", rgb: [0, 229, 255],   baseR: 40, x: 0, y: 0, vx: 0.18,  vy: 0.14,  chClass: "drone-ch",  analyser: () => droneAnalyser,  pulse: 0, bump: 0 },
-  { id: "drum",   name: "DRUMS",             num: "2", color: "#ff3838", rgb: [255, 56, 56],   baseR: 44, x: 0, y: 0, vx: -0.20, vy: 0.16,  chClass: "drum-ch",   analyser: () => drumAnalyser,   pulse: 0, bump: 0 },
-  { id: "chord",  name: "CHORDS & VOICING",  num: "3", color: "#fed330", rgb: [254, 211, 48],  baseR: 48, x: 0, y: 0, vx: 0.15,  vy: -0.19, chClass: "chord-ch",  analyser: () => chordAnalyser,  pulse: 0, bump: 0 },
-  { id: "arp",    name: "SHIMMER ARP",       num: "4", color: "#7d5fff", rgb: [125, 95, 255],  baseR: 42, x: 0, y: 0, vx: -0.16, vy: -0.14, chClass: "arp-ch",    analyser: () => arpAnalyser,    pulse: 0, bump: 0 },
-  { id: "noise",  name: "ATMOSPHERE & NOISE",num: "5", color: "#1dd1a1", rgb: [29, 209, 161],  baseR: 40, x: 0, y: 0, vx: 0.16,  vy: -0.15, chClass: "noise-ch",  analyser: () => noiseAnalyser,  pulse: 0, bump: 0 },
-  { id: "filter", name: "FILTER & ENV",      num: "6", color: "#2ed573", rgb: [46, 213, 115],  baseR: 37, x: 0, y: 0, vx: 0.14,  vy: 0.17,  chClass: "filter-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
-  { id: "delay",  name: "ANALOG DELAY",      num: "7", color: "#ff793f", rgb: [255, 121, 63],  baseR: 35, x: 0, y: 0, vx: -0.18, vy: 0.12,  chClass: "delay-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 },
-  { id: "reverb", name: "REVERB & CHORUS",   num: "8", color: "#ff5fc4", rgb: [255, 95, 196],  baseR: 38, x: 0, y: 0, vx: 0.17,  vy: 0.13,  chClass: "reverb-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
-  { id: "space",  name: "MASTER EQ & OUT",   num: "9", color: "#4b7bec", rgb: [75, 123, 236],  baseR: 37, x: 0, y: 0, vx: 0.12,  vy: -0.16, chClass: "space-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 }
+  { id: "drone",  name: "SUB",    num: "1", color: "#00e5ff", rgb: [0, 229, 255],   baseR: 40, x: 0, y: 0, vx: 0.18,  vy: 0.14,  chClass: "drone-ch",  analyser: () => droneAnalyser,  pulse: 0, bump: 0 },
+  { id: "drum",   name: "DRUMS",  num: "2", color: "#ff3838", rgb: [255, 56, 56],   baseR: 44, x: 0, y: 0, vx: -0.20, vy: 0.16,  chClass: "drum-ch",   analyser: () => drumAnalyser,   pulse: 0, bump: 0 },
+  { id: "chord",  name: "CHORDS", num: "3", color: "#fed330", rgb: [254, 211, 48],  baseR: 48, x: 0, y: 0, vx: 0.15,  vy: -0.19, chClass: "chord-ch",  analyser: () => chordAnalyser,  pulse: 0, bump: 0 },
+  { id: "arp",    name: "ARP",    num: "4", color: "#7d5fff", rgb: [125, 95, 255],  baseR: 42, x: 0, y: 0, vx: -0.16, vy: -0.14, chClass: "arp-ch",    analyser: () => arpAnalyser,    pulse: 0, bump: 0 },
+  { id: "noise",  name: "NOISE",  num: "5", color: "#1dd1a1", rgb: [29, 209, 161],  baseR: 40, x: 0, y: 0, vx: 0.16,  vy: -0.15, chClass: "noise-ch",  analyser: () => noiseAnalyser,  pulse: 0, bump: 0 },
+  { id: "filter", name: "FILTER", num: "6", color: "#2ed573", rgb: [46, 213, 115],  baseR: 37, x: 0, y: 0, vx: 0.14,  vy: 0.17,  chClass: "filter-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
+  { id: "delay",  name: "DELAY",  num: "7", color: "#ff793f", rgb: [255, 121, 63],  baseR: 35, x: 0, y: 0, vx: -0.18, vy: 0.12,  chClass: "delay-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 },
+  { id: "reverb", name: "SPACE",  num: "8", color: "#ff5fc4", rgb: [255, 95, 196],  baseR: 38, x: 0, y: 0, vx: 0.17,  vy: 0.13,  chClass: "reverb-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
+  { id: "space",  name: "OUT",    num: "9", color: "#4b7bec", rgb: [75, 123, 236],  baseR: 37, x: 0, y: 0, vx: 0.12,  vy: -0.16, chClass: "space-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 }
 ];
 
 // Maps a dspChainOrder pedal key to the orbital orb it corresponds to --

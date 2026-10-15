@@ -593,6 +593,14 @@ renders identically; checked element by element at 1512x900, 1100x800 and 800x90
   sizes. **Not yet tested on a real iPhone.** Known leftover: on iPhone landscape the Full Screen
   button still shows (tapping it says full screen isn't available).
 
+## Update — 2026-10-15 (Claude: simplified module names)
+
+Ben asked for simple module names: SUB, DRUMS, CHORDS, ARP, NOISE, FILTER, DELAY, SPACE, OUT.
+SPACE is the Reverb & Chorus pedal (the pedal chain's "SPACE" key) and OUT is Master EQ & Out (the
+"space" orb id). Changed: orb names (`ORBITAL_MODULES`, so also the orb panel titles), console strip
+and pedal titles, `PEDAL_BASE_NAMES`, the routing pills (3: SPACE, OUT, RESET (F-D-S)), the
+visualizer legend and chord-panel tag (SUB), and the tooltips. Internal ids and keys are unchanged.
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE
