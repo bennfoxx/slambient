@@ -19,7 +19,6 @@
     --bg: #07080c;
     --bg-darker: #040507;
     --panel: #0d0f17;
-    --panel-header: #121520;
     --border: #1a1e2b;
     --border-light: #282e42;
     --border-bright: #3b4460;
@@ -37,7 +36,6 @@
     --color-delay: #ff793f;
     --color-reverb: #ff5fc4;
     --color-space: #4b7bec;
-    --color-live: #ffffff;
     --rgb-drone: 0, 229, 255;
     --rgb-drum: 255, 56, 56;
     --rgb-chord: 254, 211, 48;
@@ -51,9 +49,6 @@
     --accent: var(--color-chord);
     --accent-dim: rgba(var(--rgb-chord), 0.14);
 
-    --key-chassis: #07080c;
-    --key-natural: #161822;
-    --key-sharp: #0a0b0f;
 
     --cursor-default: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='4' stroke='%23000' stroke-width='2' opacity='0.7'/%3E%3Ccircle cx='12' cy='12' r='4' stroke='%2300e5ff' stroke-width='1.2' stroke-dasharray='2 2'/%3E%3Cline x1='12' y1='2' x2='12' y2='7' stroke='%23000' stroke-width='2.5' stroke-linecap='round' opacity='0.7'/%3E%3Cline x1='12' y1='17' x2='12' y2='22' stroke='%23000' stroke-width='2.5' stroke-linecap='round' opacity='0.7'/%3E%3Cline x1='2' y1='12' x2='7' y2='12' stroke='%23000' stroke-width='2.5' stroke-linecap='round' opacity='0.7'/%3E%3Cline x1='17' y1='12' x2='22' y2='12' stroke='%23000' stroke-width='2.5' stroke-linecap='round' opacity='0.7'/%3E%3Cline x1='12' y1='3' x2='12' y2='7' stroke='%2300e5ff' stroke-width='1.4' stroke-linecap='round'/%3E%3Cline x1='12' y1='17' x2='12' y2='21' stroke='%2300e5ff' stroke-width='1.4' stroke-linecap='round'/%3E%3Cline x1='3' y1='12' x2='7' y2='12' stroke='%2300e5ff' stroke-width='1.4' stroke-linecap='round'/%3E%3Cline x1='17' y1='12' x2='21' y2='12' stroke='%2300e5ff' stroke-width='1.4' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='12' r='1.2' fill='%23ffffff'/%3E%3C/svg%3E") 12 12, crosshair;
     --cursor-pointer: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M5 8V5h3M16 5h3v3M19 16v3h-3M8 19H5v-3' stroke='%23000' stroke-width='2.5' stroke-linecap='round' opacity='0.7'/%3E%3Cpath d='M5 8V5h3M16 5h3v3M19 16v3h-3M8 19H5v-3' stroke='%23fed330' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='12' y1='8' x2='12' y2='16' stroke='%23000' stroke-width='2.5' stroke-linecap='round' opacity='0.7'/%3E%3Cline x1='8' y1='12' x2='16' y2='12' stroke='%23000' stroke-width='2.5' stroke-linecap='round' opacity='0.7'/%3E%3Cline x1='12' y1='9' x2='12' y2='15' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='9' y1='12' x2='15' y2='12' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") 12 12, pointer;
@@ -161,14 +156,6 @@
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
 
-  .header-main {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    gap: 10px;
-    flex: 1;
-    min-width: 0;
-  }
   .top-bar-row {
     display: flex;
     align-items: center;
@@ -736,7 +723,6 @@
   .pal-random { margin-top: 4px; border-top: 1px solid var(--border); border-radius: 0 0 4px 4px; }
   .pal-num { width: 14px; color: var(--text-tertiary); text-align: center; }
   .pal-name { flex: 1; white-space: nowrap; }
-  .pal-hint { font-size: 12px; font-weight: 500; text-transform: none; color: var(--text-tertiary); }
   /* Randomize row before a random palette exists: nine dashed placeholder
      swatches, the same size as a real palette's, so the row matches the others. */
   .pal-swatches.pal-ghost i { background: transparent; box-shadow: none; border: 1px dashed var(--text-tertiary); box-sizing: border-box; opacity: 0.7; }
@@ -2600,18 +2586,6 @@
     box-shadow: 0 0 10px var(--accent-dim);
   }
 
-  .pedals-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-    width: 100%;
-  }
-  @media (max-width: 1024px) {
-    .pedals-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
   /* MASTER DECK -- pedals laid out left-to-right so the signal chain order
      is readable at a glance; the Master EQ & Out strip always renders last
      (see updatePedalsOrderUI) and is visually distinguished to show it isn't
@@ -3003,28 +2977,6 @@
   }
 
   /* UNIFIED CHANNEL STRIP MASTER VOLUME & AUX ROUTING */
-  .strip-footer-row {
-    margin-top: auto;
-    padding-top: 8px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .strip-aux-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
-  .strip-aux-label {
-    font-size: 11.5px;
-    font-weight: 800;
-    letter-spacing: 0.8px;
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  }
   .btn-aux-toggle {
     display: inline-flex;
     align-items: center;
@@ -3121,10 +3073,6 @@
     font-size: 12.5px;
     color: var(--text-tertiary);
     padding: 4px 6px;
-  }
-  footer.app-footer span.status-val {
-    color: var(--accent);
-    font-weight: 700;
   }
 
   .master-vol-pod {
@@ -3519,10 +3467,12 @@
     body {
       min-height: 100vh;
       min-height: 100dvh;
-      padding: 10px max(10px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+      /* bottom padding leaves room for the floating mini transport bar */
+      padding: 10px max(10px, env(safe-area-inset-right)) calc(16px + 64px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
       gap: 12px;
       overflow-x: hidden;
       overflow-x: clip;
+      overflow-y: visible;
     }
     * { -webkit-tap-highlight-color: transparent; }
 
@@ -3951,8 +3901,11 @@
       text-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
     }
 
-    /* Mini transport bar (built by JS on phones only): slides up from the bottom
-       once the header's Start button has scrolled out of view. */
+    /* Mini transport bar (built by JS on phones only): fades in at the bottom of
+       the screen once the header's Start button has scrolled out of view. It
+       only fades (no slide, no backdrop blur): iPhone Safari could leave a
+       sliding fixed bar stranded partway up the page while the toolbars
+       collapsed during a scroll. */
     .mini-transport {
       position: fixed;
       left: max(10px, env(safe-area-inset-left));
@@ -3964,22 +3917,20 @@
       gap: 8px;
       height: 56px;
       padding: 0 7px;
-      background: rgba(13, 15, 23, 0.94);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      background: rgba(13, 15, 23, 0.97);
       border: 1px solid var(--eno-glow-border, rgba(var(--rgb-chord), 0.65));
       border-radius: 8px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), var(--eno-glow-shadow, 0 0 16px rgba(var(--rgb-chord), 0.25));
-      transform: translateY(calc(100% + 16px + env(safe-area-inset-bottom)));
       opacity: 0;
       visibility: hidden;
-      transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease, visibility 0s linear 0.24s;
+      pointer-events: none;
+      transition: opacity 0.2s ease, visibility 0s linear 0.2s;
     }
     .mini-transport.is-visible {
-      transform: none;
       opacity: 1;
       visibility: visible;
-      transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease, visibility 0s;
+      pointer-events: auto;
+      transition: opacity 0.2s ease, visibility 0s;
     }
     .mini-transport .btn-main-play,
     .mini-transport .btn-record {
@@ -4020,9 +3971,6 @@
       color: var(--accent);
       letter-spacing: 0.5px;
       text-shadow: 0 0 6px rgba(var(--rgb-chord), 0.3);
-    }
-    body.mini-transport-on {
-      padding-bottom: calc(16px + 64px + env(safe-area-inset-bottom));
     }
 
     /* ---- Orbital deck header (phone) ----
@@ -4777,7 +4725,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    #paletteMenu .pal-hint { font-size: 10.5px; }
     #paletteMenu .pal-swatches { gap: 3px; flex: 0 0 auto; }
     #paletteMenu .pal-swatches i { width: 13px; height: 13px; border-radius: 3px; }
 
@@ -6539,7 +6486,7 @@ function setKeyboardRoute(mode) {
   if (btnA) btnA.classList.toggle("active", mode === "ARP");
 
   if (mode === "ARP") {
-    for (const [m, v] of activeLiveVoices) {
+    for (const m of activeLiveVoices.keys()) {
       stopNoteLive(m, true);
     }
     if (heldMidiNotes.size > 0) {
@@ -6823,7 +6770,7 @@ function updateMusicalConfig(triggerSound = false) {
 
 let audioCtx = null;
 let masterBusPre, masterBusPost, masterGain, chordBusGain, limiterNode, saturationNode, reverbNode, reverbSend;
-let masterEqLow, masterEqMid, masterEqHigh, masterDriveNode, masterWidthNode;
+let masterEqLow, masterEqMid, masterEqHigh, masterDriveNode;
 let masterEqLowVal = 0, masterEqMidVal = 0, masterEqHighVal = 0, masterDriveVal = 10;
 let reverbToneFilter, chorusInputGain, chorusWetGain, chorusVoices = [];
 let masterVolumeGain;
@@ -6895,7 +6842,6 @@ function makeAnalogTapeCurve(drivePct = 15, n_samples = 1024) {
 }
 
 // Jawari curved bone/ebony bridge grazing curve for Maihar Sitar physical model
-let jawariCurveCache = null;
 function getJawariCurve(buzzAmount = 0.7) {
   const n = 1024;
   const curve = new Float32Array(n);
@@ -6962,8 +6908,22 @@ function enableMediaPlaybackSession() {
     if (silentMediaEl.paused) { const pr = silentMediaEl.play(); if (pr && pr.catch) pr.catch(() => {}); }
   } catch (e) {}
 }
+// Create the audio engine if needed and make sure it is running. Call it from a
+// tap/click/key handler: phone browsers only let a page start or resume audio
+// from inside a gesture (the Invaders game uses it, so its sounds work even
+// before the transport's Start button has been pressed).
+function ensureAudioReady() {
+  if (!audioCtx) initAudio();
+  if (audioCtx.state !== "running") audioCtx.resume().catch(() => {});
+}
+// Every completed tap / click / key press also re-asserts the media session and
+// wakes a suspended context (iOS suspends it when the page is backgrounded or
+// interrupted, and only a gesture can bring it back).
 ["touchend", "click", "keydown"].forEach((evt) =>
-  window.addEventListener(evt, enableMediaPlaybackSession, { capture: true, passive: true }));
+  window.addEventListener(evt, () => {
+    enableMediaPlaybackSession();
+    if (audioCtx && audioCtx.state !== "running") audioCtx.resume().catch(() => {});
+  }, { capture: true, passive: true }));
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState !== "visible") return;
   enableMediaPlaybackSession();
@@ -7388,14 +7348,6 @@ function rewireDspChain(newOrder, immediate = false) {
   }
 }
 
-function getDspChainOrder() {
-  return [...dspChainOrder];
-}
-
-function setDspChainOrder(order) {
-  rewireDspChain(order, false);
-}
-
 /* ==========================================================================
    PEDALBOARD LOGIC, DRAG-AND-DROP REWIRING & CROSS-VIEW SYNCHRONIZATION
    ========================================================================== */
@@ -7525,7 +7477,47 @@ function togglePedalBypass(key) {
 }
 
 // Drag & drop handlers with unified Pointer Events + HTML5 drag fallback
-let draggedPedalKey = null;
+// Pointer-event drag-to-reorder on drag handles (reliable on desktop and tablet).
+// Shared by the upper-deck widgets and the pedalboard: dragging a handle and
+// releasing over another card calls onDrop(sourceKey, targetKey).
+function bindPointerReorder({ cards, handles, cardSelector, keyAttr, bodyClass, onDrop }) {
+  const cardUnder = (ev) => [...cards].find(c => {
+    const r = c.getBoundingClientRect();
+    return ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom;
+  });
+  handles.forEach(handle => {
+    handle.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const activeCard = handle.closest(cardSelector);
+      if (!activeCard) return;
+      const activeKey = activeCard.getAttribute(keyAttr);
+      activeCard.classList.add("dragging");
+      document.body.classList.add(bodyClass);
+      handle.setPointerCapture(e.pointerId);
+
+      const onPointerMove = (ev) => {
+        const over = cardUnder(ev);
+        cards.forEach(c => c.classList.toggle("drag-over", c === over));
+      };
+      const onPointerUp = (ev) => {
+        handle.releasePointerCapture(ev.pointerId);
+        window.removeEventListener("pointermove", onPointerMove);
+        window.removeEventListener("pointerup", onPointerUp);
+        window.removeEventListener("pointercancel", onPointerUp);
+        document.body.classList.remove(bodyClass);
+        activeCard.classList.remove("dragging");
+        cards.forEach(c => c.classList.remove("drag-over"));
+        const target = cardUnder(ev);
+        const targetKey = target && target.getAttribute(keyAttr);
+        if (targetKey && targetKey !== activeKey) onDrop(activeKey, targetKey);
+      };
+      window.addEventListener("pointermove", onPointerMove);
+      window.addEventListener("pointerup", onPointerUp);
+      window.addEventListener("pointercancel", onPointerUp);
+    });
+  });
+}
 
 function reorderDspChainModules(sourceKey, targetKey) {
   if (!sourceKey || !targetKey || sourceKey === targetKey) return;
@@ -7574,7 +7566,6 @@ function initUpperDeckDragAndDrop() {
       upperWidgetOrder.splice(fromIdx, 1);
       upperWidgetOrder.splice(toIdx, 0, srcKey);
       renderUpperDeckOrder();
-      if (typeof resizeScopeCanvas === 'function') resizeScopeCanvas();
     }
   }
 
@@ -7616,61 +7607,12 @@ function initUpperDeckDragAndDrop() {
   });
 
   // Pointer Events on Drag Handle
-  handles.forEach(handle => {
-    let activeCard = null;
-    let activeKey = null;
-
-    handle.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      activeCard = handle.closest(".upper-deck-card");
-      if (!activeCard) return;
-      activeKey = activeCard.getAttribute("data-upper-widget");
-      activeCard.classList.add("dragging");
-      document.body.classList.add("upper-dragging");
-      handle.setPointerCapture(e.pointerId);
-
-      const onPointerMove = (ev) => {
-        cards.forEach(c => {
-          const rect = c.getBoundingClientRect();
-          if (ev.clientX >= rect.left && ev.clientX <= rect.right &&
-              ev.clientY >= rect.top && ev.clientY <= rect.bottom) {
-            c.classList.add("drag-over");
-          } else {
-            c.classList.remove("drag-over");
-          }
-        });
-      };
-
-      const onPointerUp = (ev) => {
-        handle.releasePointerCapture(ev.pointerId);
-        window.removeEventListener("pointermove", onPointerMove);
-        window.removeEventListener("pointerup", onPointerUp);
-        window.removeEventListener("pointercancel", onPointerUp);
-
-        activeCard.classList.remove("dragging");
-        document.body.classList.remove("upper-dragging");
-        let dropTarget = null;
-        cards.forEach(c => {
-          c.classList.remove("drag-over");
-          const rect = c.getBoundingClientRect();
-          if (ev.clientX >= rect.left && ev.clientX <= rect.right &&
-              ev.clientY >= rect.top && ev.clientY <= rect.bottom) {
-            dropTarget = c.getAttribute("data-upper-widget");
-          }
-        });
-
-        if (dropTarget && dropTarget !== activeKey) {
-          reorderWidgets(activeKey, dropTarget);
-        }
-        activeCard = null;
-        activeKey = null;
-      };
-
-      window.addEventListener("pointermove", onPointerMove);
-      window.addEventListener("pointerup", onPointerUp);
-      window.addEventListener("pointercancel", onPointerUp);
-    });
+  bindPointerReorder({
+    cards, handles,
+    cardSelector: ".upper-deck-card",
+    keyAttr: "data-upper-widget",
+    bodyClass: "upper-dragging",
+    onDrop: reorderWidgets
   });
 }
 
@@ -7683,66 +7625,12 @@ function initPedalDragAndDrop() {
   // that clicking/dragging a slider or other control anywhere on the pedal
   // doesn't get hijacked into a native HTML5 drag of the whole card.
 
-  // Pointer-event drag-and-drop on drag handles (reliable in all desktop/tablet viewports)
-  handles.forEach(handle => {
-    let pointerOriginX = 0;
-    let activeCard = null;
-    let activeModule = null;
-
-    handle.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      activeCard = handle.closest(".pedal-chassis");
-      if (!activeCard) return;
-      activeModule = activeCard.getAttribute("data-module");
-      draggedPedalKey = activeModule;
-      pointerOriginX = e.clientX;
-      activeCard.classList.add("dragging");
-      document.body.classList.add("pedal-dragging");
-      handle.setPointerCapture(e.pointerId);
-
-      const onPointerMove = (ev) => {
-        // Find which pedal card is under the cursor
-        cards.forEach(c => {
-          const rect = c.getBoundingClientRect();
-          if (ev.clientX >= rect.left && ev.clientX <= rect.right &&
-              ev.clientY >= rect.top && ev.clientY <= rect.bottom) {
-            c.classList.add("drag-over");
-          } else {
-            c.classList.remove("drag-over");
-          }
-        });
-      };
-
-      const onPointerUp = (ev) => {
-        handle.releasePointerCapture(ev.pointerId);
-        window.removeEventListener("pointermove", onPointerMove);
-        window.removeEventListener("pointerup", onPointerUp);
-        window.removeEventListener("pointercancel", onPointerUp);
-
-        document.body.classList.remove("pedal-dragging");
-        activeCard.classList.remove("dragging");
-        let dropTarget = null;
-        cards.forEach(c => {
-          c.classList.remove("drag-over");
-          const rect = c.getBoundingClientRect();
-          if (ev.clientX >= rect.left && ev.clientX <= rect.right &&
-              ev.clientY >= rect.top && ev.clientY <= rect.bottom) {
-            dropTarget = c.getAttribute("data-module");
-          }
-        });
-
-        if (dropTarget && dropTarget !== activeModule) {
-          reorderDspChainModules(activeModule, dropTarget);
-        }
-        draggedPedalKey = null;
-        activeCard = null;
-      };
-
-      window.addEventListener("pointermove", onPointerMove);
-      window.addEventListener("pointerup", onPointerUp);
-      window.addEventListener("pointercancel", onPointerUp);
-    });
+  bindPointerReorder({
+    cards, handles,
+    cardSelector: ".pedal-chassis",
+    keyAttr: "data-module",
+    bodyClass: "pedal-dragging",
+    onDrop: reorderDspChainModules
   });
 }
 
@@ -7800,6 +7688,7 @@ function applyChorusModeParams() {
 
 function midiToFreq(m) { return 440 * Math.pow(2, (m - 69) / 12); }
 
+const DRONE_GLIDE_TC = 0.05, DRONE_STEP_TC = 0.03;
 function currentDroneMidi() {
   let baseOctaveMidi = 48;
   if (droneOctaveChoice === "D1") baseOctaveMidi = 36;
@@ -7825,7 +7714,10 @@ function updateDronePitches(glide = true) {
   droneOsc2.frequency.cancelScheduledValues(now);
   droneOsc2.frequency.setValueAtTime(droneOsc2.frequency.value, now);
 
-  const timeConstant = glide ? 0.45 : 0.08;
+  // New drone pitches arrive almost immediately: a 0.45s time constant meant a
+  // ~1.5s audible swoop on every chord change and wander step. 0.05s is a
+  // click-free step that still reads as a clean new note.
+  const timeConstant = glide ? DRONE_GLIDE_TC : DRONE_STEP_TC;
   droneOsc1.frequency.setTargetAtTime(target1, now, timeConstant);
   droneOsc2.frequency.setTargetAtTime(target2, now, timeConstant);
 
@@ -8010,11 +7902,6 @@ function triggerFilterEnvelope(vel = 85) {
     f.frequency.linearRampToValueAtTime(Math.max(60, peakFreq), now + attSec);
     f.frequency.exponentialRampToValueAtTime(safeBase, now + attSec + decSec);
   });
-}
-
-function playNoteLive(midi, duration = 0.5, vel = 90) {
-  startNoteLive(midi, vel);
-  setTimeout(() => stopNoteLive(midi), duration * 1000);
 }
 
 function startNoteLive(midi, vel = 90) {
@@ -10464,7 +10351,6 @@ const ARCADE_TYPES = {
 };
 const ARCADE_TYPE_KEYS = Object.keys(ARCADE_TYPES);
 const ARCADE_UFO_RGB = [255, 95, 196];
-const ARCADE_MAX_COLS = 10;
 
 // Formation patterns: given rows x cols, return true where a slot is filled.
 const ARCADE_FORMATIONS = [
@@ -10493,6 +10379,7 @@ const ARCADE_PLAYER_SPRITE = ["00000100000", "00001110000", "00001110000", "0111
 
 function toggleArcadeGame(forceState) {
   arcadeActive = (typeof forceState === "boolean") ? forceState : !arcadeActive;
+  if (arcadeActive) ensureAudioReady();
   const btn = document.getElementById("btnToggleArcade");
   if (btn) {
     btn.classList.toggle("active", arcadeActive);
@@ -10680,7 +10567,6 @@ window.addEventListener("keyup", (e) => {
 // move the ship (relative, so it never jumps to the finger), hold either FIRE
 // button to shoot repeatedly. The thumb mirrors the ship every frame, so
 // keyboard / canvas steering and the slider always agree.
-const ARCADE_PAD_THUMB_W = 52;
 function syncArcadePad() {
   const track = document.getElementById("arcadePadTrack");
   const thumb = document.getElementById("arcadePadThumb");
@@ -10698,6 +10584,7 @@ function syncArcadePad() {
     if (!arcadeActive || !arcade || pid !== null) return;
     pid = e.pointerId; startX = e.clientX; startPlayerX = arcade.playerX;
     arcade.pointerX = null;
+    ensureAudioReady();
     try { track.setPointerCapture(pid); } catch (err) {}
     e.preventDefault();
   });
@@ -10719,6 +10606,7 @@ function syncArcadePad() {
       fid = e.pointerId;
       btn.classList.add("is-down");
       try { btn.setPointerCapture(fid); } catch (err) {}
+      ensureAudioReady();
       arcadeHandleFire(arcade);
       timer = setInterval(() => {
         if (!arcadeActive || !arcade) { stop(); return; }
@@ -12803,10 +12691,6 @@ function toggleChannelPower(ch) {
   updateAudioParams();
 }
 
-function toggleDronePower() {
-  toggleChannelPower('drone');
-}
-
 function toggleChannelAux(ch) {
   channelAux[ch] = !channelAux[ch];
   const auxBtn = document.getElementById('btnAux_' + ch);
@@ -14051,8 +13935,7 @@ function stopSessionTimer() {
 }
 
 function togglePlay() {
-  if (!audioCtx) initAudio();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
+  ensureAudioReady();
 
   isPlaying = !isPlaying;
   const btn = document.getElementById("btnPlay");
@@ -15180,7 +15063,6 @@ const ENO_PHOSPHORS = [
 ];
 let enoPhosIndex = 0;
 let enoHeadController = null;
-let currentEnoRGB = [254, 211, 48];
 {
   const enoCanvasEl = document.getElementById("enoWidgetCanvas");
   if (enoCanvasEl) {
@@ -15199,7 +15081,6 @@ function updateHeaderEnoGlow(colorHex) {
     g = parseInt(colorHex.slice(3, 5), 16);
     b = parseInt(colorHex.slice(5, 7), 16);
   }
-  currentEnoRGB = [r, g, b];
   rootEl.style.setProperty("--eno-glow-border", `rgba(${r}, ${g}, ${b}, 0.65)`);
   rootEl.style.setProperty("--eno-glow-shadow", `0 0 16px rgba(${r}, ${g}, ${b}, 0.25), inset 0 0 1px rgba(${r}, ${g}, ${b}, 0.20)`);
   rootEl.style.setProperty("--eno-glow-border-soft", `rgba(${r}, ${g}, ${b}, 0.40)`);
@@ -15219,7 +15100,6 @@ function toggleEnoPhosphor() {
 
 let activeModuleView = "orbital";
 let orbitalCanvas, orbitalCtx;
-let orbitalAnimId = null;
 let expandedOrbId = null;
 let orbitalPanelActive = false;
 const ORB_CLICK_DEBOUNCE_MS = 250;
@@ -15847,7 +15727,6 @@ const ORBITAL_LOWER_DECK_IDS = ["drone", "drum", "chord", "arp", "noise"];
 
 function restoreStripsToRack() {
   const lowerRack = document.querySelector(".lower-deck");
-  const masterRack = document.querySelector(".master-chain-deck");
 
   // Give any icon row borrowed into the modal header (see expandModuleOrb)
   // back to its home strip before that strip moves back into the rack --
@@ -16530,13 +16409,25 @@ window.addEventListener("keydown", (e) => {
     if (bpmLbl) new MutationObserver(syncBpm).observe(bpmLbl, { childList: true, characterData: true, subtree: true });
     syncPlay(); syncRec(); syncBpm();
 
-    if ("IntersectionObserver" in window) {
-      new IntersectionObserver((entries) => {
-        const e = entries[entries.length - 1];
-        startVisible = e.isIntersecting || e.boundingClientRect.top > 0;
-        update();
-      }).observe(btnPlay);
+    // Show the bar once the header's Start button has scrolled off the top.
+    // Measured from the button's position on scroll / resize / rotation (not an
+    // IntersectionObserver, whose callbacks iPhone Safari can delay or drop
+    // while the toolbars collapse), so the bar always matches where the page is.
+    let measureRaf = 0;
+    const measure = () => {
+      measureRaf = 0;
+      startVisible = btnPlay.getBoundingClientRect().bottom > 0;
+      update();
+    };
+    const queueMeasure = () => { if (!measureRaf) measureRaf = requestAnimationFrame(measure); };
+    window.addEventListener("scroll", queueMeasure, { passive: true });
+    window.addEventListener("resize", queueMeasure);
+    window.addEventListener("orientationchange", queueMeasure);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", queueMeasure);
+      window.visualViewport.addEventListener("scroll", queueMeasure);
     }
+    measure();
   }
 
   function update() {
@@ -16545,7 +16436,6 @@ window.addEventListener("keydown", (e) => {
     bar.hidden = !mq.matches;
     bar.classList.toggle("is-visible", show);
     bar.setAttribute("aria-hidden", show ? "false" : "true");
-    document.body.classList.toggle("mini-transport-on", show);
   }
 
   function onMq() {
@@ -16585,33 +16475,8 @@ window.addEventListener("keydown", (e) => {
     try { mq.addEventListener("change", fn); } catch (e) { try { mq.addListener(fn); } catch (e2) {} }
   };
 
-  // 1. Orb size. Desktop orbs (radius 35-48 + a 22px spacing buffer) crowd a
-  //    ~370px-wide arena, so phones draw them at ~76-90% depending on the
-  //    arena width. orb.baseR is only read by effectiveOrbRadius() (size,
-  //    hit-testing, collisions) and as a wave phase offset; the desktop value
-  //    is kept and restored if the viewport grows past the phone breakpoint.
-  //    The ORB SIZE slider still multiplies on top of this. Labels keep their
-  //    desktop 11px / 16px font.
-  function phoneOrbScale() {
-    const arena = document.getElementById("orbitalArenaWrapper");
-    const w = (arena && arena.clientWidth) || (window.innerWidth - 20);
-    // Phones now default the ORB SIZE slider to 65% (applyDefaultOrbSize), which
-    // does the shrinking, so no extra fixed scale here.
-    return 1;
-  }
-  function applyOrbScale() {
-    if (typeof ORBITAL_MODULES === "undefined" || !Array.isArray(ORBITAL_MODULES)) return;
-    const k = mq.matches ? phoneOrbScale() : 1;
-    ORBITAL_MODULES.forEach((orb) => {
-      if (mq.matches) {
-        if (orb._deskBaseR === undefined) orb._deskBaseR = orb.baseR;
-        orb.baseR = orb._deskBaseR * k;
-      } else if (orb._deskBaseR !== undefined) {
-        orb.baseR = orb._deskBaseR;
-      }
-    });
-  }
-
+  // 1. Orb size on phones is handled by the ORB SIZE slider's 65% default
+  //    (applyDefaultOrbSize), so no extra per-orb scaling is needed here.
   //    The first frame lays the orbs out on a circle sized to the arena's
   //    short side; in a tall phone arena that leaves empty bands above and
   //    below, so stretch that first layout vertically into an ellipse once.
@@ -16643,12 +16508,31 @@ window.addEventListener("keydown", (e) => {
     } catch (err) {}
   }, true);
 
-  // 3. Bottom sheet: drag the header (grab handle / title row) down to close.
+  // 3. Bottom sheet gestures on the header (grab handle / title row):
+  //    drag down to close, swipe left / right to step to the next / previous
+  //    module (wraps around). The first ~8px of movement picks the axis.
   let panel = null, header = null;
-  let pid = null, startY = 0, dy = 0, t0 = 0;
+  let pid = null, startX = 0, startY = 0, dx = 0, dy = 0, t0 = 0, axis = null;
   function resetDrag() {
-    pid = null; dy = 0;
+    pid = null; dx = 0; dy = 0; axis = null;
     if (panel) { panel.classList.remove("sheet-dragging"); panel.style.transform = ""; }
+    const body = document.getElementById("orbitalModalBody");
+    if (body) { body.style.transition = ""; body.style.transform = ""; body.style.opacity = ""; }
+  }
+  // Step to the neighbouring module, sliding its controls in from the swipe side.
+  function stepModule(dir) {
+    if (typeof ORBITAL_MODULES === "undefined" || typeof expandModuleOrb !== "function") return;
+    const idx = ORBITAL_MODULES.findIndex((o) => o.id === expandedOrbId);
+    if (idx < 0) return;
+    const next = ORBITAL_MODULES[(idx + dir + ORBITAL_MODULES.length) % ORBITAL_MODULES.length];
+    expandModuleOrb(next.id);
+    const body = document.getElementById("orbitalModalBody");
+    if (body && body.animate) {
+      body.animate(
+        [{ transform: "translateX(" + (dir > 0 ? 36 : -36) + "px)", opacity: 0 }, { transform: "none", opacity: 1 }],
+        { duration: 220, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" }
+      );
+    }
   }
   function initSheetSwipe() {
     panel = document.getElementById("orbitalSidePanel");
@@ -16658,23 +16542,38 @@ window.addEventListener("keydown", (e) => {
       if (!mq.matches || pid !== null || !panel.classList.contains("active")) return;
       if (e.pointerType === "mouse" && e.button !== 0) return;
       if (e.target.closest && e.target.closest("button, a, input, select, label, .custom-dropdown-wrap, .pedal-slot-badge")) return;
-      pid = e.pointerId; startY = e.clientY; dy = 0; t0 = performance.now();
+      pid = e.pointerId; startX = e.clientX; startY = e.clientY; dx = 0; dy = 0; axis = null; t0 = performance.now();
       try { header.setPointerCapture(pid); } catch (err) {}
-      panel.classList.add("sheet-dragging");
     });
     header.addEventListener("pointermove", (e) => {
       if (e.pointerId !== pid) return;
-      dy = Math.max(0, e.clientY - startY);
-      panel.style.transform = dy ? "translateY(" + dy + "px)" : "";
+      dx = e.clientX - startX;
+      dy = e.clientY - startY;
+      if (!axis && Math.max(Math.abs(dx), Math.abs(dy)) > 8) {
+        axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+        if (axis === "y") panel.classList.add("sheet-dragging");
+      }
+      if (axis === "y") {
+        panel.style.transform = dy > 0 ? "translateY(" + dy + "px)" : "";
+      } else if (axis === "x") {
+        // The controls follow the finger a little as feedback.
+        const body = document.getElementById("orbitalModalBody");
+        if (body) { body.style.transform = "translateX(" + Math.max(-60, Math.min(60, dx * 0.35)) + "px)"; body.style.opacity = String(1 - Math.min(0.5, Math.abs(dx) / 240)); }
+      }
     });
     const end = (e) => {
       if (e.pointerId !== pid) return;
       try { header.releasePointerCapture(e.pointerId); } catch (err) {}
-      const speed = dy / Math.max(1, performance.now() - t0);
-      const shouldClose = e.type === "pointerup" &&
-        (dy > Math.min(120, panel.offsetHeight * 0.25) || (dy > 32 && speed > 0.5));
+      const elapsed = Math.max(1, performance.now() - t0);
+      const up = e.type === "pointerup";
+      const downDy = Math.max(0, dy);
+      const shouldClose = up && axis === "y" &&
+        (downDy > Math.min(120, panel.offsetHeight * 0.25) || (downDy > 32 && downDy / elapsed > 0.5));
+      const stepDir = up && axis === "x" && (Math.abs(dx) > 48 || (Math.abs(dx) > 24 && Math.abs(dx) / elapsed > 0.4))
+        ? (dx < 0 ? 1 : -1) : 0;
       resetDrag(); // same frame as the class change below, so it animates from the finger
       if (shouldClose && typeof closeOrbitalModal === "function") closeOrbitalModal();
+      else if (stepDir) stepModule(stepDir);
     };
     header.addEventListener("pointerup", end);
     header.addEventListener("pointercancel", end);
@@ -16725,7 +16624,6 @@ window.addEventListener("keydown", (e) => {
   }, true);
 
   function onMq() {
-    applyOrbScale();
     if (!mq.matches) {
       resetDrag();
       document.querySelectorAll(".custom-dropdown-menu[data-sheet-fit]").forEach((menu) => {
@@ -16746,11 +16644,6 @@ window.addEventListener("keydown", (e) => {
     if (typeof ORBITAL_MODULES === "undefined" || !ORBITAL_MODULES[0]) return;
     ORBITAL_MODULES[0].initialized = false;
     if (mq.matches) stretchInitialLayout();
-  });
-  let resizeRaf = 0;
-  window.addEventListener("resize", () => {
-    if (!mq.matches || resizeRaf) return;
-    resizeRaf = requestAnimationFrame(() => { resizeRaf = 0; applyOrbScale(); });
   });
 })();
 
