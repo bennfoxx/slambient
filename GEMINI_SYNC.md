@@ -601,6 +601,12 @@ SPACE is the Reverb & Chorus pedal (the pedal chain's "SPACE" key) and OUT is Ma
 and pedal titles, `PEDAL_BASE_NAMES`, the routing pills (3: SPACE, OUT, RESET (F-D-S)), the
 visualizer legend and chord-panel tag (SUB), and the tooltips. Internal ids and keys are unchanged.
 
+## Update — 2026-10-15 (Claude: no Full Screen button on phones)
+
+Ben: no need for the Full Screen button on phones. `#btnAppFullscreen` is now hidden at max-width 640px
+and on touch devices under 500px tall (phone landscape), always, not only when the Fullscreen API is
+missing. Desktop and iPad are unchanged. The visualizer's own fullscreen button is separate and stays.
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE

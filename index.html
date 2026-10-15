@@ -3441,6 +3441,10 @@
   }
   /* Browsers without the Fullscreen API (iPhone Safari) at any width. */
   html.no-fullscreen-api #btnAppFullscreen { display: none !important; }
+  /* No full-screen button on phones (portrait, or touch landscape). */
+  @media (max-width: 640px), (hover: none) and (pointer: coarse) and (max-height: 500px) {
+    #btnAppFullscreen { display: none !important; }
+  }
 
   /* =====================================================================
      PHONE PORTRAIT LAYOUT (max-width: 640px)
