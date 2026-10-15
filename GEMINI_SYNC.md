@@ -645,6 +645,10 @@ Ben asked for a Phrygian scale option. The scale list already had the Phrygian n
 
 **Transport icons.** START/PAUSE, RECORD and ⟲ ALL now use one square icon slot (`--tr-icon`: 16px desktop, 18px phone transport row and mini bar), the same 7px gap to the label, and are centred on the label's line (measured: icon and label centres equal the button's centre, left/right padding equal after compensating the label's trailing letter-spacing). Play/pause are redrawn on a 16-unit grid, the record dot is drawn by `.rec-dot::before` inside that slot (12px of 16), the arrow is the existing SVG. Sliders were checked: thumbs are 14px on desktop and 22px on phone everywhere, so no change there.
 
+## Update — 2026-10-15 (Claude: no more browser MIDI permission prompt on page load)
+
+A first-time visitor to the live GitHub Pages link got a browser prompt that the site wanted to "control your MIDI devices" and could block it. Cause: `navigator.requestMIDIAccess()` was called at page load. Web MIDI is now opt-in. The "Hardware MIDI Output" menu (module 9. OUT) starts as `MIDI Off` with a `Connect MIDI Device…` entry; the browser is only asked when that entry is chosen (`connectMidi()`), after which the menu lists outputs and MIDI keyboard input is attached as before. Browsers without Web MIDI (iOS Safari) don't show the connect entry. The custom dropdown now rebuilds its menu when option text changes, not only when the option count changes. Trade-off: external MIDI keyboards no longer play the app until the user picks "Connect MIDI Device…" once per visit.
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE

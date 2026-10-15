@@ -6080,7 +6080,7 @@
         </div>
         <div class="control-row">
           <div class="control-label">Hardware MIDI Output</div>
-          <select id="selMidiOut"><option value="">No Hardware Device Connected</option></select>
+          <select id="selMidiOut"><option value="">MIDI Off</option><option value="__connect">Connect MIDI Device&hellip;</option></select>
         </div>
         <div class="control-row">
           <div class="control-label"><span>Master Tempo (BPM)</span><span class="control-val space-val" id="lblBpm">72 BPM</span></div>
@@ -14363,22 +14363,55 @@ function attachMidiInputs(access) {
   }
 }
 
-if (navigator.requestMIDIAccess) {
-  navigator.requestMIDIAccess().then((access) => {
-    const select = document.getElementById("selMidiOut");
-    if (select) {
-      select.innerHTML = '<option value="">No Hardware Device Connected</option>';
-      for (let output of access.outputs.values()) {
-        const opt = document.createElement("option");
-        opt.value = output.id; opt.text = output.name;
-        select.appendChild(opt);
-      }
-      select.onchange = (e) => { midiOutput = access.outputs.get(e.target.value); };
-    }
-    attachMidiInputs(access);
-    access.onstatechange = () => attachMidiInputs(access);
-  }).catch(() => {});
+// Web MIDI is opt-in: asking for it on page load makes browsers show a
+// "wants to control your MIDI devices" prompt to every first-time visitor.
+// Instead the Hardware MIDI Output menu offers "Connect MIDI Device..." and the
+// browser is only asked once the user picks it.
+let midiAccess = null;
+function populateMidiSelect(select, keepId) {
+  select.innerHTML = '<option value="">' + (midiAccess.outputs.size ? 'No Output Selected' : 'No Hardware Device Connected') + '</option>';
+  for (let output of midiAccess.outputs.values()) {
+    const opt = document.createElement("option");
+    opt.value = output.id; opt.text = output.name;
+    select.appendChild(opt);
+  }
+  select.value = (keepId && midiAccess.outputs.has(keepId)) ? keepId : "";
+  midiOutput = select.value ? midiAccess.outputs.get(select.value) : null;
 }
+function connectMidi(select) {
+  if (!navigator.requestMIDIAccess) {
+    select.value = "";
+    return;
+  }
+  navigator.requestMIDIAccess().then((access) => {
+    midiAccess = access;
+    populateMidiSelect(select, null);
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    attachMidiInputs(access);
+    access.onstatechange = () => {
+      attachMidiInputs(access);
+      populateMidiSelect(select, midiOutput && midiOutput.id);
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+  }).catch(() => {
+    select.value = "";
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+}
+(function setupMidiSelect() {
+  const select = document.getElementById("selMidiOut");
+  if (!select) return;
+  if (!navigator.requestMIDIAccess) {
+    // e.g. iOS Safari has no Web MIDI: drop the offer instead of a dead option.
+    const o = select.querySelector('option[value="__connect"]');
+    if (o) o.remove();
+    return;
+  }
+  select.addEventListener("change", () => {
+    if (select.value === "__connect") { connectMidi(select); return; }
+    if (midiAccess) midiOutput = select.value ? midiAccess.outputs.get(select.value) : null;
+  });
+})();
 
 function setupRandomInitialState() {
   // Fresh non-repeating seed on every startup
@@ -15496,8 +15529,10 @@ function initSmartDropdowns() {
       document.querySelectorAll(".custom-dropdown-wrap.is-open").forEach(w => w.classList.remove("is-open"));
       if (!isOpen) {
         // Re-build if dynamic options changed (like MIDI devices)
-        if (menu.children.length !== sel.options.length) {
+        const optSig = [...sel.options].map(o => o.value + "|" + o.textContent).join("\n");
+        if (menu.children.length !== sel.options.length || menu.dataset.optSig !== optSig) {
           rebuildMenuOptions();
+          menu.dataset.optSig = optSig;
         }
         syncUI();
         menu.classList.add("open");
