@@ -6079,7 +6079,7 @@
           <button class="badge-tag" style="color: var(--color-space); border-color: rgba(75,123,236,0.3);" onclick="randomizeSpace()" title="Randomize Out"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
         </div>
         <div class="control-row">
-          <div class="control-label">Hardware MIDI Output</div>
+          <div class="control-label" title="Notes go out on 4 MIDI channels: 1 Sub, 2 Chords, 3 Arp, 4 Drums">Hardware MIDI Output</div>
           <select id="selMidiOut"><option value="">MIDI Off</option><option value="__connect">Connect MIDI Device&hellip;</option></select>
         </div>
         <div class="control-row">
@@ -6135,6 +6135,46 @@ const PHONE_ORB_MQ = window.matchMedia("(max-width: 640px), (hover: none) and (p
    ========================================================================== */
 let isRecording = false;
 let midiOutput = null;
+
+// Hardware/DAW MIDI out: one MIDI channel per instrument so a DAW (Logic via
+// the macOS IAC Driver) can split them across tracks. Channels are 0-based here
+// (0 = MIDI channel 1).
+const MIDI_CH = { SUB: 0, CHORD: 1, ARP: 2, DRUMS: 3 };
+// General-MIDI-style drum map for channel 4 (tabla strokes use the bongo/conga keys).
+const MIDI_DRUM_NOTE = { KICK: 36, SNARE: 38, HAT: 42, HAT_ACCENT: 46, WOODBLOCK: 76, DAYAN_OPEN: 63, DAYAN_MUTE: 62, BAYAN: 64 };
+function midiNoteOn(ch, note, vel) {
+  if (!midiOutput) return;
+  try { midiOutput.send([0x90 | ch, note & 127, Math.max(1, Math.min(127, Math.round(vel)))]); } catch (e) {}
+}
+function midiNoteOff(ch, note) {
+  if (!midiOutput) return;
+  try { midiOutput.send([0x80 | ch, note & 127, 0]); } catch (e) {}
+}
+function midiNoteTimed(ch, note, vel, durationSec, delaySec = 0) {
+  if (!midiOutput) return;
+  const out = midiOutput;
+  setTimeout(() => {
+    if (midiOutput !== out) return;
+    midiNoteOn(ch, note, vel);
+    setTimeout(() => midiNoteOff(ch, note), Math.max(20, durationSec * 1000));
+  }, delaySec * 1000);
+}
+function midiDrumHit(key, vel = 100) { midiNoteTimed(MIDI_CH.DRUMS, MIDI_DRUM_NOTE[key], vel, 0.1); }
+function midiAllNotesOff() {
+  if (!midiOutput) return;
+  midiSubNote = null;
+  for (let ch = 0; ch < 4; ch++) { try { midiOutput.send([0xB0 | ch, 123, 0]); } catch (e) {} }
+}
+// The sub drone is a held note: re-sent whenever its pitch changes.
+let midiSubNote = null;
+function midiSubSync() {
+  if (!midiOutput || !isPlaying) return;
+  const note = currentDroneMidi();
+  if (note === midiSubNote) return;
+  if (midiSubNote !== null) midiNoteOff(MIDI_CH.SUB, midiSubNote);
+  midiSubNote = note;
+  midiNoteOn(MIDI_CH.SUB, note, 90);
+}
 
 /* ==========================================================================
    1. DETERMINISTIC SEED & MATH
@@ -7743,6 +7783,13 @@ function applyChorusModeParams() {
 
 function midiToFreq(m) { return 440 * Math.pow(2, (m - 69) / 12); }
 
+function currentDroneMidi() {
+  let baseOctaveMidi = 48;
+  if (droneOctaveChoice === "D1") baseOctaveMidi = 36;
+  else if (droneOctaveChoice === "D0") baseOctaveMidi = 24;
+  return Math.max(0, Math.min(127, Math.round(baseOctaveMidi + rootNote + currentChordDeg + droneWanderSemis)));
+}
+
 function updateDronePitches(glide = true) {
   if (!droneOsc1 || !audioCtx) return;
   const now = audioCtx.currentTime;
@@ -7751,6 +7798,7 @@ function updateDronePitches(glide = true) {
   else if (droneOctaveChoice === "D0") baseOctaveMidi = 24;
 
   const droneMidi = baseOctaveMidi + rootNote + currentChordDeg + droneWanderSemis;
+  midiSubSync();
   const target1 = Math.max(20, midiToFreq(droneMidi));
   const target2 = Math.max(10, midiToFreq(droneMidi - 12));
 
@@ -8149,9 +8197,7 @@ function startNoteLive(midi, vel = 90) {
     releaseSec
   });
 
-  if (midiOutput) {
-    try { midiOutput.send([0x90, midi, vel]); } catch(e){}
-  }
+  midiNoteOn(MIDI_CH.CHORD, midi, vel);
 
   handleLiveKeyInput();
 }
@@ -8193,9 +8239,7 @@ function stopNoteLive(midi, instant = false) {
     });
   }
 
-  if (midiOutput) {
-    try { midiOutput.send([0x80, midi, 0]); } catch(e){}
-  }
+  midiNoteOff(MIDI_CH.CHORD, midi);
 }
 
 // Sympathetic string resonance bank (Taraf strings) for Maihar Sitar physical model
@@ -8430,14 +8474,7 @@ function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0,
   osc1.stop(now + duration + 0.1); osc2.stop(now + duration + 0.1);
   if (tremOsc) { tremOsc.start(now); tremOsc.stop(now + duration + 0.1); }
 
-  if (midiOutput) {
-    try {
-      setTimeout(() => {
-        midiOutput.send([0x90, midi, vel]);
-        setTimeout(() => midiOutput.send([0x80, midi, 0]), duration * 1000);
-      }, delayOffsetSec * 1000);
-    } catch(e){}
-  }
+  midiNoteTimed(MIDI_CH.CHORD, midi, vel, duration, delayOffsetSec);
 }
 
 function onChordVoicingSelectChange() {
@@ -8678,12 +8715,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
   if (pan) { gain.connect(pan); pan.connect(arpBusGain); }
   else { gain.connect(arpBusGain); }
 
-  if (midiOutput) {
-    try {
-      midiOutput.send([0x90, midi, vel]);
-      setTimeout(() => midiOutput.send([0x80, midi, 0]), durationSec * 1000);
-    } catch(e){}
-  }
+  midiNoteTimed(MIDI_CH.ARP, midi, vel, durationSec);
 }
 
 function getArpNotesPool() {
@@ -8724,6 +8756,7 @@ function getDrumKitModifiers() {
 
 function playKick(drive = 1.0) {
   if (!audioCtx || drumVol <= 0.01) return;
+  midiDrumHit("KICK", 100);
   const now = audioCtx.currentTime;
   const kit = getDrumKitModifiers();
   const effDrive = drive * kit.drive;
@@ -8795,6 +8828,7 @@ function getPinkNoiseBuffer() {
 
 function playSnare(hard = false) {
   if (!audioCtx || drumVol <= 0.01) return;
+  midiDrumHit("SNARE", hard ? 115 : 90);
   const now = audioCtx.currentTime;
   const kit = getDrumKitModifiers();
 
@@ -8824,6 +8858,7 @@ function playSnare(hard = false) {
 
 function playWoodblock(pitchMult = 1.0) {
   if (!audioCtx || drumVol <= 0.01) return;
+  midiDrumHit("WOODBLOCK", 85);
   const now = audioCtx.currentTime;
   const kit = getDrumKitModifiers();
 
@@ -8842,6 +8877,7 @@ function playWoodblock(pitchMult = 1.0) {
 
 function playHiHat(accent = false) {
   if (!audioCtx || drumVol <= 0.01) return;
+  midiDrumHit(accent ? "HAT_ACCENT" : "HAT", accent ? 105 : 70);
   const now = audioCtx.currentTime;
   const kit = getDrumKitModifiers();
 
@@ -8863,6 +8899,7 @@ function playHiHat(accent = false) {
 // and metal/clay Bayan (left-hand bass drum with palm-heel pressure meend).
 function playDayan(stroke = "TUN", hard = 1.0) {
   if (!audioCtx || drumVol <= 0.01) return;
+  midiDrumHit((stroke === "TUN" || stroke === "TIN" || stroke === "NA" || stroke === "TA") ? "DAYAN_OPEN" : "DAYAN_MUTE", 60 + 60 * Math.min(1, hard));
   const now = audioCtx.currentTime;
   const kit = getDrumKitModifiers();
   const baseFreq = midiToFreq(48 + rootNote) * kit.pitchMult;
@@ -8973,6 +9010,7 @@ function playDayan(stroke = "TUN", hard = 1.0) {
 
 function playBayan(stroke = "GHE", slide = true, hard = 1.0) {
   if (!audioCtx || drumVol <= 0.01) return;
+  midiDrumHit("BAYAN", 60 + 60 * Math.min(1, hard));
   const now = audioCtx.currentTime;
   const kit = getDrumKitModifiers();
 
@@ -14011,6 +14049,7 @@ function togglePlay() {
     const ms = (60000 / bpm) / 4; clockInterval = setInterval(clockTick, ms);
     triggerCurrentChord();
     startSessionTimer();
+    midiSubSync();
 
     // Anti-click soft attack envelope on Drone & Sub-Bass
     if (audioCtx) {
@@ -14031,6 +14070,7 @@ function togglePlay() {
     btn.classList.remove("active"); label.textContent = "Start";
     status.textContent = "Engine: Paused"; clearInterval(clockInterval);
     stopSessionTimer();
+    midiAllNotesOff();
 
     // Anti-click soft release envelope on Drone & Sub-Bass before full stop
     if (audioCtx) {
@@ -14409,7 +14449,11 @@ function connectMidi(select) {
   }
   select.addEventListener("change", () => {
     if (select.value === "__connect") { connectMidi(select); return; }
-    if (midiAccess) midiOutput = select.value ? midiAccess.outputs.get(select.value) : null;
+    if (midiAccess) {
+      midiAllNotesOff();
+      midiOutput = select.value ? midiAccess.outputs.get(select.value) : null;
+      midiSubSync();
+    }
   });
 })();
 
