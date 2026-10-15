@@ -558,6 +558,41 @@ Ben reported that getting hit in Slambient Invaders sometimes froze the visualiz
 - Verified in headless Chromium: a hit with 3 other shots on screen threw before and now loses a
   life cleanly with the visualizer still animating; desktop layout unchanged.
 
+## Update — 2026-10-15 (Claude: phone portrait layout)
+
+Ben: on an iPhone in portrait the app was cluttered and the spacing was off. Desktop (above 640px)
+renders identically; checked element by element at 1512x900, 1100x800 and 800x900.
+
+- **Where it lives:** one `@media (max-width: 640px)` block at the end of `<style>` ("PHONE PORTRAIT
+  LAYOUT"), one `<script>` before `</body>` ("Phone layout helpers"), and `PHONE_LAYOUT_MQ` /
+  `TOUCH_POINTER_MQ` at the top of the main script for canvas code. **New phone styling goes in that
+  block, using the theme variables.**
+- **Base:** phones render at `html { zoom: 1 }` (desktop stays 0.75); `viewport-fit=cover` with
+  safe-area padding; one column with 10px gutters and 12px gaps.
+- **Header:** not sticky on phones. Presets are a 2-row swipeable strip with full names; Start /
+  Record / ALL, KEY+SCALE, METER, TEMPO+TAP rows; Palette / Undo / Full Screen row (? hidden on touch
+  phones, Full Screen hidden where the Fullscreen API is missing); 2x2 telemetry; master volume and a
+  small Eno pod side by side.
+- **Mini transport bar** (`#miniTransport`, phones only): fixed at the bottom once the header's Start
+  scrolls away; mirrors Play/Record/BPM.
+- **Upper deck:** taller scope with a full-width layer-toggle row; chord wheel drawn 1.55x; keyboard
+  TARGET/LEDS row above full-width keys; Invaders shows touch instructions on touch devices.
+- **Orbital:** taller arena, orbs scaled 0.76-0.9 (`orb._deskBaseR` keeps the desktop size), labels
+  fitted inside the orbs (`orbPhoneLabel`), the module panel is a bottom sheet (swipe down to close).
+- **Console Rack:** strips, pedals and Master EQ stack in one column; dropdown menus are placed inside
+  the viewport (`placeMenu`/`visibleBox` in the helpers).
+- **Touch fixes (all widths, touch only):** a scroll that starts on a slider no longer changes it; open
+  dropdowns close on an outside tap (iOS sends no click there); a piano key touch holds the note
+  (pointerenter double-start).
+- **Other fixes:** a pedal or Master EQ card open in the orb panel stays there when the chain is
+  reordered (was emptying the panel, desktop too). Short landscape screens (641px+, under 500px tall)
+  get a non-sticky header; 641-740px hides the Eno pod (the header was broken there); orbs re-layout
+  when crossing 640px.
+- Built by four parallel region passes, then four review passes (visual, touch, code, sizes/rotation).
+  Tested in Chromium iPhone emulation at 390x844, 375x667, 430x932, 360x780 plus landscape and iPad
+  sizes. **Not yet tested on a real iPhone.** Known leftover: on iPhone landscape the Full Screen
+  button still shows (tapping it says full screen isn't available).
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE

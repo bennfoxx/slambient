@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Slambient — Generative Ambient Instrument</title>
 <!-- The UI leans on Mac-only system fonts (ui-monospace/SFMono-Regular/Menlo) for
      almost every label. They look right on the machine this was built on, but a
@@ -3418,6 +3418,1510 @@
     .root-scale-ctrl, .time-sig-ctrl, .tempo-ctrl { padding: 0 6px; }
     .tempo-ctrl input[type="range"] { width: 70px; }
   }
+
+  /* Phone landscape / short windows (641px+ wide, under 500px tall): the
+     sticky desktop header would cover most or all of the screen. */
+  @media (min-width: 641px) and (max-height: 500px) {
+    .header-bar-wrapper { position: relative; }
+  }
+  /* 641-740px (phone landscape, narrow windows): the square Eno pod squeezes
+     the header card until the utils cover TEMPO/TAP; drop the pod there. */
+  @media (min-width: 641px) and (max-width: 740px) {
+    .eno-standalone-pod { display: none; }
+  }
+  /* viewport-fit=cover (for the phone layout) also applies in landscape, so
+     keep the desktop layout clear of the notch there. html has zoom 0.75
+     above 640px, hence the division. env() is 0 on desktops. */
+  @media (min-width: 641px) {
+    body {
+      padding-left: max(22px, calc(env(safe-area-inset-left) / 0.75));
+      padding-right: max(22px, calc(env(safe-area-inset-right) / 0.75));
+      padding-bottom: max(16px, calc(env(safe-area-inset-bottom) / 0.75));
+    }
+  }
+  /* Browsers without the Fullscreen API (iPhone Safari) at any width. */
+  html.no-fullscreen-api #btnAppFullscreen { display: none !important; }
+
+  /* =====================================================================
+     PHONE PORTRAIT LAYOUT (max-width: 640px)
+     Everything phone-specific lives in this one block so desktop is
+     untouched. The desktop page runs at html zoom 0.75; on a phone that
+     made every control too small to tap, so phones render at zoom 1 and
+     the sections below re-flow each area into a single vertical column.
+     ===================================================================== */
+  @media (max-width: 640px) {
+    /* ---- Base ---- */
+    html { zoom: 1; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 10px max(10px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+      gap: 12px;
+      overflow-x: hidden;
+    }
+    * { -webkit-tap-highlight-color: transparent; }
+
+        /* ---- Header (phone) ---- */
+
+    /* Wrapper: not sticky on phones (it would eat half the screen), and no
+       desktop breakout trick (that assumed 22px/16px body padding) -- the card
+       simply sits inside body's padding like every other panel. Static, not
+       relative, so an open dropdown/palette inside the header can still rise
+       above the mini transport bar. */
+    .header-bar-wrapper {
+      position: static;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      gap: 12px 10px;
+      width: auto;
+      margin: 0;
+      padding: 0;
+      background: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    header.top-bar {
+      flex: 1 1 100%;
+      width: 100%;
+      min-width: 0;
+      padding: 12px;
+      gap: 12px;
+    }
+    header.top-bar:has(.palette-menu.open) { z-index: 9000; }
+
+    /* Shared look for the boxed "TAG + controls" rows (BANK, KEY, METER, TEMPO) */
+    .patch-bank-section,
+    .global-transport > .root-scale-ctrl,
+    .global-transport > .time-sig-ctrl,
+    .global-transport > .tempo-ctrl {
+      display: flex;
+      align-items: center;
+      height: 40px;
+      padding: 0 4px 0 10px;
+      gap: 8px;
+      background: #080a11;
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6);
+    }
+    .patch-bank-section > .preset-label,
+    .global-transport .tag {
+      flex: 0 0 auto;
+      min-width: 42px;
+      font-size: 10px;
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+
+    /* Brand row -> vertical stack: brand, presets strip, bank */
+    .brand-row {
+      flex-direction: column;
+      flex-wrap: nowrap;
+      align-items: stretch;
+      gap: 12px;
+    }
+    .brand-group {
+      width: 100%;
+      gap: 8px;
+    }
+    .app-title {
+      font-size: 30px;
+      padding: 0 2px;
+    }
+    .app-sub {
+      font-size: 13px;
+      padding: 5px 14px;
+    }
+
+    /* Presets: 2-row horizontal scroller with full chip names. The strip bleeds
+       to the card's inner edge so chips slide under a soft fade; JS toggles
+       .is-scrolled / .at-end to show/hide the left/right fades. */
+    .preset-group {
+      order: 0;
+      flex: none;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+      min-width: 0;
+    }
+    .preset-group > .preset-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 10px;
+    }
+    /* touch hint, gone once the strip has been scrolled */
+    .preset-group > .preset-label::after {
+      content: "Swipe \203A";
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+    }
+    .preset-group:has(.preset-bar.is-scrolled) > .preset-label::after,
+    .preset-group:has(.preset-bar.at-end) > .preset-label::after { opacity: 0; }
+    .preset-bar {
+      --fade-l: 0px;
+      --fade-r: 36px;
+      display: grid;
+      grid-auto-flow: column;
+      grid-template-columns: none;
+      grid-template-rows: repeat(2, 32px);
+      grid-auto-columns: max-content;
+      gap: 6px;
+      flex: none;
+      max-width: none;
+      margin: -4px -12px;
+      padding: 4px 12px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x proximity;
+      scroll-padding-inline: 12px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent 100%);
+      mask-image: linear-gradient(90deg, transparent 0, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent 100%);
+    }
+    .preset-bar::-webkit-scrollbar { display: none; }
+    .preset-bar.is-scrolled { --fade-l: 28px; }
+    .preset-bar.at-end { --fade-r: 0px; }
+    .preset-bar .btn-preset-chip {
+      height: 32px;
+      line-height: 30px;
+      padding: 0 12px;
+      font-size: 10.5px;
+      letter-spacing: 0.6px;
+      overflow: visible;
+      text-overflow: clip;
+      scroll-snap-align: start;
+    }
+
+    /* BANK: one boxed row, SAVE / LOAD side by side */
+    .patch-bank-section {
+      margin-left: 0;
+      align-self: stretch;
+      flex-shrink: 0;
+    }
+    .preset-io-stack {
+      flex: 1 1 auto;
+      flex-direction: row;
+      gap: 4px;
+      min-width: 0;
+    }
+    .btn-preset-io {
+      flex: 1 1 0;
+      min-width: 0;
+      height: 32px;
+      padding: 0 8px;
+      font-size: 11px;
+      gap: 7px;
+    }
+    .btn-preset-io svg { width: 12px; height: 12px; }
+
+    /* Transport section: everything full width, one control per row */
+    .transport-row {
+      flex-direction: column;
+      flex-wrap: nowrap;
+      align-items: stretch;
+      gap: 8px;
+      padding-top: 12px;
+    }
+    .global-transport {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      flex: none;
+      width: 100%;
+    }
+    .global-transport > .btn-main-play,
+    .global-transport > .btn-record,
+    .global-transport > .btn-randomize-all {
+      width: 100%;
+      min-width: 0;
+      height: 40px;
+      padding: 0 4px;
+      font-size: 12px;
+      letter-spacing: 0.6px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    /* "Stop & Save" is the longest label; tighten it so the dot never clips */
+    .global-transport > .btn-record.recording,
+    .global-transport > .btn-record:disabled {
+      gap: 4px;
+      padding: 0 2px;
+      letter-spacing: 0;
+    }
+    .global-transport > .root-scale-ctrl,
+    .global-transport > .time-sig-ctrl,
+    .global-transport > .tempo-ctrl {
+      grid-column: 1 / -1;
+      min-width: 0;
+    }
+
+    /* KEY + SCALE */
+    .root-scale-ctrl .tag + .tag,
+    .root-scale-ctrl .custom-dropdown-wrap + .tag {
+      min-width: 0;
+      margin-left: 2px !important;
+    }
+    #wrap_topRootKey { flex: 0 0 58px; }
+    #wrap_topScaleMode,
+    #wrap_selTimeSig { flex: 1 1 auto; }
+    .global-transport .custom-dropdown-wrap { min-width: 0; }
+    .global-transport .custom-dropdown-trigger {
+      height: 32px;
+      gap: 6px;
+      padding: 0 9px;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+    /* If the native selects were ever left un-upgraded, keep them aligned too */
+    .root-scale-ctrl select, .time-sig-ctrl select {
+      height: 32px;
+      font-size: 12px;
+      min-width: 0;
+    }
+
+    /* METER: dropdown fills the row, cycle button is a 32px square */
+    .time-sig-ctrl .btn-meter-cycle {
+      flex: 0 0 32px;
+      width: 32px;
+      height: 32px;
+    }
+    .time-sig-ctrl .btn-meter-cycle svg { width: 16px; height: 16px; }
+
+    /* TEMPO: grabbable slider + value + TAP */
+    .global-transport > .tempo-ctrl input[type="range"] {
+      flex: 1 1 auto;
+      width: auto;
+      min-width: 0;
+      height: 32px;
+    }
+    .global-transport > .tempo-ctrl input[type="range"]::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 3px;
+    }
+    .global-transport > .tempo-ctrl input[type="range"]::-webkit-slider-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      margin-top: -9px;
+    }
+    .global-transport > .tempo-ctrl input[type="range"]::-moz-range-track { height: 6px; border-radius: 3px; }
+    .global-transport > .tempo-ctrl input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 5px; }
+    .global-transport > .tempo-ctrl .tempo-val {
+      flex: 0 0 auto;
+      min-width: 56px;
+      font-size: 12px;
+    }
+    .global-transport > .tempo-ctrl .btn-tap-tempo {
+      flex: 0 0 auto;
+      height: 32px;
+      padding: 0 12px;
+      margin-left: 0;
+      font-size: 11px;
+      border-radius: 4px;
+    }
+
+    /* Utility buttons: equal-width row of icon buttons */
+    .header-utils {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(0, 1fr);
+      align-self: stretch;
+      gap: 8px;
+      margin-left: 0;
+      width: 100%;
+    }
+    .header-utils > .palette-wrap,
+    .header-utils > .btn-header-util {
+      min-width: 0;
+    }
+    .header-utils .btn-header-util {
+      width: 100%;
+      height: 36px;
+      padding: 0;
+    }
+    .header-utils .btn-header-util svg { width: 16px; height: 16px; }
+    .header-utils .btn-header-help { font-size: 15px; }
+    .header-utils .pal-btn-dots { grid-template-columns: repeat(2, 6px); }
+    .header-utils .pal-btn-dots i { width: 6px; height: 6px; }
+    /* iPhone Safari has no Fullscreen API for pages (class set from JS) */
+    html.no-fullscreen-api #btnAppFullscreen { display: none; }
+
+    /* Telemetry: compact 2x2 grid of label-over-value tiles */
+    .sys-readout {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      padding-top: 10px;
+      margin-top: 2px;
+    }
+    .telemetry-pill {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 3px 6px;
+      min-width: 0;
+      padding: 6px 10px;
+    }
+    .telemetry-pill .pill-k {
+      font-size: 10px;
+      white-space: nowrap;
+      line-height: 1.2;
+    }
+    .telemetry-pill .val {
+      flex: 1 0 100%;
+      min-width: 0;
+      font-size: 12px;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Pods row under the card: master volume (horizontal) + square Eno CRT.
+       syncEnoPodSquare() writes an inline width from offsetHeight; the fixed
+       height + !important width below make that a no-op on phones. */
+    .master-vol-pod {
+      flex: 1 1 0;
+      min-width: 0;
+      width: auto;
+      height: 88px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      grid-template-rows: 32px 28px;
+      grid-template-areas: "title val mute" "slider slider slider";
+      align-items: center;
+      align-content: center;
+      gap: 6px 10px;
+      padding: 0 12px;
+    }
+    .master-vol-title {
+      grid-area: title;
+      font-size: 10px;
+    }
+    .master-vol-val {
+      grid-area: val;
+      font-size: 12px;
+    }
+    .master-vol-mute {
+      grid-area: mute;
+      width: 32px;
+      height: 32px;
+      font-size: 11px;
+    }
+    .master-vol-slider-wrap {
+      grid-area: slider;
+      width: 100%;
+      height: 28px;
+    }
+    .master-vol-slider-wrap input[type="range"] {
+      width: 100%;
+      height: 28px;
+      transform: none;
+    }
+    .master-vol-slider-wrap input[type="range"]::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 3px;
+    }
+    .master-vol-slider-wrap input[type="range"]::-webkit-slider-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      margin-top: -9px;
+    }
+    .master-vol-slider-wrap input[type="range"]::-moz-range-track { height: 6px; border-radius: 3px; }
+    .master-vol-slider-wrap input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 5px; }
+
+    .eno-standalone-pod {
+      position: relative;
+      flex: 0 0 88px;
+      width: 88px !important;
+      height: 88px;
+      aspect-ratio: auto;
+      padding: 5px;
+      gap: 0;
+    }
+    .eno-standalone-pod .eno-crt-screen {
+      flex: 1 1 auto;
+      width: 100%;
+      height: 100%;
+      border-radius: 4px;
+    }
+    .eno-standalone-pod .eno-bio-scan-label { display: none; }
+    /* "ENO · Y" becomes an on-screen caption on a dark band inside the CRT,
+       so the screen itself stays square (the canvas is drawn square). */
+    .eno-standalone-pod .eno-crt-meta {
+      position: absolute;
+      left: 7px;
+      right: 7px;
+      bottom: 7px;
+      width: auto;
+      z-index: 5;
+      padding: 10px 0 4px;
+      border-radius: 0 0 3px 3px;
+      background: linear-gradient(rgba(2, 4, 2, 0), rgba(2, 4, 2, 0.88) 55%);
+      pointer-events: none;
+    }
+    .eno-standalone-pod .eno-sub {
+      font-size: 10px;
+      line-height: 1;
+      letter-spacing: 0.4px;
+      text-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
+    }
+
+    /* Mini transport bar (built by JS on phones only): slides up from the bottom
+       once the header's Start button has scrolled out of view. */
+    .mini-transport {
+      position: fixed;
+      left: max(10px, env(safe-area-inset-left));
+      right: max(10px, env(safe-area-inset-right));
+      bottom: calc(8px + env(safe-area-inset-bottom));
+      z-index: 8000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 56px;
+      padding: 0 7px;
+      background: rgba(13, 15, 23, 0.94);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--eno-glow-border, rgba(var(--rgb-chord), 0.65));
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), var(--eno-glow-shadow, 0 0 16px rgba(var(--rgb-chord), 0.25));
+      transform: translateY(calc(100% + 16px + env(safe-area-inset-bottom)));
+      opacity: 0;
+      visibility: hidden;
+      transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease, visibility 0s linear 0.24s;
+    }
+    .mini-transport.is-visible {
+      transform: none;
+      opacity: 1;
+      visibility: visible;
+      transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease, visibility 0s;
+    }
+    .mini-transport .btn-main-play,
+    .mini-transport .btn-record {
+      flex: 1 1 0;
+      min-width: 0;
+      height: 40px;
+      padding: 0 8px;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .mini-transport .mt-bpm {
+      flex: 0 0 auto;
+      min-width: 64px;
+      height: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 0 8px;
+      background: #080a11;
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6);
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      line-height: 1;
+    }
+    .mini-transport .mt-bpm-k {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+    }
+    .mini-transport .mt-bpm-v {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 6px rgba(var(--rgb-chord), 0.3);
+    }
+    body.mini-transport-on {
+      padding-bottom: calc(16px + 64px + env(safe-area-inset-bottom));
+    }
+
+    /* ---- Orbital deck header (phone) ----
+       One card, stacked: view switcher, FLOAT SPEED / ORB SIZE rows (orbital
+       view only -- setModuleView() toggles their inline display), then
+       RE-SEED / PANIC. Telemetry chips stay hidden (max-width:1200px rule). */
+    .orbital-deck-header {
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 10px;
+      margin-bottom: 0;
+      padding: 12px;
+      border-radius: 8px;
+    }
+    .orbital-bar-center { display: none; }
+
+    /* Full-width 2-segment view switcher */
+    .orbital-deck-header .view-switcher-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 3px;
+      border-radius: 6px;
+    }
+    .orbital-deck-header .btn-view-mode {
+      min-width: 0;
+      height: 40px;
+      padding: 0 8px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* FLOAT SPEED / ORB SIZE: two full-width boxed slider rows, same shape as
+       the header's TEMPO row (40px box, 22px thumb, 6px track). */
+    #orbitalFloatControls {
+      flex: none;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 8px;
+      min-width: 0;
+    }
+    #orbitalFloatControls .orbital-slider-ctrl {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 40px;
+      box-sizing: border-box;
+      padding: 0 10px;
+      gap: 10px;
+    }
+    #orbitalFloatControls .orbital-slider-ctrl .tag {
+      flex: 0 0 84px;
+      font-size: 10px;
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+    #orbitalFloatControls .orbital-slider-ctrl input[type="range"] {
+      flex: 1 1 auto;
+      width: auto;
+      min-width: 0;
+      height: 32px;
+      touch-action: pan-y;
+    }
+    #orbitalFloatControls .orbital-slider-ctrl input[type="range"]::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 3px;
+    }
+    #orbitalFloatControls .orbital-slider-ctrl input[type="range"]::-webkit-slider-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      margin-top: -9px;
+    }
+    #orbitalFloatControls .orbital-slider-ctrl input[type="range"]::-moz-range-track { height: 6px; border-radius: 3px; }
+    #orbitalFloatControls .orbital-slider-ctrl input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 5px; }
+    #orbitalFloatControls .orbital-slider-ctrl .tempo-val {
+      flex: 0 0 44px;
+      min-width: 0;
+      font-size: 12px;
+      text-align: right;
+    }
+
+    /* No hover on touch screens: a tapped button must not stay "hovered". */
+    .orbital-deck-header .btn-view-mode:not(.active):hover { color: var(--text-tertiary); }
+    .orbital-bar-actions .btn-telemetry-action:hover {
+      color: var(--text-secondary);
+      border-color: var(--border-light);
+      background: #0b0d14;
+    }
+    /* ...but they do light up while pressed. */
+    .orbital-deck-header .btn-view-mode:not(.active):active { color: #ffffff; }
+    .orbital-bar-actions .btn-telemetry-action:active {
+      color: #ffffff;
+      border-color: var(--border-bright);
+      background: #141724;
+    }
+
+    /* RE-SEED / PANIC: one equal-width row */
+    .orbital-bar-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      width: 100%;
+    }
+    .orbital-bar-actions .btn-telemetry-action {
+      height: 40px;
+      min-width: 0;
+      padding: 0 8px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      border-radius: 4px;
+    }
+
+    /* ---- Orbital arena (phone) ----
+       Taller than wide so the 9 orbs have room in a ~370px column. svh, not
+       dvh: the canvas re-allocates (and re-seeds its starfield) on every size
+       change, so the height must not track iOS's collapsing toolbar. */
+    .orbital-arena-wrapper {
+      height: max(420px, min(125vw, 70vh));
+      height: max(420px, min(125vw, 70svh));
+      min-height: 0;
+    }
+    /* Vertical swipes on the canvas still scroll the page; taps open orbs and
+       horizontal drags move them (pointer events keep flowing for those). */
+    .orbital-arena-wrapper canvas#orbitalCanvas {
+      touch-action: pan-y;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+    /* Desktop hint says "Click ..." -- swap in a short touch hint. */
+    .orbital-hint {
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      text-align: center;
+      font-size: 0;
+      letter-spacing: 0;
+    }
+    .orbital-hint::after {
+      content: "Tap an orb to open its controls";
+      font-size: 10px;
+      letter-spacing: 1px;
+    }
+
+    /* ---- Orb controls: bottom sheet (phone) ----
+       #orbitalSidePanel stays in the arena's DOM but is fixed to the viewport
+       bottom. Its header stays put; only the body scrolls. Not-active state is
+       pushed below the screen and hidden. Active state uses transform:none (not
+       translateY(0)) so the sheet never becomes the containing block of
+       position:fixed descendants such as dropdown menus. */
+    .orbital-side-panel {
+      position: fixed;
+      top: auto;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: auto;
+      max-width: none;
+      max-height: 72vh;
+      max-height: 72dvh;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      padding: 0;
+      overflow: hidden;
+      z-index: 8500;
+      border-right: 0;
+      border-top: 2px solid var(--modal-accent-color, var(--color-drone));
+      border-radius: 16px 16px 0 0;
+      background:
+        linear-gradient(180deg, rgba(var(--modal-accent-rgb, var(--rgb-drone)), 0.11) 0%, rgba(var(--modal-accent-rgb, var(--rgb-drone)), 0.03) 110px, rgba(var(--modal-accent-rgb, var(--rgb-drone)), 0) 220px),
+        #080a12;
+      box-shadow:
+        0 -10px 34px var(--modal-accent-glow, rgba(var(--rgb-drone), 0.35)),
+        0 -2px 0 rgba(var(--modal-accent-rgb, var(--rgb-drone)), 0.18),
+        0 -30px 60px rgba(0, 0, 0, 0.7);
+      transform: translateY(calc(100% + 24px));
+      visibility: hidden;
+      transition: transform 0.26s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.26s;
+    }
+    .orbital-side-panel.active {
+      transform: none;
+      visibility: visible;
+      transition: transform 0.26s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s;
+    }
+    /* While the finger drags the sheet down (orbital.js), follow it 1:1. */
+    .orbital-side-panel.sheet-dragging { transition: none; }
+
+    /* Sheet header: grab handle, then [title ... close], then the module's
+       own action buttons (PWR / M / S / randomize, or a pedal's slot badge,
+       shift arrows and bypass) as a full-width row. */
+    .orbital-side-panel .orbital-modal-header {
+      flex: none;
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: 10px 8px;
+      margin: 0;
+      padding: 20px 12px 12px;
+      touch-action: none;
+    }
+    .orbital-side-panel .orbital-modal-header::before {
+      content: "";
+      position: absolute;
+      top: 7px;
+      left: 50%;
+      width: 40px;
+      height: 4px;
+      margin-left: -20px;
+      border-radius: 2px;
+      background: rgba(var(--modal-accent-rgb, var(--rgb-drone)), 0.45);
+    }
+    .orbital-side-panel .orbital-modal-header-right { display: contents; }
+    .orbital-side-panel .orbital-modal-title {
+      grid-column: 1;
+      grid-row: 1;
+      min-width: 0;
+      font-size: 14px;
+      line-height: 1.25;
+      letter-spacing: 1.2px;
+    }
+    .orbital-side-panel .orbital-modal-close {
+      grid-column: 3;
+      grid-row: 1;
+      width: 40px;
+      height: 40px;
+      font-size: 15px;
+      border-radius: 6px;
+    }
+    .orbital-side-panel .orbital-modal-actions-slot {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .orbital-side-panel .orbital-modal-actions-slot:empty { display: none; }
+    .orbital-side-panel .orbital-modal-actions-slot .panel-header-actions {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .orbital-side-panel .orbital-modal-actions-slot .btn-power,
+    .orbital-side-panel .orbital-modal-actions-slot .btn-mute,
+    .orbital-side-panel .orbital-modal-actions-slot .btn-solo,
+    .orbital-side-panel .orbital-modal-actions-slot .badge-tag,
+    .orbital-side-panel .orbital-modal-actions-slot .btn-drum-fill,
+    .orbital-side-panel .orbital-modal-actions-slot .btn-pedal-shift {
+      flex: 1 1 0;
+      width: auto;
+      min-width: 0;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      padding: 0 6px;
+      margin: 0;
+      font-size: 11px;
+      border-radius: 5px;
+    }
+    /* A pedal's slot badge (IN / INSERT / OUT) is a label, not a button. */
+    .orbital-side-panel .orbital-modal-actions-slot .pedal-slot-badge {
+      flex: 0 0 auto;
+      height: 36px;
+      padding: 0 4px 0 0;
+      font-size: 10px;
+      letter-spacing: 1px;
+      background: transparent;
+      border-color: transparent;
+      color: var(--text-secondary);
+    }
+    /* Master EQ has only a randomize button: it sits on the title row, left of
+       the close button, instead of taking a row of its own. */
+    .orbital-side-panel .orbital-modal-actions-slot:has(> .badge-tag:only-child) {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .orbital-side-panel .orbital-modal-actions-slot > .badge-tag { flex: 0 0 40px; height: 40px; }
+    .orbital-side-panel .orbital-modal-actions-slot svg { width: 15px; height: 15px; }
+    /* Engaged power/bypass takes the open module's color (its own .x-ch color
+       rule no longer reaches it once the button moves up into this header). */
+    .orbital-side-panel .orbital-modal-actions-slot .btn-power.active {
+      background: rgba(var(--modal-accent-rgb, var(--rgb-drone)), 0.18);
+      border-color: var(--modal-accent-color, var(--color-drone));
+      color: var(--modal-accent-color, var(--color-drone));
+      box-shadow: 0 0 8px rgba(var(--modal-accent-rgb, var(--rgb-drone)), 0.45);
+    }
+    /* Pedal reordering by drag doesn't apply inside the sheet; the < > shift
+       buttons still reorder. */
+    .orbital-side-panel .orbital-modal-actions-slot .pedal-drag-handle { display: none; }
+
+    /* Sheet body: the only scrolling part. Safe-area padding at the bottom. */
+    .orbital-side-panel .orbital-modal-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      gap: 12px;
+      padding: 14px 12px calc(20px + env(safe-area-inset-bottom));
+      border-top: 1px solid rgba(var(--modal-accent-rgb, var(--rgb-drone)), 0.3);
+    }
+
+    /* The module card inside the sheet: flatten it (the sheet is the card). */
+    #orbitalSidePanel .strip-channel,
+    #orbitalSidePanel .pedal-chassis {
+      padding: 0;
+      gap: 16px;
+      background: transparent;
+      border: 0 !important;
+      border-radius: 0;
+      box-shadow: none !important;
+    }
+    #orbitalSidePanel .pedal-controls-body { gap: 16px; }
+    /* Bypassed pedal: dim only. filter would make the pedal the containing
+       block of any position:fixed dropdown menu inside it. */
+    #orbitalSidePanel .pedal-chassis.bypassed { filter: none; opacity: 0.6; }
+
+    /* Controls inside the sheet: readable labels, grabbable sliders, tappable
+       dropdowns, toggles and AUX buttons. */
+    #orbitalSidePanel .control-row { gap: 4px; }
+    /* Label left, value right; a long label pushes the value onto its own line
+       instead of squeezing it. */
+    #orbitalSidePanel .control-label {
+      flex-wrap: wrap;
+      align-items: center;
+      column-gap: 10px;
+      row-gap: 2px;
+      min-height: 18px;
+      font-size: 12px;
+      line-height: 1.3;
+    }
+    #orbitalSidePanel .control-label > :last-child:not(:first-child) { margin-left: auto; }
+    #orbitalSidePanel .pedal-controls-body .control-label { font-size: 11px; }
+    #orbitalSidePanel .control-val { font-size: 12px; white-space: nowrap; }
+    #orbitalSidePanel .control-sublabel { font-size: 10px; margin-bottom: 0; }
+    #orbitalSidePanel input[type="range"] {
+      height: 30px;
+      touch-action: pan-y;
+    }
+    #orbitalSidePanel input[type="range"]::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 3px;
+    }
+    #orbitalSidePanel input[type="range"]::-webkit-slider-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      margin-top: -9px;
+    }
+    #orbitalSidePanel input[type="range"]::-moz-range-track { height: 6px; border-radius: 3px; }
+    #orbitalSidePanel input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 5px; }
+    /* Paired sliders (Attack/Decay, Mix/Tone ...): wider gutter so the 22px
+       thumbs never touch. Master 3-band EQ: one row per band (label, slider)
+       instead of three ~100px sliders -- same layout as the console rack. */
+    #orbitalSidePanel .control-row > div[style*="flex"] { gap: 16px !important; }
+    #orbitalSidePanel #masterEqOutStrip .control-row > div[style*="flex"] {
+      flex-direction: column;
+      gap: 4px !important;
+    }
+    #orbitalSidePanel #masterEqOutStrip .control-row > div[style*="flex"] > div {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      align-items: center;
+      column-gap: 10px;
+    }
+    #orbitalSidePanel .custom-dropdown-trigger {
+      height: 40px;
+      padding: 0 12px;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+    #orbitalSidePanel .select-with-toggle { gap: 10px; }
+    #orbitalSidePanel .toggle-switch { width: 52px; height: 32px; }
+    #orbitalSidePanel .toggle-switch .toggle-track { border-radius: 5px; }
+    #orbitalSidePanel .toggle-switch .toggle-track::before {
+      width: 24px;
+      height: 24px;
+      left: 3px;
+      top: 3px;
+      border-radius: 3px;
+    }
+    #orbitalSidePanel .toggle-switch input:checked + .toggle-track::before { transform: translateX(20px); }
+    #orbitalSidePanel .btn-aux-toggle {
+      height: 32px;
+      padding: 0 10px;
+      margin-left: 8px;
+      font-size: 10px;
+      border-radius: 4px;
+    }
+
+    /* ---- Console rack (phone) ----
+       Scope: the module strips in .lower-deck (1-5), the pedal chain and
+       Master EQ in #pedalsContainer (6-9). Every rule is scoped to those
+       containers so the same strips stay untouched while borrowed into the
+       orbital side panel. */
+    .lower-deck { gap: 12px; }
+    #pedalsContainer { margin-top: 0 !important; gap: 12px; }
+    #masterDeckUnified { grid-template-columns: 1fr; gap: 12px; }
+
+    /* Strip / pedal cards */
+    .lower-deck > .strip-channel,
+    #masterDeckUnified > .pedal-chassis,
+    #masterDeckUnified > .strip-channel {
+      padding: 12px;
+      gap: 12px;
+    }
+    #masterDeckUnified .pedal-controls-body { gap: 12px; }
+
+    /* Card header: title left (wraps to 2 lines rather than squeezing the
+       buttons), 32px action buttons right */
+    .lower-deck .panel-header,
+    #masterDeckUnified .panel-header {
+      gap: 10px;
+      min-height: 32px;
+      margin-bottom: 0;
+      padding-bottom: 10px;
+    }
+    .lower-deck .panel-header > span:first-child,
+    #masterDeckUnified .panel-header > span:first-child {
+      flex: 1 1 auto;
+      min-width: 0;
+      height: auto;
+      font-size: 13px;
+      letter-spacing: 0.6px;
+      line-height: 1.25;
+      white-space: normal;
+      text-wrap: balance;
+    }
+    .lower-deck .panel-header-actions,
+    #masterDeckUnified .panel-header-actions {
+      flex: 0 0 auto;
+      gap: 5px;
+    }
+    .lower-deck .panel-header .btn-power,
+    .lower-deck .panel-header .btn-mute,
+    .lower-deck .panel-header .btn-solo,
+    .lower-deck .panel-header button.badge-tag,
+    #masterDeckUnified .panel-header .btn-power,
+    #masterDeckUnified .panel-header button.badge-tag,
+    #masterDeckUnified .btn-pedal-shift {
+      width: 32px;
+      height: 32px;
+      flex: 0 0 auto;
+    }
+    .lower-deck .panel-header .btn-power { font-size: 9.5px; }
+    .lower-deck .panel-header .btn-mute,
+    .lower-deck .panel-header .btn-solo { font-size: 12px; }
+    .lower-deck .panel-header button.badge-tag svg,
+    #masterDeckUnified .panel-header button.badge-tag svg { width: 16px; height: 16px; }
+    .lower-deck .btn-drum-fill {
+      height: 32px;
+      padding: 0 10px;
+      font-size: 10px;
+    }
+
+    /* Pedal header: slot badge + up/down shift + bypass. The chain stacks
+       vertically here, so the left/right shift chevrons turn into up/down.
+       The drag handle is a desktop pointer affordance -- hidden. */
+    #masterDeckUnified .pedal-slot-badge {
+      height: 32px;
+      padding: 0 8px;
+      font-size: 10px;
+      line-height: 1;
+    }
+    #masterDeckUnified .pedal-drag-handle { display: none; }
+    #masterDeckUnified .btn-pedal-shift svg {
+      width: 14px;
+      height: 14px;
+      transform: rotate(90deg);
+    }
+    #masterDeckUnified .panel-header .btn-power svg { width: 16px; height: 16px; }
+
+    /* Control rows: label left, value right (value drops under a long label
+       instead of squeezing it), control full width below */
+    .lower-deck .control-row,
+    #masterDeckUnified .control-row { gap: 2px; }
+    .lower-deck .control-label,
+    #masterDeckUnified .control-label,
+    #masterDeckUnified .pedal-controls-body .control-label {
+      flex-wrap: wrap;
+      align-items: center;
+      column-gap: 10px;
+      row-gap: 2px;
+      min-height: 20px;
+      font-size: 12px;
+      line-height: 1.3;
+    }
+    #masterDeckUnified .pedal-controls-body .control-label { font-size: 11px; }
+    .lower-deck .control-label > :last-child,
+    #masterDeckUnified .control-label > :last-child { margin-left: auto; }
+    .lower-deck .control-val,
+    #masterDeckUnified .control-val,
+    #masterDeckUnified .pedal-controls-body .control-val {
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    #masterDeckUnified .control-sublabel,
+    #masterDeckUnified .pedal-controls-body .control-sublabel {
+      font-size: 10px;
+      margin-bottom: 0;
+    }
+    .lower-deck .strip-channel > .control-row:last-child,
+    #masterDeckUnified .strip-channel > .control-row:last-child { padding-top: 12px; }
+
+    /* AUX send toggle next to the FX value */
+    .lower-deck .btn-aux-toggle {
+      position: relative;
+      height: 26px;
+      padding: 0 9px;
+      margin-left: 8px;
+      font-size: 10px;
+    }
+
+    /* Sliders: 28px hit area, 6px track, 22px thumb */
+    .lower-deck input[type="range"],
+    #masterDeckUnified input[type="range"] { height: 26px; }
+    .lower-deck input[type="range"]::-webkit-slider-runnable-track,
+    #masterDeckUnified input[type="range"]::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 3px;
+    }
+    .lower-deck input[type="range"]::-moz-range-track,
+    #masterDeckUnified input[type="range"]::-moz-range-track {
+      height: 6px;
+      border-radius: 3px;
+    }
+    .lower-deck input[type="range"]::-webkit-slider-thumb,
+    #masterDeckUnified input[type="range"]::-webkit-slider-thumb {
+      width: 22px;
+      height: 22px;
+      margin-top: -8px;
+      border-radius: 5px;
+      border-width: 2px;
+    }
+    .lower-deck input[type="range"]::-moz-range-thumb,
+    #masterDeckUnified input[type="range"]::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      border-width: 2px;
+    }
+
+    /* Paired sliders (Attack/Decay, Mix/Tone ...) keep two columns, with a
+       wider gutter so the 22px thumbs never touch */
+    #masterDeckUnified .control-row > div[style*="flex"] { gap: 16px !important; }
+    /* Master 3-band EQ: three 100px sliders are too coarse -- one row per
+       band, label left, slider right */
+    #masterEqOutStrip .control-row > div[style*="flex"] {
+      flex-direction: column;
+      gap: 4px !important;
+    }
+    #masterEqOutStrip .control-row > div[style*="flex"] > div {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      align-items: center;
+      column-gap: 10px;
+    }
+
+    /* Dropdown triggers + auto-evolve toggles inside the cards */
+    .lower-deck .custom-dropdown-trigger,
+    #masterDeckUnified .custom-dropdown-trigger {
+      height: 36px;
+      padding: 0 12px;
+      font-size: 12.5px;
+      border-radius: 3px;
+    }
+    .lower-deck .custom-dropdown-trigger svg,
+    #masterDeckUnified .custom-dropdown-trigger svg { width: 11px; height: 8px; }
+    .lower-deck .select-with-toggle,
+    #masterDeckUnified .select-with-toggle { gap: 10px; }
+    #masterDeckUnified .select-with-toggle[style*="margin-bottom"] { margin-bottom: 2px !important; }
+    .lower-deck .toggle-switch,
+    #masterDeckUnified .toggle-switch {
+      width: 48px;
+      height: 28px;
+    }
+    .lower-deck .toggle-switch .toggle-track::before,
+    #masterDeckUnified .toggle-switch .toggle-track::before {
+      width: 20px;
+      height: 20px;
+      left: 3px;
+      top: 3px;
+      border-radius: 3px;
+    }
+    .lower-deck .toggle-switch input:checked + .toggle-track::before,
+    #masterDeckUnified .toggle-switch input:checked + .toggle-track::before {
+      transform: translateX(20px);
+    }
+    /* Invisible hit-area extension: toggles and AUX read compact but take a
+       34px+ tall tap */
+    .lower-deck .toggle-switch::after,
+    #masterDeckUnified .toggle-switch::after,
+    .lower-deck .btn-aux-toggle::after {
+      content: "";
+      position: absolute;
+      inset: -4px -3px;
+    }
+    /* Tanpura on/off sits in the label row */
+    .lower-deck .control-label > .toggle-switch { margin-left: auto; }
+
+    /* ---- Pedal chain header (DSP insert chain) ---- */
+    #pedalsContainer .pedals-routing-header {
+      flex-direction: column;
+      flex-wrap: nowrap;
+      align-items: stretch;
+      gap: 10px;
+      padding: 12px;
+    }
+    #pedalsContainer .pedals-header-left { min-width: 0; }
+    #pedalsContainer .pedals-deck-title {
+      font-size: 12px;
+      letter-spacing: 0.8px;
+      line-height: 1.35;
+      text-wrap: balance;
+    }
+    /* "Drag & drop pedals..." -- desktop hint, and the drag handle is hidden */
+    #pedalsContainer .pedals-deck-sub { display: none; }
+    /* Routing stream: one row that always fits -- the two end badges wrap to
+       two short lines, the three pills share the remaining width */
+    #pedalsContainer .pedals-routing-stream {
+      display: grid;
+      grid-template-columns: auto auto 1fr auto 1fr auto 1fr auto auto;
+      align-items: center;
+      gap: 2px;
+      min-width: 0;
+      padding: 8px 6px;
+    }
+    #pedalsContainer .routing-node-badge {
+      width: min-content;
+      font-size: 10px;
+      letter-spacing: 0.3px;
+      line-height: 1.25;
+      text-align: center;
+    }
+    #pedalsContainer .routing-node-badge:last-child {
+      width: auto;
+      max-width: calc(8ch + 3px); /* MASTER / EQ & OUT */
+    }
+    #pedalsContainer .routing-arrow { font-size: 10px; text-align: center; }
+    #pedalsContainer .routing-pill {
+      min-width: 0;
+      padding: 5px 2px;
+      font-size: 10px;
+      letter-spacing: 0;
+      line-height: 1.2;
+      text-align: center;
+    }
+    #pedalsContainer .pedals-header-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    #pedalsContainer .btn-pedal-action {
+      height: 36px;
+      padding: 0 8px;
+      font-size: 10.5px;
+    }
+
+    /* ---- Footer: two centred lines ---- */
+    footer.app-footer {
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 2px 0 0;
+      font-size: 10px;
+      line-height: 1.5;
+      text-align: center;
+    }
+    footer.app-footer > span {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ---- Custom dropdown menus (initSmartDropdowns) ----
+       Width/edges are clamped here; console.js picks the side (up/down) with
+       room, caps the height to that room and nudges the menu inside the
+       viewport. */
+    .custom-dropdown-menu {
+      min-width: max(100%, 168px);
+      max-width: calc(100vw - 20px);
+      max-height: 60vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      padding: 3px;
+      border-radius: 4px;
+    }
+    .custom-dropdown-item {
+      min-height: 40px;
+      padding: 6px 10px;
+      flex-wrap: wrap;
+      column-gap: 12px;
+      row-gap: 0;
+      font-size: 12.5px;
+      line-height: 1.3;
+      white-space: normal;
+      border-radius: 2px;
+    }
+    .custom-dropdown-item .item-main { min-width: 0; }
+    .custom-dropdown-item .item-check { width: 12px; font-size: 10px; }
+    .custom-dropdown-item .item-sub {
+      margin-left: auto;
+      font-size: 10.5px;
+      text-align: right;
+    }
+
+    /* ---- Palette popover: full-width card under the header utils row ---- */
+    .header-utils { position: relative; }
+    .header-utils > .palette-wrap { position: static; }
+    #paletteMenu {
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      width: auto;
+      max-height: calc(100dvh - 24px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 8px;
+    }
+    #paletteMenu .pal-head {
+      padding: 4px 8px 8px;
+      font-size: 10.5px;
+    }
+    #paletteMenu .pal-row {
+      min-height: 44px;
+      gap: 10px;
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+    #paletteMenu .pal-num { width: 16px; }
+    #paletteMenu .pal-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #paletteMenu .pal-hint { font-size: 10.5px; }
+    #paletteMenu .pal-swatches { gap: 3px; flex: 0 0 auto; }
+    #paletteMenu .pal-swatches i { width: 13px; height: 13px; border-radius: 3px; }
+
+    /* ---- Shortcuts overlay ---- */
+    .shortcuts-overlay {
+      padding: max(12px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    }
+    .shortcuts-panel {
+      width: 100%;
+      max-width: 460px;
+      max-height: 100%;
+      padding: 0 14px 14px;
+      overscroll-behavior: contain;
+    }
+    .shortcuts-panel h3 {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      margin: 0 0 2px;
+      padding: 8px 0;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .shortcuts-close {
+      width: 40px;
+      height: 40px;
+      margin-right: -10px;
+      font-size: 18px;
+    }
+    .shortcuts-panel h4 { margin: 14px 0 6px; font-size: 10.5px; }
+    .shortcuts-panel .sc-row {
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 12px;
+      padding: 7px 0;
+      font-size: 12px;
+    }
+    .shortcuts-panel .sc-row > span:last-child {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 4px;
+      margin-left: auto;
+    }
+    .shortcuts-panel kbd {
+      min-width: 22px;
+      margin-left: 0;
+      padding: 2px 6px;
+      font-size: 11px;
+    }
+
+    /* [review-visual] F1: a card raised for its open dropdown must stay under the mini bar */
+    .lower-deck .strip-channel:has(.custom-dropdown-menu.open),
+    #masterDeckUnified .strip-channel:has(.custom-dropdown-menu.open),
+    #pedalsContainer .pedal-chassis:has(.custom-dropdown-menu.open) { z-index: 7999 !important; }
+    /* F4: palette names fit at 360 */
+    @media (max-width: 374px) {
+      #paletteMenu .pal-row { gap: 8px; }
+      #paletteMenu .pal-swatches { gap: 2px; }
+      #paletteMenu .pal-swatches i { width: 11px; height: 11px; }
+    }
+    /* F5 */
+    .lower-deck .panel-header .btn-power { font-size: 10px; }
+    /* F6: triggers use the app mono like their menus */
+    .custom-dropdown-trigger { font-family: inherit; }
+    /* F7: hint stays legible when an orb drifts under it */
+    .orbital-hint::after { display: inline-block; padding: 3px 10px; border-radius: 999px; background: rgba(7, 8, 12, 0.78); }
+    /* F9 */
+    #masterDeckUnified #lblEqSummary { color: var(--color-space); }
+    /* [review-visual] Console Rack toggles and AUX match the orb sheet's sizes */
+    .lower-deck .btn-aux-toggle { height: 32px; padding: 0 10px; border-radius: 4px; }
+    .lower-deck .toggle-switch, #masterDeckUnified .toggle-switch { width: 52px; height: 32px; }
+    .lower-deck .toggle-switch .toggle-track::before, #masterDeckUnified .toggle-switch .toggle-track::before { width: 24px; height: 24px; }
+    /* The ? panel lists keyboard shortcuts only; hide it on touch phones */
+    @media (hover: none) and (pointer: coarse) { .header-utils #btnShortcuts { display: none; } }
+    /* Brand stays one word on wider phone-layout screens (small tablets, 600-640px) */
+    .brand-group { max-width: 400px; }
+    /* Phones in landscape that still get this layout (640x360, 568x320): fit the
+       arena and the orb sheet to the short screen */
+    @media (orientation: landscape) and (max-height: 480px) {
+      .orbital-arena-wrapper { height: calc(100vh - 84px); height: calc(100svh - 84px); }
+      .orbital-side-panel { max-height: calc(100vh - 12px); max-height: calc(100dvh - 12px); }
+    }
+
+    /* ---- Upper deck: Visualizer, Chord Analysis, Keyboard (phone) ---- */
+
+    /* Deck: one full-width column; cards size to their content. */
+    .upper-deck { flex-direction: column; gap: 12px; }
+    .upper-deck-card { min-height: 0; -webkit-user-drag: none; }
+    .scope-panel, .chord-info-panel, .keyboard-panel {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0;
+      flex: 0 0 auto !important;
+      padding: 12px;
+      gap: 10px;
+    }
+    /* Drag-to-reorder handles: HTML5 drag-and-drop has no touch path. */
+    .upper-drag-handle { display: none; }
+    .upper-deck .panel-title-text { font-size: 13px; letter-spacing: 1px; height: 20px; }
+
+    /* ---- Visualizer header: title + legend, then a full-width layer bar ---- */
+    .scope-panel > .panel-header {
+      height: auto;
+      min-height: 0;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      column-gap: 10px;
+      row-gap: 10px;
+      padding-bottom: 10px;
+    }
+    .scope-panel .scope-legend { display: contents; }
+    .scope-panel .legend-item { font-size: 10px; gap: 5px; letter-spacing: 0.4px; }
+    .scope-panel .legend-item:first-of-type { margin-left: auto; }
+    .scope-panel .scope-layer-toggles {
+      flex: 1 0 100%;
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      border-left: 0;
+    }
+    .scope-panel .btn-layer-toggle { width: auto; height: 36px; border-radius: 4px; }
+    .scope-panel .btn-layer-toggle svg { width: 22px; height: 18px; }
+    .scope-panel .btn-layer-toggle.layer-fullscreen svg { width: 18px; height: 16px; }
+
+    /* Canvas: phone-proportioned. pan-y keeps page scrolling over the canvas;
+       while Slambient Invaders runs (#btnToggleArcade gets .active), touches
+       go to the game instead, and the playfield gets more height. */
+    .scope-left-viz { height: max(220px, 62vw); min-height: 220px; }
+    .scope-left-viz canvas { touch-action: pan-y; -webkit-touch-callout: none; }
+    #scopePanel:has(#btnToggleArcade.active) #scopeCanvas { touch-action: none; }
+    #scopePanel:not(.is-fullscreen):has(#btnToggleArcade.active) .scope-left-viz { height: max(300px, 80vw); }
+
+    /* Visualizer fullscreen: fill the dynamic viewport inside the safe areas. */
+    .scope-panel.is-fullscreen {
+      height: 100vh;
+      height: 100dvh;
+      width: 100%;
+      max-width: 100% !important;
+      padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    }
+    .scope-panel.is-fullscreen .scope-left-viz { flex: 1 1 auto; height: auto; min-height: 0; }
+    html:has(body.scope-fullscreen-open) { overflow: hidden; }
+
+    /* ---- Chord Analysis: wheel card and readouts at full width ---- */
+    .chord-wheel-card { padding: 10px 10px 8px; gap: 8px; }
+    .chord-wheel-header { padding: 0 2px 8px; gap: 10px; }
+    .chord-wheel-root { font-size: 18px; }
+    .chord-wheel-voicing { font-size: 16px; text-align: right; min-width: 0; overflow-wrap: anywhere; }
+    .chord-meta-block { padding: 10px 12px; gap: 6px; }
+    .telem-row { font-size: 11px; gap: 12px; }
+    .telem-k { font-size: 11px; }
+    .telem-v { font-size: 12px; }
+    .activity-meter-row { gap: 8px; margin-top: 6px; }
+    .act-track-wrap { gap: 4px; }
+    .act-tag { font-size: 10px; }
+    .act-bar-bg { height: 5px; }
+
+    /* ---- Keyboard ---- */
+    /* Header row: title, AUTO/LIVE badge, OCT -/+. The "Keys A-K" hint and the
+       octave range are desktop helpers (the keys are labelled themselves). */
+    .keyboard-panel > .keyboard-meta { height: auto; min-height: 34px; gap: 8px; padding-bottom: 8px; }
+    .keyboard-hint { display: none; }
+    .keyboard-panel-header { height: auto; min-width: 0; overflow: hidden; }
+    .keyboard-meta-controls { gap: 6px; }
+    .keyboard-panel .takeover-badge { font-size: 10px; height: 28px; padding: 0 8px; display: inline-flex; align-items: center; }
+    .oct-controls { gap: 6px; }
+    .btn-oct { height: 32px; padding: 0 9px; font-size: 11px; border-radius: 4px; }
+    /* The full "Playable MIDI Keyboard" title only fits beside the controls on
+       the widest phones; narrower ones show "MIDI Keyboard". */
+    @media (max-width: 419px) {
+      .keyboard-panel .panel-title-text { font-size: 0; letter-spacing: 0; }
+      .keyboard-panel .panel-title-text::before { content: "MIDI Keyboard"; font-size: 13px; letter-spacing: 1px; }
+    }
+
+    /* TARGET / LEDS: the desktop's vertical column becomes one compact row. */
+    .keyboard-stage { flex-direction: column; gap: 8px; min-height: 0; }
+    .vert-routing-control {
+      width: 100%;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 8px;
+    }
+    .vert-ctrl-label { font-size: 10px; margin-top: 0 !important; }
+    .vert-toggle-rack { flex-direction: row; flex: 1 1 0; width: auto; min-width: 0; gap: 4px; padding: 3px; }
+    .vert-toggle-rack + .vert-ctrl-label { margin-left: 4px; }
+    .vert-mode-btn { height: 32px; min-width: 0; }
+
+    /* Keys: full width, no page scroll or callouts while playing. */
+    .piano-keys-wrapper {
+      flex: 0 0 auto;
+      height: clamp(150px, 44vw, 190px);
+      min-height: 0;
+      touch-action: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+    }
+    .white-key { padding-bottom: 7px; min-width: 0; }
+    .black-key { width: 5.6%; padding-bottom: 5px; }
+    .black-keys-layer { height: 60%; }
+    .key-shortcut { display: none; }
+    .key-label { font-size: 10px; letter-spacing: 0; }
+    .black-key-label { font-size: 10px; letter-spacing: 0; }
+    .white-key::after { width: 10px; }
+    /* No hover on touch: keep tapped keys from staying lit (sticky :hover). */
+    .white-key:hover { background: linear-gradient(180deg, #181a24 0%, #0f1016 100%); border-color: #242938; }
+    .black-key:hover { background: linear-gradient(180deg, #0b0c10 0%, #040507 100%); border-color: #1a1c26; }
+
+    /* ---- Very narrow phones (<350px, below the tested sizes) ----
+       Legend drops under the Visualizer title; keyboard header tightens. */
+    @media (max-width: 349px) {
+      .scope-panel > .panel-header > div:first-child { flex-basis: 100%; }
+      .scope-panel .legend-item:first-of-type { margin-left: 0; }
+      .keyboard-panel .panel-title-text::before { font-size: 12px; letter-spacing: 0.4px; }
+      .btn-oct { padding: 0 7px; }
+    }
+  }
 </style>
 </head>
 <body>
@@ -4466,6 +5970,11 @@
   </footer>
 
 <script>
+
+// Matches the CSS phone layout block (max-width: 640px). Canvas drawing
+// code reads it to size text for phones; desktop never takes those paths.
+const PHONE_LAYOUT_MQ = window.matchMedia("(max-width: 640px)");
+const TOUCH_POINTER_MQ = window.matchMedia("(pointer: coarse)");
 
 /* ==========================================================================
    TOP-LEVEL MUTABLE STATE
@@ -5634,7 +7143,7 @@ function updatePedalsOrderUI() {
   // Append each pedal in current dspChainOrder, updating dynamic numbers (6, 7, 8 after 5. Atmosphere & Noise)
   dspChainOrder.forEach((key, idx) => {
     const el = document.getElementById("pedalCard_" + key);
-    if (el) container.appendChild(el);
+    if (el && !el.closest("#orbitalModalBody")) container.appendChild(el);
 
     const chainNum = 6 + idx; // Slot 0 -> 6, Slot 1 -> 7, Slot 2 -> 8
 
@@ -5672,7 +7181,7 @@ function updatePedalsOrderUI() {
   });
 
   const eqStrip = document.getElementById("masterEqOutStrip");
-  if (eqStrip && container) {
+  if (eqStrip && container && !eqStrip.closest("#orbitalModalBody")) {
     container.appendChild(eqStrip);
   }
 }
@@ -9246,8 +10755,9 @@ function drawArcadeGame(w, h, ts) {
       scopeCtx.fillText(ln, w / 2, h / 2 + (i - (lines.length - 1) / 2) * fs * 2);
     });
   };
-  if (g.phase === "title") centerMsg(["SLAMBIENT INVADERS", "SPACE / TAP TO START", "← → MOVE · SPACE FIRE · ESC QUIT"]);
-  else if (g.phase === "gameover") centerMsg(["GAME OVER", `SCORE ${g.score}`, "SPACE / TAP TO PLAY AGAIN"]);
+  const touchUi = PHONE_LAYOUT_MQ.matches || TOUCH_POINTER_MQ.matches;
+  if (g.phase === "title") centerMsg(touchUi ? ["SLAMBIENT INVADERS", "TAP TO START", "DRAG TO MOVE · TAP TO FIRE", "TAP THE INVADER BUTTON TO QUIT"] : ["SLAMBIENT INVADERS", "SPACE / TAP TO START", "← → MOVE · SPACE FIRE · ESC QUIT"]);
+  else if (g.phase === "gameover") centerMsg(["GAME OVER", `SCORE ${g.score}`, touchUi ? "TAP TO PLAY AGAIN" : "SPACE / TAP TO PLAY AGAIN"]);
   else if (g.phase === "cleared") centerMsg([`WAVE ${g.wave} CLEAR`]);
   else if (g.phase === "playing" && ts < g.bannerUntil) centerMsg([`WAVE ${g.wave}`, g.formation]);
 
@@ -9861,12 +11371,14 @@ function drawChordWheelCard() {
   if (!chordWheelCanvas || !chordWheelCtx) return;
 
   const dpr = window.devicePixelRatio || 1;
-  const size = 124; const targetBuffer = Math.round(size * dpr);
+  // Phones draw the wheel 1.55x so its 6.5px note names reach 10px.
+  const wheelK = PHONE_LAYOUT_MQ.matches ? 1.55 : 1;
+  const size = 124; const cssSize = Math.round(size * wheelK); const targetBuffer = Math.round(cssSize * dpr);
   if (chordWheelCanvas.width !== targetBuffer || chordWheelCanvas.height !== targetBuffer) {
     chordWheelCanvas.width = targetBuffer; chordWheelCanvas.height = targetBuffer;
-    chordWheelCanvas.style.width = size + "px"; chordWheelCanvas.style.height = size + "px";
+    chordWheelCanvas.style.width = cssSize + "px"; chordWheelCanvas.style.height = cssSize + "px";
   }
-  chordWheelCtx.resetTransform(); chordWheelCtx.scale(dpr, dpr);
+  chordWheelCtx.resetTransform(); chordWheelCtx.scale(dpr * wheelK, dpr * wheelK);
 
   const w = size; const h = size; const cx = w / 2; const cy = h / 2;
   chordWheelCtx.clearRect(0, 0, w, h);
@@ -13341,6 +14853,43 @@ function updateOrbitalFeelParams() {
 // Every orb's displayed/collision radius, in one place -- orb.baseR is the
 // fixed per-module design size; orbBaseSizeMult is the global Orb Size
 // slider; the (1 + excite*0.35) term is the existing audio-reactive pulse.
+// An orb's name split over two lines at the middle word (desktop layout).
+function orbNameLines(name) {
+  const words = name.split(/[ /]/).filter(Boolean);
+  if (words.length < 2) return [name];
+  const mid = Math.ceil(words.length / 2);
+  return [words.slice(0, mid).join(" "), words.slice(mid).join(" ")];
+}
+
+// Phones draw the orbs smaller (see the phone layout helpers), so the label
+// block is compressed with the radius and the name shrunk (to no less than
+// 9px) and split at the word that keeps it narrowest, so it stays inside the
+// ring. Sized from the resting radius so labels don't wobble with the audio
+// pulse, and cached per orb so text is only measured when the size changes.
+function orbPhoneLabel(orb) {
+  const restR = orb.baseR * orbBaseSizeMult;
+  const c = orb._phoneLabel;
+  if (c && c.r === restR && c.name === orb.name) return c;
+  const k = Math.min(1, restR / 40);
+  const fontAt = (px) => `700 ${px.toFixed(1)}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+  orbitalCtx.save();
+  orbitalCtx.font = fontAt(Math.max(9, 11 * k));
+  const widest = (ls) => Math.max(...ls.map(l => orbitalCtx.measureText(l).width));
+  let lines = orbNameLines(orb.name);
+  const words = orb.name.split(/[ /]/).filter(Boolean);
+  for (let i = 1; i < words.length; i++) {
+    const alt = [words.slice(0, i).join(" "), words.slice(i).join(" ")];
+    if (widest(alt) < widest(lines)) lines = alt;
+  }
+  const lowest = (lines.length > 1 ? 24 : 12) * k + 4;
+  const room = Math.min(restR * 1.72, 2 * Math.sqrt(Math.max(0, restR * restR - lowest * lowest)));
+  const w = widest(lines);
+  let px = Math.max(9, 11 * k);
+  if (w > room) px = Math.max(9, px * room / w);
+  orbitalCtx.restore();
+  return (orb._phoneLabel = { r: restR, name: orb.name, k, lines, font: fontAt(px) });
+}
+
 function effectiveOrbRadius(orb) {
   return orb.baseR * orbBaseSizeMult * (1.0 + (orb.pulse + orb.bump) * 0.35);
 }
@@ -13972,7 +15521,9 @@ function updateAndDrawOrbitalCanvas() {
   let leftPad = padding;
   if (orbitalPanelActive) {
     const panelEl = document.getElementById("orbitalSidePanel");
-    if (panelEl) leftPad = (panelEl.offsetWidth || panelEl.getBoundingClientRect().width) + 24;
+    // On phones the panel is a bottom sheet (position: fixed), not a left
+    // side panel, so it doesn't take any width away from the orbs.
+    if (panelEl && getComputedStyle(panelEl).position !== "fixed") leftPad = (panelEl.offsetWidth || panelEl.getBoundingClientRect().width) + 24;
   }
 
   const now = performance.now();
@@ -14179,21 +15730,23 @@ function updateAndDrawOrbitalCanvas() {
     orbitalCtx.moveTo(orb.x, orb.y - 4); orbitalCtx.lineTo(orb.x, orb.y + 4);
     orbitalCtx.stroke();
 
+    const phoneLabel = PHONE_LAYOUT_MQ.matches ? orbPhoneLabel(orb) : null;
+    const labelK = phoneLabel ? phoneLabel.k : 1;
+
     orbitalCtx.fillStyle = "#ffffff";
     orbitalCtx.font = "800 16px ui-monospace, SFMono-Regular, Menlo, monospace";
     orbitalCtx.textAlign = "center";
     orbitalCtx.textBaseline = "middle";
-    orbitalCtx.fillText(orb.num, orb.x, orb.y - 13);
+    orbitalCtx.fillText(orb.num, orb.x, orb.y - 13 * labelK);
 
     orbitalCtx.fillStyle = orb.color;
-    orbitalCtx.font = "700 11px ui-monospace, SFMono-Regular, Menlo, monospace";
-    const nameWords = orb.name.split(/[ /]/).filter(Boolean);
-    if (nameWords.length > 1) {
-      const mid = Math.ceil(nameWords.length / 2);
-      orbitalCtx.fillText(nameWords.slice(0, mid).join(" "), orb.x, orb.y + 10);
-      orbitalCtx.fillText(nameWords.slice(mid).join(" "), orb.x, orb.y + 24);
+    orbitalCtx.font = phoneLabel ? phoneLabel.font : "700 11px ui-monospace, SFMono-Regular, Menlo, monospace";
+    const nameLines = phoneLabel ? phoneLabel.lines : orbNameLines(orb.name);
+    if (nameLines.length > 1) {
+      orbitalCtx.fillText(nameLines[0], orb.x, orb.y + 10 * labelK);
+      orbitalCtx.fillText(nameLines[1], orb.x, orb.y + 24 * labelK);
     } else {
-      orbitalCtx.fillText(orb.name, orb.x, orb.y + 12);
+      orbitalCtx.fillText(orb.name, orb.x, orb.y + 12 * labelK);
     }
 
     orbitalCtx.restore();
@@ -14411,6 +15964,529 @@ window.addEventListener("keydown", (e) => {
   const valid = saved && Array.isArray(saved.colors) && saved.colors.length === THEME_KEYS.length &&
     saved.colors.every(c => /^#[0-9a-f]{6}$/i.test(c));
   applyColorTheme(valid ? saved : COLOR_THEMES[0], false);
+})();
+</script>
+<script>
+/* ===== Phone layout helpers ===== */
+/* --- Header (phone): fullscreen-API flag, preset strip fades, mini transport bar --- */
+(function initPhoneHeader() {
+  const mq = window.matchMedia("(max-width: 640px)");
+  const $ = (id) => document.getElementById(id);
+  const onMqChange = (fn) => { try { mq.addEventListener("change", fn); } catch (e) { mq.addListener(fn); } };
+
+  // iPhone Safari has no page Fullscreen API: flag it so the phone CSS can
+  // hide the app Full Screen button (harmless on desktop, where it exists).
+  try {
+    const d = document;
+    if (!(d.fullscreenEnabled || d.webkitFullscreenEnabled)) {
+      d.documentElement.classList.add("no-fullscreen-api");
+    }
+  } catch (e) {}
+
+  // Preset strip: show the left fade once scrolled, drop the right fade at
+  // the end, and bring a newly active chip into view (horizontally only).
+  try {
+    const strip = document.querySelector(".preset-bar");
+    if (strip) {
+      const syncFades = () => {
+        if (!mq.matches) { strip.classList.remove("is-scrolled", "at-end"); return; }
+        const max = strip.scrollWidth - strip.clientWidth;
+        strip.classList.toggle("is-scrolled", strip.scrollLeft > 2);
+        strip.classList.toggle("at-end", max <= 2 || strip.scrollLeft >= max - 2);
+      };
+      strip.addEventListener("scroll", syncFades, { passive: true });
+      window.addEventListener("resize", syncFades);
+      onMqChange(syncFades);
+      syncFades();
+
+      // Only react to a chip that just gained .active -- never to the strip's
+      // own fade classes, or the user's own scrolling would be undone.
+      const revealChip = (chip) => {
+        const pad = 12, sr = strip.getBoundingClientRect(), cr = chip.getBoundingClientRect();
+        const left = cr.left - sr.left + strip.scrollLeft, right = left + cr.width;
+        if (left < strip.scrollLeft + pad) strip.scrollTo({ left: left - pad, behavior: "smooth" });
+        else if (right > strip.scrollLeft + strip.clientWidth - 40) strip.scrollTo({ left: right - strip.clientWidth + 40, behavior: "smooth" });
+      };
+      new MutationObserver((muts) => {
+        if (!mq.matches) return;
+        for (const m of muts) {
+          const t = m.target;
+          if (t !== strip && t.classList.contains("active") && !/(^|\s)active(\s|$)/.test(m.oldValue || "")) { revealChip(t); break; }
+        }
+      }).observe(strip, { subtree: true, attributes: true, attributeFilter: ["class"], attributeOldValue: true });
+    }
+  } catch (e) {}
+
+  // Mini transport bar: Play/Pause, Record and BPM, fixed to the bottom of
+  // the screen while the header's Start button is scrolled out of view.
+  // Mirrors #btnPlay / #btnRecord / #lblBpmHeader and calls the existing
+  // togglePlay() / toggleRecord(). Built only once a phone width is seen.
+  const btnPlay = $("btnPlay"), btnRec = $("btnRecord");
+  if (!btnPlay || !btnRec) return;
+  let bar = null, startVisible = true;
+
+  function build() {
+    bar = document.createElement("div");
+    bar.className = "mini-transport";
+    bar.id = "miniTransport";
+    bar.setAttribute("role", "toolbar");
+    bar.setAttribute("aria-label", "Transport");
+    bar.innerHTML =
+      '<button type="button" class="btn-main-play" data-mt="play">' +
+        '<span class="play-icon-wrap">' +
+          '<svg class="icon-play" width="10" height="11" viewBox="0 0 10 11" fill="currentColor"><path d="M1 1.5L9 5.5L1 9.5V1.5Z"/></svg>' +
+          '<svg class="icon-pause" width="10" height="11" viewBox="0 0 10 11" fill="currentColor"><rect x="1" y="1.5" width="2.5" height="8" rx="0.5"/><rect x="6.5" y="1.5" width="2.5" height="8" rx="0.5"/></svg>' +
+        '</span><span data-mt="play-label">Start</span>' +
+      '</button>' +
+      '<button type="button" class="btn-record" data-mt="rec"><div class="rec-dot"></div><span data-mt="rec-label">Record</span></button>' +
+      '<div class="mt-bpm" aria-label="Tempo"><span class="mt-bpm-k">BPM</span><span class="mt-bpm-v" data-mt="bpm">--</span></div>';
+    document.body.appendChild(bar);
+
+    const mPlay = bar.querySelector('[data-mt="play"]');
+    const mPlayLbl = bar.querySelector('[data-mt="play-label"]');
+    const mRec = bar.querySelector('[data-mt="rec"]');
+    const mRecLbl = bar.querySelector('[data-mt="rec-label"]');
+    const mBpm = bar.querySelector('[data-mt="bpm"]');
+
+    mPlay.addEventListener("click", () => { if (typeof togglePlay === "function") togglePlay(); mPlay.blur(); });
+    mRec.addEventListener("click", () => { if (typeof toggleRecord === "function") toggleRecord(); mRec.blur(); });
+
+    const syncPlay = () => {
+      const lbl = $("btnPlayLabel");
+      mPlay.classList.toggle("active", btnPlay.classList.contains("active"));
+      if (lbl) mPlayLbl.textContent = lbl.textContent;
+      mPlay.title = btnPlay.classList.contains("active") ? "Pause" : "Start";
+    };
+    const syncRec = () => {
+      const lbl = $("btnRecordLabel");
+      mRec.classList.toggle("recording", btnRec.classList.contains("recording"));
+      mRec.disabled = !!btnRec.disabled;
+      if (lbl) mRecLbl.textContent = lbl.textContent;
+    };
+    const syncBpm = () => {
+      const lbl = $("lblBpmHeader");
+      const n = lbl ? parseInt(lbl.textContent, 10) : NaN;
+      mBpm.textContent = isNaN(n) ? "--" : String(n);
+    };
+    const watch = { attributes: true, attributeFilter: ["class", "disabled"], childList: true, characterData: true, subtree: true };
+    new MutationObserver(syncPlay).observe(btnPlay, watch);
+    new MutationObserver(syncRec).observe(btnRec, watch);
+    const bpmLbl = $("lblBpmHeader");
+    if (bpmLbl) new MutationObserver(syncBpm).observe(bpmLbl, { childList: true, characterData: true, subtree: true });
+    syncPlay(); syncRec(); syncBpm();
+
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver((entries) => {
+        const e = entries[entries.length - 1];
+        startVisible = e.isIntersecting || e.boundingClientRect.top > 0;
+        update();
+      }).observe(btnPlay);
+    }
+  }
+
+  function update() {
+    if (!bar) return;
+    const show = mq.matches && !startVisible;
+    bar.hidden = !mq.matches;
+    bar.classList.toggle("is-visible", show);
+    bar.setAttribute("aria-hidden", show ? "false" : "true");
+    document.body.classList.toggle("mini-transport-on", show);
+  }
+
+  function onMq() {
+    if (mq.matches && !bar) build();
+    update();
+  }
+  onMqChange(onMq);
+  onMq();
+})();
+
+/* Upper deck (phone): one touch = one note on the piano keys.
+   A touch contact fires pointerenter (with buttons === 1) just before
+   pointerdown, so bindKeyEvents()'s pointerenter handler (meant for mouse
+   glissando) starts the note, then pointerdown starts it again. The second
+   start drops the note from heldMidiNotes while the finger is still down, so
+   LIVE takeover and chord detection never fire from touch. Touch pointers
+   are implicitly captured by the key they land on, so pointerenter has no
+   other job for touch; stop it at the container before it reaches the key.
+   Touch only (any width, so landscape phones and tablets too); mouse and pen
+   glissando are unchanged. */
+(function () {
+  const keys = document.getElementById('keyboardContainer');
+  if (!keys) return;
+  keys.addEventListener('pointerenter', (e) => {
+    if (e.pointerType === 'touch' && e.target !== keys) e.stopPropagation();
+  }, true);
+})();
+
+/* ---- Orbital view on phones (orbs, touch, bottom sheet) ----
+   All of this is a no-op unless the phone media query matches.
+   Relies on the main script's globals: ORBITAL_MODULES, draggedOrbId,
+   dragPointerId, dragMoved, closeOrbitalModal(). */
+(function orbitalPhone() {
+  const mq = window.matchMedia ? window.matchMedia("(max-width: 640px)") : null;
+  if (!mq) return;
+  const onMqChange = (fn) => {
+    try { mq.addEventListener("change", fn); } catch (e) { try { mq.addListener(fn); } catch (e2) {} }
+  };
+
+  // 1. Orb size. Desktop orbs (radius 35-48 + a 22px spacing buffer) crowd a
+  //    ~370px-wide arena, so phones draw them at ~76-90% depending on the
+  //    arena width. orb.baseR is only read by effectiveOrbRadius() (size,
+  //    hit-testing, collisions) and as a wave phase offset; the desktop value
+  //    is kept and restored if the viewport grows past the phone breakpoint.
+  //    The ORB SIZE slider still multiplies on top of this. Labels keep their
+  //    desktop 11px / 16px font.
+  function phoneOrbScale() {
+    const arena = document.getElementById("orbitalArenaWrapper");
+    const w = (arena && arena.clientWidth) || (window.innerWidth - 20);
+    return Math.min(0.9, Math.max(0.76, w / 440));
+  }
+  function applyOrbScale() {
+    if (typeof ORBITAL_MODULES === "undefined" || !Array.isArray(ORBITAL_MODULES)) return;
+    const k = mq.matches ? phoneOrbScale() : 1;
+    ORBITAL_MODULES.forEach((orb) => {
+      if (mq.matches) {
+        if (orb._deskBaseR === undefined) orb._deskBaseR = orb.baseR;
+        orb.baseR = orb._deskBaseR * k;
+      } else if (orb._deskBaseR !== undefined) {
+        orb.baseR = orb._deskBaseR;
+      }
+    });
+  }
+
+  //    The first frame lays the orbs out on a circle sized to the arena's
+  //    short side; in a tall phone arena that leaves empty bands above and
+  //    below, so stretch that first layout vertically into an ellipse once.
+  function stretchInitialLayout() {
+    let tries = 0;
+    const tick = () => {
+      if (!mq.matches || typeof ORBITAL_MODULES === "undefined") return;
+      const first = ORBITAL_MODULES[0];
+      if (!first || !first.initialized) { if (++tries < 600) requestAnimationFrame(tick); return; }
+      const w = (typeof cachedOrbitalW !== "undefined" && cachedOrbitalW) || 0;
+      const h = (typeof cachedOrbitalH !== "undefined" && cachedOrbitalH) || 0;
+      if (!w || !h || h <= w) return;
+      const k = Math.min(1.3, (h * 0.36) / Math.min(w * 0.38, h * 0.36));
+      const cy = h / 2;
+      ORBITAL_MODULES.forEach((orb) => { orb.y = cy + (orb.y - cy) * k; });
+    };
+    requestAnimationFrame(tick);
+  }
+
+  // 2. Touch: the canvas uses touch-action: pan-y, so a vertical swipe that
+  //    starts on an orb scrolls the page and the browser sends pointercancel.
+  //    The orb handler treats a cancel without movement as a tap and would open
+  //    the sheet mid-scroll; mark it as a drag first (window capture runs
+  //    before the canvas listener) so it's a no-op release instead.
+  window.addEventListener("pointercancel", (e) => {
+    if (!mq.matches || e.pointerType === "mouse") return;
+    try {
+      if (typeof draggedOrbId !== "undefined" && draggedOrbId && e.pointerId === dragPointerId) dragMoved = true;
+    } catch (err) {}
+  }, true);
+
+  // 3. Bottom sheet: drag the header (grab handle / title row) down to close.
+  let panel = null, header = null;
+  let pid = null, startY = 0, dy = 0, t0 = 0;
+  function resetDrag() {
+    pid = null; dy = 0;
+    if (panel) { panel.classList.remove("sheet-dragging"); panel.style.transform = ""; }
+  }
+  function initSheetSwipe() {
+    panel = document.getElementById("orbitalSidePanel");
+    header = panel ? panel.querySelector(".orbital-modal-header") : null;
+    if (!panel || !header) return;
+    header.addEventListener("pointerdown", (e) => {
+      if (!mq.matches || pid !== null || !panel.classList.contains("active")) return;
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      if (e.target.closest && e.target.closest("button, a, input, select, label, .custom-dropdown-wrap, .pedal-slot-badge")) return;
+      pid = e.pointerId; startY = e.clientY; dy = 0; t0 = performance.now();
+      try { header.setPointerCapture(pid); } catch (err) {}
+      panel.classList.add("sheet-dragging");
+    });
+    header.addEventListener("pointermove", (e) => {
+      if (e.pointerId !== pid) return;
+      dy = Math.max(0, e.clientY - startY);
+      panel.style.transform = dy ? "translateY(" + dy + "px)" : "";
+    });
+    const end = (e) => {
+      if (e.pointerId !== pid) return;
+      try { header.releasePointerCapture(e.pointerId); } catch (err) {}
+      const speed = dy / Math.max(1, performance.now() - t0);
+      const shouldClose = e.type === "pointerup" &&
+        (dy > Math.min(120, panel.offsetHeight * 0.25) || (dy > 32 && speed > 0.5));
+      resetDrag(); // same frame as the class change below, so it animates from the finger
+      if (shouldClose && typeof closeOrbitalModal === "function") closeOrbitalModal();
+    };
+    header.addEventListener("pointerup", end);
+    header.addEventListener("pointercancel", end);
+  }
+
+  //    Opening another orb while the sheet is up swaps its content in place;
+  //    start the new module at the top instead of the old scroll position.
+  function initSheetScrollReset() {
+    const title = document.getElementById("orbitalModalTitle");
+    const body = document.getElementById("orbitalModalBody");
+    if (!title || !body || !("MutationObserver" in window)) return;
+    new MutationObserver(() => { if (mq.matches) body.scrollTop = 0; })
+      .observe(title, { childList: true, characterData: true, subtree: true });
+  }
+
+  // 4. Dropdown menus opened inside the sheet live in its scrolling body, so
+  //    anything past the body's edges is clipped. On open, scroll the control
+  //    up to the top of the body (room to open downward), then -- after any
+  //    other placement code has run -- cap the menu to the room left inside
+  //    the body if it still doesn't fit (the menu then scrolls itself).
+  const FIT_PROPS = ["top", "bottom", "maxHeight", "overflowY"];
+  function fitMenuInSheet(menu, body, trigger) {
+    if (!mq.matches || !menu.classList.contains("open")) return;
+    const b = body.getBoundingClientRect();
+    const top = b.top + 4, bottom = b.bottom - 4;
+    const m = menu.getBoundingClientRect();
+    if (m.top >= top - 1 && m.bottom <= bottom + 1) return;
+    const a = trigger.getBoundingClientRect();
+    const below = Math.floor(bottom - a.bottom - 2), above = Math.floor(a.top - top - 2);
+    const up = above > below;
+    menu.dataset.sheetFit = "1";
+    menu.style.top = up ? "auto" : "calc(100% + 2px)";
+    menu.style.bottom = up ? "calc(100% + 2px)" : "auto";
+    menu.style.maxHeight = Math.max(96, up ? above : below) + "px";
+    menu.style.overflowY = "auto";
+  }
+  document.addEventListener("click", (e) => {
+    if (!mq.matches || !e.target || !e.target.closest) return;
+    const trigger = e.target.closest("#orbitalModalBody .custom-dropdown-trigger");
+    const body = document.getElementById("orbitalModalBody");
+    const menu = trigger && trigger.parentElement ? trigger.parentElement.querySelector(".custom-dropdown-menu") : null;
+    if (!trigger || !body || !menu || menu.classList.contains("open")) return;
+    if (menu.dataset.sheetFit) { FIT_PROPS.forEach((p) => { menu.style[p] = ""; }); delete menu.dataset.sheetFit; }
+    const row = trigger.closest(".control-row") || trigger;
+    const lift = row.getBoundingClientRect().top - body.getBoundingClientRect().top - 12;
+    if (lift > 0) body.scrollTop += lift;
+    requestAnimationFrame(() => requestAnimationFrame(() => fitMenuInSheet(menu, body, trigger)));
+  }, true);
+
+  function onMq() {
+    applyOrbScale();
+    if (!mq.matches) {
+      resetDrag();
+      document.querySelectorAll(".custom-dropdown-menu[data-sheet-fit]").forEach((menu) => {
+        FIT_PROPS.forEach((p) => { menu.style[p] = ""; });
+        delete menu.dataset.sheetFit;
+      });
+    }
+  }
+
+  try { initSheetSwipe(); } catch (e) {}
+  try { initSheetScrollReset(); } catch (e) {}
+  onMqChange(onMq);
+  onMq();
+  if (mq.matches) stretchInitialLayout();
+  // Crossing the breakpoint (rotation, resizing) changes the arena's shape a
+  // lot; lay the orbs out again for it, like a fresh load.
+  onMqChange(() => {
+    if (typeof ORBITAL_MODULES === "undefined" || !ORBITAL_MODULES[0]) return;
+    ORBITAL_MODULES[0].initialized = false;
+    if (mq.matches) stretchInitialLayout();
+  });
+  let resizeRaf = 0;
+  window.addEventListener("resize", () => {
+    if (!mq.matches || resizeRaf) return;
+    resizeRaf = requestAnimationFrame(() => { resizeRaf = 0; applyOrbScale(); });
+  });
+})();
+
+/* Console region (phone only): keep custom dropdown menus and the palette
+   popover inside the screen. Desktop: every handler returns early, and any
+   inline style this sets is cleared when the phone query stops matching. */
+(function () {
+  const mq = window.matchMedia("(max-width: 640px)");
+  const EDGE = 10;   // min distance from the viewport edges
+  const GAP = 2;     // trigger <-> menu gap (matches the desktop CSS)
+  const PROPS = ["left", "top", "bottom", "maxHeight", "maxWidth"];
+
+  function clearMenu(menu) {
+    PROPS.forEach(p => { menu.style[p] = ""; });
+  }
+
+  // Park the menu at the left screen edge, at most viewport-wide, so that
+  // opening it can never overflow the page sideways (on iOS / mobile
+  // Chrome a transient overflow zooms the layout viewport out).
+  function parkMenu(menu, wrapLeft, vw) {
+    clearMenu(menu);
+    menu.style.maxWidth = (vw - 2 * EDGE) + "px";
+    menu.style.left = Math.round(EDGE - wrapLeft) + "px";
+  }
+
+  // Visible box for the menu: the viewport, narrowed by any ancestor that
+  // clips its overflow (e.g. the orbital arena around the side panel).
+  function visibleBox(el, vw, vh) {
+    const box = { top: EDGE, bottom: vh - EDGE, left: EDGE, right: vw - EDGE };
+    let inFixed = false;
+    for (let n = el.parentElement; n && n !== document.body; n = n.parentElement) {
+      const cs = getComputedStyle(n);
+      if (cs.position === "fixed") inFixed = true;
+      if (cs.overflowX === "visible" && cs.overflowY === "visible") { if (inFixed) break; continue; }
+      const r = n.getBoundingClientRect();
+      if (cs.overflowY !== "visible") {
+        box.top = Math.max(box.top, r.top + 4);
+        box.bottom = Math.min(box.bottom, r.bottom - 4);
+      }
+      if (cs.overflowX !== "visible") {
+        box.left = Math.max(box.left, r.left + 4);
+        box.right = Math.min(box.right, r.right - 4);
+      }
+      if (inFixed) break; // a fixed box isn't clipped by anything above it
+    }
+    // Stay clear of the floating mini transport bar when it is showing
+    // (the bottom sheet covers it, so menus in the sheet ignore it).
+    const bar = document.getElementById("miniTransport");
+    if (bar && !bar.hidden && !inFixed) {
+      const r = bar.getBoundingClientRect();
+      if (r.height && r.top < vh && r.top > box.top) box.bottom = Math.min(box.bottom, r.top - 6);
+    }
+    return box;
+  }
+
+  // Pick the side with room, cap the height to it, clamp horizontally.
+  function placeMenu(menu) {
+    if (!menu || !mq.matches || !menu.classList.contains("open")) return;
+    const wrap = menu.parentElement;
+    if (!wrap) return;
+    const trigger = wrap.querySelector(".custom-dropdown-trigger") || wrap;
+    const vw = document.documentElement.clientWidth;
+    const vh = window.innerHeight;
+    const w = wrap.getBoundingClientRect();
+    const box = visibleBox(wrap, vw, vh);
+
+    parkMenu(menu, w.left, vw);
+    menu.style.maxWidth = Math.max(160, box.right - box.left) + "px";
+    menu.style.maxHeight = "none";
+    menu.style.top = "calc(100% + " + GAP + "px)";
+    menu.style.bottom = "auto";
+
+    // Horizontal: align with the trigger, slide left if it would overflow.
+    const width = menu.offsetWidth;
+    const x = Math.max(Math.min(box.left, w.left), Math.min(w.left, box.right - width));
+    menu.style.left = Math.round(x - w.left) + "px";
+
+    // Vertical: open towards the side with room, scroll inside if needed.
+    const a = trigger.getBoundingClientRect();
+    const natural = menu.offsetHeight;
+    const below = Math.floor(box.bottom - a.bottom - GAP);
+    const above = Math.floor(a.top - box.top - GAP);
+    const cap = Math.max(240, Math.round(vh * 0.62));
+    const goUp = natural > below && above > below;
+    const room = Math.max(80, goUp ? above : below);
+    if (goUp) {
+      menu.style.top = "auto";
+      menu.style.bottom = "calc(100% + " + GAP + "px)";
+    }
+    menu.style.maxHeight = Math.min(natural, room, cap) + "px";
+
+    // Long lists open scrolled to the current choice.
+    const cur = menu.querySelector(".custom-dropdown-item.selected");
+    if (cur && menu.scrollHeight > menu.clientHeight) {
+      menu.scrollTop = cur.offsetTop - (menu.clientHeight - cur.offsetHeight) / 2;
+    }
+  }
+
+  function placeOpenMenus() {
+    document.querySelectorAll(".custom-dropdown-menu.open").forEach(placeMenu);
+  }
+
+  // The palette card sits under the header utils row; bring it on screen.
+  function revealPalette() {
+    const menu = document.getElementById("paletteMenu");
+    if (!menu || !mq.matches || !menu.classList.contains("open")) return;
+    const r = menu.getBoundingClientRect();
+    const vh = window.innerHeight;
+    let dy = 0;
+    if (r.bottom > vh - EDGE) dy = r.bottom - (vh - EDGE);
+    if (r.top - dy < EDGE) dy = r.top - EDGE;
+    if (Math.abs(dy) > 1) window.scrollBy({ top: dy, behavior: "smooth" });
+  }
+
+  // Capture phase: runs before the trigger's own handler (which stops
+  // propagation); the rAF runs after it, before the next paint.
+  document.addEventListener("click", (e) => {
+    if (!mq.matches || !e.target || !e.target.closest) return;
+    const trigger = e.target.closest(".custom-dropdown-trigger");
+    if (trigger) {
+      const wrap = trigger.parentElement;
+      const menu = wrap && wrap.querySelector(".custom-dropdown-menu");
+      if (!menu) return;
+      if (!menu.classList.contains("open")) {
+        parkMenu(menu, wrap.getBoundingClientRect().left, document.documentElement.clientWidth);
+      }
+      requestAnimationFrame(() => placeMenu(menu));
+      return;
+    }
+    if (e.target.closest("#btnPalette")) requestAnimationFrame(revealPalette);
+  }, true);
+
+  window.addEventListener("resize", () => { if (mq.matches) placeOpenMenus(); });
+
+  const onChange = () => {
+    if (mq.matches) { placeOpenMenus(); return; }
+    document.querySelectorAll(".custom-dropdown-menu").forEach(clearMenu);
+  };
+  if (mq.addEventListener) mq.addEventListener("change", onChange);
+  else if (mq.addListener) mq.addListener(onChange);
+})();
+
+/* Touch: a scroll that starts on a slider must not change it. Blink and
+   WebKit jump a range thumb to the finger on touchstart and keep that value
+   even when the gesture turns into a page or sheet scroll (pointercancel).
+   On phones the full-width slider rows sit right in the scroll path, so put
+   the old value back when the browser takes the gesture for scrolling. */
+(function () {
+  const mq = window.matchMedia('(max-width: 640px)');
+  let pending = null;
+  document.addEventListener('pointerdown', (e) => {
+    const el = e.target;
+    pending = (mq.matches && e.pointerType === 'touch' && el && el.tagName === 'INPUT' && el.type === 'range')
+      ? { el, value: el.value, id: e.pointerId } : null;
+  }, true);
+  document.addEventListener('pointercancel', (e) => {
+    if (!pending || e.pointerId !== pending.id) return;
+    const { el, value } = pending;
+    pending = null;
+    if (el.value !== value) { el.value = value; el.dispatchEvent(new Event('input', { bubbles: true })); }
+  }, true);
+  document.addEventListener('pointerup', (e) => { if (pending && e.pointerId === pending.id) pending = null; }, true);
+})();
+
+/* Touch: close open dropdown menus when tapping anywhere else. The menus'
+   own outside-close listens for "click", which iOS Safari never fires for a
+   tap on plain, non-interactive page areas. */
+(function () {
+  document.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' || !e.target || !e.target.closest) return;
+    if (e.target.closest('.custom-dropdown-wrap')) return;
+    document.querySelectorAll('.custom-dropdown-menu.open').forEach((m) => m.classList.remove('open', 'drop-up'));
+    document.querySelectorAll('.custom-dropdown-trigger.open').forEach((t) => t.classList.remove('open'));
+    document.querySelectorAll('.custom-dropdown-wrap.is-open').forEach((w) => w.classList.remove('is-open'));
+  }, true);
+})();
+
+/* Crossing the 640px breakpoint (rotation, resizing) changes dozens of button
+   sizes, and their desktop "transition: all" animates that, so anything that
+   measures the layout on resize (syncEnoPodSquare) sees a half-way state and
+   the Eno pod locks to the wrong size. Finish those transitions at once, then
+   measure again. */
+(function () {
+  const mq = window.matchMedia('(max-width: 640px)');
+  const onChange = () => {
+    try {
+      document.getAnimations().forEach((a) => {
+        if (typeof CSSTransition !== 'undefined' && a instanceof CSSTransition) a.finish();
+      });
+    } catch (e) {}
+    if (typeof syncEnoPodSquare === 'function') syncEnoPodSquare();
+  };
+  try { mq.addEventListener('change', onChange); } catch (e) { try { mq.addListener(onChange); } catch (e2) {} }
 })();
 </script>
 </body>
