@@ -724,3 +724,14 @@ Each item has its own `## Update — 2026-10-15` entry above with details.
 - `cc617af` — Slambient Invaders hit-freeze fix
 
 Still unverified on a real iPhone: phone portrait layout, orb sheet width, silent-switch audio, preset chip widths in Safari, transport icons. Not yet tried in Logic: the 4-channel MIDI output.
+
+## Update — 2026-10-15 (Cross-Browser Safari vs. Chrome Layout & Font-Size Parity under `html { zoom: 0.75 }`)
+
+**Root cause of Safari vs. Chrome visual discrepancy**:
+- On desktop (`> 640px`), `index.html` sets `html { zoom: 0.75; }`.
+- **Safari (macOS WebKit)** enforces a minimum on-screen rendered font floor of `9px` physical CSS pixels *after* `zoom: 0.75` is applied (`9px / 0.75 = 12px` in the zoomed layout coordinate space). As a result, Safari automatically clamped all 70 desktop CSS rules that had `font-size < 12px` (`6.5px` through `11px`) up to **`12px`**.
+- **Chrome (Blink)** applies its minimum font check *before* CSS `zoom: 0.75`, so Chrome shrank every `font-size < 12px` down to `4.9px–8.25px` on screen. Because `.preset-bar` uses `width: max-content; grid-template-columns: repeat(5, 1fr);`, the smaller font in Chrome made the 5×3 preset grid ~25% narrower than in Safari, left `.orbital-bar-center`'s `.telemetry-chip` items tiny on one line instead of Safari's 2-line stacked readout, and shrank the Chord Analysis rows, keyboard key labels, header telemetry pills, and console strip labels.
+
+**Fix applied**:
+- Standardized all 70 desktop CSS `font-size` declarations below `12px` (lines 1–3468, prior to the `@media (max-width: 640px)` phone block where `zoom: 1` is active) to `font-size: 12px`, matching the exact `12px` floor (`9px` on screen) that Safari was already rendering. Safari's layout is unchanged while Chrome now matches Safari across the header preset bar, transport row, telemetry pills, Chord Analysis, keyboard, Orbital View bar, and Console Rack.
+- Added `"JetBrains Mono"` as the primary family in the `chordWheelCanvas` and `orbitalCanvas` 2D context `.font` strings (and bumped desktop orb labels from `11px` to `12px`) so canvas text metrics match across both engines.
