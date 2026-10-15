@@ -6819,7 +6819,48 @@ function createDidgeridooBuzzWave(ctx) {
   return ctx.createPeriodicWave(real, imag, { disableNormalization: false });
 }
 
+// iPhone: Web Audio is "ambient" by default, so the ring/silent switch mutes
+// it. Mark the page as media playback (like a music app) so it plays with the
+// switch on silent. iOS 16.4+ has navigator.audioSession; older iOS only
+// treats the page as media while an <audio> element is playing, so loop an
+// inaudible one (iOS only, so desktop browsers never show media controls).
+// Must run inside a user gesture (first tap); also re-asserted when the page
+// comes back to the foreground.
+let silentMediaEl = null;
+function enableMediaPlaybackSession() {
+  try {
+    if (navigator.audioSession && navigator.audioSession.type !== "playback") navigator.audioSession.type = "playback";
+  } catch (e) {}
+  const ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if (!ios) return;
+  try {
+    if (!silentMediaEl) {
+      const n = 8000, bytes = new Uint8Array(44 + n);
+      const dv = new DataView(bytes.buffer);
+      const str = (o, t) => { for (let i = 0; i < t.length; i++) bytes[o + i] = t.charCodeAt(i); };
+      str(0, "RIFF"); dv.setUint32(4, 36 + n, true); str(8, "WAVE"); str(12, "fmt ");
+      dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
+      dv.setUint32(24, 8000, true); dv.setUint32(28, 8000, true); dv.setUint16(32, 1, true); dv.setUint16(34, 8, true);
+      str(36, "data"); dv.setUint32(40, n, true);
+      bytes.fill(128, 44);   // 8-bit PCM silence
+      silentMediaEl = new Audio(URL.createObjectURL(new Blob([bytes], { type: "audio/wav" })));
+      silentMediaEl.loop = true;
+      silentMediaEl.preload = "auto";
+      silentMediaEl.setAttribute("playsinline", "");
+    }
+    if (silentMediaEl.paused) { const pr = silentMediaEl.play(); if (pr && pr.catch) pr.catch(() => {}); }
+  } catch (e) {}
+}
+["touchend", "click", "keydown"].forEach((evt) =>
+  window.addEventListener(evt, enableMediaPlaybackSession, { capture: true, passive: true }));
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState !== "visible") return;
+  enableMediaPlaybackSession();
+  if (audioCtx && audioCtx.state !== "running") audioCtx.resume().catch(() => {});
+});
+
 function initAudio() {
+  enableMediaPlaybackSession();
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
   drumAnalyser = audioCtx.createAnalyser(); drumAnalyser.fftSize = 512;

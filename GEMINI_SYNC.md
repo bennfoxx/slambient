@@ -623,6 +623,10 @@ missing. Desktop and iPad are unchanged. The visualizer's own fullscreen button 
 
 Ben: header preset chip names wrapped/ellipsized ("NOSTALGIC DR…"). The chips (a fixed 5×3 grid, `minmax(0, 1fr)`) ellipsized any name wider than the chip, which depends on the font actually rendered, browser zoom and window width. New `fitPresetChips()` (next to `initPresetChipTitles`) measures every name on a canvas and sets one shared font size on all chips, the largest at which every name fits (never above the stylesheet size, never below 7px), re-run on load, font load, resize and bar resize. Skipped on phones (the bar scrolls and chips size to their text). The chips transition `all`, so the fit turns transitions off while it reads the stylesheet size; `scrollWidth` can't be used for the check because of the page's CSS zoom.
 
+## Update — 2026-10-15 (Claude: play audio with the iPhone silent switch on)
+
+Ben: on iPhone the sound only played with the ringer on. Web Audio is "ambient" on iOS by default, so the ring/silent switch mutes it. New `enableMediaPlaybackSession()` (just above `initAudio`) sets `navigator.audioSession.type = "playback"` (Safari 16.4+) and, on iOS only, loops an inaudible generated 1 s WAV in an `<audio>` element so older iOS also treats the page as media. It runs from `initAudio()` and from the first touchend/click/keydown (must be inside a user gesture), and again when the page returns to the foreground, where a suspended/interrupted `audioCtx` is also resumed. Desktop browsers never create the audio element. Needs a real-iPhone check (the silent-switch behavior can't be emulated).
+
 ## Master Implementation Roadmap & Phase Status
 
 ### Phase 1: Audio Core, Safety Ceilings & Dynamic DSP Graph — ✅ DONE
