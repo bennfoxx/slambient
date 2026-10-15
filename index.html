@@ -7752,11 +7752,11 @@ function playTanpuraPluck(stringIdx) {
   } else if (stringIdx === 1) {
     // String 2: Middle Sa (Jodi 1) -- symmetric +/- chorus detune around true pitch center
     midi = baseSa;
-    detuneCents = -1.5;
+    detuneCents = -4;
   } else if (stringIdx === 2) {
     // String 3: Middle Sa (Jodi 2) with acoustic chorusing detune
     midi = baseSa;
-    detuneCents = +1.5;
+    detuneCents = +4;
   } else {
     // String 4: Kharaj Sa (Lower Octave Tonic)
     midi = baseSa - 12;
@@ -7791,14 +7791,14 @@ function playTanpuraPluck(stringIdx) {
   const oscHarmonics = audioCtx.createOscillator();
   oscHarmonics.type = "sawtooth";
   oscHarmonics.frequency.setValueAtTime(freq, now);
-  oscHarmonics.detune.setValueAtTime(detuneCents + (Math.random() * 0.8 - 0.4), now);
+  oscHarmonics.detune.setValueAtTime(detuneCents + (Math.random() * 3 - 1.5), now);
 
   // 3. Golden Jawari Bridge Resonator (Silk/Cotton thread non-linear buzzing cascade)
   const jawariFilter = audioCtx.createBiquadFilter();
   jawariFilter.type = "bandpass";
-  const formantCenter = 1750 + javariVal * 1650; // 1750 Hz - 3400 Hz golden formant peak
+  const formantCenter = 1100 + javariVal * 1100; // 1.1 - 2.2 kHz formant: a soft buzz, not a whistle
   jawariFilter.frequency.setValueAtTime(formantCenter, now);
-  jawariFilter.Q.setValueAtTime(5.0 + javariVal * 4.5, now); // Sharp golden ring
+  jawariFilter.Q.setValueAtTime(2.2 + javariVal * 2.0, now); // wide band, so it blends instead of ringing at one pitch
 
   // Micro-flutter on bridge contact (subtle acoustic undulation)
   const flutter = audioCtx.createOscillator();
@@ -7811,8 +7811,8 @@ function playTanpuraPluck(stringIdx) {
   const buzzGain = audioCtx.createGain();
   const buzzAmt = Math.min(1.0, 0.40 + javariVal * 0.90);
   buzzGain.gain.setValueAtTime(0.0001, now);
-  buzzGain.gain.linearRampToValueAtTime(0.44 * buzzAmt, now + 0.05);
-  buzzGain.gain.linearRampToValueAtTime(0.58 * buzzAmt, now + 0.32); // Swell into golden bloom
+  buzzGain.gain.linearRampToValueAtTime(0.34 * buzzAmt, now + 0.05);
+  buzzGain.gain.linearRampToValueAtTime(0.44 * buzzAmt, now + 0.32); // Swell into golden bloom
   buzzGain.gain.exponentialRampToValueAtTime(0.0001, now + ringDuration * 0.9);
 
   // 4. Warm Gourd Body Resonator (cavity formant filter)
@@ -7834,7 +7834,13 @@ function playTanpuraPluck(stringIdx) {
   bodyMixGain.connect(voiceGain);
   oscSubBody.connect(voiceGain);
 
-  voiceGain.connect(tanpuraBusGain);
+  // Rounds off the top so the strings sit behind the other voices.
+  const voiceLP = audioCtx.createBiquadFilter();
+  voiceLP.type = "lowpass";
+  voiceLP.frequency.setValueAtTime(2600, now);
+  voiceLP.Q.setValueAtTime(0.5, now);
+  voiceGain.connect(voiceLP);
+  voiceLP.connect(tanpuraBusGain);
 
   // Start & Stop
   oscBody.start(now);
@@ -7859,6 +7865,7 @@ function playTanpuraPluck(stringIdx) {
       bodyFilter.disconnect();
       bodyMixGain.disconnect();
       voiceGain.disconnect();
+      voiceLP.disconnect();
     } catch (e) {}
   }, (ringDuration + 0.2) * 1000);
 }
@@ -13154,8 +13161,8 @@ function applyPreset(idx) {
     document.getElementById("selDroneOctave").value = "D2";
     if (chkTanpura) chkTanpura.checked = true;
     if (document.getElementById("selTanpuraTuning")) document.getElementById("selTanpuraTuning").value = "PA";
-    if (document.getElementById("knobTanpura")) document.getElementById("knobTanpura").value = 70;
-    if (document.getElementById("knobJavari")) document.getElementById("knobJavari").value = 80;
+    if (document.getElementById("knobTanpura")) document.getElementById("knobTanpura").value = 38;
+    if (document.getElementById("knobJavari")) document.getElementById("knobJavari").value = 55;
     document.getElementById("knobDrone").value = 75;
     document.getElementById("knobDroneFilter").value = 220;
     document.getElementById("knobDroneDetune").value = 3.5;
