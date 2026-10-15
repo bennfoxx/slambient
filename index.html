@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
 <title>Slambient — Generative Ambient Instrument</title>
 <!-- The UI leans on Mac-only system fonts (ui-monospace/SFMono-Regular/Menlo) for
      almost every label. They look right on the machine this was built on, but a
@@ -3472,12 +3472,20 @@
   @media (max-width: 640px) {
     /* ---- Base ---- */
     html { zoom: 1; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    /* iPhone Safari widens the layout viewport (and zooms the page out) to fit
+       any content wider than the screen, which also pushes position:fixed
+       things like the orb sheet past the screen edges. minimum-scale=1 in the
+       viewport meta stops the zoom-out; clipping both roots means nothing can
+       pan the page sideways either (hidden first, as the fallback for
+       browsers without overflow: clip). */
+    html, body { max-width: 100%; overflow-x: hidden; overflow-x: clip; }
     body {
       min-height: 100vh;
       min-height: 100dvh;
       padding: 10px max(10px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
       gap: 12px;
       overflow-x: hidden;
+      overflow-x: clip;
     }
     * { -webkit-tap-highlight-color: transparent; }
 
@@ -4133,7 +4141,7 @@
       right: 0;
       bottom: 0;
       width: auto;
-      max-width: none;
+      max-width: 100vw;
       max-height: 72vh;
       max-height: 72dvh;
       display: flex;
