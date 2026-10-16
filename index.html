@@ -285,10 +285,77 @@
 
   .preset-group {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    flex: 0 0 auto;
+    width: max-content;
+    max-width: 100%;
     min-width: 0;
+  }
+  .preset-bank-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 8px;
+    box-sizing: border-box;
+  }
+  .preset-bank-tabs,
+  .patch-bank-actions {
+    display: inline-flex;
+    align-items: center;
+    background: #080a11;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    padding: 2px;
+    gap: 2px;
+    flex-shrink: 0;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.55);
+  }
+  .btn-bank-tab {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    height: 24px;
+    border-radius: 3px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: all 0.12s ease;
+    box-sizing: border-box;
+    white-space: nowrap;
+  }
+  .btn-bank-tab:hover {
+    color: #ffffff;
+  }
+  .btn-bank-tab.active {
+    background: rgba(var(--rgb-chord), 0.15);
+    color: var(--accent);
+    box-shadow: 0 0 6px rgba(var(--rgb-chord), 0.2);
+  }
+  .btn-bank-tab.btn-preset-io {
+    color: var(--color-drone);
+    padding: 2px 8px;
+    gap: 5px;
+  }
+  .btn-bank-tab.btn-preset-io:hover {
+    color: #ffffff;
+    background: rgba(var(--rgb-drone), 0.16);
+    box-shadow: 0 0 6px rgba(var(--rgb-drone), 0.25);
+  }
+  .btn-bank-tab.btn-preset-io svg {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
   }
   .preset-label {
     font-size: 13px;
@@ -302,13 +369,6 @@
   }
   .preset-bar {
     display: grid;
-    /* The bar is as wide as its longest preset name needs: width: max-content
-       makes all five 1fr tracks equal to the widest chip, so every name shows
-       in full and the grid stays uniform. (Safari bumps text under ~9px up to
-       9px even inside the page's zoom 0.75, so names can render wider than the
-       zoomed layout predicts; a fixed 640px bar truncated them.) At narrow
-       widths the presets move to their own full-width line instead (see the
-       max-width: 1240px block). */
     flex: 0 0 auto;
     width: max-content;
     min-width: 0;
@@ -319,69 +379,6 @@
     align-items: center;
   }
   .preset-bar .btn-preset-chip { padding: 0 12px; }
-  .patch-bank-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    padding: 5px 8px;
-    background: #080a11;
-    border: 1px solid var(--border-light);
-    border-radius: 5px;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.55);
-    flex-shrink: 0;
-    align-self: center;
-  }
-  .patch-bank-section > .preset-label {
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 1.2px;
-    color: var(--accent);
-    line-height: 1;
-    margin: 0;
-    text-transform: uppercase;
-  }
-  .preset-io-stack {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 4px;
-    flex-shrink: 0;
-  }
-  .btn-preset-io {
-    background: #0f121c;
-    color: var(--color-drone);
-    border: 1px solid rgba(var(--rgb-drone), 0.42);
-    padding: 0 8px;
-    height: 24px;
-    min-width: 66px;
-    box-sizing: border-box;
-    border-radius: 3px;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    cursor: var(--cursor-pointer) !important;
-    transition: all 0.12s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    white-space: nowrap;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
-  }
-  .btn-preset-io:hover {
-    background: rgba(var(--rgb-drone), 0.16);
-    color: #ffffff;
-    border-color: var(--color-drone);
-    box-shadow: 0 0 10px rgba(var(--rgb-drone), 0.35);
-  }
-  .btn-preset-io svg {
-    width: 10px;
-    height: 10px;
-  }
   .btn-preset-chip {
     background: #0f121c;
     color: var(--text-secondary);
@@ -426,38 +423,7 @@
     box-shadow: 0 0 16px rgba(var(--rgb-chord), 0.4);
   }
 
-  .preset-bank-tabs {
-    display: inline-flex;
-    align-items: center;
-    background: #080a11;
-    border: 1px solid var(--border-light);
-    border-radius: 4px;
-    padding: 2px;
-    gap: 2px;
-    flex-shrink: 0;
-  }
-  .btn-bank-tab {
-    background: transparent;
-    border: none;
-    color: var(--text-dim);
-    font-family: inherit;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    padding: 2px 7px;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: all 0.12s ease;
-  }
-  .btn-bank-tab:hover {
-    color: #ffffff;
-  }
-  .btn-bank-tab.active {
-    background: rgba(var(--rgb-chord), 0.15);
-    color: var(--accent);
-    box-shadow: 0 0 6px rgba(var(--rgb-chord), 0.2);
-  }
+
   .btn-store-user {
     background: rgba(var(--rgb-filter), 0.12) !important;
     border-color: rgba(var(--rgb-filter), 0.5) !important;
@@ -4560,7 +4526,6 @@
     .btn-preset-chip { padding: 0 5px; font-size: 12px; letter-spacing: 0.2px; }
     .preset-bar { gap: 4px; }
     .brand-row { gap: 12px; }
-    .patch-bank-section { padding: 4px 6px; gap: 4px; }
     .btn-preset-io { min-width: 0; padding: 0 6px; font-size: 10.5px; }
   }
   /* Narrower than ~1240px (or ~150% browser zoom): there isn't room for brand
@@ -4577,7 +4542,6 @@
       max-width: none;
       grid-template-columns: repeat(5, minmax(max-content, 1fr));
     }
-    .patch-bank-section { align-self: center; }
     .header-utils { align-self: flex-end; }
   }
   @media (max-width: 900px) {
@@ -4730,10 +4694,23 @@
       align-items: center;
       gap: 6px;
     }
-    .preset-bank-tabs {
+    .preset-bank-header {
+      display: contents;
+    }
+    .preset-bank-tabs,
+    .patch-bank-actions {
       flex: 0 0 auto;
       margin-bottom: 0;
       padding: 2px;
+    }
+    .preset-bank-tabs {
+      order: 0;
+    }
+    .preset-bar {
+      order: 1;
+    }
+    .patch-bank-actions {
+      order: 2;
     }
     .btn-bank-tab {
       height: 24px;
@@ -4765,22 +4742,6 @@
       letter-spacing: 0.2px;
       white-space: nowrap;
     }
-    .patch-bank-section {
-      flex: 0 0 auto;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      height: 24px;
-      padding: 0 4px;
-      gap: 4px;
-      border: none;
-      background: none;
-      box-shadow: none;
-    }
-    .patch-bank-section > .preset-label { display: none; }
-    .preset-io-stack { flex-direction: row; gap: 4px; }
-    .btn-preset-io { height: 24px; padding: 0 5px; font-size: 9px; gap: 3px; }
-    .btn-preset-io svg { width: 10px; height: 10px; }
 
     /* ---- Modular App Toolbar (3 Symmetric Distinct Sections) ---- */
     .transport-row {
@@ -5352,8 +5313,7 @@
     }
     header.top-bar:has(.palette-menu.open) { z-index: 9000; }
 
-    /* Shared look for the boxed "TAG + controls" rows (BANK, KEY, METER, TEMPO, SAMPLE) */
-    .patch-bank-section,
+    /* Shared look for the boxed "TAG + controls" rows (KEY, METER, TEMPO, SAMPLE) */
     .global-transport > .root-scale-ctrl,
     .global-transport > .time-sig-ctrl,
     .global-transport > .tempo-ctrl,
@@ -5368,7 +5328,6 @@
       border-radius: 4px;
       box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6);
     }
-    .patch-bank-section > .preset-label,
     .global-transport .tag {
       flex: 0 0 auto;
       min-width: 42px;
@@ -5415,9 +5374,18 @@
       max-width: 100%;
       min-width: 0;
     }
-    .preset-bank-tabs {
-      align-self: flex-start;
+    .preset-bank-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
       margin-bottom: 2px;
+      gap: 8px;
+    }
+    .preset-bank-tabs,
+    .patch-bank-actions {
+      align-self: auto;
+      margin-bottom: 0;
       padding: 2px;
     }
     .btn-bank-tab {
@@ -5481,28 +5449,6 @@
       text-overflow: clip;
       scroll-snap-align: start;
     }
-
-    /* BANK: one boxed row, SAVE / LOAD side by side */
-    .patch-bank-section {
-      margin-left: 0;
-      align-self: stretch;
-      flex-shrink: 0;
-    }
-    .preset-io-stack {
-      flex: 1 1 auto;
-      flex-direction: row;
-      gap: 4px;
-      min-width: 0;
-    }
-    .btn-preset-io {
-      flex: 1 1 0;
-      min-width: 0;
-      height: 32px;
-      padding: 0 8px;
-      font-size: 11px;
-      gap: 7px;
-    }
-    .btn-preset-io svg { width: 12px; height: 12px; }
 
     /* Transport section: 4 distinct modular sections stacked cleanly & symmetrically */
     .transport-row {
@@ -7224,9 +7170,22 @@
         </div>
 
         <div class="preset-group">
-          <div class="preset-bank-tabs">
-            <button class="btn-bank-tab active" id="tabBankFactory" onclick="switchPresetBank('factory')" title="Factory curated presets">PRESETS</button>
-            <button class="btn-bank-tab" id="tabBankUser" onclick="switchPresetBank('user')" title="User saved patch bank (U1-U6)">USER [U1–U6]</button>
+          <div class="preset-bank-header">
+            <div class="preset-bank-tabs">
+              <button class="btn-bank-tab active" id="tabBankFactory" onclick="switchPresetBank('factory')" title="Factory curated presets">PRESETS</button>
+              <button class="btn-bank-tab" id="tabBankUser" onclick="switchPresetBank('user')" title="User saved patch bank (U1-U6)">USER [U1–U6]</button>
+            </div>
+            <div class="patch-bank-actions">
+              <button type="button" class="btn-bank-tab btn-preset-io" onclick="savePresetBankJson()" title="Export current console & DSP chain patch as a JSON file">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 1.5V8M6 8L3.2 5.2M6 8L8.8 5.2M2 10.5H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>SAVE</span>
+              </button>
+              <button type="button" class="btn-bank-tab btn-preset-io" onclick="triggerLoadPresetBankJson()" title="Import a saved JSON patch & restore console + DSP chain routing">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 8.5V2M6 2L3.2 4.8M6 2L8.8 4.8M2 10.5H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>LOAD</span>
+              </button>
+              <input type="file" id="inputPresetJson" accept=".json,application/json" style="display:none;" onchange="loadPresetBankJson(event)">
+            </div>
           </div>
           <div class="preset-bar" id="presetBarFactory">
             <button class="btn-preset-chip" onclick="applyPreset(0)" title="Nostalgic Drift — 7/4 warm tape pads, music box arp, drifting sub">Nostalgia</button>
@@ -7253,22 +7212,6 @@
             <button class="btn-preset-chip user-slot-chip" id="btnUserSlot5" onclick="handleUserSlotClick(5, event)" oncontextmenu="handleUserSlotContextMenu(event, 5)" title="Slot U5 — Click to load / Shift-click to save">U5: Empty</button>
             <button class="btn-preset-chip user-slot-chip" id="btnUserSlot6" onclick="handleUserSlotClick(6, event)" oncontextmenu="handleUserSlotContextMenu(event, 6)" title="Slot U6 — Click to load / Shift-click to save">U6: Empty</button>
             <button class="btn-preset-chip btn-store-user" onclick="storeToUserSlotPrompt()" title="Save current console & synth state into a user patch slot">+ STORE</button>
-          </div>
-
-          <!-- UNIFIED PATCH BANK MODULE (Save/Load stacked next to presets) -->
-          <div class="patch-bank-section">
-            <span class="preset-label">BANK</span>
-            <div class="preset-io-stack">
-              <button class="btn-preset-io" onclick="savePresetBankJson()" title="Export current console & DSP chain patch as a JSON file">
-                <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 1.5V8M6 8L3.2 5.2M6 8L8.8 5.2M2 10.5H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <span>SAVE</span>
-              </button>
-              <button class="btn-preset-io" onclick="triggerLoadPresetBankJson()" title="Import a saved JSON patch & restore console + DSP chain routing">
-                <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 8.5V2M6 2L3.2 4.8M6 2L8.8 4.8M2 10.5H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <span>LOAD</span>
-              </button>
-              <input type="file" id="inputPresetJson" accept=".json,application/json" style="display:none;" onchange="loadPresetBankJson(event)">
-            </div>
           </div>
         </div>
       </div>
