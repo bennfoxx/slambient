@@ -1633,3 +1633,21 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
     - Updated total module count from 9 to 10.
     - Added **Mod 6**: **Field Recorder** (`#2bcbba` Turquoise / `43, 203, 186`).
     - Shifted Master Filter to Mod 7, Analog Delay to Mod 8, Reverb & Chorus to Mod 9, and Master Space & Out to Mod 10.
+## Update — 2026-10-16 (Desktop Close-Up Module View Cyber-Chassis & Signal Routing Ribbon)
+
+- **Desktop Viewport-Centered Cyber-Chassis**:
+  - Replaced container-bound full-height modal (`.lower-deck > .orbital-side-panel`, `#orbitalArenaWrapper > .orbital-side-panel`) with a viewport-centered floating cyber-chassis (`position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 580px; height: auto; max-height: min(88vh, 680px);`).
+  - **Zero Dead Space**: Auto-fits content vertically, eliminating the large empty dark void that previously appeared at the bottom of 300px effect cards.
+  - **Zero Cutoff**: Never clipped or pushed offscreen by grid bounds or scroll offsets; backdrop blurs background with `backdrop-filter: blur(8px)`.
+  - **Seamless Faceplate Design**: Flattened `.orbital-side-panel .strip-channel` and `.orbital-side-panel .pedal-chassis` to transparent with zero nested borders, removing the awkward "box-inside-a-box" double outline.
+- **Interactive Signal Routing Ribbon (`#orbitalSignalRibbon`)**:
+  - Added a tactile 10-module signal routing status bar directly on the inspector faceplate on desktop: `[1. SUB] [2. DRM] [3. CHD] [4. ARP] [5. NOI] [6. FLD] ➔ [7. FLT] [8. DLY] [9. SPC] ➔ [10. OUT]`.
+  - Active module is highlighted with its semantic neon accent halo and glowing text. Clicking any module node pill instantly jumps to that module's controls.
+  - Automatically hidden on mobile bottom sheet (`@media (max-width: 640px)`) to preserve compact phone ergonomics.
+- **Hardware Keyboard Navigation & Shortcuts**:
+  - While modal is active:
+    - `ESC`: Closes inspector.
+    - `ArrowLeft` or `[`: Cycles to previous module in signal chain.
+    - `ArrowRight` or `]`: Cycles to next module in signal chain.
+    - `P` / `p`: Toggles power/bypass for current module.
+    - `R` / `r`: Triggers randomization for current module.

@@ -2457,138 +2457,66 @@
     pointer-events: auto;
   }
 
+  /* ==========================================================================
+     CLOSE-UP MODULE INSPECTOR (Desktop Viewport-Centered Cyber-Chassis)
+     ========================================================================== */
+  .orbital-modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(3, 5, 12, 0.82);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .orbital-modal-backdrop.active {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   .orbital-side-panel {
     display: none;
     flex-direction: column;
     position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 620px;
-    max-width: 88vw;
-    background: linear-gradient(145deg, rgba(var(--modal-accent-rgb, 0, 229, 255), 0.08) 0%, rgba(9, 12, 20, 0.98) 42%, #070910 100%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.97);
+    width: 580px;
+    max-width: min(92vw, 620px);
+    height: auto;
+    max-height: min(88vh, 680px);
+    background: linear-gradient(155deg, rgba(var(--modal-accent-rgb, 0, 229, 255), 0.10) 0%, rgba(10, 13, 22, 0.98) 36%, #070912 100%);
     border: 1px solid var(--modal-accent-color, var(--color-drone));
-    border-radius: 6px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.85), 0 0 28px var(--modal-accent-glow, rgba(var(--rgb-drone), 0.35));
-    padding: 14px 16px;
-    overflow: hidden;
+    border-radius: 8px;
+    box-shadow:
+      0 16px 50px rgba(0, 0, 0, 0.92),
+      0 0 32px var(--modal-accent-glow, rgba(var(--rgb-drone), 0.35)),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    padding: 16px 20px 20px;
+    box-sizing: border-box;
     z-index: 10000;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.22s ease;
-    box-sizing: border-box;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
   }
   .orbital-side-panel.active {
     display: flex;
     opacity: 1;
     pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
   }
 
-  /* Rack View (Desktop): Confined strictly to the lower-deck UI bounds */
-  .lower-deck {
-    position: relative;
-  }
-  .lower-deck > .orbital-modal-backdrop {
-    display: none;
-    position: absolute;
-    inset: 0;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 6px;
-    background: rgba(4, 6, 12, 0.78);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    z-index: 100;
-  }
-  .lower-deck > .orbital-modal-backdrop.active {
-    display: block;
-    opacity: 1;
-    pointer-events: auto;
-  }
-  .lower-deck > .orbital-side-panel {
-    display: none;
-    position: absolute;
-    inset: 0;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    max-width: 760px;
-    margin: 0 auto;
-    height: 100%;
-    max-height: 100%;
-    border: 1px solid var(--modal-accent-color, var(--color-drone));
-    border-radius: 6px;
-    background: linear-gradient(145deg, rgba(var(--modal-accent-rgb, 0, 229, 255), 0.10) 0%, rgba(9, 12, 20, 0.98) 38%, #070910 100%);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.9), 0 0 28px var(--modal-accent-glow, rgba(var(--rgb-drone), 0.35));
-    padding: 14px 18px;
-    z-index: 101;
-    transform: none;
-    box-sizing: border-box;
-    overflow: hidden;
-  }
-  .lower-deck > .orbital-side-panel.active {
-    display: flex;
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  /* Orbital View (Desktop): Confined strictly to the arena wrapper card */
-  #orbitalArenaWrapper {
-    position: relative;
-  }
-  #orbitalArenaWrapper > .orbital-modal-backdrop {
-    display: none;
-    position: absolute;
-    inset: 0;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 8px;
-    background: rgba(4, 6, 12, 0.78);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    z-index: 100;
-  }
-  #orbitalArenaWrapper > .orbital-modal-backdrop.active {
-    display: block;
-    opacity: 1;
-    pointer-events: auto;
-  }
-  #orbitalArenaWrapper > .orbital-side-panel {
-    display: none;
-    position: absolute;
-    inset: 0;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    max-width: 680px;
-    margin: 0 auto;
-    height: 100%;
-    max-height: 100%;
-    border: 1px solid var(--modal-accent-color, var(--color-drone));
-    border-radius: 8px;
-    background: linear-gradient(145deg, rgba(var(--modal-accent-rgb, 0, 229, 255), 0.10) 0%, rgba(9, 12, 20, 0.98) 38%, #070910 100%);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.9), 0 0 28px var(--modal-accent-glow, rgba(var(--rgb-drone), 0.35));
-    padding: 14px 18px;
-    z-index: 101;
-    transform: none;
-    box-sizing: border-box;
-    overflow: hidden;
-  }
-  #orbitalArenaWrapper > .orbital-side-panel.active {
-    display: flex;
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .orbital-side-panel .orbital-modal-actions-slot .pedal-drag-handle {
+  .orbital-side-panel .orbital-modal-actions-slot .pedal-drag-handle,
+  .orbital-side-panel .orbital-modal-actions-slot .btn-pedal-shift {
     display: none !important;
   }
   .orbital-modal-header {
@@ -2804,22 +2732,91 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    padding-right: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--modal-accent-color, var(--accent)) rgba(255, 255, 255, 0.04);
   }
+  .orbital-modal-body::-webkit-scrollbar {
+    width: 5px;
+  }
+  .orbital-modal-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 3px;
+  }
+  .orbital-modal-body::-webkit-scrollbar-thumb {
+    background: var(--modal-accent-color, var(--accent));
+    border-radius: 3px;
+    box-shadow: 0 0 6px var(--modal-accent-glow, rgba(var(--rgb-drone), 0.4));
+  }
+
+  /* Signal Routing Ribbon */
+  .orbital-signal-ribbon {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    margin: -4px 0 14px 0;
+    padding: 6px 8px;
+    background: rgba(0, 0, 0, 0.38);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 5px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .orbital-signal-ribbon::-webkit-scrollbar { display: none; }
+  .orbital-signal-ribbon-node {
+    padding: 3px 6px;
+    font-size: 9.5px;
+    font-weight: 800;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: 0.5px;
+    border-radius: 3px;
+    border: 1px solid transparent;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    transition: all 0.14s ease;
+    white-space: nowrap;
+    line-height: 1.2;
+    background: transparent;
+    flex-shrink: 0;
+  }
+  .orbital-signal-ribbon-node:hover {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .orbital-signal-ribbon-node.active {
+    color: #ffffff !important;
+    background: rgba(var(--modal-accent-rgb, 0, 229, 255), 0.22);
+    border-color: var(--modal-accent-color, var(--accent)) !important;
+    box-shadow: 0 0 8px rgba(var(--modal-accent-rgb, 0, 229, 255), 0.45);
+  }
+  .orbital-signal-ribbon-arrow {
+    color: var(--text-tertiary);
+    font-size: 8px;
+    opacity: 0.4;
+    user-select: none;
+    flex-shrink: 0;
+  }
+
   .orbital-side-panel .module-drawer-toggle.expanded {
     color: var(--modal-accent-color, var(--accent));
     border-color: rgba(var(--modal-accent-rgb, 0, 229, 255), 0.45);
     background: rgba(var(--modal-accent-rgb, 0, 229, 255), 0.10);
   }
 
-  /* Scoped styling for strip channel (and, for the Filter/Delay/Reverb
-     orbs, the pedal-chassis card) when inside the orbital side view widget */
+  /* Scoped styling for strip channel and pedal chassis when inside close-up view:
+     Seamless hardware faceplate design (no redundant card-in-card double borders) */
   .orbital-side-panel .strip-channel,
   .orbital-side-panel .pedal-chassis {
-    background: rgba(13, 16, 26, 0.90);
-    border: 1px solid rgba(var(--modal-accent-rgb, 0, 229, 255), 0.38) !important;
-    border-top: 2px solid var(--modal-accent-color, var(--color-drone)) !important;
-    border-radius: 6px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--modal-accent-rgb, 0, 229, 255), 0.16) !important;
+    background: transparent !important;
+    border: none !important;
+    border-top: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
   }
   /* The orbital modal header already shows this module's title and (once
      borrowed up by expandModuleOrb) its mute/solo/power/randomize icons
@@ -6442,6 +6439,7 @@
     }
     /* While the finger drags the sheet down (orbital.js), follow it 1:1. */
     .orbital-side-panel.sheet-dragging { transition: none; }
+    .orbital-side-panel .orbital-signal-ribbon { display: none; }
 
     /* Sheet header: grab handle, then [title ... close], then the module's
        own action buttons (PWR / M / S / randomize, or a pedal's slot badge,
@@ -7898,6 +7896,7 @@
         <button class="orbital-modal-close" onclick="closeOrbitalModal()" title="Close Controls (ESC)">✕</button>
       </div>
     </div>
+    <div class="orbital-signal-ribbon" id="orbitalSignalRibbon"></div>
     <div class="orbital-modal-body" id="orbitalModalBody"></div>
   </div>
 
@@ -20145,7 +20144,31 @@ function initOrbitalConstellation() {
   });
 
   window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && expandedOrbId) closeOrbitalModal();
+    if (!expandedOrbId) return;
+    if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "SELECT" || e.target.isContentEditable)) return;
+
+    if (e.key === "Escape") {
+      e.preventDefault();
+      closeOrbitalModal();
+    } else if (e.key === "ArrowLeft" || e.key === "[") {
+      e.preventDefault();
+      cycleOrbitalModule(-1);
+    } else if (e.key === "ArrowRight" || e.key === "]") {
+      e.preventDefault();
+      cycleOrbitalModule(1);
+    } else if (e.key === "p" || e.key === "P") {
+      const pwrBtn = document.querySelector("#orbitalModalActions .btn-power, #orbitalModalActions .btn-mini-power");
+      if (pwrBtn) {
+        e.preventDefault();
+        pwrBtn.click();
+      }
+    } else if (e.key === "r" || e.key === "R") {
+      const rndBtn = document.querySelector("#orbitalModalActions button.badge-tag");
+      if (rndBtn) {
+        e.preventDefault();
+        rndBtn.click();
+      }
+    }
   });
 
   if (typeof initPedalDragAndDrop === 'function') initPedalDragAndDrop();
@@ -20545,19 +20568,10 @@ function expandModuleOrb(orbId) {
   }
 
   const backdrop = document.getElementById("orbitalModalBackdrop");
-  const isMobile = window.matchMedia && window.matchMedia("(max-width: 640px)").matches;
-  if (!isMobile) {
-    const targetContainer = (activeModuleView === "console")
-      ? document.querySelector(".lower-deck")
-      : document.getElementById("orbitalArenaWrapper");
-    if (targetContainer) {
-      if (backdrop && backdrop.parentElement !== targetContainer) targetContainer.appendChild(backdrop);
-      if (panel && panel.parentElement !== targetContainer) targetContainer.appendChild(panel);
-    }
-  } else {
-    if (backdrop && backdrop.parentElement !== document.body) document.body.appendChild(backdrop);
-    if (panel && panel.parentElement !== document.body) document.body.appendChild(panel);
-  }
+  if (backdrop && backdrop.parentElement !== document.body) document.body.appendChild(backdrop);
+  if (panel && panel.parentElement !== document.body) document.body.appendChild(panel);
+
+  renderSignalRibbon(targetId);
 
   panel.classList.add("active");
   if (backdrop) backdrop.classList.add("active");
@@ -20592,6 +20606,42 @@ function getSignalChainOrbList() {
   const pedals = (Array.isArray(dspChainOrder) ? dspChainOrder : ["FILTER", "DELAY", "SPACE"])
     .map(k => (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && PEDAL_KEY_TO_ORBITAL_ID[k]) ? PEDAL_KEY_TO_ORBITAL_ID[k] : k.toLowerCase());
   return ["drone", "drum", "chord", "arp", "noise", "field", ...pedals, "space"];
+}
+
+function renderSignalRibbon(activeOrbId) {
+  const ribbon = document.getElementById("orbitalSignalRibbon");
+  if (!ribbon) return;
+  const chain = getSignalChainOrbList();
+  ribbon.innerHTML = "";
+
+  chain.forEach((orbId, idx) => {
+    if (idx === 6 || idx === 9) {
+      const sep = document.createElement("span");
+      sep.className = "orbital-signal-ribbon-arrow";
+      sep.textContent = "➔";
+      ribbon.appendChild(sep);
+    }
+
+    const orb = ORBITAL_MODULES.find(o => o.id === orbId);
+    if (!orb) return;
+
+    const node = document.createElement("button");
+    node.type = "button";
+    node.className = "orbital-signal-ribbon-node" + (orb.id === activeOrbId ? " active" : "");
+    node.textContent = `${orb.num}. ${orb.name}`;
+    node.setAttribute("title", `Inspect ${orb.num}. ${orb.name}`);
+    node.style.setProperty("--node-color", orb.color);
+    if (orb.id === activeOrbId) {
+      node.style.borderColor = orb.color;
+      node.style.color = orb.color;
+      node.style.boxShadow = `0 0 8px rgba(${orb.rgb[0]}, ${orb.rgb[1]}, ${orb.rgb[2]}, 0.45)`;
+    }
+    node.onclick = (e) => {
+      e.stopPropagation();
+      expandModuleOrb(orb.id);
+    };
+    ribbon.appendChild(node);
+  });
 }
 
 function cycleOrbitalModule(dir) {
