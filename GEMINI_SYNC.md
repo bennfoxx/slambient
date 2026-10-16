@@ -1428,7 +1428,7 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
 - **Rack View & Symmetrical 6-Module Grid**:
   - Renamed view mode from `Pedal View` / `Console Rack` to **`Rack View`** (`#btnViewConsole`).
   - Added Module 6: **`6. FX CHAIN`** (`.pedal-chain-module`) directly inside `.lower-deck` alongside Modules 1–5 (`SUB`, `DRUMS`, `CHORDS`, `ARP`, `NOISE`).
-  - Updated grid layout for `.lower-deck` to `repeat(6, 1fr)` on wide desktop (> 1440px), `repeat(3, 1fr)` on medium desktop (1025px–1440px) and landscape mobile, `repeat(2, 1fr)` on tablet (641px–1024px), and `1fr` on portrait mobile (<= 640px). Every breakpoint forms a balanced, symmetrical grid with zero orphan blanks.
+  - **100% Desktop Zoom 1-Line Layout**: Removed the legacy `@media (max-width: 1440px)` 3-column wrap rule that forced laptop/desktop monitors at 100% browser zoom into 2 rows. `.lower-deck` now stays on **1 single line** across all desktop viewports (`repeat(6, minmax(0, 1fr))` with `gap: 10px`), matching the 85% zoom behavior. Compacted `.strip-channel` padding to `10px 10px` and added `min-width: 0` to prevent child blowout. Tablet wraps to 2 columns (`max-width: 1024px`) and portrait phone wraps to 1 column (`max-width: 640px`).
 - **Birds-Eye FX Chain Architecture**:
   - Entire DSP insert chain condensed into a single module with identical dimensions to the instrument channel strips.
   - Hardware signal flow diagram header: `[BUS PRE] ➔ LIVE INSERT MATRIX ➔ [OUT]`.
