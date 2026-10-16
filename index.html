@@ -898,14 +898,14 @@
   }
   .shortcuts-overlay.open { display: flex; }
   .shortcuts-panel {
-    width: min(640px, calc(100vw - 32px));
+    width: min(720px, calc(100vw - 32px));
     max-height: calc(100vh - 48px);
     overflow-y: auto;
     background: var(--panel);
     border: 1px solid rgba(var(--rgb-drone), 0.45);
     border-radius: 8px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.75), 0 0 24px rgba(var(--rgb-drone), 0.18);
-    padding: 16px 18px 16px;
+    padding: 16px 18px 18px;
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     color: var(--text-secondary);
   }
@@ -913,12 +913,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 0 0 10px;
-    padding-bottom: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0 0 12px;
+    padding-bottom: 8px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
   .manual-title {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
     font-size: 13px;
@@ -926,6 +928,7 @@
     letter-spacing: 1.2px;
     text-transform: uppercase;
     color: var(--color-drone);
+    min-width: 0;
   }
   .manual-title .pill {
     font-size: 9px;
@@ -936,6 +939,7 @@
     border: 1px solid var(--color-drone);
     color: var(--color-drone);
     letter-spacing: 0.5px;
+    white-space: nowrap;
   }
   .shortcuts-panel h3 {
     margin: 0 0 10px;
@@ -949,34 +953,42 @@
   }
   .manual-nav {
     display: flex;
-    gap: 4px;
-    overflow-x: auto;
-    padding-bottom: 8px;
-    margin-bottom: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-    -webkit-overflow-scrolling: touch;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
   .manual-nav-btn {
+    flex: 1 1 auto;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 4px;
     color: var(--text-secondary);
-    padding: 5px 10px;
+    padding: 6px 12px;
     font-family: inherit;
     font-size: 11px;
+    font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 32px;
     transition: all 0.15s ease;
   }
   .manual-nav-btn:hover {
     background: rgba(255, 255, 255, 0.08);
     color: #fff;
+    border-color: rgba(255, 255, 255, 0.18);
   }
   .manual-nav-btn.active {
     background: rgba(var(--rgb-drone), 0.2);
     border-color: var(--color-drone);
     color: var(--color-drone);
     font-weight: 600;
+    box-shadow: 0 0 10px rgba(var(--rgb-drone), 0.25);
   }
   .manual-pane {
     display: none;
@@ -1053,13 +1065,28 @@
     color: #e6ecff;
   }
   .shortcuts-close {
-    background: none;
-    border: none;
-    color: var(--text-tertiary);
-    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    margin-left: auto;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1;
     cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
   }
-  .shortcuts-close:hover { color: #fff; }
+  .shortcuts-close:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #fff;
+  }
   .btn-header-util .icon-exit-fs { display: none; }
   .btn-header-util.active .icon-enter-fs { display: none; }
   .btn-header-util.active .icon-exit-fs { display: block; }
@@ -5231,7 +5258,7 @@
     }
     .shortcuts-panel {
       width: 100%;
-      max-width: 460px;
+      max-width: 580px;
       max-height: 100%;
       padding: 0 14px 14px;
       overscroll-behavior: contain;
@@ -5239,19 +5266,31 @@
     .manual-header {
       position: sticky;
       top: 0;
-      z-index: 2;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
       background: var(--panel);
-      padding: 10px 0 6px;
-      margin: 0 0 6px;
+      padding: 10px 0 8px;
+      margin: 0 0 8px;
       border-bottom: 1px solid var(--border);
     }
     .manual-title {
       font-size: 11.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .manual-nav {
+      gap: 5px;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
     }
     .manual-nav-btn {
-      padding: 6px 10px;
-      font-size: 11px;
-      min-height: 32px;
+      padding: 6px 8px;
+      font-size: 10.5px;
+      min-height: 30px;
     }
     .shortcuts-panel h3 {
       position: sticky;
@@ -5264,10 +5303,10 @@
       font-size: 13px;
     }
     .shortcuts-close {
-      width: 40px;
-      height: 40px;
-      margin-right: -10px;
-      font-size: 18px;
+      width: 28px;
+      height: 28px;
+      font-size: 15px;
+      margin: 0 0 0 auto;
     }
     .shortcuts-panel h4 { margin: 14px 0 6px; font-size: 10.5px; }
     .shortcuts-panel .sc-row {
@@ -16818,7 +16857,7 @@ function buildShortcutsPanel() {
           <span>Slambient Field Manual</span>
           <span class="pill">v1.2</span>
         </div>
-        <button class="shortcuts-close" onclick="toggleShortcutsPanel(false)" title="Close (Esc)">✕</button>
+        <button class="shortcuts-close" onclick="toggleShortcutsPanel(false)" title="Close (Esc)" aria-label="Close Field Manual">✕</button>
       </div>
 
       <div class="manual-nav" role="tablist">
