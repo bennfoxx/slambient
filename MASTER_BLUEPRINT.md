@@ -16,6 +16,8 @@ This master architecture document serves as the authoritative single-source-of-t
 * **Part II (Sections 6–12):** Canonical Web Workstation Architecture (`slambient_dev/index.html`): the 9-module audio engine (five instrument strips, a live-reorderable three-pedal insert chain, and the Master EQ & Out strip), the 4-layer CRT visualizer with fullscreen and roadside scenery, the drag-reorderable upper deck with playable MIDI keyboard and additive arpeggiator, the orbital constellation view, 15 presets with JSON patch save/load, implementation roadmap status, and architectural guardrails.
 * **Part III (Sections 13–15):** App Development, PWA Shell & Cross-Platform Packaging: standalone PWA wrapper (`manifest.json`, icon suite), offline-first service worker (`sw.js`), mobile viewport adaptation (safe-area insets, touch physics), Screen Wake Lock integration, WebKit/Safari Web Audio memory leak hardening, stereo binaural spatial drift engine, and native container deployment paths (Capacitor for iOS/Android, Tauri/Electron for Desktop).
 * **Part IV (Sections 16–19):** FM-1 Hardware Conversion Planning & Physical Control Mapping Specification: complete physical surface translation (27 silicone keys, continuous rotary encoders, 24 FPS SPI display), dual-mode parameter dispatch (Macro vs. Module Page), AUTO-to-LIVE downbeat hand-off state machine, and comprehensive 8-phase embedded engineering roadmap.
+* **Part V (Sections 20–23):** Commercialization, Monetization Strategy & Native Release Roadmap: market landscape, competitive moats, Step 1 (iOS/iPadOS App Store via Capacitor), Step 2 (Desktop Studio & Royalty-Free Stem Generator via Tauri), distribution storefronts, 3-week execution schedule, and revenue financial models.
+* **Part VI (Sections 24–27):** Hardware-Inspired Pedal Board & Eurorack UI Architecture: standardized 32 HP / 64 HP grid system, Pedals Mode dashboard with bezier patch cables, edge-to-edge orbital swipe navigation, multi-topology filter intensity scale, modular multi-delay engine (Tape/BBD/Digital/Ping-Pong), and 3-phase implementation roadmap.
 
 ---
 
@@ -825,6 +827,112 @@ WEEK 3: Merchandising, Storefronts & Launch Campaign
   * Total Year 1 Software Net: **~$120,382 USD**.
 * **Hardware Expansion (FM-1 Batch Run of 500 units):**
   * 500 units × $199.00 = $99,500 gross revenue (~$65,000 gross profit).
+
+---
+
+### Part VI: Hardware-Inspired Pedal Board & Eurorack UI Architecture
+
+#### 24. Executive Summary & Aesthetic Paradigm
+This design and engineering architecture overhauls Slambient’s user interface and signal-chain management by replacing legacy console views with a hardware-inspired **Pedals Mode**. Driven by Eurorack proportions, modular HP sizing, and authentic tactile analog metaphors (braided patch cables, metallic jacks, textured faceplates, corner mounting screws), the redesign unifies macro rack navigation, fluid edge-to-edge orbital swiping, granular multi-delay algorithms, and responsive multi-topology filter controls into a cohesive, tactile ambient sound-design environment.
+
+#### 25. Core Architectural Components
+
+##### 25.1 The Eurorack-Inspired HP Sizing Grid
+Modules snap strictly to a standardized horizontal grid using physical HP (Horizontal Pitch, where $1\text{ HP} = 5.08\text{ mm}$ / standardized CSS layout unit) to maintain authentic hardware proportions across mobile, tablet, and desktop viewports:
+* **Grid Case Framework:**
+  * **Mobile:** Case layouts lock to a fixed **32 HP** rack width per row, rendering as an ultra-clean 2-column structural grid without cramped horizontal squishing.
+  * **Desktop / Large Screens:** Case layouts lock to a unified **64 HP** rack width per row.
+* **Module Width Classifications:**
+  * **Utility / LFOs:** **8 HP** width (compact utility strips, CV modulators, routing utilities).
+  * **Standard Modules (Filter, Chorus, Master EQ):** **16 HP** width (primary controls, macro dials, metering).
+  * **Complex Modules (Multi-Delay, Diffusion Reverb, Field Sampler):** **24 HP** width (deep multi-parameter algorithms, secondary drawers).
+* **Surface Materials & Tactile Aesthetics:**
+  * Faceplates: Anodized dark slate brushed metal (`#2B2D31`) with matte texture and subtle vertical grain.
+  * Studio Chassis / Base: Deep low-resonance enclosure (`#1A1C23`).
+  * Structural Rails: Machined cold-rolled steel rails (`#3F4248`) running horizontally above and below each rack row.
+  * Hardware Accents: Hexagonal corner mounting screws (`#111215` with metallic chamfer highlights) positioned at standard Eurorack mounting ear intervals.
+
+##### 25.2 Pedals Mode (Replacing Legacy Mobile Console View)
+A macro-level physical rack dashboard giving the performer an immediate, zero-clutter overview of their active signal chain:
+* **Visual Faceplate Elements:**
+  * Each module renders as a physical Eurorack panel displaying an uppercase silkscreened module name in crisp monospace typography.
+  * Dedicated HP badge (e.g. `[16 HP]`, `[24 HP]`) in subtle etched dark zinc.
+  * Hardware bypass toggle switch (`[Byp]`) with an active colored LED status bezel.
+  * Micro-jack anchor points (6px metallic circular rings with dark interior bore) positioned for audio inputs, audio outputs, and CV inputs.
+* **Braided Bezier Patch Lines:**
+  * Thin, semi-transparent neon teal (`#00E5FF`, `rgba(0, 229, 255, 0.65)`) dynamic SVG cubic bezier curves simulate weighted physical patch cables hanging with natural gravitational slack.
+  * Real-time audio routing dynamically drawn from module output jacks to the downstream module's input jacks.
+  * Secondary amber (`#FFB000`) and violet (`#A855F7`) patch lines map active CV/LFO modulation assignments and sidechain ducking triggers.
+  * Dynamic visual feedback: Patch lines pulse and glow subtly in real-time correlation with audio bus amplitudes and LFO rate cycles.
+* **Direct Tactile Interactions:**
+  * **Tap to Focus:** Tapping any module card triggers a fluid spring animation zooming directly into its deep **Orbital View**.
+  * **Long-Press & Drag Reordering:** Long-pressing a module lifts its chassis off the mounting rails with an elevated drop-shadow; dragging left/right slides adjacent modules smoothly along the Eurorack rails, instantly executing `rewireDspChain()` live without audio dropouts or clicks.
+
+##### 25.3 Orbital View & Edge-to-Edge Gesture Navigation
+When focused on a single module, the interface smoothly expands its full faceplate controls while preserving continuous workflow continuity:
+* **Horizontal Edge-to-Edge Swiping:**
+  * Swiping left or right edge-to-edge across the screen instantly slides the current module out of frame and brings the adjacent module in the DSP signal chain into focus.
+  * Eliminates tedious menu diving, allowing the musician to dial in Delay, swipe to Reverb, swipe to Filter, and swipe to Master EQ in one continuous gestural sweep.
+* **Fluid Exit Transitions:**
+  * A pinch-in gesture or tapping the header back arrow (`← RACK`) smoothly collapses the single-module view back out to the macro Pedals Mode overview.
+
+---
+
+#### 26. Deep-Dive Audio Parameter Modules
+
+##### 26.1 The Filter Module & Intensity Scale
+Engineered specifically to eliminate flat, sterile filter sweeps in generative ambient landscapes:
+* **Switchable Analog-Emulated Topologies:**
+  1. *Ladder 24dB:* Classic transistor ladder lowpass with rich saturated warmth and steep cutoff slope.
+  2. *State-Variable 12dB (SEM):* Organic 2-pole multi-mode filter with smooth, singing resonance.
+  3. *Formant / Vocal:* Dual-peak vowel cavity filter creating acoustic bansuri and vocal throat textures.
+  4. *Comb Filter:* Resonant short-delay feedback comb creating physical string and resonator halos.
+* **Primary Faceplate Controls:**
+  * Chunky knurled rotary knobs for **Cutoff** ($20\text{ Hz} – 20\text{ kHz}$ with logarithmic response) and **Resonance** (with calibrated self-oscillation headroom and automatic soft-limiting).
+* **Filter Intensity Scale:**
+  * A prominent horizontal slider positioned across the main faceplate acting as a master macro-scaling control for overall effect depth and modulation extremity.
+  * **Bipolar Polarity Toggle:** Switches between normal sweeps (positive modulation) and inverted sweeps (negative modulation envelope dipping).
+  * **Automatic Low-End Makeup Gain:** Dynamic psychoacoustic compensation circuit that boosts the fundamental low-end as resonance increases, preventing the classic volume drop-out inherent in resonant ladders.
+* **Collapsible Parameter Drawers:**
+  * Expandable accordion drawer housing secondary controls: Envelope Follower Sensitivity (Attack/Release times), Envelope-to-Cutoff depth, and internal modulation LFO (Rate, Depth, Triangle/Sine/Random S&H Shape).
+
+##### 26.2 Modular Multi-Delay Engine Architecture
+A multi-engine ambient delay processor offering four distinct sonic character profiles:
+* **Engine Selector:**
+  * Instant pill-bar selector toggling between four discrete DSP engines:
+    1. **Tape:** Analog tape saturation, wow/flutter capstan drift, and high-frequency tape head loss.
+    2. **BBD (Bucket Brigade Device):** Dark compander saturation, warm clock noise, and analog bucket-loss grit.
+    3. **Digital:** Pristine, crystal-clear 32-bit floating-point high-fidelity repeats with zero coloration.
+    4. **Ping-Pong:** Stereo alternating spatial bounces with psychoacoustic binaural Haas micro-delays.
+* **Primary Faceplate Controls:**
+  * Oversized macro rotary knobs for **Time** (tempo-synced divisions $1/16$ to $2/1$ or free $20\text{ ms} – 2000\text{ ms}$) and **Feedback** (calibrated up to 48% safety ceiling or continuous dub hold).
+* **Engine-Specific Dynamic Drawers:**
+  * Expanding accordion sub-drawers dynamically adapt parameters based on the active engine:
+    * *Tape Mode:* Exposes Tape Age, Head Saturation Drive, and Motor Inertia / Flutter Speed.
+    * *BBD Mode:* Exposes Clock Noise floor, Color Darkness, and Bucket Stage count ($1024 / 4096$).
+    * *Digital Mode:* Exposes Bitcrush Resolution ($8\text{-bit} – 24\text{-bit}$) and Sample-Rate Reducer.
+    * *Ping-Pong Mode:* Exposes Stereo Width ($0\% – 200\%$) and Cross-Feedback Diffusion.
+  * Includes internal LFO delay modulation and dynamic input ducking (automatically ducks delay repeats during active lead phrases).
+
+---
+
+#### 27. Implementation Phasing & Roadmap
+
+##### Phase 1: Grid Foundation & Pedals Mode Layout (Front-End)
+* [ ] Implement the Eurorack HP sizing grid and CSS/layout token framework across mobile (32 HP) and desktop (64 HP) viewports.
+* [ ] Build the macro Pedals Mode container to replace the legacy mobile console view.
+* [ ] Code the metallic jack anchor points and dynamic bezier-curve SVG "patch cables" for audio and CV routing.
+
+##### Phase 2: Orbital View & Gesture Navigation
+* [ ] Implement the tap-to-focus transition from macro overview to single-module Orbital View.
+* [ ] Program horizontal edge-to-edge swipe gesture listeners to cycle adjacent modules seamlessly.
+* [ ] Build the accordion drawer component for collapsible sub-parameters.
+
+##### Phase 3: DSP & Parameter Integration (Filter & Multi-Delay)
+* [ ] Code the multi-topology filter DSP engine (Ladder, State-Variable, Formant, Comb) with pre-filter saturation and the Filter Intensity Scale.
+* [ ] Build the multi-delay engine switcher (Tape, BBD, Digital, Ping-Pong) with dynamic drawer parameter mapping.
+* [ ] Connect internal modulation sources (LFOs/Envelope Followers) to drive real-time parameter changes with pulsing visual feedback on patch lines.
+
 
 
 

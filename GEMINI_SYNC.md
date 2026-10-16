@@ -1286,3 +1286,24 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
 - **Utilities row**: Palette and `?` are split onto their own full-width row as two equal 40px buttons (Palette label restored; Install/Fullscreen share the row when available).
 - **Meter**: METER now has a full-width row (dropdown min 96px, 14px type, 32px cycle button) so the time signature is clearly legible; TEMPO takes its own full-width row below it.
 - **Record format dropdown**: MP3/WAV/STEMS is a custom dropdown (the native select is hidden), so the old selector never applied; the wrapper/trigger is now 40px tall to match START and RECORD.
+
+## Update — 2026-10-16 (Master Roadmap: Hardware-Inspired Pedal Board & Eurorack UI Architecture)
+
+- **Strategic Objective & Paradigm**:
+  - Authored and codified **Part VI (Sections 24–27)** of `MASTER_BLUEPRINT.md` establishing the architectural blueprint for replacing legacy mobile console views with a physical, hardware-inspired **Pedals Mode**.
+- **Eurorack HP Sizing Grid & Aesthetics**:
+  - Horizontal Pitch (HP) modular sizing standard: **32 HP** fixed rack width per row on mobile (2-column structural layout) and **64 HP** on desktop.
+  - Module Width Standards: Utility/LFOs (**8 HP**), Standard Modules/Filter/EQ (**16 HP**), Complex Modules/Multi-Delay/Reverb (**24 HP**).
+  - Surface Materials: Anodized dark slate faceplates (`#2B2D31`), low-resonance studio base (`#1A1C23`), machined cold-rolled steel rails (`#3F4248`), and hexagonal mounting screws.
+- **Pedals Mode Dashboard & Visual Metaphors**:
+  - Module faceplates with uppercase silkscreened labels, etched HP badges, illuminated hardware bypass toggles (`[Byp]`), and 6px metallic micro-jack anchor points.
+  - Dynamic braided SVG cubic bezier patch lines: neon teal (`#00E5FF`) audio signal flow with gravitational slack, plus amber/violet CV/LFO lines with amplitude-reactive visual pulse feedback.
+  - Interactive tactile manipulation: Tap-to-focus transition to Orbital View; long-press and drag reordering along the Eurorack rails triggering live, click-free `rewireDspChain()` audio re-routing.
+- **Orbital View & Edge-to-Edge Gestural Navigation**:
+  - Horizontal edge-to-edge swiping to slide between adjacent DSP modules in the active signal chain without menu diving.
+  - Fluid pinch-to-collapse gesture or header back-arrow to return to macro Pedals Mode overview.
+- **Deep-Dive Audio Modules & Roadmap**:
+  - **Filter Module**: Switchable topologies (Ladder 24dB, State-Variable 12dB, Formant/Vocal, Comb), knurled Cutoff/Resonance dials, Filter Intensity Scale macro slider with bipolar polarity toggle, dynamic low-end makeup gain, and collapsible modulation sub-drawers.
+  - **Modular Multi-Delay Engine**: 4 discrete DSP algorithms (Tape with capstan wow/flutter, BBD with clock noise grit, Digital 32-bit pristine, Ping-Pong binaural spatial bounce), macro Time/Feedback dials, dynamic engine-specific accordion drawers, and dynamic lead ducking.
+  - **3-Phase Phased Implementation Roadmap**: Phase 1 (Grid & Pedals Mode Layout), Phase 2 (Orbital View & Gestures), Phase 3 (DSP & Parameter Integration).
+
