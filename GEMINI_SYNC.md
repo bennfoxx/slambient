@@ -1509,4 +1509,19 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Upgraded `SHUFFLE` button across `#pedalChainModule` and `#pedalsContainer` from raw unicode `⟲` to an inline SVG cycle/refresh icon.
   - Standardized `.btn-pedal-action` to exact `height: 24px`, matching `PWR`, `M`, `S`, and `badge-tag` header actions with `JetBrains Mono` 9.5px / 800 weight typography and neon cyan hover glow.
 
+## Update — 2026-10-16 (Preset Bank Header & Symmetrical I/O Module Unification)
+
+- **Eliminated Broken Floating Bank Card**:
+  - Removed the standalone `.patch-bank-section` box located below the preset chips on mobile, along with the floating label text "BANK".
+  - Cleaned up obsolete mobile CSS rules that forced `.patch-bank-section` into an awkward 40px boxed-row container.
+- **Unified Symmetrical Preset Bank Header**:
+  - Added `<div class="preset-bank-header">` directly above `#presetBarFactory` and `#presetBarUser`.
+  - Positioned `.preset-bank-tabs` (`PRESETS`, `USER [U1–U6]`) and `.patch-bank-actions` (`SAVE`, `LOAD`) side-by-side as flex items on the same horizontal line.
+  - Styled both groups with matching pill container aesthetics (`background: #080a11; border: 1px solid var(--border-light); border-radius: 4px; padding: 2px`) and symmetrical button typography (`.btn-bank-tab` and `.btn-preset-io`).
+  - Responsive support:
+    - Desktop: flex row header spanning above preset chips with `justify-content: space-between`.
+    - Mobile portrait (`max-width: 640px`): header row sits cleanly across the top of `.preset-group` above the 2-row chip scroller.
+    - Phone landscape (`max-height: 550px`): `display: contents;` with flex order flows tabs, chips, and actions inline.
+
+
 
