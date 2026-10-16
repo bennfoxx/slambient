@@ -131,16 +131,18 @@ This master architecture document serves as the authoritative single-source-of-t
   * Seam-centered black keys and aligned baseline labels.
   * Additive Live Arpeggiator (`triggerLiveArpStep`, `lastLiveArpMidi`) preserving pattern continuity when adding/releasing keys.
 
-#### 8. Dual Module Workspace: Orbital View & Console Rack
+#### 8. Dual Module Workspace: Orbital View & Modular Rack View
 
-* **Two-Way View Switcher:** Orbital View (`btnViewOrbital`) and Console Rack (`btnViewConsole`).
+* **Two-Way View Switcher:** Orbital View (`btnViewOrbital`) and Rack View (`btnViewConsole`).
 * **Orbital Constellation View (`orbitalArenaWrapper`):**
   * 9 audio-buoyant planetary orbs over drifting background starfield with collision physics and boundary dampening.
-  * Click-and-drag with momentum fling; debounced stationary click (< 5px movement) opens the slide-out Orbital Side Panel (`orbitalSidePanel`).
+  * Click-and-drag with momentum fling; debounced stationary click (< 5px movement) opens the slide-out Modular Inspector Panel (`orbitalSidePanel`).
   * Live signal chain lines (`getOrbitalConnectionChain`) reflecting real-time DSP insert order.
   * Orbital Feel sliders (Float Speed 0–250%, Orb Size 50–200%, ⟲ RE-SEED, and PANIC).
-* **Console Rack:** Five instrument channel strips (Modules 1–5), three reorderable pedals (Modules 6–8), and Master EQ & Out (Module 9).
-* **Shared Controls Across Views:** The console and the orbital side panel reuse the same DOM elements, guaranteeing perfect two-way parameter coherence.
+* **Modular Rack View (`lower-deck`):** Symmetrical 6-column layout across desktop (6 columns wide desktop, 3 columns medium desktop / landscape phone, 2 columns tablet, 1 column portrait phone) housing Five instrument channel strips (Modules 1–5: SUB, DRUMS, CHORDS, ARP, NOISE) plus Module 6: Live DSP FX Chain.
+* **Birds-Eye FX Chain Module (`pedalChainModule`):** Entire DSP insert chain condensed into an instrument-sized `.strip-channel` module. Contains a hardware signal flow bar (`BUS PRE ➔ LIVE INSERT MATRIX ➔ OUT`) and 4 compact rectangular cards (Filter, Delay, Space, and Master Out) displaying slot assignment, power/bypass status (`ON` / `BYP`), live chain reordering (`▲` / `▼`), and an inspect trigger (`EDIT ↗`).
+* **Universal Modular Inspector Overlay (`orbitalSidePanel` + `orbitalModalBackdrop`):** A fixed slide-over modal drawer with blurred backdrop. Inspecting any module or pedal from Rack View opens its complete controls directly over Rack View without switching to Orbital View; closing the inspector seamlessly restores Rack View.
+* **Shared Controls Across Views:** The console rack, birds-eye pedal chain, and inspector panel borrow and restore identical DOM elements, guaranteeing perfect two-way parameter coherence.
 
 #### 9. Complete 9-Module Audio Engine Specification
 
@@ -999,7 +1001,10 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
 * [x] **Center-Justify Orbital Module Title & Nav Arrows:** Center-justify `#orbitalModalTitle` and navigation cycle arrows (`#btnOrbitalPrev`, `#btnOrbitalNext`) across desktop and mobile, ensuring balanced layout between `[PEDALS]` back button and `[ACTIONS] [✕]` controls.
 * [x] **Desktop Header Bar Eurorack Symmetry & Unified Bank Module:** Restructure the desktop top bar into a balanced 2-row Eurorack chassis layout. Row 1 houses Transport & Audio on the left and Harmony & Master Clock on the right; Row 2 houses the Telemetry HUD on the left and Workspace Utilities & Generative Engine on the right. Nest the Patch Bank I/O inside `.preset-group` as a unified module immediately adjacent to the preset grid with `SAVE` and `LOAD` stacked vertically, eliminating blank gaps, disassociated line-wrapping, and text collisions.
 * [x] **Mobile Transport 2-Row Layout & Auto-Fill Elements:** Symmetrically align mobile Section 1 into two 12-column rows: Row 1 splits START (cols 1–6) and RECORD + Format (cols 7–12); Row 2 splits SAMPLE (cols 1–9) and MIDI (cols 10–12). Apply `flex: 1 1 0` to `MIC` and `DROP` buttons to auto-fill the sample block with zero dead space, auto-contracting when a sample is loaded to give prominence to the waveform display.
-* [x] **View Switcher 'Pedal View' Re-labeling:** Rename the view mode toggle button from `Console Rack` to `Pedal View` (`Pedalboard & Console Rack View`) so users can immediately identify and toggle the pedalboard console mode.
+* [x] **View Switcher 'Rack View' Re-labeling:** Rename the view mode toggle button to `Rack View` (`Modular Rack & Signal Chain View`) across UI buttons and telemetry.
+* [x] **Sample Button Sizing & Format Dropdown Centering:** Standardized `MIC` and `DROP` button heights and SVG icons to 15px matching transport standards, centered record format dropdown trigger and menu options with zero text clipping.
+* [x] **Birds-Eye FX Chain Module (Module 6 in Rack View):** Condensed the DSP insert chain into a single `.strip-channel` module matching instrument widths, displaying compact rectangular cards for Filter, Delay, Space, and Master Out with slot labels, power/bypass toggles (`ON` / `BYP`), live reordering (`▲` / `▼`), and modular inspector launch triggers (`EDIT ↗`).
+* [x] **Universal Modular Inspector Overlay:** Decoupled `#orbitalSidePanel` and `#orbitalModalBackdrop` from `#orbitalArenaWrapper` into a fixed top-level overlay with blurred backdrop. Inspecting any module or pedal from Rack View opens its controls directly over Rack View without switching to Orbital View; closing returns the user directly to Rack View.
 
 ##### Phase 0: Mobile Microphone & Pocket Field Recorder Resiliency (COMPLETED)
 * [x] **Pointer Capture & Touch Physics:** Implement `setPointerCapture(e.pointerId)` on `pointerdown` for all `[data-field-hold]` elements, combined with dedicated `touchstart`/`touchend` hooks to prevent iOS Safari `pointercancel` micro-jitter aborts.
@@ -1008,9 +1013,9 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
 * [x] **AudioSession Type Guarding:** Soften `navigator.audioSession.type = "play-and-record"` toggling with automated output restore to prevent mobile Safari background audio muting.
 * [x] **High-Visibility Status & Denied Feedback:** Explicit visual state machine on `[data-field-hold]` (`HOLD TO REC`, `REC 0.0s`, `TAP TO STOP`, `MIC PERMISSION BLOCKED`) with user-friendly toast guidance.
 
-##### Phase 1: Grid Foundation & Pedals Mode Layout (Front-End)
-* [ ] Implement the Eurorack HP sizing grid and CSS/layout token framework across mobile (32 HP) and desktop (64 HP) viewports.
-* [ ] Build the macro Pedals Mode container to replace the legacy mobile console view (active view toggle renamed to `Pedal View`).
+##### Phase 1: Grid Foundation & Modular Rack Layout (COMPLETED)
+* [x] Implement symmetrical 6-column grid across desktop (6 cols), tablet (2 cols), and landscape mobile (3 cols) with 1-column portrait mobile fallback.
+* [x] Build the Birds-Eye FX Chain module to replace unwieldy pedal decks with an instrument-sized rack card.
 * [ ] Code the metallic jack anchor points and dynamic bezier-curve SVG "patch cables" for audio and CV routing.
 
 ##### Phase 2: Orbital View & Gesture Navigation (COMPLETED)

@@ -2391,32 +2391,45 @@
     opacity: 0;
   }
 
+  .orbital-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(4, 6, 12, 0.72);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .orbital-modal-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   .orbital-side-panel {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
     width: 620px;
-    max-width: 85%;
+    max-width: 88vw;
     background: linear-gradient(145deg, rgba(var(--modal-accent-rgb, 0, 229, 255), 0.08) 0%, rgba(9, 12, 20, 0.98) 42%, #070910 100%);
     border-right: 2px solid var(--modal-accent-color, var(--color-drone));
     box-shadow: 14px 0 36px var(--modal-accent-glow, rgba(var(--rgb-drone), 0.35)), inset -1px 0 0 rgba(var(--modal-accent-rgb, 0, 229, 255), 0.25), inset 0 0 20px rgba(0,0,0,0.8);
     padding: 16px 18px;
     overflow-y: auto;
-    z-index: 5;
+    z-index: 10000;
     transform: translateX(-100%);
     transition: transform 0.26s cubic-bezier(0.18, 0.89, 0.32, 1.1);
     pointer-events: none;
   }
-  /* Below ~900px the arena itself is too narrow for 85% to leave any real
-     room for the remaining orbs -- the leftover sliver can't fit even one
-     orb's diameter, which read as overlapping/cut-off orb labels peeking
-     out from behind the panel. Let the panel take over the view almost
-     entirely instead of pretending there's still a usable constellation
-     visible beside it. */
   @media (max-width: 900px) {
     .orbital-side-panel {
-      max-width: 94%;
+      max-width: 94vw;
     }
   }
   .orbital-side-panel.active {
@@ -2717,7 +2730,7 @@
   }
   .lower-deck {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 14px;
     align-items: stretch;
   }
@@ -2729,6 +2742,243 @@
   }
   @media (max-width: 640px) {
     .lower-deck { grid-template-columns: 1fr; }
+  }
+
+  /* =====================================================================
+     6. BIRDS-EYE VIEW PEDAL CHAIN MODULE (Rack View)
+     ===================================================================== */
+  .strip-channel.pedal-chain-module {
+    border-top: 3px solid #00e5ff;
+    border-color: rgba(0, 229, 255, 0.35);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 229, 255, 0.14);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pedal-chain-module .panel-header > span:first-child {
+    color: #00e5ff;
+    text-shadow: 0 0 8px rgba(0, 229, 255, 0.35);
+  }
+  .pedal-chain-module .panel-header {
+    border-bottom-color: rgba(0, 229, 255, 0.25);
+  }
+  .pedal-chain-module .panel-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .pedal-chain-module .btn-pedal-action {
+    background: #101420;
+    border: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    border-radius: 3px;
+    padding: 3px 6px;
+    font-size: 9px;
+    font-weight: 800;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .pedal-chain-module .btn-pedal-action:hover {
+    color: #fff;
+    border-color: #00e5ff;
+    background: rgba(0, 229, 255, 0.12);
+  }
+
+  .birds-eye-flow-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #060911;
+    border: 1px solid #141b2b;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+  }
+  .birds-eye-flow-bar .flow-bus-node {
+    color: #4b7bec;
+    background: rgba(75, 123, 236, 0.15);
+    padding: 1px 5px;
+    border-radius: 2px;
+    border: 1px solid rgba(75, 123, 236, 0.35);
+  }
+  .birds-eye-flow-bar .flow-bus-node.out-node {
+    color: #a855f7;
+    background: rgba(168, 85, 247, 0.15);
+    border-color: rgba(168, 85, 247, 0.35);
+  }
+  .birds-eye-flow-bar .flow-bus-label {
+    color: var(--text-secondary);
+    font-size: 8px;
+    text-transform: uppercase;
+  }
+  .birds-eye-flow-bar .flow-arrow {
+    color: #3b4252;
+    font-size: 9px;
+  }
+
+  .pedal-birds-eye-rack {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    flex: 1 1 auto;
+  }
+
+  .mini-pedal-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #0e121d 0%, #080a11 100%);
+    border: 1px solid var(--border-light);
+    border-left: 3px solid var(--card-accent, #00e5ff);
+    border-radius: 4px;
+    padding: 6px 8px;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    transition: all 0.14s ease;
+  }
+  .mini-pedal-card:hover {
+    border-color: var(--card-accent, #00e5ff);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.6), 0 0 10px rgba(var(--card-rgb, 0, 229, 255), 0.2);
+  }
+  .mini-pedal-card.bypassed {
+    opacity: 0.55;
+    border-left-color: #444c5e;
+  }
+
+  .mini-pedal-card.mini-card-filter { --card-accent: var(--color-filter); --card-rgb: var(--rgb-filter); }
+  .mini-pedal-card.mini-card-delay { --card-accent: var(--color-delay); --card-rgb: var(--rgb-delay); }
+  .mini-pedal-card.mini-card-space { --card-accent: var(--color-reverb); --card-rgb: var(--rgb-reverb); }
+  .mini-pedal-card.mini-card-master { --card-accent: #a855f7; --card-rgb: 168, 85, 247; }
+
+  .mini-pedal-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .mini-pedal-badge {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(var(--card-rgb, 0, 229, 255), 0.16);
+    border: 1px solid var(--card-accent, #00e5ff);
+    color: var(--card-accent, #00e5ff);
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 10px;
+    font-weight: 800;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .mini-pedal-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+  .mini-pedal-name {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    color: var(--card-accent, #fff);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mini-pedal-slot {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 8.5px;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+  }
+
+  .mini-pedal-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .btn-mini-shift {
+    width: 20px;
+    height: 22px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #101420;
+    border: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    border-radius: 2px;
+    font-size: 8.5px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+  }
+  .btn-mini-shift:hover:not(:disabled) {
+    color: #fff;
+    border-color: var(--border-bright);
+    background: #181f30;
+  }
+  .btn-mini-shift:disabled {
+    opacity: 0.25;
+    cursor: default;
+  }
+
+  .btn-mini-power {
+    height: 22px;
+    padding: 0 6px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 9px;
+    font-weight: 800;
+    border-radius: 2px;
+    background: #090c14;
+    border: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .btn-mini-power.active {
+    background: rgba(var(--card-rgb, 0, 229, 255), 0.18);
+    border-color: var(--card-accent, #00e5ff);
+    color: var(--card-accent, #00e5ff);
+    box-shadow: 0 0 8px rgba(var(--card-rgb, 0, 229, 255), 0.35);
+  }
+
+  .btn-mini-inspect {
+    height: 22px;
+    padding: 0 7px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 9.5px;
+    font-weight: 800;
+    border-radius: 2px;
+    background: rgba(var(--card-rgb, 0, 229, 255), 0.08);
+    border: 1px solid rgba(var(--card-rgb, 0, 229, 255), 0.4);
+    color: var(--card-accent, #00e5ff);
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .btn-mini-inspect:hover {
+    background: rgba(var(--card-rgb, 0, 229, 255), 0.22);
+    border-color: var(--card-accent, #00e5ff);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(var(--card-rgb, 0, 229, 255), 0.4);
+  }
+  .mini-pedal-status-tag {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 8.5px;
+    font-weight: 800;
+    color: #a855f7;
+    background: rgba(168, 85, 247, 0.15);
+    border: 1px solid rgba(168, 85, 247, 0.35);
+    padding: 2px 5px;
+    border-radius: 2px;
   }
 
   .strip-channel {
@@ -5120,9 +5370,9 @@
       min-width: 38px;
     }
     .header-sec-transport > .sample-ctrl .btn-field {
-      height: 30px;
+      height: 32px;
       padding: 0 8px;
-      font-size: 10.5px;
+      font-size: 11px;
       flex: 1 1 0;
       min-width: 0;
       display: inline-flex;
@@ -5136,8 +5386,8 @@
       padding: 0 6px;
     }
     .header-sec-transport > .sample-ctrl .btn-field svg {
-      width: 13px;
-      height: 13px;
+      width: 15px;
+      height: 15px;
       flex-shrink: 0;
     }
     .header-sec-transport > .sample-ctrl .field-wave {
@@ -5737,7 +5987,7 @@
        arena card 1:1 (inset: 0) so its borders line up with and overlay the
        borders of the module behind it, never extending past the arena width. */
     .orbital-side-panel {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
       right: 0;
@@ -5751,7 +6001,7 @@
       box-sizing: border-box;
       padding: 0;
       overflow: hidden;
-      z-index: 20;
+      z-index: 10000;
       border: 1.5px solid var(--modal-accent-color, var(--color-drone));
       border-radius: 7px;
       background:
@@ -9837,6 +10087,73 @@ function updatePedalsOrderUI() {
   if (eqStrip && container && !eqStrip.closest("#orbitalModalBody")) {
     container.appendChild(eqStrip);
   }
+
+  if (typeof renderBirdsEyePedalRack === "function") {
+    renderBirdsEyePedalRack();
+  }
+}
+
+function renderBirdsEyePedalRack() {
+  const rack = document.getElementById("pedalBirdsEyeRack");
+  if (!rack) return;
+
+  const pedalsMeta = {
+    FILTER: { name: "FILTER", orbId: "filter", class: "mini-card-filter", desc: "SVF Filter & Env" },
+    DELAY: { name: "DELAY", orbId: "delay", class: "mini-card-delay", desc: "Stereo Tape Delay" },
+    SPACE: { name: "SPACE", orbId: "reverb", class: "mini-card-space", desc: "Reverb & Chorus" }
+  };
+
+  const order = Array.isArray(dspChainOrder) ? dspChainOrder : ["FILTER", "DELAY", "SPACE"];
+  
+  let html = "";
+  order.forEach((key, idx) => {
+    const meta = pedalsMeta[key];
+    if (!meta) return;
+    const isBypassed = !!(typeof pedalBypassState !== "undefined" && pedalBypassState[key]);
+    const slotLabel = idx === 0 ? "IN" : (idx === order.length - 1 ? "OUT" : "INSERT");
+    const num = 6 + idx;
+    const canShiftUp = idx > 0;
+    const canShiftDown = idx < order.length - 1;
+
+    html += `
+      <div class="mini-pedal-card ${meta.class} ${isBypassed ? 'bypassed' : 'active'}" data-pedal="${key}">
+        <div class="mini-pedal-left" onclick="openMiniPedalInspector('${meta.orbId}')" title="Open ${meta.name} controls">
+          <span class="mini-pedal-badge">${num}</span>
+          <div class="mini-pedal-info">
+            <span class="mini-pedal-name">${meta.name}</span>
+            <span class="mini-pedal-slot">${slotLabel}</span>
+          </div>
+        </div>
+        <div class="mini-pedal-actions">
+          <button type="button" class="btn-mini-shift" onclick="shiftPedalLeft('${key}')" ${!canShiftUp ? 'disabled' : ''} title="Move earlier in chain">▲</button>
+          <button type="button" class="btn-mini-shift" onclick="shiftPedalRight('${key}')" ${!canShiftDown ? 'disabled' : ''} title="Move later in chain">▼</button>
+          <button type="button" class="btn-mini-power ${isBypassed ? '' : 'active'}" onclick="togglePedalBypass('${key}')" title="${isBypassed ? 'Engage ' + meta.name : 'Bypass ' + meta.name}">
+            ${isBypassed ? 'BYP' : 'ON'}
+          </button>
+          <button type="button" class="btn-mini-inspect" onclick="openMiniPedalInspector('${meta.orbId}')" title="Inspect full controls">EDIT ↗</button>
+        </div>
+      </div>
+    `;
+  });
+
+  // Terminal Master EQ & Out Node (Node 9)
+  html += `
+    <div class="mini-pedal-card mini-card-master active" data-pedal="MASTER">
+      <div class="mini-pedal-left" onclick="openMiniPedalInspector('space')" title="Open Master EQ & Out controls">
+        <span class="mini-pedal-badge">9</span>
+        <div class="mini-pedal-info">
+          <span class="mini-pedal-name">MASTER OUT</span>
+          <span class="mini-pedal-slot">BUS TERM</span>
+        </div>
+      </div>
+      <div class="mini-pedal-actions">
+        <span class="mini-pedal-status-tag">ACTIVE</span>
+        <button type="button" class="btn-mini-inspect" onclick="openMiniPedalInspector('space')" title="Inspect Master EQ & Out">EDIT ↗</button>
+      </div>
+    </div>
+  `;
+
+  rack.innerHTML = html;
 }
 
 function shiftPedalLeft(key) {
@@ -9902,6 +10219,10 @@ function togglePedalBypass(key) {
       chorusWetGain.gain.setTargetAtTime(isBypassed ? 0.0001 : chorusMixVal, now, 0.05);
       spaceDryGain.gain.setTargetAtTime(isBypassed ? 1.0 : 0.88, now, 0.05);
     }
+  }
+
+  if (typeof renderBirdsEyePedalRack === "function") {
+    renderBirdsEyePedalRack();
   }
 }
 
@@ -10054,13 +10375,22 @@ function openModuleInOrbital(moduleEl) {
   else if (moduleEl.classList.contains("chord-ch")) orbId = "chord";
   else if (moduleEl.classList.contains("arp-ch")) orbId = "arp";
   else if (moduleEl.classList.contains("noise-ch")) orbId = "noise";
+  else if (moduleEl.classList.contains("pedal-chain-module")) {
+    const firstPedal = (Array.isArray(dspChainOrder) && dspChainOrder[0]) ? dspChainOrder[0] : "FILTER";
+    orbId = (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && PEDAL_KEY_TO_ORBITAL_ID[firstPedal]) ? PEDAL_KEY_TO_ORBITAL_ID[firstPedal] : "filter";
+  }
   else if (moduleEl.classList.contains("pedal-filter") || moduleEl.getAttribute("data-module") === "FILTER") orbId = "filter";
   else if (moduleEl.classList.contains("pedal-delay") || moduleEl.getAttribute("data-module") === "DELAY") orbId = "delay";
   else if (moduleEl.classList.contains("pedal-space") || moduleEl.getAttribute("data-module") === "SPACE") orbId = "reverb";
   else if (moduleEl.classList.contains("space-ch")) orbId = "space";
 
-  if (orbId && typeof setModuleView === "function" && typeof expandModuleOrb === "function") {
-    setModuleView("orbital");
+  if (orbId && typeof expandModuleOrb === "function") {
+    expandModuleOrb(orbId);
+  }
+}
+
+function openMiniPedalInspector(orbId) {
+  if (orbId && typeof expandModuleOrb === "function") {
     expandModuleOrb(orbId);
   }
 }
@@ -19533,6 +19863,12 @@ function expandModuleOrb(orbId) {
 
   panel.classList.add("active");
 
+  const backdrop = document.getElementById("orbitalModalBackdrop");
+  if (backdrop) backdrop.classList.add("active");
+
+  const backLabel = document.getElementById("btnOrbitalBackLabel");
+  if (backLabel) backLabel.textContent = (activeModuleView === "orbital" ? "ORBITAL" : "RACK");
+
   const hint = document.getElementById("orbitalHint");
   if (hint) hint.classList.add("hidden-by-panel");
 }
@@ -19540,6 +19876,8 @@ function expandModuleOrb(orbId) {
 function closeOrbitalModal() {
   const panel = document.getElementById("orbitalSidePanel");
   if (panel) panel.classList.remove("active");
+  const backdrop = document.getElementById("orbitalModalBackdrop");
+  if (backdrop) backdrop.classList.remove("active");
   expandedOrbId = null;
   orbitalPanelActive = false;
 
@@ -19564,7 +19902,6 @@ function collapseOrbitalToPedals() {
       panel.style.transform = "";
       panel.style.opacity = "";
     }
-    setModuleView("console");
   }, 160);
 }
 
@@ -19713,7 +20050,11 @@ function restoreStripsToRack() {
       movedAPedal = true;
     }
   });
-  if (movedAPedal && typeof updatePedalsOrderUI === "function") updatePedalsOrderUI();
+  const pedalChainMod = document.getElementById("pedalChainModule");
+  if (lowerRack && pedalChainMod) {
+    lowerRack.appendChild(pedalChainMod);
+  }
+  if (typeof updatePedalsOrderUI === "function") updatePedalsOrderUI();
 }
 
 let cachedOrbitalW = 0, cachedOrbitalH = 0, orbitalNeedsResize = true;

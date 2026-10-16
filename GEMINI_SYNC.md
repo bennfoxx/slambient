@@ -1423,3 +1423,23 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Added `dsp-engines.js` to `PRECACHE_URLS` in `sw.js` and bumped cache version to `slambient-v4`.
   - Comprehensive unit test suite verified in Node.js with 100% test passing across all curves, topologies, and delay modes.
 
+## Update — 2026-10-16 (Birds-Eye Rack View FX Chain, Universal Slide-Over Inspector & Sample UI Sizing)
+
+- **Rack View & Symmetrical 6-Module Grid**:
+  - Renamed view mode from `Pedal View` / `Console Rack` to **`Rack View`** (`#btnViewConsole`).
+  - Added Module 6: **`6. FX CHAIN`** (`.pedal-chain-module`) directly inside `.lower-deck` alongside Modules 1–5 (`SUB`, `DRUMS`, `CHORDS`, `ARP`, `NOISE`).
+  - Updated grid layout for `.lower-deck` to `repeat(6, 1fr)` on wide desktop (> 1440px), `repeat(3, 1fr)` on medium desktop (1025px–1440px) and landscape mobile, `repeat(2, 1fr)` on tablet (641px–1024px), and `1fr` on portrait mobile (<= 640px). Every breakpoint forms a balanced, symmetrical grid with zero orphan blanks.
+- **Birds-Eye FX Chain Architecture**:
+  - Entire DSP insert chain condensed into a single module with identical dimensions to the instrument channel strips.
+  - Hardware signal flow diagram header: `[BUS PRE] ➔ LIVE INSERT MATRIX ➔ [OUT]`.
+  - 4 compact rectangular cards (`mini-pedal-card`) for Filter, Delay, Space, and Master Out displaying slot assignment (`IN`, `INSERT`, `OUT`, `BUS TERM`), bypass state (`ON` / `BYP`), live chain reordering (`▲` / `▼`), and inspector launch triggers (`EDIT ↗`).
+  - Dynamically kept in real-time sync with Web Audio API routing via `renderBirdsEyePedalRack()`, `updatePedalsOrderUI()`, and `togglePedalBypass()`.
+- **Universal Modular Inspector Overlay**:
+  - Decoupled `<div class="orbital-side-panel" id="orbitalSidePanel">` and `<div class="orbital-modal-backdrop" id="orbitalModalBackdrop">` from `#orbitalArenaWrapper` into a top-level overlay with fixed positioning (`z-index: 10000`).
+  - **In-Place Rack View Inspection**: Clicking any module header or `EDIT ↗` button while on Rack View opens the full inspector drawer directly over Rack View with blurred backdrop. It no longer forces a view switch to Orbital View.
+  - Modal back button (`#btnOrbitalBackLabel`) dynamically labels destination context (`RACK` vs `ORBITAL`); closing the inspector smoothly returns the user directly to whichever view they were on.
+- **Sample Button Sizing & Dropdown Centering**:
+  - Sized `MIC` and `DROP` button SVG icons to 15px x 15px matching all other module icons (`--tr-icon`).
+  - Standardized mobile sample button height to 32px with `flex: 1 1 0` auto-fill.
+  - Centered filetype label (`MP3`, `WAV`, `STEMS`) in both custom dropdown trigger and dropdown menu items.
+
