@@ -471,15 +471,32 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    height: 32px;
   }
   .rec-ctrl-wrap .custom-dropdown-wrap {
     min-width: 0;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
   }
   .rec-ctrl-wrap .custom-dropdown-trigger {
     justify-content: center;
     text-align: center;
     gap: 5px;
-    padding: 0 6px;
+    padding: 0 8px;
+    height: 32px;
+    box-sizing: border-box;
+    font-size: 11.5px;
+    font-weight: 800;
+    border-radius: 4px;
+    background: #101420;
+    border: 1px solid var(--border-light);
+    color: var(--text-secondary);
+  }
+  .rec-ctrl-wrap .custom-dropdown-trigger:hover {
+    color: #fff;
+    border-color: var(--border-bright);
+    background: #161c2c;
   }
   .rec-ctrl-wrap .custom-dropdown-trigger .trigger-label {
     text-align: center;
@@ -575,10 +592,63 @@
     border: none;
     box-shadow: none;
     height: 32px;
-    padding: 0 4px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
   .header-sec-transport .sample-ctrl:hover {
     border: none;
+  }
+  .header-sec-transport .sample-ctrl .tag {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--color-noise);
+    letter-spacing: 0.8px;
+    line-height: 32px;
+    margin-right: 2px;
+  }
+  .header-sec-transport .sample-ctrl .btn-field {
+    height: 32px;
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background: #101420;
+    border: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    transition: all 0.12s ease;
+  }
+  .header-sec-transport .sample-ctrl .btn-field:hover {
+    color: #fff;
+    border-color: var(--border-bright);
+    background: #161c2c;
+  }
+  .header-sec-transport .sample-ctrl .btn-field svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .transport-sep {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--border-light);
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1;
+    height: 32px;
+    padding: 0 2px;
+    opacity: 0.45;
+    user-select: none;
+    flex-shrink: 0;
   }
   .header-sec-harmony {
     margin-left: auto;
@@ -4565,6 +4635,7 @@
       grid-template-columns: repeat(12, minmax(0, 1fr));
       gap: 4px;
     }
+    .header-sec-transport > .transport-sep { display: none; }
     .header-sec-transport > .btn-main-play {
       grid-column: 1 / 7;
       grid-row: 1;
@@ -5284,6 +5355,7 @@
       gap: 6px;
       padding: 6px;
     }
+    .header-sec-transport > .transport-sep { display: none; }
     .header-sec-transport > .btn-main-play {
       grid-column: 1 / 7;
       grid-row: 1;
@@ -7056,6 +7128,8 @@
             </select>
           </div>
 
+          <span class="transport-sep" aria-hidden="true">|</span>
+
           <div class="sample-ctrl field-badge" id="fieldBadge" title="Pocket Field Recorder: hold MIC to sample (tap records 5 s), or DROP audio file. Woven into Noise module.">
             <span class="tag">SAMPLE</span>
             <button type="button" class="btn-field btn-field-mic" data-field-hold aria-label="Hold to record from the microphone">
@@ -7069,6 +7143,8 @@
             <canvas class="field-wave" data-field-wave width="84" height="20"></canvas>
             <button type="button" class="btn-field-eject" data-field-eject title="Eject sample" aria-label="Eject sample">&times;</button>
           </div>
+
+          <span class="transport-sep" aria-hidden="true">|</span>
 
           <button class="btn-header-util btn-header-midi" id="btnHeaderMidi" onclick="toggleMidiConnectionPrompt()" title="Web MIDI hardware connection">
             <span class="midi-status-dot" id="midiStatusDot"></span>
