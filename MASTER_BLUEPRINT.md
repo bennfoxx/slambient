@@ -328,6 +328,17 @@ This master architecture document serves as the authoritative single-source-of-t
 * **Continuous Foreground & Background Drift:** Driven by `requestAnimationFrame` at 60 FPS when active, and maintained via `clockTick()` when backgrounded or locked.
 * **Embedded Hardware Parity:** On the embedded FM-1 hardware, full audio-rate biquad filtering per channel is substituted with slow sinusoidal LFO modulators sending pan CC modulations using fixed-point math (`SINE_LUT`).
 
+##### 15.4 Full-Range Keyboard Register Architecture & Anti-Piercing Acoustic Damping
+* **Panoramic Register Liberation:** Accommodating the 88-Key Panoramic Harmonic Radar mode (A0 MIDI 21 to C8 MIDI 108), instruments roam freely across wide registers instead of being forced into the center two octaves (C3–C5).
+* **Extended Voicing Ceilings & Bass Anchors:**
+  * **Chords & Voicings:** Voicing ceiling lifted from MIDI 72 (C5) to MIDI 84 (C6), allowing 7th, 9th, and 11th intervals to breathe. Polyphonic chords add an acoustic bass anchor at `rootMidi - 12` (C2–B2, MIDI 36–47) for deep, non-muddy grounding. Sitar phrases roam between Mandra (G2–C3, MIDI 43–48) and Taar (A5, MIDI 81) saptaks.
+  * **Arpeggiator Engine:** Note range unlocked from MIDI 36 (C2) to MIDI 96 (C7), allowing multi-octave arps (`arpOctaves = 2, 3, 4`) to traverse across 5 octaves. Extreme upper keys (C#7–C8, MIDI 97–108) are reserved to keep the soundstage crystalline and uncrowded.
+  * **Melodic Lead:** Roams between G2 (MIDI 43, warm cello range) and A5 (MIDI 81, soaring horn range).
+* **Psychoacoustic Anti-Piercing Damping & Tone Softening:**
+  * **Dynamic Voice Filter Cutoff:** Voice filter low-pass cutoffs reduce from `5.4x` to `3.0x` fundamental for notes above MIDI 72 (capped at 3000 Hz), eliminating harsh upper harmonics.
+  * **Velocity Tapering:** `highNoteDamp = Math.max(0.38, 1.0 - Math.max(0, midi - 56) * 0.018)` smoothly softens velocities above G#3.
+  * **FM Index & Harmonic Scaling:** High-register FM indices on `GLASS_EP`, `RHODES`, and `GLASS_FM` taper inversely with frequency to eliminate digital sideband aliasing. Metallic tines on `KALIMBA`, chimes on `MUSIC_BOX`, and pulse levels on `ANALOG_PULSE` are progressively softened above MIDI 72.
+
 ---
 
 ### Part IV: FM-1 Hardware Conversion Planning & Physical Control Mapping Specification

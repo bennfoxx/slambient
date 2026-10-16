@@ -1201,4 +1201,33 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - **Dual Foreground/Background Loop**: Updated at 60 FPS in `drawScope` and maintained during background tabs in `clockTick()`.
   - **Full Stem Isolation**: Output flows through analysers, ensuring binaural positioning is captured across multi-track stem recordings.
 
+## Update — 2026-10-16 (88-Key Register Expansion & Anti-Piercing Acoustic Damping)
+
+- **Musical Context**:
+  - Previously, notes were clamped tightly into the center two octaves (C3–C5, MIDI 48–74) with hard folding loops designed for the compact 25-key keyboard.
+  - With the 88-Key Panoramic Harmonic Radar mode active, chords, arpeggios, and melodic leads were prevented from moving into higher or lower registers across the full keyboard.
+- **Full-Range Register Architecture**:
+  - **Chord Voicings (`triggerCurrentChord`)**:
+    - Expanded ceiling from MIDI 72 (C5) up to MIDI 84 (C6), allowing 7ths, 9ths, and 11ths to bloom into upper registers.
+    - Added an acoustic bass root anchor (`rootMidi - 12` clamped to MIDI 36–47 / C2–B2) when `intervals.length >= 3` for rich, non-muddy grounding.
+    - Sitar phrases now traverse Mandra (G2–C3, MIDI 43–48) and Taar (A5, MIDI 81) saptaks.
+  - **Arpeggiator Engine (`playArpNote` & `getArpNotesPool`)**:
+    - Expanded note bounds from MIDI 74 up to MIDI 96 (C7) and down to MIDI 36 (C2), providing a massive 5-octave range while leaving extreme top keys (C#7–C8, MIDI 97–108) free of piercing clutter.
+    - Multi-octave settings (`arpOctaves = 2, 3, 4`) now climb continuously across the keyboard instead of collapsing back down into the center octave.
+  - **Melodic Lead (`clockTick`)**:
+    - Expanded `leadScaleDeg` bounds from `[-3, 5]` to `[-6, 10]`.
+    - Clamped melody between G2 (MIDI 43, warm cello range) and A5 (MIDI 81, soaring horn range).
+- **Psychoacoustic Anti-Piercing Damping & Tone Softening**:
+  - **Dynamic Voice Filter Cutoff**:
+    - When `midi > 72`, `voiceFilter` multiplier drops from `5.4` to `3.0`, capped at 3000 Hz.
+    - In `playArpNote`, `arpVoiceFilter` multiplier drops from `3.8` to `2.4` for `midi > 74`.
+  - **Progressive High-Note Damping**:
+    - `highNoteDamp = Math.max(0.38, 1.0 - Math.max(0, midi - 56) * 0.018)` smoothly tapers velocities on notes above G#3, rendering C6–C7 notes delicate, crystalline, and ambient.
+  - **Timbre Overtone Scaling**:
+    - **FM Pianos (`GLASS_EP`, `RHODES`, `GLASS_FM`)**: Scaled modulation index inversely with pitch above MIDI 72 to eliminate digital FM sideband aliasing and harsh clatter.
+    - **Kalimba & Music Box**: Metallic tine/chime harmonic gains taper smoothly above MIDI 72.
+    - **Analog Pulse**: Square wave pulse level reduces from 0.28 to 0.08 above MIDI 72 with tighter low-pass filtering.
+  - **Live Keyboard Parity (`startNoteLive`)**: Applied identical damping, filter scaling, and FM index attenuation so real-time playing across all 88 keys maintains consistent warmth.
+
+
 
