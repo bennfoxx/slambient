@@ -926,3 +926,9 @@ The following phased roadmap organizes upcoming work into discrete, focused engi
    - 250ms click debounce on orbital nodes to prevent double-click flicker.
    - Standard DAW global transport shortcuts (Spacebar / Enter to Play/Pause).
 
+
+## Update — 2026-10-16 (Phase 8: Mobile slider touch isolation)
+
+- **Roadmap Phases 8–11 adopted** (Phase 8 mobile UX, Phase 9 Maihar/Lineage sound, Phase 10 Pocket Field Recorder, Phase 11 blueprint polish; note Phase 11's items were already shipped in blueprint Phases 6 and 7, so only a verification pass is left there).
+- **Phase 8 item 1 done**: every `input[type="range"]` now has `touch-action: none !important`, `user-select: none` and `-webkit-touch-callout: none`. The legacy `touch-action: pan-y` rules on `#orbitalFloatControls` and `#orbitalSidePanel` sliders were changed to `none`. On `(pointer: coarse)` devices the hit height is `36px !important` (master volume slider `28px` so it never overlaps the mute button). Canvas `pan-y` rules are intentionally untouched.
+- **Phase 8 item 2 intentionally not redone**: landscape header geometry was already resolved differently (see the entries above): `syncEnoPodSquare()` uses `offsetHeight` (not `getBoundingClientRect()`, which returns 0.75x values under `html { zoom: 0.75 }`), is skipped at `max-height: 500px`, and phone landscape uses a CSS grid (Eno 76px over a vertical master volume strip). Pure CSS `aspect-ratio: 1/1; width: auto` in the flex row was tried and squished the pod.
