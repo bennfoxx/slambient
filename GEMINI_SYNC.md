@@ -1494,6 +1494,9 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Scoped legacy embedded `.field-panel` rules to `:not(.strip-channel)` to eliminate style bleed into the standalone channel strip.
   - Updated `drawWaves` to render waveforms using `--color-field` (`#2bcbba`) matching the instrument's visual identity.
   - Added `field` to `THEME_KEYS` and updated all 5 color theme presets in `COLOR_THEMES`.
+- **Transport Bar SAMPLE Tag Perfect Centering**:
+  - Centered `<span class="tag">SAMPLE</span>` horizontally between the preceding `|` separator and the `[ 🎙 MIC ]` button by standardizing `.transport-sep` (`width: 8px; padding: 0`) and setting `margin: 0 4px 0 0` on `.tag`, yielding an exact 10px visual gap on both sides.
+  - Centered `SAMPLE` vertically by switching `.tag` to `display: inline-flex; align-items: center; justify-content: center; height: 32px; line-height: 1; vertical-align: middle`, perfectly matching `.btn-field`'s 32px height and optical center line.
 
 ## Update — 2026-10-16 (FX Chain Button Inspector Navigation & Header Button Standardization)
 
