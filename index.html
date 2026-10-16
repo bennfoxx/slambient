@@ -1779,6 +1779,16 @@
     border-color: var(--color-arp) !important;
     box-shadow: 0 0 16px rgba(var(--rgb-arp), 0.7), inset 0 0 8px var(--color-arp) !important;
   }
+  .white-key.active-drone, .black-key.active-drone {
+    background: linear-gradient(180deg, rgba(var(--rgb-drone), 0.3) 0%, rgba(var(--rgb-drone), 0.9) 100%) !important;
+    border-color: var(--color-drone) !important;
+    box-shadow: 0 0 16px rgba(var(--rgb-drone), 0.8), inset 0 0 8px var(--color-drone) !important;
+  }
+  .white-key.active-drum, .black-key.active-drum {
+    background: linear-gradient(180deg, rgba(var(--rgb-drum), 0.3) 0%, rgba(var(--rgb-drum), 0.9) 100%) !important;
+    border-color: var(--color-drum) !important;
+    box-shadow: 0 0 16px rgba(var(--rgb-drum), 0.8), inset 0 0 8px var(--color-drum) !important;
+  }
   .white-key.active-live, .black-key.active-live,
   .white-key:active, .black-key:active {
     background: linear-gradient(180deg, rgba(var(--rgb-drone), 0.4) 0%, var(--color-drone) 100%) !important;
@@ -1813,6 +1823,8 @@
   }
   .white-key.active-chord::after, .black-key.active-chord::after,
   .white-key.active-arp::after, .black-key.active-arp::after,
+  .white-key.active-drone::after, .black-key.active-drone::after,
+  .white-key.active-drum::after, .black-key.active-drum::after,
   .white-key.active-live::after, .black-key.active-live::after {
     background: rgba(7, 8, 12, 0.65);
     box-shadow: 0 0 4px rgba(255, 255, 255, 0.45);
@@ -1862,7 +1874,9 @@
     margin-bottom: 2px;
   }
   .active-chord .key-label, .active-chord .black-key-label,
-  .active-arp .key-label, .active-arp .black-key-label {
+  .active-arp .key-label, .active-arp .black-key-label,
+  .active-drone .key-label, .active-drone .black-key-label,
+  .active-drum .key-label, .active-drum .black-key-label {
     color: #07080c !important;
     font-weight: 800;
   }
@@ -1872,9 +1886,100 @@
   }
   .active-chord .key-shortcut,
   .active-arp .key-shortcut,
+  .active-drone .key-shortcut,
+  .active-drum .key-shortcut,
   .active-live .key-shortcut {
     color: rgba(7, 8, 12, 0.72) !important;
     font-weight: 700;
+  }
+
+  /* 88-Key Panoramic Harmonic Radar Styling */
+  .keyboard-view-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    background: #07080d;
+    border: 1px solid var(--border-light);
+    border-radius: 5px;
+    padding: 2px;
+  }
+  .btn-kb-view {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 7px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+  }
+  .btn-kb-view:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .btn-kb-view.active {
+    background: rgba(var(--rgb-drone), 0.22);
+    border-color: var(--color-drone);
+    color: var(--color-drone);
+    box-shadow: 0 0 8px rgba(var(--rgb-drone), 0.35);
+  }
+  .piano-keys-wrapper.mode-radar {
+    pointer-events: none !important;
+    cursor: default;
+    padding: 4px;
+  }
+  .piano-keys-wrapper.mode-radar .white-keys-layer {
+    gap: 1px;
+  }
+  .piano-keys-wrapper.mode-radar .white-key {
+    min-width: 0;
+    padding-bottom: 3px;
+    border-radius: 0 0 2px 2px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .piano-keys-wrapper.mode-radar .white-key::after {
+    width: 65%;
+    height: 2px;
+    margin-top: auto;
+    margin-bottom: 2px;
+  }
+  .piano-keys-wrapper.mode-radar .black-key {
+    width: calc(100% / 52 * 0.72);
+    min-width: 2.5px;
+    padding-bottom: 2px;
+    border-radius: 0 0 2px 2px;
+    z-index: 2;
+  }
+  .piano-keys-wrapper.mode-radar .black-key::after {
+    width: 65%;
+    height: 2px;
+    margin-top: auto;
+    margin-bottom: 2px;
+  }
+  .piano-keys-wrapper.mode-radar .key-shortcut {
+    display: none !important;
+  }
+  .piano-keys-wrapper.mode-radar .key-label {
+    display: none;
+    font-size: 7.5px;
+    letter-spacing: -0.5px;
+  }
+  .piano-keys-wrapper.mode-radar .key-label.octave-marker {
+    display: flex;
+    font-size: 8px;
+    font-weight: 800;
+    color: var(--text-tertiary);
+  }
+  .piano-keys-wrapper.mode-radar .black-key-label {
+    display: none !important;
   }
 
   .orbital-deck-header {
@@ -5711,11 +5816,15 @@
             <span class="upper-drag-handle" title="Drag to reorder visualizer widgets"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg></span>
             <span class="panel-title-text">Playable MIDI Keyboard</span>
           </div>
-          <span class="keyboard-hint">Keys A-K · <span id="valOctave">C3 - C5</span></span>
+          <span class="keyboard-hint" id="keyboardHintText">Keys A-K · <span id="valOctave">C3 - C5</span></span>
         </div>
         <div class="keyboard-meta-controls">
           <span class="takeover-badge" id="hudTakeover" title="Takeover Status: AUTO progression or LIVE keyboard takeover">AUTO</span>
-          <div class="oct-controls">
+          <div class="keyboard-view-toggle" id="keyboardViewToggle" title="Toggle between 25-Key Playable mode and 88-Key Panoramic Harmonic Radar">
+            <button class="btn-kb-view active" id="btnKbPlay" onclick="setKeyboardDisplayMode('25')" title="25-Key Touch & QWERTY Playable Keyboard">25 PLAY</button>
+            <button class="btn-kb-view" id="btnKbRadar" onclick="setKeyboardDisplayMode('88')" title="88-Key Full-Range Harmonic Radar (Multi-Voice Spectrum)">88 RADAR</button>
+          </div>
+          <div class="oct-controls" id="octControlsGroup">
             <button class="btn-oct" onclick="shiftOctave(-1)">OCT -</button>
             <button class="btn-oct" onclick="shiftOctave(1)">OCT +</button>
           </div>
@@ -8521,6 +8630,9 @@ function updateDronePitches(glide = true) {
   else if (droneOctaveChoice === "D0") baseOctaveMidi = 24;
 
   const droneMidi = baseOctaveMidi + rootNote + currentChordDeg + droneWanderSemis;
+  if (isPlaying && isChannelAudible('drone') && droneVol > 0.01) {
+    activeMidiNotes.set(droneMidi, { expiry: performance.now() + 600, source: "DRONE" });
+  }
   midiSubSync();
   const target1 = Math.max(20, midiToFreq(droneMidi));
   const target2 = Math.max(10, midiToFreq(droneMidi - 12));
@@ -8581,6 +8693,7 @@ function playTanpuraPluck(stringIdx) {
   }
 
   const freq = midiToFreq(midi);
+  activeMidiNotes.set(midi, { expiry: performance.now() + 1800, source: "DRONE" });
   const ringDuration = 9.5; // Expansive resonant ring (all 4 strings overlap into golden bed)
 
   // Pluck Voice Gain Envelope: rich golden acoustic resonance
@@ -9543,6 +9656,7 @@ function getDrumKitModifiers() {
 function playKick(drive = 1.0) {
   if (!audioCtx || drumVol <= 0.01) return;
   midiDrumHit("KICK", 100);
+  activeMidiNotes.set(36, { expiry: performance.now() + 180, source: "DRUM" });
   const now = audioCtx.currentTime;
   const kit = getDrumKitModifiers();
   const effDrive = drive * kit.drive;
@@ -9617,6 +9731,7 @@ function getPinkNoiseBuffer() {
 function playSnare(hard = false) {
   if (!audioCtx || drumVol <= 0.01) return;
   midiDrumHit("SNARE", hard ? 115 : 90);
+  activeMidiNotes.set(38, { expiry: performance.now() + 160, source: "DRUM" });
   const now = audioCtx.currentTime;
   const kit = getDrumKitModifiers();
 
@@ -9649,6 +9764,7 @@ function playSnare(hard = false) {
 function playWoodblock(pitchMult = 1.0) {
   if (!audioCtx || drumVol <= 0.01) return;
   midiDrumHit("WOODBLOCK", 85);
+  activeMidiNotes.set(40, { expiry: performance.now() + 120, source: "DRUM" });
   const now = audioCtx.currentTime;
   const kit = getDrumKitModifiers();
 
@@ -9669,6 +9785,7 @@ function playWoodblock(pitchMult = 1.0) {
 function playHiHat(accent = false) {
   if (!audioCtx || drumVol <= 0.01) return;
   midiDrumHit(accent ? "HAT_ACCENT" : "HAT", accent ? 105 : 70);
+  activeMidiNotes.set(42, { expiry: performance.now() + 100, source: "DRUM" });
   const now = audioCtx.currentTime;
   const kit = getDrumKitModifiers();
 
@@ -9692,6 +9809,8 @@ function playHiHat(accent = false) {
 function playDayan(stroke = "TUN", hard = 1.0) {
   if (!audioCtx || drumVol <= 0.01) return;
   midiDrumHit((stroke === "TUN" || stroke === "TIN" || stroke === "NA" || stroke === "TA") ? "DAYAN_OPEN" : "DAYAN_MUTE", 60 + 60 * Math.min(1, hard));
+  const dayanMidi = (stroke === "TUN" || stroke === "TIN") ? 43 : ((stroke === "NA" || stroke === "TA") ? 45 : 41);
+  activeMidiNotes.set(dayanMidi, { expiry: performance.now() + 160, source: "DRUM" });
   const now = audioCtx.currentTime;
   const kit = getDrumKitModifiers();
   const baseFreq = midiToFreq(48 + rootNote) * kit.pitchMult;
@@ -9808,6 +9927,8 @@ function playDayan(stroke = "TUN", hard = 1.0) {
 function playBayan(stroke = "GHE", slide = true, hard = 1.0) {
   if (!audioCtx || drumVol <= 0.01) return;
   midiDrumHit("BAYAN", 60 + 60 * Math.min(1, hard));
+  const bayanMidi = (stroke === "KAT" || stroke === "KE") ? 38 : 36;
+  activeMidiNotes.set(bayanMidi, { expiry: performance.now() + 220, source: "DRUM" });
   const now = audioCtx.currentTime;
   const kit = getDrumKitModifiers();
 
@@ -12946,14 +13067,89 @@ function bindKeyEvents(el, midi) {
   }, { passive: true });
 })();
 
+let keyboardDisplayMode = "25";
+
+function setKeyboardDisplayMode(mode) {
+  keyboardDisplayMode = mode;
+  const container = document.getElementById("keyboardContainer");
+  const btnPlay = document.getElementById("btnKbPlay");
+  const btnRadar = document.getElementById("btnKbRadar");
+  const hintText = document.getElementById("keyboardHintText");
+
+  if (mode === "88") {
+    if (container) container.classList.add("mode-radar");
+    if (btnPlay) btnPlay.classList.remove("active");
+    if (btnRadar) btnRadar.classList.add("active");
+    if (hintText) hintText.innerHTML = `Full-Range Radar (A0 - C8) · Multi-Voice Harmonic Radar`;
+  } else {
+    if (container) container.classList.remove("mode-radar");
+    if (btnPlay) btnPlay.classList.add("active");
+    if (btnRadar) btnRadar.classList.remove("active");
+    if (hintText) hintText.innerHTML = `Keys A-K · <span id="valOctave">C${baseKeyboardOctave} - C${baseKeyboardOctave + 2}</span>`;
+  }
+  buildKeyboard();
+}
+
 let cachedKeyElements = [];
 function buildKeyboard() {
   const container = document.getElementById("keyboardContainer");
+  if (!container) return;
   container.innerHTML = "";
   cachedKeyElements = [];
 
   const whiteKeysLayer = document.createElement("div"); whiteKeysLayer.className = "white-keys-layer";
   const blackKeysLayer = document.createElement("div"); blackKeysLayer.className = "black-keys-layer";
+
+  if (keyboardDisplayMode === "88") {
+    container.classList.add("mode-radar");
+    const whiteKeys = [];
+    for (let m = 21; m <= 108; m++) {
+      if ([0, 2, 4, 5, 7, 9, 11].includes(m % 12)) {
+        whiteKeys.push(m);
+      }
+    }
+
+    for (let w = 0; w < whiteKeys.length; w++) {
+      const midi = whiteKeys[w];
+      const keyEl = document.createElement("div");
+      keyEl.className = "white-key";
+      keyEl.dataset.midi = midi;
+      if (isKeyLedLit(midi)) keyEl.classList.add("in-scale");
+
+      if (midi === 21 || midi % 12 === 0) {
+        const label = document.createElement("span");
+        label.className = "key-label octave-marker";
+        label.textContent = `${NOTE_NAMES[midi % 12]}${Math.floor(midi / 12) - 1}`;
+        keyEl.appendChild(label);
+      }
+
+      whiteKeysLayer.appendChild(keyEl);
+      cachedKeyElements.push({ el: keyEl, midi, lastClass: "" });
+    }
+
+    for (let w = 0; w < whiteKeys.length - 1; w++) {
+      if (whiteKeys[w + 1] - whiteKeys[w] === 2) {
+        const bMidi = whiteKeys[w] + 1;
+        const bKeyEl = document.createElement("div");
+        bKeyEl.className = "black-key";
+        bKeyEl.dataset.midi = bMidi;
+        const pct = ((w + 1) / 52) * 100;
+        bKeyEl.style.left = `calc(${pct.toFixed(4)}% - 0.5px)`;
+        bKeyEl.style.transform = "translateX(-50%)";
+        bKeyEl.style.width = `calc(100% / 52 * 0.72)`;
+        if (isKeyLedLit(bMidi)) bKeyEl.classList.add("in-scale");
+
+        blackKeysLayer.appendChild(bKeyEl);
+        cachedKeyElements.push({ el: bKeyEl, midi: bMidi, lastClass: "" });
+      }
+    }
+
+    container.appendChild(whiteKeysLayer);
+    container.appendChild(blackKeysLayer);
+    return;
+  }
+
+  container.classList.remove("mode-radar");
 
   const whiteKeyOffsets = [0, 2, 4, 5, 7, 9, 11];
   const whiteShortcuts = ["A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'"];
@@ -13043,7 +13239,8 @@ function buildKeyboard() {
 
 function shiftOctave(delta) {
   baseKeyboardOctave = Math.max(1, Math.min(5, baseKeyboardOctave + delta));
-  document.getElementById("valOctave").textContent = `C${baseKeyboardOctave} - C${baseKeyboardOctave + 2}`;
+  const valOctave = document.getElementById("valOctave");
+  if (valOctave) valOctave.textContent = `C${baseKeyboardOctave} - C${baseKeyboardOctave + 2}`;
   buildKeyboard();
 }
 
@@ -13062,19 +13259,23 @@ function renderKeyboardHighlights() {
       if (now < info.expiry) {
         if (info.source === "CHORD") activeClass = "active-chord";
         else if (info.source === "ARP") activeClass = "active-arp";
+        else if (info.source === "DRONE") activeClass = "active-drone";
+        else if (info.source === "DRUM") activeClass = "active-drum";
         else activeClass = "active-live";
       } else {
         activeMidiNotes.delete(midi);
       }
     } else if (heldMidiNotes.has(midi)) {
       activeClass = keyboardRoute === "CHORD" ? "active-chord" : "active-live";
+    } else if (typeof currentDroneMidi === "function" && isPlaying && isChannelAudible('drone') && droneVol > 0.01 && currentDroneMidi() === midi) {
+      activeClass = "active-drone";
     }
 
     const sig = (inScale ? "1:" : "0:") + activeClass;
     if (item.lastClass !== sig) {
       item.lastClass = sig;
       el.classList.toggle("in-scale", inScale);
-      el.classList.remove("active-chord", "active-arp", "active-live");
+      el.classList.remove("active-chord", "active-arp", "active-live", "active-drone", "active-drum");
       if (activeClass) el.classList.add(activeClass);
     }
   }
