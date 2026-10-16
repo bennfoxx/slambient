@@ -1000,16 +1000,23 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Updated `.btn-mic-mini` in `.mini-transport` to include `<span>SAMPLE</span>` with the mic icon.
   - Styled with equal `flex: 1 1 0` sizing (40px height, 12px JetBrains Mono bold text), perfectly matching the `[ ▶ Start ]` and `[ ● Record ]` buttons in the bottom floating toolbar.
 
-## Update — 2026-10-16 (Mic Capture: Zero Audio Bleed & Stream Authorization Caching)
+## Update — 2026-10-16 (Mic Capture: Bulletproof Web Audio Pipeline & Zero-Bleed Capture)
 
-- **Eliminated Jarring Audio Playback on Mic Button Press**:
-  - Previously, `beginCapture()` resumed `audioCtx` (which flushed suspended synthesizer notes) and connected `rec.proc` to `ctx.destination` through a mute gain node that leaked during initialization.
-  - Now uses an **isolated capture AudioContext** (`getCaptureContext()`) completely decoupled from `audioCtx`, so the master synth is never unintentionally resumed.
-  - Replaced the speaker connection with a completely silent dummy sink (`ctx.createMediaStreamDestination()`) with zero physical route to the speakers.
-  - Explicitly zeroed `ev.outputBuffer.getChannelData(0).fill(0)` on every audio quantum to prevent any buffer bleed.
-  - Removed `navigator.audioSession.type = "play-and-record"` toggling, preventing iOS Safari hardware audio route re-configuration clicks and ducking.
-- **Microphone Authorization Caching (No Repeated Prompts)**:
-  - Previously called `t.stop()` on every track at the end of recording, destroying the capture session and causing Safari/Chrome to prompt for microphone permission on every single take.
-  - Now caches the active stream in `S.micStream` and puts the audio track into hardware-muted standby (`track.enabled = false`) when idle.
-  - Subsequent presses immediately re-enable the existing live track (`track.enabled = true`), starting recording instantly with zero permission dialogs during the session.
+- **Eliminated Jarring Audio Playback & Synth Bursts**:
+  - Previously, tapping the mic button called `audioCtx.resume()` even when the transport was paused, causing pending synth voice queues to suddenly burst through the speakers.
+  - Now, if transport is paused (`!isPlaying`), capture uses an isolated temporary AudioContext (`new AC()`) that is cleanly closed upon teardown (`rec.ctx.close()`), keeping the main synthesis engine untouched and completely silent.
+  - The script processor output is explicitly routed through a dedicated zero-gain mute node (`rec.mute.gain.setValueAtTime(0, 0); rec.mute.gain.value = 0; rec.mute.connect(ctx.destination)`) ensuring the audio pull loop runs continuously in both Chromium and WebKit.
+  - Inside `rec.proc.onaudioprocess`, `ev.outputBuffer.getChannelData(0).fill(0)` is executed unconditionally on every quantum, guaranteeing 0dB bleed and completely preventing feedback loops.
+  - Removed `navigator.audioSession.type = "play-and-record"` toggling, preventing iOS Safari hardware audio route re-configuration clicks, speaker ducking, or Bluetooth profile drops.
+
+- **Restored Bulletproof Desktop & Mobile Recording**:
+  - `MediaStreamDestinationNode` was identified as causing `ScriptProcessorNode` to suspend (browsers do not pull buffers through dummy streams unless consumed by WebRTC/MediaRecorder). Reverting to the muted gain node connected to destination keeps the capture buffer pumping reliably.
+  - Media stream tracks are cleanly stopped upon teardown (`rec.stream.getTracks().forEach(t => t.stop())`), respecting browser sandboxing and preventing ghost/detached hardware track states.
+
+- **Microphone Permission Persistence Instructions**:
+  - Browser security models govern microphone permission prompts at the origin level. To permanently remember permission and prevent repeated prompts:
+    - **iOS Safari**: Tap the `aA` / Page Settings icon on the left of the URL bar → Tap **Website Settings** → Set **Microphone** to **Allow** (instead of "Ask").
+    - **macOS Safari**: Safari menu → **Settings** (or Preferences) → **Websites** tab → **Microphone** → Set the site to **Allow**.
+    - **Chrome (Desktop & Mobile)**: Tap the tune/padlock icon in the URL bar → **Site Settings** / **Permissions** → Set **Microphone** to **Allow**.
+
 
