@@ -1443,3 +1443,20 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Standardized mobile sample button height to 32px with `flex: 1 1 0` auto-fill.
   - Centered filetype label (`MP3`, `WAV`, `STEMS`) in both custom dropdown trigger and dropdown menu items.
 
+## Update — 2026-10-16 (Transport Control Unification & Modular Section Dividers)
+
+- **Exact 32px Button Height Unification**:
+  - Standardized all interactive buttons in `.header-sec-transport` to `height: 32px; box-sizing: border-box;`:
+    - `[ ▶ START ]` (`.btn-main-play`)
+    - `[ ● RECORD ]` (`.btn-record`)
+    - `[ MP3 ∨ ]` (`.record-format-select` & `.custom-dropdown-trigger` inside `.rec-ctrl-wrap`)
+    - `[ 🎙 MIC ]` and `[ 🎛 DROP ]` (`.header-sec-transport .sample-ctrl .btn-field`)
+    - `[ ● MIDI ]` (`.btn-header-util.btn-header-midi`)
+  - Elevated desktop `.btn-field` padding to `0 10px`, font size to `12px` (800 weight), border-radius to `4px`, and SVG icon size to `14x14px` so they align flush with surrounding transport buttons.
+- **Section Dividers (`|`) within Transport Module**:
+  - Inserted `<span class="transport-sep" aria-hidden="true">|</span>` immediately after the record format dropdown (`MP3 ∨`) before the `SAMPLE` group.
+  - Inserted `<span class="transport-sep" aria-hidden="true">|</span>` immediately after the `DROP` sample button before the `MIDI` button.
+  - Styled `.transport-sep` with `opacity: 0.45`, `color: var(--border-light)`, `font-family: "JetBrains Mono"`, and `height: 32px; align-items: center`.
+  - Added `.header-sec-transport > .transport-sep { display: none; }` in mobile landscape and portrait media queries so dividers do not pollute mobile 2-row CSS grids.
+
+
