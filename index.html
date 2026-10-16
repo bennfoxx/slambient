@@ -4237,11 +4237,12 @@
     /* SECTION 1: Transport & Audio */
     .header-sec-transport {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) 48px;
       gap: 4px;
     }
     .header-sec-transport > .btn-main-play {
       grid-column: 1;
+      grid-row: 1;
       width: 100%;
       height: 30px;
       padding: 0 6px;
@@ -4250,14 +4251,17 @@
       letter-spacing: 0.4px;
       white-space: nowrap;
       border-radius: 3px;
+      min-width: 0;
     }
     .header-sec-transport > .rec-ctrl-wrap {
       grid-column: 2;
+      grid-row: 1;
       display: flex;
       align-items: center;
       gap: 3px;
       width: 100%;
       height: 30px;
+      min-width: 0;
     }
     .header-sec-transport > .rec-ctrl-wrap > .btn-record {
       flex: 1 1 auto;
@@ -4281,8 +4285,29 @@
       font-size: 10px;
       border-radius: 3px;
     }
+    .header-sec-transport > .btn-header-midi {
+      grid-column: 3;
+      grid-row: 1;
+      width: 48px;
+      min-width: 48px;
+      height: 30px;
+      padding: 0 4px;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 3px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+    }
+
+    /* Row 2: SAMPLE full width in landscape */
     .header-sec-transport > .sample-ctrl {
-      grid-column: 1;
+      grid-column: 1 / -1;
+      grid-row: 2;
+      width: 100%;
+      box-sizing: border-box;
       display: flex;
       align-items: center;
       height: 28px;
@@ -4291,25 +4316,31 @@
       background: #06070a;
       border: 1px solid var(--border-light);
       border-radius: 3px;
+      min-width: 0;
+      overflow: hidden;
     }
     .header-sec-transport > .sample-ctrl .tag { font-size: 8.5px; letter-spacing: 0.4px; flex: 0 0 auto; }
     .header-sec-transport > .sample-ctrl .btn-field {
       height: 22px;
-      padding: 0 4px;
+      padding: 0 5px;
       font-size: 9px;
-      flex: 1 1 0;
-      min-width: 0;
+      flex: 0 0 auto;
+      border-radius: 2px;
+      white-space: nowrap;
     }
-    .header-sec-transport > .sample-ctrl .field-wave { flex: 1 1 auto; min-width: 18px; height: 16px; }
-    .header-sec-transport > .sample-ctrl .btn-field-eject { width: 18px; height: 18px; font-size: 13px; flex: 0 0 18px; }
-    .header-sec-transport > .btn-header-midi {
-      grid-column: 2;
-      width: 100%;
-      height: 28px;
-      padding: 0 6px;
-      font-size: 10px;
-      font-weight: 700;
-      border-radius: 3px;
+    .header-sec-transport > .sample-ctrl .field-wave {
+      flex: 1 1 auto;
+      min-width: 0;
+      height: 18px;
+      border-radius: 2px;
+      box-sizing: border-box;
+    }
+    .header-sec-transport > .sample-ctrl .btn-field-eject {
+      width: 18px;
+      height: 18px;
+      font-size: 13px;
+      flex: 0 0 18px;
+      margin-left: 2px;
     }
 
     /* SECTION 2: Harmony & Master Clock */
@@ -4904,12 +4935,13 @@
     .header-sec-transport {
       grid-column: 1 / -1;
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) 56px;
       gap: 6px;
       padding: 6px;
     }
     .header-sec-transport > .btn-main-play {
       grid-column: 1;
+      grid-row: 1;
       width: 100%;
       height: 40px;
       padding: 0 8px;
@@ -4918,15 +4950,18 @@
       letter-spacing: 0.8px;
       border-radius: 4px;
       white-space: nowrap;
+      min-width: 0;
     }
     .header-sec-transport > .rec-ctrl-wrap {
       grid-column: 2;
+      grid-row: 1;
       display: flex;
       align-items: center;
       gap: 4px;
       width: 100%;
       height: 40px;
       padding: 0;
+      min-width: 0;
     }
     .header-sec-transport > .rec-ctrl-wrap > .btn-record {
       flex: 1 1 auto;
@@ -4953,29 +4988,50 @@
     /* Custom dropdown that replaces the native format <select>: same height as
        the Start / Record buttons */
     .header-sec-transport > .rec-ctrl-wrap > .custom-dropdown-wrap {
-      flex: 0 0 64px;
-      width: 64px;
+      flex: 0 0 62px;
+      width: 62px;
       height: 40px;
       align-self: stretch;
     }
     .header-sec-transport > .rec-ctrl-wrap > .custom-dropdown-wrap .custom-dropdown-trigger {
       height: 40px;
-      padding: 0 8px;
-      gap: 4px;
-      font-size: 12px;
+      padding: 0 6px;
+      gap: 3px;
+      font-size: 11.5px;
       border-radius: 4px;
     }
-    /* Row 2: SAMPLE and MIDI share the second row */
+    .header-sec-transport > .btn-header-midi {
+      grid-column: 3;
+      grid-row: 1;
+      width: 56px;
+      min-width: 56px;
+      height: 40px;
+      padding: 0 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    /* Row 2: SAMPLE spans full width so waveform can extend cleanly without displacing MIDI */
     .header-sec-transport > .sample-ctrl {
-      grid-column: 1;
+      grid-column: 1 / -1;
+      grid-row: 2;
       width: 100%;
       box-sizing: border-box;
       display: flex;
       align-items: center;
       padding: 0 8px;
       gap: 6px;
-      height: 38px;
+      height: 40px;
       border-radius: 4px;
+      min-width: 0;
+      overflow: hidden;
     }
     .header-sec-transport > .sample-ctrl .tag {
       font-size: 10px;
@@ -4985,36 +5041,30 @@
     }
     .header-sec-transport > .sample-ctrl .btn-field {
       height: 30px;
-      padding: 0 6px;
+      padding: 0 8px;
       font-size: 10.5px;
-      flex: 1 1 0;
-      min-width: 0;
+      flex: 0 0 auto;
       border-radius: 3px;
+      white-space: nowrap;
+    }
+    .header-sec-transport > .sample-ctrl .btn-field svg {
+      width: 13px;
+      height: 13px;
+      flex-shrink: 0;
     }
     .header-sec-transport > .sample-ctrl .field-wave {
       flex: 1 1 auto;
-      min-width: 32px;
-      height: 22px;
+      min-width: 0;
+      height: 24px;
+      border-radius: 2px;
+      box-sizing: border-box;
     }
     .header-sec-transport > .sample-ctrl .btn-field-eject {
-      width: 26px;
-      height: 26px;
+      width: 24px;
+      height: 24px;
       font-size: 16px;
-      flex: 0 0 26px;
-    }
-    .header-sec-transport > .btn-header-midi {
-      grid-column: 2;
-      width: 100%;
-      height: 38px;
-      padding: 0 8px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      border-radius: 4px;
+      flex: 0 0 24px;
+      margin-left: 2px;
     }
 
     /* SECTION 2: Harmony & Master Clock (Full Width, 3 Symmetrical Rows) */

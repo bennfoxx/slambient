@@ -203,6 +203,9 @@ This master architecture document serves as the authoritative single-source-of-t
 * **Phase 9 — Maihar Gharana & "Lineage" Sonic Refinements (Done):** Tanpura 2-bar cycle, Tabla Bayan/Dayan fingerings, Maihar Sitar wire mizrab attack click & meend pitch bends, Raga Taan phrases with natural breathing rests (Ma).
 * **Phase 10 — "Pocket Field Recorder" Live Mic & Found Sound Engine (Done):** Desktop header & mobile transport `[ 🎙 REC / 📼 DROP ]`, browser `getUserMedia()` live sampling, dynamic level normalization, and Module 5 hauntological playback modes.
 * **Phase 11 — Blueprint Visualizers & Interaction Polish (Done):** Roadside 3D shapes density scaling, Space Invaders audio coupling, and DAW-style transport shortcuts.
+* **UI Fixes & Visual Polish (TOP PRIORITY / ACTIVE):**
+  * **Orbital Modal Opacity Bleed During Module Switching:** In Orbital View popup module sheets (`#orbitalSidePanel`), swiping (`.swiping-left` / `.swiping-right`) or switching modules currently applies `opacity: 0.55` to the entire side panel, causing the top UI header, borders, and backdrop to turn transparent and bleed background starfield elements through. Scope opacity transitions exclusively to the body content container (`#orbitalModalBody`), keeping `.orbital-modal-header` and outer panel chassis opaque (`opacity: 1 !important`, solid backdrop fill).
+  * **Center-Justified Title & Module Selection Navigation:** Center-justify the orbital popup module title (`#orbitalModalTitle`) and adjacent cycle arrows (`#btnOrbitalPrev`, `#btnOrbitalNext`) across both desktop and mobile viewports. On mobile, wrap `#btnOrbitalPrev`, `#orbitalModalTitle`, and `#btnOrbitalNext` into a unified centered cluster (`.orbital-nav-group` with `margin: 0 auto; justify-self: center;`) with balanced left (`[PEDALS]`) and right (`[ACTIONS] [✕]`) header anchor slots.
 * **Phase 13 — Mobile Microphone & Pocket Field Recorder Resiliency Engine (PRIORITY 1 / ACTIVE):**
   * **Pointer Capture & Touch Physics:** Call `e.target.closest("[data-field-hold]").setPointerCapture(e.pointerId)` on `pointerdown` and bind dedicated touch event fallbacks to prevent iOS Safari `pointercancel` micro-jitter aborts.
   * **AudioContext Synchronous Gesture Pre-Warm:** Pre-warm and resume `captureCtx` synchronously within user touch dispatch before entering asynchronous `getUserMedia()` queries to prevent WebKit gesture token expiration.
@@ -989,6 +992,10 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
 ---
 
 #### 27. Implementation Phasing & Roadmap
+
+##### UI Fixes & Visual Polish (TOP PRIORITY / ACTIVE)
+* [ ] **Orbital Modal Opacity Bleed Fix:** Prevent top UI header, borders, and backdrop from going transparent when swiping or switching between modules in Orbital Mode by scoping opacity transitions (`.swiping-left`, `.swiping-right`) to `#orbitalModalBody` rather than `#orbitalSidePanel`.
+* [ ] **Center-Justify Orbital Module Title & Nav Arrows:** Center-justify `#orbitalModalTitle` and navigation cycle arrows (`#btnOrbitalPrev`, `#btnOrbitalNext`) across desktop and mobile, ensuring balanced layout between `[PEDALS]` back button and `[ACTIONS] [✕]` controls.
 
 ##### Phase 0: Mobile Microphone & Pocket Field Recorder Resiliency (PRIORITY 1 / ACTIVE)
 * [ ] **Pointer Capture & Touch Physics:** Implement `setPointerCapture(e.pointerId)` on `pointerdown` for all `[data-field-hold]` elements, combined with dedicated `touchstart`/`touchend` hooks to prevent iOS Safari `pointercancel` micro-jitter aborts.
