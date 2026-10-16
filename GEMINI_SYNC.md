@@ -1307,3 +1307,38 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - **Modular Multi-Delay Engine**: 4 discrete DSP algorithms (Tape with capstan wow/flutter, BBD with clock noise grit, Digital 32-bit pristine, Ping-Pong binaural spatial bounce), macro Time/Feedback dials, dynamic engine-specific accordion drawers, and dynamic lead ducking.
   - **3-Phase Phased Implementation Roadmap**: Phase 1 (Grid & Pedals Mode Layout), Phase 2 (Orbital View & Gestures), Phase 3 (DSP & Parameter Integration).
 
+## Update — 2026-10-16 (Mobile Microphone & Pocket Field Recorder Resiliency Architecture: Priority 1)
+
+- **Problem Diagnosis (Mobile WebKit / Blink Mic Failure Modes)**:
+  - **Pointer Event Cancellation**: `pointerdown` on mobile touchscreens without `setPointerCapture` emits immediate `pointercancel` when user fingers jitter or scroll-intent triggers, immediately halting capture before audio buffers initialize.
+  - **Asynchronous User Gesture Expiration**: On iOS Safari, creating or resuming `AudioContext` after `await navigator.mediaDevices.getUserMedia(...)` expires the user-activation token, causing WebKit to silently suspend `captureCtx` or ignore input node connections.
+  - **ScriptProcessor Throttling & Silent Zeroing**: iOS 17+ heavily throttles or blocks `createScriptProcessor(4096, 1, 1)` callbacks if routed to muted gain nodes, leading to 0-byte buffer captures and empty recordings.
+  - **AudioSession Background Muting**: `navigator.audioSession.type = "play-and-record"` can throw or fail to restore playback routing on certain Safari versions.
+- **Architectural Solution & Priority 1 Action Plan**:
+  - **Step A (Pointer Capture & Touch Physics)**: Bind `setPointerCapture(e.pointerId)` on `pointerdown` and add resilient `touchstart`/`touchend` listeners with `touch-action: none` to isolate hold-to-record gestures from mobile viewport scrolling.
+  - **Step B (MediaRecorder Modernization with ScriptProcessor Fallback)**: Switch primary recording pipeline to standard `MediaRecorder` (`audio/webm` / `audio/mp4` / AAC/Opus) decoded directly into Float32 PCM via `ctx.decodeAudioData`, completely bypassing the iOS `ScriptProcessorNode` thread freeze while retaining backward compatibility.
+  - **Step C (Synchronous AudioContext Pre-Warming)**: Pre-warm and synchronously resume `captureCtx` inside the initial touch/pointer call stack prior to the async `getUserMedia` promise.
+  - **Step D (High-Visibility UI & Denied Permissions Guidance)**: Update `[data-field-hold]` button state with unambiguous visual feedback (`HOLD TO REC`, `REC 0.0s`, `TAP TO STOP`, `MIC ACCESS BLOCKED`) and clear recovery instructions when browser mic permission is denied or dismissed.
+  - **Roadmap Placement**: Codified as **Phase 0 / Priority 1** in both Section 11 and Section 27 of `MASTER_BLUEPRINT.md`.
+
+## Update — 2026-10-16 (Mobile Landscape App-Native Architecture & Floating Mini-Transport Fix)
+
+- **Floating Play/Pause Mini-Transport Bar Fix**:
+  - **Root Cause**: `html { zoom: 0.75; }` was set on root `html` in the base stylesheet. In WebKit/iOS Safari, CSS `zoom` on `html` creates a scaled root layout viewport; media-query overrides (`zoom: 1`) fail to reset the fixed-position containing block in WebKit, causing elements with `position: fixed; bottom: calc(8px + ...)` to be calculated against the scaled viewport height (~60% down the screen, locking it in the middle when scrolling).
+  - **Resolution**:
+    - Changed base `html` to native `zoom: 1`. Moved `zoom: 0.75` strictly into `@media (min-width: 1025px) and (min-height: 551px)` so desktop is untouched while all mobile devices (portrait & landscape) run natively at `zoom: 1`.
+    - Upgraded `.mini-transport` CSS with `position: fixed !important`, `bottom: calc(8px + env(safe-area-inset-bottom)) !important`, `z-index: 99999 !important`, and hardware-accelerated `-webkit-transform: translateZ(0) !important; transform: translateZ(0) !important; will-change: transform, opacity;`.
+- **Horizontal (Landscape) Mobile Architecture Overhaul**:
+  - Replaced the desktop-cloned landscape layout (`max-height: 520px`) with a modern, touch-optimized, "appify'd" mobile landscape architecture:
+    - **Header & Side Dock**: Symmetrical 2-column header wrapper (`grid-template-columns: minmax(0, 1fr) 74px;`) with the Eno CRT head and Master Output Volume neatly docked on the right side.
+    - **Brand & Preset Strip**: Compact single-row horizontal swipeable chip strip (`preset-bar`) with smooth fades and bank tabs, reducing header height by over 55%.
+    - **Modular App Toolbar (3 Symmetric Sections)**:
+      - Section 1 (Transport & Audio): `START`, `RECORD` (with format dropdown), `SAMPLE` (with MIC/DROP), and `MIDI`.
+      - Section 2 (Harmony & Clock): `KEY`/`SCALE`, `METER` (large readable font), and `TEMPO` slider + `TAP`.
+      - Section 3 & 4 (Generative & Utilities): `RANDOMIZE ALL` & `UNDO` on one symmetrical level, and `PALETTE` + `?` (Help) + Fullscreen below.
+    - **Telemetry HUD**: 4-pill compact horizontal row (`TIME`, `METER`, `KEY/SCALE`, `SEED`).
+    - **Upper Deck Symmetrical Split**: Visualizer (`scope-panel`) and Chord Analysis (`chord-info-panel`) side-by-side with balanced heights (`clamp(130px, 35vh, 180px)`) and zero layer-toggle clipping.
+    - **Playable MIDI Keyboard**: Full 100% width, horizontal routing bar (`TARGET: CHD/ARP` and `LEDS`), and thumb-ergonomic keys (`clamp(80px, 25vh, 115px)`).
+- **Responsive JS Helpers**: Updated `mq` in `initPhoneHeader`, `orbitalPhone`, and dropdown `placeMenu` to match both portrait (`max-width: 640px`) and landscape mobile (`orientation: landscape and max-height: 550px`).
+
+

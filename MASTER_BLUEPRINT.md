@@ -203,7 +203,13 @@ This master architecture document serves as the authoritative single-source-of-t
 * **Phase 9 — Maihar Gharana & "Lineage" Sonic Refinements (Done):** Tanpura 2-bar cycle, Tabla Bayan/Dayan fingerings, Maihar Sitar wire mizrab attack click & meend pitch bends, Raga Taan phrases with natural breathing rests (Ma).
 * **Phase 10 — "Pocket Field Recorder" Live Mic & Found Sound Engine (Done):** Desktop header & mobile transport `[ 🎙 REC / 📼 DROP ]`, browser `getUserMedia()` live sampling, dynamic level normalization, and Module 5 hauntological playback modes.
 * **Phase 11 — Blueprint Visualizers & Interaction Polish (Done):** Roadside 3D shapes density scaling, Space Invaders audio coupling, and DAW-style transport shortcuts.
-* **Phase 12 — Production Hosting, PWA, Audio Stability & Privacy (Done):** PWA standalone manifest (`manifest.json` / `manifest.webmanifest`), offline service worker (`sw.js`), Screen Wake Lock API integration, Cloudflare Pages edge delivery with security headers, and complete Safari Web Audio memory leak graph teardown.
+* **Phase 13 — Mobile Microphone & Pocket Field Recorder Resiliency Engine (PRIORITY 1 / ACTIVE):**
+  * **Pointer Capture & Touch Physics:** Call `e.target.closest("[data-field-hold]").setPointerCapture(e.pointerId)` on `pointerdown` and bind dedicated touch event fallbacks to prevent iOS Safari `pointercancel` micro-jitter aborts.
+  * **AudioContext Synchronous Gesture Pre-Warm:** Pre-warm and resume `captureCtx` synchronously within user touch dispatch before entering asynchronous `getUserMedia()` queries to prevent WebKit gesture token expiration.
+  * **MediaRecorder Modernization & ScriptProcessor Fallback:** Wrap capture in native `MediaRecorder` (`audio/webm` or `audio/mp4` / AAC/Opus) with `AudioContext.decodeAudioData`, completely bypassing iOS 17+ `createScriptProcessor` silent thread throttling while retaining `Float32Array` fallbacks for older browsers.
+  * **AudioSession Type Guarding:** Soften `navigator.audioSession.type = "play-and-record"` toggling with automated output restore to prevent mobile Safari background audio muting.
+  * **High-Visibility Status & Denied Feedback:** Explicit visual state machine on `[data-field-hold]` (`HOLD TO REC`, `REC 0.0s`, `TAP TO STOP`, `MIC PERMISSION BLOCKED`) with user-friendly toast guidance.
+* **Phase 14 — Mobile CPU, GPU & RAM Optimization Engine (Planned / Active):** Strict DPR clamping on high-density displays (`Math.min(1.25, DPR)` on mobile), rAF loop throttling (30 FPS active, 15 FPS / sleep when paused or off-screen), Web Audio voice node pooling and explicit disconnect sweeps, Convolver impulse response scaling on mobile profiles, and zero-reflow DOM highlight decoupling—ensuring 100% preservation of all existing desktop audio routing, tuning, and functionality.
 
 #### 12. Implementation Guardrails & Known Issues
 
@@ -211,6 +217,7 @@ This master architecture document serves as the authoritative single-source-of-t
 * **Downbeat Entry:** Preset changes, ⟲ ALL, and new seeds never force an immediate chord hit; new material enters on the next natural downbeat so it does not clash with outgoing delay and reverb tails.
 * **WebKit / Safari Web Audio Graph Teardown (CRITICAL):** In Safari / WebKit, dynamic `AudioNode` instances (oscillators, gain nodes, biquad filters) are **not** garbage-collected when allowed to go out of JavaScript scope if they remain connected to any running upstream or downstream node in the audio context graph. Voice playback functions (`playSynthVoice`, `playArpNote`, `playDayan`, `playBayan`, `playSnare`, `playHiHat`, `triggerSympatheticStrings`) must use variadic `disconnectOnEnded(...)` to disconnect every oscillator, modulator, filter, and gain node upon voice envelope completion. Audio clock fallback oscillators (`scheduleAudioClockFallback`) must explicitly call `.disconnect()` when stopped. Dynamic aux sends in Module 5 sampler (`route()`) must be tracked and disconnected before creating replacement routing.
 * **Live Field Recorder Memory Safety Cap:** Continuous live mic recording must enforce a hard 45-minute safety cap (~238 MB Float32Array mono at 44.1 kHz) to prevent unbounded memory allocation and mobile browser tab crashes.
+* **Zero-Regression Mobile Performance Guardrail (CRITICAL):** Mobile RAM, CPU, and GPU optimizations must strictly operate as non-intrusive progressive enhancements. Desktop browsers must retain full 60 FPS rendering, full DPR resolution, full-length 4.8s convolution tails, and unthrottled visualizer rings. No optimization may alter the mathematical tuning of scales, coprime clock step counts, MIDI CC responsiveness, preset serialization schemas, or audio bus topologies.
 * **Known Issue Resolution — Tangerine Dream Scale:** Resolved by validating that `activeScaleKey` maps cleanly to valid `SCALES` entries (falling back cleanly to `PHRYGIAN_AMB`).
 * **Known Issue Resolution — Airports Drums:** Resolved by mapping drums-off state to `"MUTED"` mode so the drum selector accurately reflects engine status.
 
@@ -302,6 +309,71 @@ This master architecture document serves as the authoritative single-source-of-t
     Cache-Control: public, max-age=0, must-revalidate
   ```
 * **Permissions Policy:** Specifically allows `microphone=(self)` for the pocket field recorder and `screen-wake-lock=(self)` for uninterrupted generative ambient performance while denying camera and geolocation.
+
+##### 14.3 Mobile RAM, CPU & Thermal Management Specification (Non-Breaking Architecture)
+
+###### 14.3.1 Problem Statement & Thermal/Memory Constraints on Mobile
+On modern mobile platforms (iOS Safari / WebKit and Android Chrome / Blink), running real-time generative audio synthesis alongside multiple high-frame-rate HTML5 Canvas visualizers presents severe thermal and memory constraints:
+1. **Retina Canvas Overdraw (3x DPR Multiplier):** Mobile devices feature 3x pixel density (`window.devicePixelRatio = 3.0`). Rendering a full-bleed canvas creates a $9\times$ pixel fill-rate load, allocating up to 30–40 MB per canvas backbuffer and causing immediate GPU thermal throttling and battery drain.
+2. **High-Refresh Display Churn (90 Hz / 120 Hz ProMotion):** `requestAnimationFrame` defaults to display refresh frequency, firing unthrottled visualizer and physics loops at 120 FPS—even when audio playback is stopped or idle.
+3. **Voice Allocation GC Pauses (Audio Crackles):** Continuous creation and abandonment of transient audio nodes (`createOscillator`, `createGain`, `createBiquadFilter`) generates heap churn, triggering JavaScript Garbage Collection (GC) sweeps on the main thread that cause micro-stutters and audio buffer underruns.
+4. **Main-Thread Audio Processing:** Legacy `createScriptProcessor` nodes in audio capture pipelines force sample-by-sample processing onto the UI thread, competing directly with user touch events and UI rendering.
+5. **WebKit Jetsam Memory Watchdog:** iOS terminates browser tabs that exceed dynamic memory thresholds during extended ambient listening sessions (especially when recording stems or buffering multi-channel audio).
+
+###### 14.3.2 Canvas & Visualizer GPU/CPU Throttling Protocol
+* **Strict Mobile DPR Clamping:**
+  * Desktop environments retain full native display scaling (`Math.min(2.0, window.devicePixelRatio)`).
+  * Mobile viewports enforce an explicit clamp: `Math.min(1.25, window.devicePixelRatio)`. On a 390×844 iPhone display, this drops backbuffer pixel allocation from ~3 million pixels down to ~500,000 pixels (an 83% reduction in GPU fill-rate).
+* **Adaptive Frame-Rate Regulation:**
+  * **Active Playback on Mobile:** Clamped to a rock-solid 30 FPS (`if (now - lastFrame < 32.5) return;`), reducing mobile CPU and GPU processing cycles by 50% on 60 Hz devices and 75% on 120 Hz ProMotion displays.
+  * **Paused / Idle State:** When transport is paused (`!isPlaying`), visualizer rendering drops to a minimal 15 FPS sleep cadence or pauses completely until user interaction.
+  * **Off-Screen Visibility Culling:** Both `scopeCanvas` and `orbitalCanvas` register `IntersectionObserver` instances with `0.01` threshold. When scrolled out of the viewport or covered by a modal/drawer, canvas clearing and drawing routines are completely bypassed.
+  * **View-Mode Loop Sleep:** Switching to Console View completely halts orbital starfield and physics calculations; switching to Orbital View halts CRT visualizer canvas redraws.
+* **Filter & Composite Optimization:**
+  * Expensive `shadowBlur` and multi-pass additive blends (`globalCompositeOperation = 'lighter'`) are dynamically disabled or replaced with single-pass vector strokes on mobile profiles.
+
+###### 14.3.3 Web Audio Voice Node Pooling & Main-Thread Offloading
+* **Percussive Voice Node Pooling:**
+  * Short-lived transient voices (tabla bols, woodblocks, kicks, snares, and fast shimmer notes) utilize a pre-warmed pool of reusable oscillator/gain pairs.
+  * Nodes are muted via exponential gain fade and recycled rather than dereferenced and garbage collected.
+* **AudioWorklet Capture Modernization:**
+  * Replace `createScriptProcessor(4096, 1, 1)` in the Pocket Field Recorder with a dedicated `AudioWorkletProcessor` (`field-capture-processor.js`) running in the high-priority audio rendering thread.
+  * Offloads audio RMS metering and circular ring-buffer capture completely off the JavaScript main execution thread.
+* **Explicit Graph Disconnect Sweep:**
+  * Expand `disconnectOnEnded()` to all transient generative generators, ensuring no lingering sub-nodes or feedback gains prevent WebKit memory reclamation.
+
+###### 14.3.4 Convolver Impulse Response & Analyser Optimization
+* **Adaptive Reverb Buffer Length:**
+  * Desktop maintains full 4.8-second high-density stereo impulse responses (over 210,000 samples per channel).
+  * Mobile profiles utilize a 1.6-second truncated impulse response tailored for mobile speakers and headphones, reducing real-time time-domain convolution math by 66% while preserving warm spatial decay.
+* **Scaled FFT Resolution:**
+  * Mobile visualizer ring analyzers switch from $1024$ or $2048$ down to $256$ or $512$ FFT bins, cutting per-frame frequency-analysis calculation overhead by 75%.
+
+###### 14.3.5 DOM Churn Elimination in Animation Loops
+* **Decoupled Keyboard LED & State Rendering:**
+  * Remove `renderKeyboardHighlights()` DOM mutation sweeps from the per-frame `drawScope` loop.
+  * Key classes (`.in-scale`, `.active-chord`, `.active-arp`, `.active-live`, `.active-drone`) are updated strictly on clock ticks and MIDI note state transitions (`startNoteLive`, `stopNoteLive`, `triggerCurrentChord`).
+* **Cached Transport & Meter HUD Writes:**
+  * Debounce `textContent` updates for `hudMeter` and `telemMeter` to downbeats and beat changes, eliminating repetitive DOM layout calculations.
+
+###### 14.3.6 Mobile Low-Power / Battery Saver Profile Matrix
+
+| Feature Parameter | Standard Desktop Profile | Mobile / Low-Power Profile | Impact / Savings |
+| :--- | :--- | :--- | :--- |
+| **Canvas DPR Cap** | `Math.min(2.0, DPR)` | `Math.min(1.25, DPR)` | ~83% GPU memory & fill reduction |
+| **Visualizer Frame Rate** | 60 FPS (Native) | 30 FPS (15 FPS paused) | 50%–75% CPU/GPU cycles saved |
+| **Canvas Shadow Glow** | Full `shadowBlur` multi-pass | Zero blur / crisp stroke | Eliminates expensive raster blur filters |
+| **Reverb Impulse Duration**| 4.8 seconds (210k samples) | 1.6 seconds (70k samples) | 66% reduction in convolution math |
+| **Visualizer Analyser FFT** | 1024 / 2048 bins | 256 / 512 bins | 75% reduction in FFT calculations |
+| **Orbital Star Count** | 180 particles + 3D Eno | 40 particles / 2D Eno fallback| Significant 2D canvas draw savings |
+| **Keyboard LED Updates** | Every rAF frame (~60–120 Hz) | Event-driven (clock/MIDI only)| Eliminates per-frame DOM layout reflows|
+| **Capture Processor** | AudioWorklet / ScriptProc | AudioWorklet (Worker thread)| 0% audio math on UI thread |
+
+###### 14.3.7 Zero-Regression Preservation Protocol
+To satisfy the strict architectural requirement that no change impact existing code or functionality:
+1. **Dynamic Environment Detection:** The mobile profile activates only when detecting mobile viewport dimensions (`window.matchMedia("(max-width: 900px)").matches`), touch capability (`navigator.maxTouchPoints > 0`), or an explicit user toggle (`#btnBatterySaver`).
+2. **Desktop Transparency:** Desktop sessions run the unaltered full-fidelity engine: 60 FPS, 2.0 DPR, 4.8s convolution tails, and full particle counts.
+3. **Audio Invariance:** All coprime clock math, prime-step loop lengths (7, 11, 13, 17, 19, 23), scale quantization, frequency tuning, MIDI CC mappings, and preset JSON serialization remain 100% bit-for-bit identical across all targets.
 
 #### 15. Stereo Binaural Panning & Spatial Drift Engine
 
@@ -917,6 +989,13 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
 ---
 
 #### 27. Implementation Phasing & Roadmap
+
+##### Phase 0: Mobile Microphone & Pocket Field Recorder Resiliency (PRIORITY 1 / ACTIVE)
+* [ ] **Pointer Capture & Touch Physics:** Implement `setPointerCapture(e.pointerId)` on `pointerdown` for all `[data-field-hold]` elements, combined with dedicated `touchstart`/`touchend` hooks to prevent iOS Safari `pointercancel` micro-jitter aborts.
+* [ ] **AudioContext Synchronous Gesture Pre-Warm:** Pre-warm and resume `captureCtx` synchronously within user touch dispatch before entering asynchronous `getUserMedia()` queries to prevent WebKit gesture token expiration.
+* [ ] **MediaRecorder Modernization & ScriptProcessor Fallback:** Wrap capture in native `MediaRecorder` (`audio/webm` or `audio/mp4` / AAC/Opus) with `AudioContext.decodeAudioData`, completely bypassing iOS 17+ `createScriptProcessor` silent thread throttling while retaining `Float32Array` fallbacks for older browsers.
+* [ ] **AudioSession Type Guarding:** Soften `navigator.audioSession.type = "play-and-record"` toggling with automated output restore to prevent mobile Safari background audio muting.
+* [ ] **High-Visibility Status & Denied Feedback:** Explicit visual state machine on `[data-field-hold]` (`HOLD TO REC`, `REC 0.0s`, `TAP TO STOP`, `MIC PERMISSION BLOCKED`) with user-friendly toast guidance.
 
 ##### Phase 1: Grid Foundation & Pedals Mode Layout (Front-End)
 * [ ] Implement the Eurorack HP sizing grid and CSS/layout token framework across mobile (32 HP) and desktop (64 HP) viewports.
