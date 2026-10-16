@@ -78,12 +78,26 @@ This master architecture document serves as the authoritative single-source-of-t
 * **Canonical File & Git Workflow:** All web development lives in Git tracking `master` and dedicated worktrees (`slambient_dev-thread2` on `feature-thread2`) alongside `GEMINI_SYNC.md`, the running hand-off log. Archived builds live in `_archive/old_snapshots/`.
 * **Default 75% Viewport Scale (`zoom: 0.75`):** The root `html` element applies `zoom: 0.75` with `min-height: calc(100vh / 0.75)` on `body` so the entire workstation fits cleanly into a standard Safari/Chrome window at 100% browser zoom. Canvas dimensions (`scopeCanvas`, `orbitalCanvas`) read unscaled `clientWidth`/`clientHeight` and normalize pointer coordinates against `getBoundingClientRect()` for crisp rendering and 1:1 orb click/drag accuracy.
 * **Sticky Frosted Header:** The header bar is sticky with a frosted blur backdrop (`.header-bar-wrapper` at `z-index: 3000` with overflow visible, so dropdown menus float over the upper deck).
-* **Branding & Preset Bank:** The SLAMBIENT wordmark sits above a "MEANDER ENGINE" pill subtitle in a 260px brand block. The preset bank hugs the brand block on the left with 15 preset chips (Section 10), followed by a BANK group with SAVE and LOAD buttons.
-* **Patch Save / Load (`savePresetBankJson`, `loadPresetBankJson`):** Exports and imports the full patch as JSON: every voice and effect control, power, aux, mute and solo states, pedal bypass states, and the live `dspChainOrder` pedal routing.
+* **Branding, Factory Presets & User Patch Bank (U1–U6):** The SLAMBIENT wordmark sits above a "MEANDER ENGINE" pill subtitle in a 260px brand block. The preset bank features segmented bank tabs (`FACTORY` / `USER [U1–U6]`):
+  * **Factory Bank:** 15 curated preset chips (Section 10).
+  * **User Patch Bank (U1–U6):** 6 persistent user slots saved to `localStorage["slambient_user_patches_v1"]`. Single-click loads a patch, click empty slot prompts for a name to save current state, Shift-click instantly overwrites, and right-click/contextmenu allows renaming, overwriting, or clearing. Includes a `+ STORE` quick-save button.
+  * **BANK Group:** SAVE and LOAD buttons for full patch JSON serialization.
+* **AudioWorklet Sample-Accurate Clock Engine (`clock-processor.js`):** The primary master clock runs in the dedicated Web Audio render thread via an `AudioWorkletNode` (`clock-processor`), counting exact audio buffer samples rather than relying on UI-thread timers (`setInterval` / `setTimeout`). This eliminates timing jitter, drift, and note skips during heavy canvas rendering, garbage collection pauses, or background tab throttling, with automatic fallback to buffer scheduling in sandboxed environments.
 * **Top Header & Global Transport Controls:**
   * **Start / Stop Engine (`btnPlay`):** Starts/stops the master clock and gates continuous drone busses (`droneGain` and `tanpuraBusGain`) via `updateAudioParams()` so drones silence cleanly on Stop and fade back in on Start. Engages the Screen Wake Lock API.
-  * **Record Audio (`btnRecord`):** Captures master bus audio to downloadable `.wav` / `.webm` files with an automatic 45-minute safety ceiling to prevent memory leaks.
-  * **Randomize All (⟲ ALL):** Generates a warm, consonant patch across all modules using curated sweet-spot ranges (`RANDOM_SWEET_SPOTS`), shuffles the pedal insert order, and schedules entry on the next downbeat.
+  * **Multi-Format Recording Engine (`btnRecord`, `#selRecordFormat`):** Captures live audio in three selectable formats:
+    * **MP3 (320 kbps):** Dynamic constant-bitrate MP3 encoding via client-side `lamejs`.
+    * **WAV (Lossless 16-bit PCM):** Uncompressed full-fidelity studio WAV file.
+    * **STEMS (Multi-Track ZIP Archive):** Simultaneously records 5 isolated stereo buses (`01_master_mix.wav`, `02_sub_drone.wav`, `03_drums.wav`, `04_chords_lead.wav`, `05_shimmer_arp.wav`) plus serialized `patch.json` and session metadata `session_info.txt`, bundling them into a downloadable `.zip` archive via a zero-dependency in-memory ZIP builder (`buildZip`) with CRC-32 checksums.
+    * Hard safety cap at 45 minutes to prevent out-of-memory crashes on mobile devices.
+  * **Randomize All (⟲ ALL):** Generates a warm, consonant patch across all modules using curated sweet-spot ranges (`RANDOM_SWEET_SPOTS`), shuffles the pedal insert order, and schedules entry on the next downbeat. Includes an Undo button (`#btnUndoPatch`, Ctrl/⌘+Z).
+  * **Web MIDI Hardware Integration & CC Controls (`#btnHeaderMidi`):** Header MIDI utility button with status indicator dot (`#midiStatusDot`) and device name tooltip (`toggleMidiConnectionPrompt()`). Incoming MIDI messages flash an activity LED. Full continuous controller mappings:
+    * **CC 74:** Master Filter Cutoff (`knobMasterCutoff`, 60 Hz – 16 kHz)
+    * **CC 71:** Master Filter Resonance (`knobMasterRes`, 0.5–8.0)
+    * **CC 1:** Diffusion Master Space / Weather (`knobWeather`, 0–100%)
+    * **CC 7:** Master Output Volume (`knobMasterVolume`, 0–100%)
+    * **CC 64:** Sustain Pedal (sustains active notes in `midiSustainedNotes`)
+    * **Pitch Bend:** 14-bit pitch bend mapped to ±200 cents (±2 semitones) across live synth voices.
   * **Root & 14 Scale Modes (`topRootKey`, `topScaleMode`):** Chromatic roots C–B and 14 scales: DORIAN, LYDIAN, AEOLIAN, MIXOLYDIAN, PENTATONIC, MAJOR9, HIRAJOSHI, INSEN, LYDIAN_DOM, PHRYGIAN_AMB, WHOLE_TONE, MAJ_PENTATONIC, BILAWAL (Indian Classical Major), and BHAIRAV (Maihar Morning Raga).
   * **8 Time Signatures (`selTimeSig`):** 4/4, 7/4, 5/8, 7/8, 5/4, 9/8, 11/8, and 3/4. The quick-cycle meter button is an icon-only SVG refresh glyph.
   * **Telemetry Pills:** TIME, METER (with live beat position, e.g. 7/4 [1/7]), ROOT / SCALE, and SEED (`#534C-414D` format).
