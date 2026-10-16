@@ -212,10 +212,16 @@
     padding-top: 10px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+    justify-content: flex-start;
+    gap: 8px;
     width: 100%;
     flex-wrap: wrap;
+  }
+  .readout-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding-top: 2px;
   }
 
   .brand-group {
@@ -470,18 +476,67 @@
     box-shadow: 0 0 10px #ffffff !important;
   }
 
-  .global-transport {
-    display: flex;
+  /* =========================================================================
+     FOUR DISTINCT MODULAR HEADER SECTIONS
+     1: Transport & Audio (Play, Record, Sample, MIDI)
+     2: Harmony & Master Clock (Key, Scale, Meter, Tempo)
+     3: Workspace & System Utilities (Fullscreen, Palette, ?)
+     4: Generative Engine & History (Randomize All, Undo)
+     ========================================================================= */
+  .header-section {
+    display: inline-flex;
     align-items: center;
-    flex-wrap: wrap;
+    gap: 6px;
+    height: 38px;
+    box-sizing: border-box;
+    background: #080a11;
+    border: 1px solid var(--border-light);
+    border-radius: 5px;
+    padding: 2px 6px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.55);
+    flex-shrink: 0;
+  }
+  .header-sec-transport {
+    gap: 6px;
+  }
+  .header-sec-transport .sample-ctrl {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    height: 32px;
+    padding: 0 4px;
+  }
+  .header-sec-transport .sample-ctrl:hover {
+    border: none;
+  }
+  .header-sec-harmony {
     gap: 8px;
-    /* Shrinkable so the Undo / ? / Full Screen group stays on this row when
-       the transport controls wrap at narrow widths, instead of dropping to
-       a third line of its own. */
-    flex: 1 1 0;
-    min-width: 0;
+    padding: 2px 8px;
+  }
+  .header-sec-harmony .root-scale-ctrl,
+  .header-sec-harmony .time-sig-ctrl,
+  .header-sec-harmony .tempo-ctrl {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    height: 32px;
+    padding: 0;
+  }
+  .header-sec-harmony .root-scale-ctrl,
+  .header-sec-harmony .time-sig-ctrl {
+    padding-right: 8px;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .header-sec-utils {
+    margin-left: auto;
+    gap: 6px;
+  }
+  .header-sec-gen {
+    gap: 6px;
   }
 
+  .header-section, .global-transport, .mini-transport { --tr-icon: 16px; --tr-gap: 7px; }
+  .btn-main-play, .btn-record, .btn-randomize-all { gap: var(--tr-gap, 7px); }
   .btn-main-play {
     display: inline-flex;
     align-items: center;
@@ -513,12 +568,6 @@
     border-color: var(--color-filter);
     box-shadow: 0 0 18px rgba(var(--rgb-filter), 0.7);
   }
-  /* Start/Pause, Record and the randomize-all arrow share one icon slot
-     (--tr-icon square, same gap to the label, centred on the label's line) so
-     the three buttons read as a set. The slot is 16px on desktop, 18px in the
-     phone transport row and mini bar. */
-  .global-transport, .mini-transport { --tr-icon: 16px; --tr-gap: 7px; }
-  .btn-main-play, .btn-record, .btn-randomize-all { gap: var(--tr-gap, 7px); }
   .play-icon-wrap {
     display: inline-flex;
     align-items: center;
@@ -4120,25 +4169,33 @@
     }
     .btn-preset-io svg { width: 12px; height: 12px; }
 
-    /* Transport section: everything full width, one control per row */
+    /* Transport section: 4 distinct modular sections stacked cleanly */
     .transport-row {
       flex-direction: column;
       flex-wrap: nowrap;
       align-items: stretch;
       gap: 8px;
-      padding-top: 12px;
+      padding-top: 10px;
     }
-    .global-transport {
+    .header-section {
+      width: 100%;
+      height: auto;
+      box-sizing: border-box;
+      flex-wrap: wrap;
+      padding: 6px 8px;
+      gap: 6px;
+    }
+
+    /* SECTION 1: Transport & Audio */
+    .header-sec-transport {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      flex: none;
-      width: 100%;
+      gap: 6px;
+      padding: 6px;
     }
-    .global-transport > .btn-main-play,
-    .global-transport > .rec-ctrl-wrap,
-    .global-transport > .btn-record,
-    .global-transport > .btn-randomize-all {
+    .header-sec-transport > .btn-main-play,
+    .header-sec-transport > .rec-ctrl-wrap,
+    .header-sec-transport > .btn-header-midi {
       width: 100%;
       min-width: 0;
       height: 40px;
@@ -4148,13 +4205,13 @@
       white-space: nowrap;
       overflow: hidden;
     }
-    .global-transport > .rec-ctrl-wrap {
+    .header-sec-transport > .rec-ctrl-wrap {
       display: flex;
       align-items: center;
       gap: 3px;
       padding: 0;
     }
-    .global-transport > .rec-ctrl-wrap > .btn-record {
+    .header-sec-transport > .rec-ctrl-wrap > .btn-record {
       flex: 1 1 0;
       min-width: 0;
       height: 40px;
@@ -4164,7 +4221,7 @@
       white-space: nowrap;
       overflow: hidden;
     }
-    .global-transport > .rec-ctrl-wrap > .record-format-select {
+    .header-sec-transport > .rec-ctrl-wrap > .record-format-select {
       flex: 0 0 auto;
       width: 44px;
       height: 40px;
@@ -4172,24 +4229,72 @@
       font-size: 10px;
       text-align: center;
     }
-    .global-transport, .mini-transport { --tr-icon: 18px; }
-    /* "Stop & Save" is the longest label; tighten it so the dot never clips */
-    .global-transport > .rec-ctrl-wrap > .btn-record.recording,
-    .global-transport > .rec-ctrl-wrap > .btn-record:disabled,
-    .global-transport > .btn-record.recording,
-    .global-transport > .btn-record:disabled {
+    .header-section, .mini-transport { --tr-icon: 18px; }
+    .header-sec-transport > .rec-ctrl-wrap > .btn-record.recording,
+    .header-sec-transport > .rec-ctrl-wrap > .btn-record:disabled {
       gap: 4px;
       padding: 0 2px;
       letter-spacing: 0;
     }
-    .global-transport > .root-scale-ctrl,
-    .global-transport > .time-sig-ctrl,
-    .global-transport > .tempo-ctrl {
+    .header-sec-transport > .sample-ctrl {
       grid-column: 1 / -1;
+      width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      gap: 7px;
+      height: 36px;
+    }
+    .header-sec-transport > .sample-ctrl .tag {
+      font-size: 10px;
+      letter-spacing: 1px;
+      flex: 0 0 auto;
+      min-width: 42px;
+    }
+    .header-sec-transport > .sample-ctrl .btn-field {
+      height: 32px;
+      padding: 0 8px;
+      font-size: 11px;
+      flex: 1 1 0;
       min-width: 0;
     }
+    .header-sec-transport > .sample-ctrl.has-sample .btn-field,
+    .header-sec-transport > .sample-ctrl.is-recording .btn-field {
+      flex: 0 0 auto;
+      padding: 0 8px;
+    }
+    .header-sec-transport > .sample-ctrl .field-wave {
+      flex: 1 1 auto;
+      min-width: 40px;
+      height: 24px;
+    }
+    .header-sec-transport > .sample-ctrl .btn-field-eject {
+      width: 28px;
+      height: 28px;
+      font-size: 18px;
+      flex: 0 0 28px;
+    }
 
-    /* KEY + SCALE */
+    /* SECTION 2: Harmony & Master Clock */
+    .header-sec-harmony {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+      padding: 6px 8px;
+    }
+    .header-sec-harmony > .root-scale-ctrl,
+    .header-sec-harmony > .time-sig-ctrl,
+    .header-sec-harmony > .tempo-ctrl {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 36px;
+      padding-right: 0;
+      border-right: none;
+      min-width: 0;
+    }
     .root-scale-ctrl .tag + .tag,
     .root-scale-ctrl .custom-dropdown-wrap + .tag {
       min-width: 0;
@@ -4198,54 +4303,49 @@
     #wrap_topRootKey { flex: 0 0 58px; }
     #wrap_topScaleMode,
     #wrap_selTimeSig { flex: 1 1 auto; }
-    .global-transport .custom-dropdown-wrap { min-width: 0; }
-    .global-transport .custom-dropdown-trigger {
+    .header-section .custom-dropdown-wrap { min-width: 0; }
+    .header-section .custom-dropdown-trigger {
       height: 32px;
       gap: 6px;
       padding: 0 9px;
       font-size: 12px;
       border-radius: 4px;
     }
-    /* If the native selects were ever left un-upgraded, keep them aligned too */
     .root-scale-ctrl select, .time-sig-ctrl select {
       height: 32px;
       font-size: 12px;
       min-width: 0;
     }
-
-    /* METER: dropdown fills the row, cycle button is a 32px square */
     .time-sig-ctrl .btn-meter-cycle {
       flex: 0 0 32px;
       width: 32px;
       height: 32px;
     }
     .time-sig-ctrl .btn-meter-cycle svg { width: 16px; height: 16px; }
-
-    /* TEMPO: grabbable slider + value + TAP */
-    .global-transport > .tempo-ctrl input[type="range"] {
+    .header-sec-harmony > .tempo-ctrl input[type="range"] {
       flex: 1 1 auto;
       width: auto;
       min-width: 0;
       height: 32px;
     }
-    .global-transport > .tempo-ctrl input[type="range"]::-webkit-slider-runnable-track {
+    .header-sec-harmony > .tempo-ctrl input[type="range"]::-webkit-slider-runnable-track {
       height: 6px;
       border-radius: 3px;
     }
-    .global-transport > .tempo-ctrl input[type="range"]::-webkit-slider-thumb {
+    .header-sec-harmony > .tempo-ctrl input[type="range"]::-webkit-slider-thumb {
       width: 22px;
       height: 22px;
       border-radius: 5px;
       margin-top: -9px;
     }
-    .global-transport > .tempo-ctrl input[type="range"]::-moz-range-track { height: 6px; border-radius: 3px; }
-    .global-transport > .tempo-ctrl input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 5px; }
-    .global-transport > .tempo-ctrl .tempo-val {
+    .header-sec-harmony > .tempo-ctrl input[type="range"]::-moz-range-track { height: 6px; border-radius: 3px; }
+    .header-sec-harmony > .tempo-ctrl input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 5px; }
+    .header-sec-harmony > .tempo-ctrl .tempo-val {
       flex: 0 0 auto;
       min-width: 56px;
       font-size: 12px;
     }
-    .global-transport > .tempo-ctrl .btn-tap-tempo {
+    .header-sec-harmony > .tempo-ctrl .btn-tap-tempo {
       flex: 0 0 auto;
       height: 32px;
       padding: 0 12px;
@@ -4254,48 +4354,24 @@
       border-radius: 4px;
     }
 
-    /* SAMPLE: extends from left of START to the right edge of RECORD (columns 1 & 2) */
-    .global-transport > .sample-ctrl {
-      grid-column: 1 / 3;
+    /* SECTION 4: Generative Engine & History */
+    .header-sec-gen {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 6px;
+    }
+    .header-sec-gen > .btn-randomize-all,
+    .header-sec-gen > .btn-header-util {
       width: 100%;
-      box-sizing: border-box;
-      display: flex;
-      align-items: center;
-      padding: 0 8px;
-      gap: 7px;
-    }
-    .global-transport > .sample-ctrl .tag {
-      font-size: 10px;
-      letter-spacing: 1px;
-      flex: 0 0 auto;
-      min-width: 42px;
-    }
-    .global-transport > .sample-ctrl .btn-field {
-      height: 32px;
-      padding: 0 8px;
-      font-size: 11px;
-      flex: 1 1 0;
-      min-width: 0;
-    }
-    .global-transport > .sample-ctrl.has-sample .btn-field,
-    .global-transport > .sample-ctrl.is-recording .btn-field {
-      flex: 0 0 auto;
-      padding: 0 8px;
-    }
-    .global-transport > .sample-ctrl .field-wave {
-      flex: 1 1 auto;
-      min-width: 40px;
-      height: 24px;
-    }
-    .global-transport > .sample-ctrl .btn-field-eject {
-      width: 28px;
-      height: 28px;
-      font-size: 18px;
-      flex: 0 0 28px;
+      height: 38px;
+      font-size: 12px;
+      letter-spacing: 0.6px;
+      justify-content: center;
     }
 
-    /* Utility buttons: equal-width row of icon buttons */
-    .header-utils {
+    /* SECTION 3: Workspace & System Utilities */
+    .header-sec-utils {
       display: grid;
       grid-auto-flow: column;
       grid-auto-columns: minmax(0, 1fr);
@@ -4303,22 +4379,24 @@
       gap: 8px;
       margin-left: 0;
       width: 100%;
+      padding: 6px;
     }
-    .header-utils > .palette-wrap,
-    .header-utils > .btn-header-util {
+    .header-sec-utils > .palette-wrap,
+    .header-sec-utils > .btn-header-util {
       min-width: 0;
     }
-    .header-utils .btn-header-util {
+    .header-sec-utils .btn-header-util {
       width: 100%;
       height: 36px;
       padding: 0;
     }
-    .header-utils .btn-header-util svg { width: 16px; height: 16px; }
-    .header-utils .btn-header-help { font-size: 15px; }
-    .header-utils .pal-btn-dots { grid-template-columns: repeat(2, 6px); }
-    .header-utils .pal-btn-dots i { width: 6px; height: 6px; }
+    .header-sec-utils .btn-header-util svg { width: 16px; height: 16px; }
+    .header-sec-utils .btn-header-help { font-size: 15px; }
+    .header-sec-utils .pal-btn-dots { grid-template-columns: repeat(2, 6px); }
+    .header-sec-utils .pal-btn-dots i { width: 6px; height: 6px; }
     /* iPhone Safari has no Fullscreen API for pages (class set from JS) */
     html.no-fullscreen-api #btnAppFullscreen { display: none; }
+    .readout-row { width: 100%; }
 
     /* Telemetry: compact 2x2 grid of label-over-value tiles */
     .sys-readout {
@@ -5239,8 +5317,8 @@
     }
 
     /* ---- Palette popover: full-width card under the header utils row ---- */
-    .header-utils { position: relative; }
-    .header-utils > .palette-wrap { position: static; }
+    .header-utils, .header-sec-utils { position: relative; }
+    .header-utils > .palette-wrap, .header-sec-utils > .palette-wrap { position: static; }
     #paletteMenu {
       top: calc(100% + 8px);
       left: 0;
@@ -5680,7 +5758,8 @@
       </div>
 
       <div class="top-bar-row transport-row">
-        <div class="global-transport">
+        <!-- SECTION 1: Transport & Audio (play/pause, record, sample, MIDI) -->
+        <div class="header-section header-sec-transport">
           <button class="btn-main-play" id="btnPlay" onclick="togglePlay()">
             <span class="play-icon-wrap" id="btnPlayIcon">
               <svg class="icon-play" viewBox="0 0 16 16" fill="currentColor">
@@ -5706,8 +5785,6 @@
             </select>
           </div>
 
-          <button class="btn-preset-chip btn-randomize-all" onclick="randomizeEverything()" title="Randomize every module"><svg class="rand-all-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20.5 3.5v5h-5"/></svg><span>ALL</span></button>
-
           <div class="sample-ctrl field-badge" id="fieldBadge" title="Pocket Field Recorder: hold MIC to sample (tap records 5 s), or DROP audio file. Woven into Noise module.">
             <span class="tag">SAMPLE</span>
             <button type="button" class="btn-field btn-field-mic" data-field-hold aria-label="Hold to record from the microphone">
@@ -5722,6 +5799,14 @@
             <button type="button" class="btn-field-eject" data-field-eject title="Eject sample" aria-label="Eject sample">&times;</button>
           </div>
 
+          <button class="btn-header-util btn-header-midi" id="btnHeaderMidi" onclick="toggleMidiConnectionPrompt()" title="Web MIDI hardware connection">
+            <span class="midi-status-dot" id="midiStatusDot"></span>
+            <span id="midiHeaderLabel">MIDI</span>
+          </button>
+        </div>
+
+        <!-- SECTION 2: Harmony & Master Clock (Key, scale, meter, tempo) -->
+        <div class="header-section header-sec-harmony">
           <div class="root-scale-ctrl">
             <span class="tag">KEY</span>
             <select id="topRootKey" onchange="syncRootKey(this.value)">
@@ -5780,7 +5865,13 @@
           </div>
         </div>
 
-        <div class="header-utils">
+        <!-- SECTION 3: Workspace & System Utilities (full screen, palette, ?) -->
+        <div class="header-section header-sec-utils">
+          <button class="btn-header-util" id="btnAppFullscreen" onclick="toggleAppFullscreen()" title="Full screen">
+            <svg class="icon-enter-fs" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg class="icon-exit-fs" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Full Screen</span>
+          </button>
           <div class="palette-wrap">
             <button class="btn-header-util" id="btnPalette" onclick="togglePaletteMenu()" title="Color palette">
               <span class="pal-btn-dots"><i></i><i></i><i></i><i></i></span>
@@ -5788,26 +5879,24 @@
             </button>
             <div class="palette-menu" id="paletteMenu" role="menu"></div>
           </div>
-          <button class="btn-header-util btn-header-midi" id="btnHeaderMidi" onclick="toggleMidiConnectionPrompt()" title="Web MIDI hardware connection">
-            <span class="midi-status-dot" id="midiStatusDot"></span>
-            <span id="midiHeaderLabel">MIDI</span>
-          </button>
-          <button class="btn-header-util" id="btnUndoPatch" onclick="undoPatchChange()" title="Undo the last randomize / preset / new seed (Ctrl/⌘+Z)" disabled>
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.5 3.5L2 7L5.5 10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 7H10a4 4 0 0 1 0 8H7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            <span>Undo</span>
-          </button>
           <button class="btn-header-util btn-header-help" id="btnShortcuts" onclick="toggleShortcutsPanel()" title="Keyboard shortcuts (?)">?</button>
           <button class="btn-header-util btn-install-app" id="btnInstallApp" onclick="installAppPrompt()" title="Install Slambient as App" style="display: none;">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2V10M8 10L5 7M8 10L11 7M2 13H14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <span>Install</span>
           </button>
-          <button class="btn-header-util" id="btnAppFullscreen" onclick="toggleAppFullscreen()" title="Full screen">
-            <svg class="icon-enter-fs" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <svg class="icon-exit-fs" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span>Full Screen</span>
-          </button>
         </div>
 
+        <!-- SECTION 4: Generative Engine & History (Randomize All, Undo) -->
+        <div class="header-section header-sec-gen">
+          <button class="btn-preset-chip btn-randomize-all" id="btnRandomizeAll" onclick="randomizeEverything()" title="Randomize every module"><svg class="rand-all-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20.5 3.5v5h-5"/></svg><span>Randomize All</span></button>
+          <button class="btn-header-util" id="btnUndoPatch" onclick="undoPatchChange()" title="Undo the last randomize / preset / new seed (Ctrl/⌘+Z)" disabled>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.5 3.5L2 7L5.5 10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 7H10a4 4 0 0 1 0 8H7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <span>Undo</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="top-bar-row readout-row">
         <div class="sys-readout">
           <div class="telemetry-pill"><span class="dot-live"></span><span class="pill-k">TIME</span><span class="val" id="hudTimer">00:00</span></div>
           <div class="telemetry-pill"><span class="pill-k">METER</span><span class="val" id="hudMeter">7/4 [1/7]</span></div>
