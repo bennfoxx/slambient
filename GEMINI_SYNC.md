@@ -1163,3 +1163,42 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - **Sample Burst Protection**: Clamped `this.sampleCount` to `samplesPerTick * 1.5` in `clock-processor.js` and inline fallback to prevent tick bursts upon audio thread resume.
   - **Service Worker Version Bump**: Bumped `CACHE_NAME` in `sw.js` to `slambient-v3` for immediate cache invalidation.
 
+## Update — 2026-10-16 (88-Key Panoramic Harmonic Radar View & Multi-Voice Lighting)
+
+- **Header Mode Switcher (`25 PLAY` vs `88 RADAR`)**:
+  - Added discrete toggle buttons to the Upper Deck keyboard header (`btnKbPlay` and `btnKbRadar`) calling `setKeyboardDisplayMode(mode)`.
+  - Preserved standard 25-Key touch and QWERTY playable mode (`Keys A-K · C3 - C5`).
+  - Switched to Full-Range Panoramic Harmonic Radar mode spanning **A0 (MIDI 21) to C8 (MIDI 108)**.
+- **88-Key Geometry & Touch-Lock Architecture**:
+  - Dynamically constructs 52 white keys and 36 black keys in `buildKeyboard()` when `keyboardDisplayMode === "88"`.
+  - Black keys are placed on seams between white keys `w` and `w+1` where `whiteKeys[w+1] - whiteKeys[w] === 2`, centered at `calc(${((w + 1) / 52 * 100).toFixed(4)}% - 0.5px)` with `transform: translateX(-50%)` and width `calc(100% / 52 * 0.72)`.
+  - Applied `pointer-events: none !important` via `.piano-keys-wrapper.mode-radar` to eliminate accidental touch/click triggers during panoramic observation. External hardware MIDI keyboard input continues to play and light up all keys seamlessly.
+  - Only A0 and octave root C keys (C1 through C8) render subtle `.key-label.octave-marker` typography to prevent visual noise.
+- **Multi-Instrument Phosphor Lighting (Spectral Register Mapping)**:
+  - Extended `renderKeyboardHighlights()` to monitor all sound engines with dedicated phosphor colors matching the Visualizer HUD:
+    - **Sub-Drone & Tanpura** (Cyan `#00e5ff`, `.active-drone`): Continuous glow on fundamental bass drone pitch (`currentDroneMidi()`) and bright transient flash on Tanpura string plucks.
+    - **Drums & Tabla** (Crimson `#ff3838`, `.active-drum`): Kicks (MIDI 36), Snares (MIDI 38), Woodblocks (MIDI 40), Hi-Hats (MIDI 42), Dayan (MIDI 41/43/45), and Bayan bass slides/slaps (MIDI 36/38).
+    - **Chords & Sitar** (Yellow `#fed330`, `.active-chord`): Polyphonic chord voicings and sitar pluck notes.
+    - **Shimmer Arp** (Violet `#7d5fff`, `.active-arp`): Cascading generative arpeggio melodies across the upper registers.
+    - **Live QWERTY / MIDI Input** (Electric Blue/White `#00e5ff`, `.active-live`): Real-time user performance.
+  - Extended scale LED staircase (`isKeyLedLit(midi)`) across all 88 keys, illuminating every legitimate in-scale note across 7+ octaves.
+
+
+## Update — 2026-10-16 (Binaural Spatial Drift & Acoustic Orbit Engine)
+
+- **Stereo Binaural Panning Engine (`BinauralSpatialPanner`)**:
+  - Implemented psychoacoustic 3D positioning using dual-axis drift:
+    - **Interaural Time Difference (ITD)**: Up to 0.65ms (650 microseconds) Haas delay on the opposite ear.
+    - **Interaural Level Difference (ILD)**: Head-shadow damping using a 3500 Hz `highshelf` filter (up to -4.5 dB on shadowed ear) leaving fundamental body intact.
+    - **Mono-Safe Correlation**: Positive equal-power gain curve ensures 100% phase cancellation immunity when summed to mono.
+  - **Coprime Orbit Speeds**:
+    - Sub-Drone & Kick: Locked center (`pan = 0.0`).
+    - Tanpura Drone: Subtle micro-spread (`±0.25` at 0.017 Hz / ~58s period).
+    - Chords & Sitar: Breathing figure-8 sweep (`±0.45` at 0.043 Hz / ~23s period).
+    - Shimmer Arp & Bansuri: Floating orbital swirl (`±0.75` at 0.071 Hz / ~14s period).
+    - Atmosphere & Noise: Wide atmospheric envelopment (`±0.85` at 0.031 Hz / ~32s period).
+  - **Diffusion Macro Modulation**: Scaled dynamically by `knobWeather` (`0.5 + weatherVal`).
+  - **Dual Foreground/Background Loop**: Updated at 60 FPS in `drawScope` and maintained during background tabs in `clockTick()`.
+  - **Full Stem Isolation**: Output flows through analysers, ensuring binaural positioning is captured across multi-track stem recordings.
+
+
