@@ -6872,7 +6872,7 @@ let filterLfoRateHz = 0.08;
 let filterLfoDepth = 0.25;
 let filterLFO, filterLFODepthGain;
 
-const FILTER_CUTOFF_MIN_HZ = 200, FILTER_CUTOFF_MAX_HZ = 9500;
+const FILTER_CUTOFF_MIN_HZ = 60, FILTER_CUTOFF_MAX_HZ = 16000;
 function hzFromCutoffPos(pos) {
   return FILTER_CUTOFF_MIN_HZ * Math.pow(FILTER_CUTOFF_MAX_HZ / FILTER_CUTOFF_MIN_HZ, pos / 100);
 }
@@ -8297,25 +8297,26 @@ function maybeWanderDrone() {
 
 function triggerFilterEnvelope(vel = 85) {
   if (!audioCtx || !masterFilter1 || !masterFilter2) return;
+  if (typeof pedalBypassState !== "undefined" && pedalBypassState.FILTER) return;
   const now = audioCtx.currentTime;
   const attSec = Math.max(0.015, filterAttackMs / 1000);
   const decSec = Math.max(0.05, filterDecayMs / 1000);
-  const safeBase = Math.max(60, masterBaseCutoff);
+  const safeBase = Math.max(50, Math.min(15000, masterBaseCutoff));
 
   let peakFreq;
   if (filterEnvDepth >= 0) {
-    const octaves = 2.4 * filterEnvDepth * (vel / 127);
-    peakFreq = Math.min(5400, safeBase * Math.pow(2, octaves));
+    const octaves = 2.8 * filterEnvDepth * (vel / 127);
+    peakFreq = Math.min(15000, safeBase * Math.pow(2, octaves));
   } else {
     const octaves = 2.4 * Math.abs(filterEnvDepth) * (vel / 127);
-    peakFreq = Math.max(60, safeBase / Math.pow(2, octaves));
+    peakFreq = Math.max(50, safeBase / Math.pow(2, octaves));
   }
 
   [masterFilter1, masterFilter2].forEach(f => {
-    const currentFreq = Math.max(60, Math.min(12000, f.frequency.value || safeBase));
+    const currentFreq = Math.max(50, Math.min(15000, f.frequency.value || safeBase));
     f.frequency.cancelScheduledValues(now);
     f.frequency.setValueAtTime(currentFreq, now);
-    f.frequency.linearRampToValueAtTime(Math.max(60, peakFreq), now + attSec);
+    f.frequency.linearRampToValueAtTime(Math.max(50, peakFreq), now + attSec);
     f.frequency.exponentialRampToValueAtTime(safeBase, now + attSec + decSec);
   });
 }
@@ -13608,7 +13609,7 @@ function applyPreset(idx) {
     document.getElementById("knobArpRest").value = 18;
     document.getElementById("knobArpOctaves").value = 2;
     document.getElementById("knobArpVol").value = 72;
-    document.getElementById("knobMasterCutoff").value = 65.0;
+    document.getElementById("knobMasterCutoff").value = 78.0;
     document.getElementById("knobMasterRes").value = 1.8;
     document.getElementById("knobFilterAttack").value = 65;
     document.getElementById("knobFilterDecay").value = 850;
@@ -13617,12 +13618,12 @@ function applyPreset(idx) {
     document.getElementById("knobFilterLfoDepth").value = 24;
     document.getElementById("knobDelayTime").value = 480;
     document.getElementById("knobDelayFeedback").value = 46;
-    document.getElementById("knobDelayTone").value = 2200;
+    document.getElementById("knobDelayTone").value = 2800;
     document.getElementById("knobDelayFlutter").value = 35;
     document.getElementById("knobDelayMix").value = 48;
     document.getElementById("selReverbMode").value = "CATHEDRAL";
     document.getElementById("knobReverbMix").value = 52;
-    document.getElementById("knobReverbTone").value = 4800;
+    document.getElementById("knobReverbTone").value = 6200;
     document.getElementById("selChorusMode").value = "ENSEMBLE";
     document.getElementById("knobChorusRate").value = 0.6;
     document.getElementById("knobChorusDepth").value = 55;
@@ -13835,47 +13836,48 @@ function applyPreset(idx) {
     document.getElementById("knobWeather").value = 40;
     document.getElementById("knobMutation").value = 20;
 
-    // Classical Indian Tabla theka
+    // Classical Indian Tabla theka - calibrated for chamber acoustics
     document.getElementById("selDrumStyle").value = "TABLA_GROOVE";
     document.getElementById("chkAutoEvolveDrums").checked = false;
     document.getElementById("knobDrumEvolveChance").value = 10;
-    document.getElementById("knobDrumVol").value = 85;
-    document.getElementById("knobDrumPunch").value = 75;
-    document.getElementById("knobDrumDensity").value = 70;
-    document.getElementById("knobDrumFx").value = 40;
+    document.getElementById("knobDrumVol").value = 76;
+    document.getElementById("knobDrumPunch").value = 68;
+    document.getElementById("knobDrumDensity").value = 65;
+    document.getElementById("knobDrumFx").value = 45;
 
     // Maihar Sitar Strings with authentic jawari buzz and mizrab attack
-    document.getElementById("knobStrum").value = 80;
+    document.getElementById("knobStrum").value = 75;
     document.getElementById("selChordTimbre").value = "SITAR_STRINGS";
-    document.getElementById("knobChordFx").value = 75;
+    document.getElementById("knobChordVol").value = 84;
+    document.getElementById("knobChordFx").value = 78;
 
-    // Resonant Indian Tanpura drone with rich buzzing cotton-thread Javari
+    // Resonant Indian Tanpura drone - quiet, meditative bed sitting peacefully behind sub
     document.getElementById("selDroneOctave").value = "D2";
     if (chkTanpura) chkTanpura.checked = true;
     if (document.getElementById("selTanpuraTuning")) document.getElementById("selTanpuraTuning").value = "PA";
-    if (document.getElementById("knobTanpura")) document.getElementById("knobTanpura").value = 18;
-    if (document.getElementById("knobJavari")) document.getElementById("knobJavari").value = 55;
-    document.getElementById("knobDrone").value = 75;
-    document.getElementById("knobDroneFilter").value = 220;
+    if (document.getElementById("knobTanpura")) document.getElementById("knobTanpura").value = 14;
+    if (document.getElementById("knobJavari")) document.getElementById("knobJavari").value = 52;
+    document.getElementById("knobDrone").value = 74;
+    document.getElementById("knobDroneFilter").value = 210;
     document.getElementById("knobDroneDetune").value = 3.5;
     document.getElementById("knobDroneWander").value = 15;
-    document.getElementById("knobDroneFx").value = 45;
+    document.getElementById("knobDroneFx").value = 42;
 
-    // Breathy Indian Bamboo Flute (Bansuri) arpeggios
+    // Breathy Indian Bamboo Flute (Bansuri) arpeggios in Raga Taan phrasing
     document.getElementById("selArpPattern").value = "RAGA_TAAN";
     document.getElementById("chkAutoEvolveArpPattern").checked = false;
     document.getElementById("selArpTimbre").value = "BANSURI_FLUTE";
     document.getElementById("chkAutoEvolveArpTimbre").checked = false;
     document.getElementById("knobArpEvolveChance").value = 15;
-    document.getElementById("knobArpGate").value = 400;
+    document.getElementById("knobArpGate").value = 420;
     document.getElementById("knobArpRest").value = 18;
     document.getElementById("knobArpOctaves").value = 2;
-    document.getElementById("knobArpVol").value = 85;
-    document.getElementById("knobArpFx").value = 80;
+    document.getElementById("knobArpVol").value = 82;
+    document.getElementById("knobArpFx").value = 78;
 
     // Warm temple resonance and spatial depth
-    document.getElementById("knobMasterCutoff").value = 78.0; // ~4200 Hz
-    document.getElementById("knobMasterRes").value = 2.2;
+    document.getElementById("knobMasterCutoff").value = 74.0;
+    document.getElementById("knobMasterRes").value = 2.0;
     document.getElementById("knobFilterAttack").value = 50;
     document.getElementById("knobFilterDecay").value = 950;
     document.getElementById("knobFilterEnvDepth").value = 45;
@@ -13883,17 +13885,15 @@ function applyPreset(idx) {
     document.getElementById("knobFilterLfoDepth").value = 18;
 
     document.getElementById("knobDelayTime").value = 440;
-    document.getElementById("knobDelayFeedback").value = 48;
-    document.getElementById("knobDelayTone").value = 2200;
-    document.getElementById("knobDelayFlutter").value = 28;
-    document.getElementById("knobDelayMix").value = 45;
+    document.getElementById("knobDelayFeedback").value = 45;
+    document.getElementById("knobDelayTone").value = 2400;
+    document.getElementById("knobDelayFlutter").value = 26;
+    document.getElementById("knobDelayMix").value = 44;
 
-    // Temple-like hall for the tanpura/sitar to breathe in, but only a
-    // light touch of chorus -- too much would smear the sitar's jawari buzz
-    // and meend character, which should stay crisp and acoustic.
+    // Temple-like hall for the tanpura/sitar to breathe in, with light chorus
     document.getElementById("selReverbMode").value = "CATHEDRAL";
-    document.getElementById("knobReverbMix").value = 42;
-    document.getElementById("knobReverbTone").value = 4800;
+    document.getElementById("knobReverbMix").value = 44;
+    document.getElementById("knobReverbTone").value = 5200;
     document.getElementById("selChorusMode").value = "CLASSIC";
     document.getElementById("knobChorusRate").value = 0.2;
     document.getElementById("knobChorusDepth").value = 15;
@@ -14048,21 +14048,21 @@ function applyPreset(idx) {
     document.getElementById("knobDrumDensity").value = 25;
 
     document.getElementById("knobStrum").value = 90;
-    document.getElementById("knobDrone").value = 75;
+    document.getElementById("knobDrone").value = 78;
     document.getElementById("selDroneOctave").value = "D1";
-    document.getElementById("knobDroneFilter").value = 140;
+    document.getElementById("knobDroneFilter").value = 130;
     document.getElementById("knobDroneDetune").value = 4.5;
-    document.getElementById("knobDroneWander").value = 25;
-    document.getElementById("knobDroneFx").value = 30;
-    document.getElementById("knobDrumFx").value = 20;
+    document.getElementById("knobDroneWander").value = 35;
+    document.getElementById("knobDroneFx").value = 32;
+    document.getElementById("knobDrumFx").value = 25;
 
     // Vibraphone & celesta is the Twin Peaks sound -- long sustain, soft
     // touch, heavily sent to the drenched delay/reverb below.
     document.getElementById("selChordTimbre").value = "VIBES_CELESTE";
-    document.getElementById("knobChordDynamics").value = 70;
+    document.getElementById("knobChordDynamics").value = 75;
     document.getElementById("knobChordSustain").value = 160;
-    document.getElementById("knobChordVol").value = 88;
-    document.getElementById("knobChordFx").value = 80;
+    document.getElementById("knobChordVol").value = 86;
+    document.getElementById("knobChordFx").value = 82;
 
     // A slow rocking bell figure (Laura Palmer's Theme's chime motif),
     // held static and spaced out rather than evolving or busy.
@@ -14071,17 +14071,26 @@ function applyPreset(idx) {
     document.getElementById("selArpTimbre").value = "GLASS_FM";
     document.getElementById("chkAutoEvolveArpTimbre").checked = false;
     document.getElementById("knobArpEvolveChance").value = 10;
-    document.getElementById("knobArpGate").value = 500;
+    document.getElementById("knobArpGate").value = 520;
     document.getElementById("knobArpRest").value = 45;
     document.getElementById("knobArpOctaves").value = 2;
     document.getElementById("knobArpVol").value = 65;
     document.getElementById("knobArpFx").value = 75;
 
-    document.getElementById("knobMasterCutoff").value = 58;
-    document.getElementById("knobMasterRes").value = 2.2;
+    // Pacific Northwest rainy forest mist & vintage tape dust
+    if (document.getElementById("selNoiseProfile")) document.getElementById("selNoiseProfile").value = "RAIN";
+    if (document.getElementById("selNoiseMode")) document.getElementById("selNoiseMode").value = "GUSTS";
+    if (document.getElementById("knobNoiseColor")) document.getElementById("knobNoiseColor").value = 42;
+    if (document.getElementById("knobNoiseRate")) document.getElementById("knobNoiseRate").value = 32;
+    if (document.getElementById("knobNoiseDrift")) document.getElementById("knobNoiseDrift").value = 65;
+    if (document.getElementById("knobNoiseVol")) document.getElementById("knobNoiseVol").value = 28;
+    if (document.getElementById("knobNoiseFx")) document.getElementById("knobNoiseFx").value = 65;
+
+    document.getElementById("knobMasterCutoff").value = 54;
+    document.getElementById("knobMasterRes").value = 2.0;
     document.getElementById("knobFilterAttack").value = 180;
     document.getElementById("knobFilterDecay").value = 2000;
-    document.getElementById("knobFilterEnvDepth").value = 30;
+    document.getElementById("knobFilterEnvDepth").value = 28;
     document.getElementById("knobFilterLfoRate").value = 0.06;
     document.getElementById("knobFilterLfoDepth").value = 18;
 
@@ -14089,16 +14098,20 @@ function applyPreset(idx) {
     document.getElementById("knobDelayTime").value = 580;
     document.getElementById("knobDelayFeedback").value = 42;
     document.getElementById("knobDelayTone").value = 2200;
-    document.getElementById("knobDelayFlutter").value = 30;
-    document.getElementById("knobDelayMix").value = 40;
+    document.getElementById("knobDelayFlutter").value = 32;
+    document.getElementById("knobDelayMix").value = 44;
 
     document.getElementById("selReverbMode").value = "CATHEDRAL";
-    document.getElementById("knobReverbMix").value = 55;
-    document.getElementById("knobReverbTone").value = 3800;
+    document.getElementById("knobReverbMix").value = 54;
+    document.getElementById("knobReverbTone").value = 4600;
     document.getElementById("selChorusMode").value = "ENSEMBLE";
-    document.getElementById("knobChorusRate").value = 0.3;
+    document.getElementById("knobChorusRate").value = 0.28;
     document.getElementById("knobChorusDepth").value = 45;
-    document.getElementById("knobChorusMix").value = 35;
+    document.getElementById("knobChorusMix").value = 32;
+
+    if (document.getElementById("knobEqLow")) document.getElementById("knobEqLow").value = 2.0;
+    if (document.getElementById("knobEqHigh")) document.getElementById("knobEqHigh").value = -1.5;
+    if (document.getElementById("knobMasterDrive")) document.getElementById("knobMasterDrive").value = 22;
   } else if (idx === 11) { // Aphex Twin (Selected Ambient Works / IDM Micro-Poly, DELAY -> FILTER -> SPACE at 48% feedback)
     rewireDspChain(['DELAY', 'FILTER', 'SPACE'], false);
     document.getElementById("selTimeSig").value = "7/8";

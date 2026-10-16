@@ -1014,9 +1014,30 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Added dual interaction support: press-and-hold records while held; quick tap records a 5-second take; tapping the mic button while actively recording stops and saves immediately.
   - Relaxed energy thresholds in `fieldAnalyze`: lowered noise floor to `0.0008` (-62 dBFS) and added graceful fallback to the full recorded buffer if silence trimming is narrow, preventing quiet ambient room recordings from being rejected.
 
+## Update — 2026-10-16 (Sonic Audit: Filter Range Expansion & Calibration for Lineage & Douglas Firs)
 
+- **Master Filter & Envelope Engine Optimizations**:
+  - Expanded cutoff range from `200 Hz – 9,500 Hz` to **`60 Hz – 16,000 Hz`** (`FILTER_CUTOFF_MIN_HZ = 60, FILTER_CUTOFF_MAX_HZ = 16000`).
+  - Perfect exponential center: 50% knob position lands at `980 Hz` (~1 kHz), with low-end sub warmth down to `60 Hz` and crystal-clear high-frequency air up to `16 kHz` (preserving sitar sympathetic string halos, bell chimes, and tape breath).
+  - Added filter pedal bypass guard in `triggerFilterEnvelope`: when `pedalBypassState.FILTER` is engaged, envelope sweeps are safely bypassed and filters remain wide open at 20,000 Hz.
+  - Expanded dynamic envelope ceiling (`peakFreq`) to `15,000 Hz` so high-velocity chord strikes open the filter naturally into sparkling brilliance.
 
-## Multi-Phase Roadmap Expansion: Phase 12 (Production Hosting, PWA, Audio Stability & Privacy)
+- **Fine-Tuning "Lineage" (Khan Lineage — Preset 7)**:
+  - **Tanpura Drone**: Lowered default volume to `knobTanpura: 14` with `knobJavari: 52` (subtle cotton-thread silk buzz), creating an unbroken, meditative golden bed that sits gently behind the sub drone without masking solo phrasing.
+  - **Tabla Groove**: Calibrated for authentic chamber dynamics (`knobDrumVol: 76`, `knobDrumPunch: 68`, `knobDrumDensity: 65`, `knobDrumFx: 45`), ensuring Dayan rim articulations (`TI_RE_KI_TA`, `DHA_TI_TE`, `TA_KI_TA`) and soft Bayan scoops sit in harmonious balance with the melodic lead.
+  - **Maihar Sitar**: Adjusted `knobChordVol: 84`, `knobChordFx: 78`, `knobStrum: 75ms` with brass mizrab onset and authentic meend pitch glide.
+  - **Bansuri Arpeggio**: Balanced level to `knobArpVol: 82` with extended breath gate (`420ms`).
+  - **Acoustic Space**: Cutoff at 74 (~3,744 Hz) for sympathetic string bloom, Cathedral reverb at 44% mix with 5,200 Hz tone, and 440ms tempo delay at 45% feedback.
+
+- **Fine-Tuning "Douglas Firs" (Twin Peaks / Badalamenti — Preset 10)**:
+  - **Rain & Mist Atmosphere**: Enabled Module 5 with `selNoiseProfile = "RAIN"`, `selNoiseMode = "GUSTS"`, `knobNoiseVol: 28`, `knobNoiseColor: 42`, `knobNoiseDrift: 65`, `knobNoiseFx: 65`—adding the moody Pacific Northwest forest mist and vintage tape dust.
+  - **Brooding Sub Foundation**: Set sub drone to `D1` octave, `knobDrone: 78`, `knobDroneFilter: 130 Hz`, with deepened wandering drift (`knobDroneWander: 35`).
+  - **Vibraphone & Celesta (`VIBES_CELESTE`)**: Long ringing sustain (`knobChordSustain: 160%`, `knobChordDynamics: 75%`, `knobChordVol: 86%`, `knobChordFx: 82%`).
+  - **Laura Palmer Motifs (`GLASS_FM`)**: Spaced pendulum bell figure (`knobArpGate: 520ms`, `knobArpRest: 45%`, `knobArpVol: 65%`).
+  - **Noir Saturation & Space**: 580ms tape delay (44% mix, 42% feedback), Cathedral reverb (54% mix, 4,600 Hz tone), Ensemble chorus (32% mix), `knobEqLow: +2.0 dB`, `knobEqHigh: -1.5 dB`, and `knobMasterDrive: 22`.
+
+- **Full Sonic Audit Across All 15 Presets**:
+  - Re-calibrated cutoffs and gain staging across all 15 presets to align with the new 60 Hz – 16 kHz scale. Verified zero clipping and balanced LUFS headroom across the entire patch bank.
 
 ### Phase 12: Production Hosting, PWA, Audio Stability & Privacy
 *Focus: Seamless installation on mobile, edge-accelerated delivery, rock-solid audio execution, and zero-leak privacy.*
