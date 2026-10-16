@@ -3429,7 +3429,7 @@
       padding: 8px 16px 6px 16px;
       display: grid;
       grid-template-columns: minmax(0, 1fr) 76px;
-      grid-template-rows: auto auto;
+      grid-template-rows: 76px minmax(58px, 1fr);
       column-gap: 10px;
       row-gap: 6px;
       align-items: stretch;
@@ -3467,8 +3467,9 @@
       grid-column: 2;
       grid-row: 2;
       width: 76px;
-      height: 58px;
-      padding: 4px 8px;
+      height: auto;
+      min-height: 58px;
+      padding: 6px 8px;
       gap: 8px;
       flex-direction: row;
       align-items: center;
@@ -3481,9 +3482,11 @@
       height: 100%;
       min-height: 0;
       min-width: 0;
+      container-type: size;
     }
     .master-vol-slider-wrap input[type="range"] {
-      width: 46px;
+      width: 100cqh;
+      max-width: none;
       transform: rotate(-90deg);
     }
     .master-vol-mute { width: 24px; height: 24px; flex: 0 0 24px; }
