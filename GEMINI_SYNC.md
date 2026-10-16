@@ -1247,6 +1247,35 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Footer status readout displays active palette and UI phosphor (e.g. `Palette: Glacier (SLAM · W)`).
   - Palette popover buttons carry informative tooltips indicating both description and associated UI color.
 
+## Update — 2026-10-16 (Mobile Responsive Overhaul: Symmetrical Portrait & Landscape Layouts)
+
+- **Portrait (Vertical) Overhaul**:
+  - **Transport & Audio (Section 1)**: Replaced asymmetric 3-column grid (which left orphaned empty cells and truncated "RECORD" text) with a balanced 2-row layout:
+    - **Row 1**: 50/50 split between `START` (Play) and `RECORD` (Record button with format select). The record button now has full 130px+ width, eliminating text truncation.
+    - **Row 2**: `SAMPLE` (Pocket Field Recorder with mic/drop/wave) and `MIDI` status button share the second row, eliminating orphaned empty boxes.
+    - Protected `btn-header-midi` spans so the status LED dot and "MIDI" label remain visible below 1200px.
+  - **Harmony & Master Clock (Section 2)**: Replaced bloated 3-row stack with a clean 2-row grid:
+    - **Row 1**: `KEY` (compact select) + `SCALE` (full-width dropdown).
+    - **Row 2**: `METER` (select + cycle button) paired side-by-side with `TEMPO` (slider + BPM readout + `TAP`).
+  - **Generative & Utilities (Sections 3 & 4)**: Paired Section 4 (Generative: `RANDOMIZE ALL` + `Undo`) on the left with Section 3 (Utilities: `Palette` + `? Help` + `Fullscreen`) on the right in a unified 40px row, cutting over 50px of vertical dead space.
+  - **Telemetry Readout**: Streamlined 2x2 grid (`TIME`, `METER`, `ROOT/SCALE`, `SEED`) with compact padding and full width balance.
+  - **Preset Strip**: Softened fade mask to 18px and tightened chip padding so presets fit naturally without jagged edge clipping.
+  - **Overall Vertical Height**: Reduced header footprint by >220px (~35%), opening up viewable workspace for the visualizer and console rack.
+
+- **Landscape (Horizontal) Overhaul**:
+  - **Dead Space Elimination**: Replaced fixed 440px / 270px clamps with a responsive 2-column split:
+    - Visualizer (`.scope-panel`): `flex: 1 1 0; max-width: none;` (~62% width).
+    - Chord Analysis (`.chord-info-panel`): `flex: 0 0 clamp(240px, 35vw, 300px); max-width: none;` (~38% width).
+    - Both panels now fill **100% of the screen width**, eliminating the massive black void on wide phone screens.
+  - **Visualizer Header Overflow & Overlap Fix**:
+    - Hid drag handles on touch devices.
+    - Compacted `.scope-legend` to show only the 4 glowing colored dots in landscape (hiding text labels), saving ~130px.
+    - Scaled the 7 layer toggle buttons to compact 22x22px badges.
+    - Added `overflow: hidden` to `.scope-panel-header` and `.scope-panel`, preventing toggle buttons from spilling over and overlapping the Chord Analysis title.
+  - **Keyboard Panel**: Keyboard deck spans full 100% width below the visualizer split with keys height clamped to `clamp(75px, 24vh, 115px)` (25-Play) and `clamp(55px, 16vh, 80px)` (88-Radar), ensuring full visibility without awkward clipping.
+  - **Palette Popover**: Scoped `#paletteMenu` on mobile to fill 100% width of the card with `z-index: 9999`.
+
+
 
 
 

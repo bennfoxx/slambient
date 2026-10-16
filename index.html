@@ -1140,7 +1140,9 @@
   .btn-header-util.active .icon-enter-fs { display: none; }
   .btn-header-util.active .icon-exit-fs { display: block; }
   @media (max-width: 1200px) {
-    .btn-header-util span { display: none; }
+    .btn-header-util:not(.btn-header-midi) > span:not(.midi-status-dot) { display: none; }
+    .btn-header-midi > .midi-status-dot { display: inline-block !important; }
+    .btn-header-midi > #midiHeaderLabel { display: inline !important; }
     .btn-header-util { padding: 0 9px; }
   }
   .sys-readout {
@@ -3869,38 +3871,53 @@
     .tempo-ctrl input[type="range"] { width: 70px; }
   }
 
-  /* Phone landscape / short windows (under 500px tall):
-     Keeps the header compact and prevents the Eno pod from taking over the
-     short screen. Dropping the standalone Eno pod in phone landscape gives
-     the header full width so presets and transport stay on 2 sleek rows. */
-  @media (min-width: 641px) and (max-height: 500px) {
+  /* Phone landscape / short screens (under 520px tall):
+     Guarantees full-width symmetry, eliminates dead space, resolves visualizer header
+     overflow/overlap, and fits upper deck and keyboard comfortably on screen. */
+  @media (min-width: 641px) and (max-height: 520px), (orientation: landscape) and (max-height: 520px) {
     .header-bar-wrapper {
       position: relative;
-      padding: 8px 16px 6px 16px;
+      padding: 6px 12px 4px 12px;
       display: grid;
       grid-template-columns: minmax(0, 1fr) 76px;
       grid-template-rows: 76px minmax(58px, 1fr);
-      column-gap: 10px;
+      column-gap: 8px;
       row-gap: 6px;
       align-items: stretch;
+      width: 100%;
+      box-sizing: border-box;
     }
     header.top-bar {
       grid-column: 1;
       grid-row: 1 / span 2;
-      padding: 8px 12px;
+      padding: 6px 10px;
       gap: 6px;
+      width: 100%;
+      min-width: 0;
     }
     .transport-row {
-      padding-top: 6px;
-      gap: 8px;
+      padding-top: 4px;
+      gap: 6px;
+      width: 100%;
     }
-    /* Header card is as tall as Eno + master stacked: let both rows grow and
-       center their content so there is no dead space at the bottom. */
     header.top-bar > .brand-row,
     header.top-bar > .transport-row {
       flex: 1 1 auto;
     }
-    /* Eno head on top, same size as before; master volume tucked below it */
+    .readout-row {
+      width: 100%;
+    }
+    .sys-readout {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+      width: 100%;
+    }
+    .telemetry-pill {
+      padding: 4px 6px;
+    }
+
+    /* Eno head on top; master volume tucked below it */
     .eno-standalone-pod {
       grid-column: 2;
       grid-row: 1;
@@ -3912,7 +3929,6 @@
     }
     .eno-standalone-pod .eno-bio-scan-label { display: none; }
     .eno-standalone-pod .eno-crt-meta { display: none; }
-    /* Short horizontal master volume strip */
     .master-vol-pod {
       grid-column: 2;
       grid-row: 2;
@@ -3940,6 +3956,160 @@
       transform: rotate(-90deg);
     }
     .master-vol-mute { width: 24px; height: 24px; flex: 0 0 24px; }
+
+    /* ---- Landscape Upper Deck (Visualizer & Chord Analysis 100% Symmetrical Split) ---- */
+    .upper-deck {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      gap: 10px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    .scope-panel {
+      flex: 1 1 0 !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      width: auto !important;
+      padding: 10px 12px !important;
+      overflow: hidden !important;
+    }
+    .chord-info-panel {
+      flex: 0 0 clamp(240px, 35vw, 300px) !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      width: auto !important;
+      padding: 10px 12px !important;
+      overflow: hidden !important;
+    }
+    .keyboard-panel {
+      flex: 1 1 100% !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      padding: 10px 12px !important;
+    }
+
+    /* Visualizer Header: Prevent Overflow & Overlap onto Chord Analysis */
+    .scope-panel > .panel-header {
+      min-width: 0 !important;
+      overflow: hidden !important;
+      height: 28px !important;
+      min-height: 28px !important;
+      gap: 6px !important;
+      padding-bottom: 4px !important;
+      margin-bottom: 6px !important;
+    }
+    .scope-header-left {
+      min-width: 0 !important;
+      flex: 1 1 auto !important;
+      overflow: hidden !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+    }
+    .scope-header-left .upper-drag-handle { display: none !important; }
+    .scope-header-left .panel-title-text {
+      font-size: 11px !important;
+      letter-spacing: 0.8px !important;
+      white-space: nowrap !important;
+    }
+    .scope-legend {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 5px !important;
+      margin-left: 2px !important;
+    }
+    .scope-legend .legend-item span { display: none !important; } /* Hide text in landscape */
+    .scope-legend .legend-item { gap: 0 !important; }
+    .scope-legend .legend-dot { width: 6px !important; height: 6px !important; }
+    .scope-layer-toggles {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 2px !important;
+      margin-left: auto !important;
+      padding-left: 4px !important;
+      flex-shrink: 0 !important;
+      border-left: 1px solid var(--border-light) !important;
+    }
+    .scope-layer-toggles .btn-layer-toggle {
+      width: 22px !important;
+      height: 22px !important;
+      padding: 0 !important;
+      border-radius: 3px !important;
+    }
+    .scope-layer-toggles .btn-layer-toggle svg {
+      width: 14px !important;
+      height: 12px !important;
+    }
+
+    /* Scope Canvas Dimensions */
+    .scope-left-viz {
+      height: clamp(160px, 42vh, 230px) !important;
+      min-height: 150px !important;
+      max-height: 240px !important;
+    }
+
+    /* Chord Analysis Panel: Fit compactly in landscape */
+    .chord-info-panel > .panel-header {
+      height: 28px !important;
+      min-height: 28px !important;
+      margin-bottom: 6px !important;
+      padding-bottom: 4px !important;
+    }
+    .chord-info-panel .upper-drag-handle { display: none !important; }
+    .chord-info-panel .panel-title-text { font-size: 11px !important; letter-spacing: 0.8px !important; }
+    .chord-wheel-card {
+      padding: 6px 8px !important;
+      gap: 4px !important;
+    }
+    .chord-wheel-header {
+      padding: 0 2px 4px !important;
+      margin-bottom: 2px !important;
+    }
+    .chord-wheel-root { font-size: 15px !important; }
+    .chord-wheel-voicing { font-size: 12px !important; }
+    #chordWheelCanvas {
+      width: 90px !important;
+      height: 90px !important;
+    }
+    .chord-meta-block {
+      padding: 6px 8px !important;
+      gap: 3px !important;
+    }
+    .telem-row { font-size: 10px !important; }
+    .activity-meter-row { margin-top: 4px !important; gap: 4px !important; }
+    .act-bar-bg { height: 4px !important; }
+
+    /* Keyboard in landscape */
+    .keyboard-panel > .keyboard-meta {
+      min-height: 26px !important;
+      height: 26px !important;
+      padding-bottom: 4px !important;
+      margin-bottom: 6px !important;
+      gap: 6px !important;
+    }
+    .keyboard-panel .upper-drag-handle,
+    .keyboard-hint { display: none !important; }
+    .keyboard-panel .panel-title-text { font-size: 11px !important; }
+    .piano-keys-wrapper {
+      height: clamp(75px, 24vh, 115px) !important;
+      min-height: 75px !important;
+    }
+    .piano-keys-wrapper.mode-radar {
+      height: clamp(55px, 16vh, 80px) !important;
+      min-height: 55px !important;
+    }
+
+    /* Lower deck & console racks in landscape: clean 2-column or 3-column grid */
+    .lower-deck {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      gap: 10px !important;
+    }
+    #masterDeckUnified {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 10px !important;
+    }
   }
   /* viewport-fit=cover (for the phone layout) also applies in landscape, so
      keep the desktop layout clear of the notch there. html has zoom 0.75
@@ -4109,13 +4279,13 @@
     .preset-group:has(.preset-bar.at-end) > .preset-label::after { opacity: 0; }
     .preset-bar {
       --fade-l: 0px;
-      --fade-r: 36px;
+      --fade-r: 18px;
       display: grid;
       grid-auto-flow: column;
       grid-template-columns: none;
-      grid-template-rows: repeat(2, 32px);
+      grid-template-rows: repeat(2, 30px);
       grid-auto-columns: max-content;
-      gap: 6px;
+      gap: 5px;
       flex: none;
       width: calc(100% + 24px);
       max-width: calc(100% + 24px);
@@ -4134,14 +4304,14 @@
       mask-image: linear-gradient(90deg, transparent 0, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent 100%);
     }
     .preset-bar::-webkit-scrollbar { display: none; }
-    .preset-bar.is-scrolled { --fade-l: 28px; }
+    .preset-bar.is-scrolled { --fade-l: 18px; }
     .preset-bar.at-end { --fade-r: 0px; }
     .preset-bar .btn-preset-chip {
-      height: 32px;
-      line-height: 30px;
-      padding: 0 12px;
-      font-size: 10.5px;
-      letter-spacing: 0.6px;
+      height: 30px;
+      line-height: 28px;
+      padding: 0 9px;
+      font-size: 10px;
+      letter-spacing: 0.3px;
       overflow: visible;
       text-overflow: clip;
       scroll-snap-align: start;
@@ -4169,229 +4339,297 @@
     }
     .btn-preset-io svg { width: 12px; height: 12px; }
 
-    /* Transport section: 4 distinct modular sections stacked cleanly */
+    /* Transport section: 4 distinct modular sections stacked cleanly & symmetrically */
     .transport-row {
-      flex-direction: column;
-      flex-wrap: nowrap;
-      align-items: stretch;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
-      padding-top: 10px;
+      padding-top: 8px;
+      width: 100%;
     }
     .header-section {
       width: 100%;
       height: auto;
       box-sizing: border-box;
-      flex-wrap: wrap;
       padding: 6px 8px;
       gap: 6px;
     }
 
-    /* SECTION 1: Transport & Audio */
+    /* SECTION 1: Transport & Audio (Full Width, 2 Symmetrical Rows) */
     .header-sec-transport {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 6px;
-      padding: 6px;
-    }
-    .header-sec-transport > .btn-main-play,
-    .header-sec-transport > .rec-ctrl-wrap,
-    .header-sec-transport > .btn-header-midi {
-      width: 100%;
-      min-width: 0;
-      height: 40px;
-      padding: 0 4px;
-      font-size: 12px;
-      letter-spacing: 0.6px;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-    .header-sec-transport > .rec-ctrl-wrap {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      padding: 0;
-    }
-    .header-sec-transport > .rec-ctrl-wrap > .btn-record {
-      flex: 1 1 0;
-      min-width: 0;
-      height: 40px;
-      padding: 0 3px;
-      font-size: 11px;
-      letter-spacing: 0.2px;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-    .header-sec-transport > .rec-ctrl-wrap > .record-format-select {
-      flex: 0 0 auto;
-      width: 44px;
-      height: 40px;
-      padding: 0 2px;
-      font-size: 10px;
-      text-align: center;
-    }
-    .header-section, .mini-transport { --tr-icon: 18px; }
-    .header-sec-transport > .rec-ctrl-wrap > .btn-record.recording,
-    .header-sec-transport > .rec-ctrl-wrap > .btn-record:disabled {
-      gap: 4px;
-      padding: 0 2px;
-      letter-spacing: 0;
-    }
-    .header-sec-transport > .sample-ctrl {
       grid-column: 1 / -1;
-      width: 100%;
-      box-sizing: border-box;
-      display: flex;
-      align-items: center;
-      padding: 0 8px;
-      gap: 7px;
-      height: 36px;
-    }
-    .header-sec-transport > .sample-ctrl .tag {
-      font-size: 10px;
-      letter-spacing: 1px;
-      flex: 0 0 auto;
-      min-width: 42px;
-    }
-    .header-sec-transport > .sample-ctrl .btn-field {
-      height: 32px;
-      padding: 0 8px;
-      font-size: 11px;
-      flex: 1 1 0;
-      min-width: 0;
-    }
-    .header-sec-transport > .sample-ctrl.has-sample .btn-field,
-    .header-sec-transport > .sample-ctrl.is-recording .btn-field {
-      flex: 0 0 auto;
-      padding: 0 8px;
-    }
-    .header-sec-transport > .sample-ctrl .field-wave {
-      flex: 1 1 auto;
-      min-width: 40px;
-      height: 24px;
-    }
-    .header-sec-transport > .sample-ctrl .btn-field-eject {
-      width: 28px;
-      height: 28px;
-      font-size: 18px;
-      flex: 0 0 28px;
-    }
-
-    /* SECTION 2: Harmony & Master Clock */
-    .header-sec-harmony {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 6px;
-      padding: 6px 8px;
-    }
-    .header-sec-harmony > .root-scale-ctrl,
-    .header-sec-harmony > .time-sig-ctrl,
-    .header-sec-harmony > .tempo-ctrl {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      height: 36px;
-      padding-right: 0;
-      border-right: none;
-      min-width: 0;
-    }
-    .root-scale-ctrl .tag + .tag,
-    .root-scale-ctrl .custom-dropdown-wrap + .tag {
-      min-width: 0;
-      margin-left: 2px !important;
-    }
-    #wrap_topRootKey { flex: 0 0 58px; }
-    #wrap_topScaleMode,
-    #wrap_selTimeSig { flex: 1 1 auto; }
-    .header-section .custom-dropdown-wrap { min-width: 0; }
-    .header-section .custom-dropdown-trigger {
-      height: 32px;
-      gap: 6px;
-      padding: 0 9px;
-      font-size: 12px;
-      border-radius: 4px;
-    }
-    .root-scale-ctrl select, .time-sig-ctrl select {
-      height: 32px;
-      font-size: 12px;
-      min-width: 0;
-    }
-    .time-sig-ctrl .btn-meter-cycle {
-      flex: 0 0 32px;
-      width: 32px;
-      height: 32px;
-    }
-    .time-sig-ctrl .btn-meter-cycle svg { width: 16px; height: 16px; }
-    .header-sec-harmony > .tempo-ctrl input[type="range"] {
-      flex: 1 1 auto;
-      width: auto;
-      min-width: 0;
-      height: 32px;
-    }
-    .header-sec-harmony > .tempo-ctrl input[type="range"]::-webkit-slider-runnable-track {
-      height: 6px;
-      border-radius: 3px;
-    }
-    .header-sec-harmony > .tempo-ctrl input[type="range"]::-webkit-slider-thumb {
-      width: 22px;
-      height: 22px;
-      border-radius: 5px;
-      margin-top: -9px;
-    }
-    .header-sec-harmony > .tempo-ctrl input[type="range"]::-moz-range-track { height: 6px; border-radius: 3px; }
-    .header-sec-harmony > .tempo-ctrl input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 5px; }
-    .header-sec-harmony > .tempo-ctrl .tempo-val {
-      flex: 0 0 auto;
-      min-width: 56px;
-      font-size: 12px;
-    }
-    .header-sec-harmony > .tempo-ctrl .btn-tap-tempo {
-      flex: 0 0 auto;
-      height: 32px;
-      padding: 0 12px;
-      margin-left: 0;
-      font-size: 11px;
-      border-radius: 4px;
-    }
-
-    /* SECTION 4: Generative Engine & History */
-    .header-sec-gen {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 6px;
       padding: 6px;
     }
-    .header-sec-gen > .btn-randomize-all,
-    .header-sec-gen > .btn-header-util {
+    .header-sec-transport > .btn-main-play {
+      grid-column: 1;
       width: 100%;
-      height: 38px;
+      height: 40px;
+      padding: 0 8px;
       font-size: 12px;
-      letter-spacing: 0.6px;
-      justify-content: center;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      border-radius: 4px;
+      white-space: nowrap;
     }
-
-    /* SECTION 3: Workspace & System Utilities */
-    .header-sec-utils {
-      display: grid;
-      grid-auto-flow: column;
-      grid-auto-columns: minmax(0, 1fr);
-      align-self: stretch;
-      gap: 8px;
-      margin-left: 0;
+    .header-sec-transport > .rec-ctrl-wrap {
+      grid-column: 2;
+      display: flex;
+      align-items: center;
+      gap: 4px;
       width: 100%;
-      padding: 6px;
-    }
-    .header-sec-utils > .palette-wrap,
-    .header-sec-utils > .btn-header-util {
-      min-width: 0;
-    }
-    .header-sec-utils .btn-header-util {
-      width: 100%;
-      height: 36px;
+      height: 40px;
       padding: 0;
     }
-    .header-sec-utils .btn-header-util svg { width: 16px; height: 16px; }
-    .header-sec-utils .btn-header-help { font-size: 15px; }
+    .header-sec-transport > .rec-ctrl-wrap > .btn-record {
+      flex: 1 1 auto;
+      min-width: 0;
+      height: 40px;
+      padding: 0 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+      overflow: hidden;
+      border-radius: 4px;
+    }
+    .header-sec-transport > .rec-ctrl-wrap > .record-format-select {
+      flex: 0 0 46px;
+      width: 46px;
+      height: 40px;
+      padding: 0 2px;
+      font-size: 10.5px;
+      font-weight: 700;
+      text-align: center;
+      border-radius: 4px;
+    }
+    /* Row 2: SAMPLE and MIDI share the second row */
+    .header-sec-transport > .sample-ctrl {
+      grid-column: 1;
+      width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      gap: 6px;
+      height: 38px;
+      border-radius: 4px;
+    }
+    .header-sec-transport > .sample-ctrl .tag {
+      font-size: 10px;
+      letter-spacing: 1px;
+      flex: 0 0 auto;
+      min-width: 38px;
+    }
+    .header-sec-transport > .sample-ctrl .btn-field {
+      height: 30px;
+      padding: 0 6px;
+      font-size: 10.5px;
+      flex: 1 1 0;
+      min-width: 0;
+      border-radius: 3px;
+    }
+    .header-sec-transport > .sample-ctrl .field-wave {
+      flex: 1 1 auto;
+      min-width: 32px;
+      height: 22px;
+    }
+    .header-sec-transport > .sample-ctrl .btn-field-eject {
+      width: 26px;
+      height: 26px;
+      font-size: 16px;
+      flex: 0 0 26px;
+    }
+    .header-sec-transport > .btn-header-midi {
+      grid-column: 2;
+      width: 100%;
+      height: 38px;
+      padding: 0 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border-radius: 4px;
+    }
+
+    /* SECTION 2: Harmony & Master Clock (Full Width, 2 Symmetrical Rows) */
+    .header-sec-harmony {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(0, 115px) minmax(0, 1fr);
+      gap: 6px;
+      padding: 6px 8px;
+    }
+    /* Row 1: KEY + SCALE spanning full width */
+    .header-sec-harmony > .root-scale-ctrl {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      height: 36px;
+      padding: 0 6px;
+      box-sizing: border-box;
+    }
+    .root-scale-ctrl .tag {
+      flex: 0 0 auto;
+      font-size: 10px;
+      letter-spacing: 1px;
+    }
+    #wrap_topRootKey { flex: 0 0 62px; }
+    #wrap_topScaleMode { flex: 1 1 auto; min-width: 0; }
+
+    /* Row 2: METER (left) and TEMPO (right) */
+    .header-sec-harmony > .time-sig-ctrl {
+      grid-column: 1;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+      height: 36px;
+      padding: 0 4px;
+      box-sizing: border-box;
+      min-width: 0;
+    }
+    .time-sig-ctrl .tag {
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      flex: 0 0 auto;
+    }
+    #wrap_selTimeSig { flex: 1 1 auto; min-width: 0; }
+    .time-sig-ctrl .btn-meter-cycle {
+      flex: 0 0 28px;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+    }
+    .time-sig-ctrl .btn-meter-cycle svg { width: 14px; height: 14px; }
+
+    .header-sec-harmony > .tempo-ctrl {
+      grid-column: 2;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      height: 36px;
+      padding: 0 6px;
+      box-sizing: border-box;
+      min-width: 0;
+    }
+    .header-sec-harmony > .tempo-ctrl .tag {
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      flex: 0 0 auto;
+    }
+    .header-sec-harmony > .tempo-ctrl input[type="range"] {
+      flex: 1 1 auto;
+      min-width: 40px;
+      width: auto;
+      height: 28px;
+    }
+    .header-sec-harmony > .tempo-ctrl .tempo-val {
+      flex: 0 0 auto;
+      min-width: 44px;
+      font-size: 11px;
+      text-align: right;
+    }
+    .header-sec-harmony > .tempo-ctrl .btn-tap-tempo {
+      flex: 0 0 auto;
+      height: 28px;
+      padding: 0 8px;
+      font-size: 10px;
+      border-radius: 3px;
+    }
+
+    /* SECTION 4: Generative Engine (Left half of Row 3) */
+    .header-sec-gen {
+      grid-column: 1;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 6px;
+      box-sizing: border-box;
+    }
+    .header-sec-gen > .btn-randomize-all {
+      flex: 1 1 auto;
+      min-width: 0;
+      height: 32px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      padding: 0 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      border-radius: 4px;
+    }
+    .header-sec-gen > .btn-randomize-all svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .header-sec-gen > .btn-header-util {
+      flex: 0 0 32px;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+    }
+    .header-sec-gen > .btn-header-util span { display: none; }
+    .header-sec-gen > .btn-header-util svg { width: 14px; height: 14px; }
+
+    /* SECTION 3: Workspace & System Utilities (Right half of Row 3) */
+    .header-sec-utils {
+      grid-column: 2;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      padding: 4px 6px;
+      box-sizing: border-box;
+      margin-left: 0;
+      width: 100%;
+    }
+    .header-sec-utils > .palette-wrap {
+      flex: 1 1 auto;
+      min-width: 0;
+      height: 32px;
+    }
+    .header-sec-utils > .palette-wrap > .btn-header-util {
+      width: 100%;
+      height: 32px;
+      padding: 0 6px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .header-sec-utils .btn-header-help {
+      flex: 0 0 32px;
+      width: 32px;
+      height: 32px;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 0;
+      border-radius: 4px;
+    }
+    .header-sec-utils #btnAppFullscreen {
+      flex: 0 0 32px;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border-radius: 4px;
+    }
+    .header-sec-utils #btnAppFullscreen span { display: none; }
     .header-sec-utils .pal-btn-dots { grid-template-columns: repeat(2, 6px); }
     .header-sec-utils .pal-btn-dots i { width: 6px; height: 6px; }
     /* iPhone Safari has no Fullscreen API for pages (class set from JS) */
@@ -4403,27 +4641,29 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 6px;
-      padding-top: 10px;
-      margin-top: 2px;
+      padding-top: 6px;
+      margin-top: 0;
+      width: 100%;
     }
     .telemetry-pill {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 3px 6px;
+      gap: 2px 6px;
       min-width: 0;
-      padding: 6px 10px;
+      padding: 5px 8px;
     }
     .telemetry-pill .pill-k {
-      font-size: 10px;
+      font-size: 9.5px;
       white-space: nowrap;
       line-height: 1.2;
     }
     .telemetry-pill .val {
       flex: 1 0 100%;
       min-width: 0;
-      font-size: 12px;
-      line-height: 1.25;
+      font-size: 11.5px;
+      font-weight: 700;
+      line-height: 1.2;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -5316,18 +5556,23 @@
       text-align: right;
     }
 
-    /* ---- Palette popover: full-width card under the header utils row ---- */
-    .header-utils, .header-sec-utils { position: relative; }
-    .header-utils > .palette-wrap, .header-sec-utils > .palette-wrap { position: static; }
+    /* ---- Palette popover: full-width card under the transport row ---- */
+    .header-utils { position: relative; }
+    .header-utils > .palette-wrap { position: static; }
+    .transport-row { position: relative; }
+    .header-sec-utils { position: static; }
+    .header-sec-utils > .palette-wrap { position: static; }
     #paletteMenu {
-      top: calc(100% + 8px);
+      top: calc(100% + 6px);
       left: 0;
       right: 0;
-      width: auto;
+      width: 100%;
+      box-sizing: border-box;
       max-height: calc(100dvh - 24px);
       overflow-y: auto;
       overscroll-behavior: contain;
       padding: 8px;
+      z-index: 9999;
     }
     #paletteMenu .pal-head {
       padding: 4px 8px 8px;
