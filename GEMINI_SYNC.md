@@ -943,3 +943,26 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
    - Finger phrases (`TABLA_PHRASES`, `playTablaPhrase`): `TI_RE_KI_TA`, `DHA_TI_TE`, `TA_KI_TA` (with `NA` rim strikes and a muted `KAT`) replace the random off-beat fillers on selected beats (`TABLA_PHRASE_BEATS`: Rupak 7/4 beats 2/4/6, Teental 4/4 beats 1/2/3), chance `0.30 + drumDensity * 0.50`. Only for x/4 sigs with 4 ticks per beat.
 3. **Sitar** (`SITAR_STRINGS` in `playSynthVoice`): brass mizrab noise-click at onset (bandpass ~3.6 kHz+, ~22 ms); lead meend depth `0.865-0.915` of target pitch rising over `80-180 ms` (octave partial now bends with the fundamental); taraf bank has a 4th string, ring `3.4-4.8 s` (was `1.9-2.7`), peak `0.040` (was `0.028`), slower `0.30 s` bloom.
 4. **Raga Taan arp**: state machine (`taanNotesLeft`, `taanRestTicks`, `taanDir`, `taanNoteIdx`): phrases of 3-5 notes, one per tick, starting on tala boundaries (Rupak 7/4 beats 0, 3, 5; other sigs beat 0 and `floor(beats/2)`) with 62% chance, a crescendoing velocity (72+), then 1-2 beats of silence. Arp rest probability no longer drops notes inside a taan run. State resets on time-signature change. The live keyboard arp (`triggerLiveArpStep`) keeps its old step logic.
+
+## Update — 2026-10-16 (Phase 10: "Pocket Field Recorder" — Live Mic & Found Sound Engine)
+
+- **Desktop Header & Mobile UI Integration**:
+  - Added `#fieldBadge` beside the `⟲ ALL` button with `[ 🎙 REC ]`, `[ 📼 DROP ]`, dynamic waveform preview canvas, and eject button.
+  - Added thumb-friendly `[ 🎙 ]` button (`.btn-mic-mini`) to mobile bottom floating transport bar (`.mini-transport`).
+  - Full-window drag-and-drop ingestion + file picker (`input#inputFieldAudio`) supporting `.wav`, `.m4a`, `.mp3`, `.aac`, `.ogg`, `.flac`.
+- **Live Mic Sampling & On-the-Fly Analysis**:
+  - Press-and-hold (or quick tap for 5s, max 8s) via browser `navigator.mediaDevices.getUserMedia()`.
+  - Signal never routed directly to speakers (strictly isolated from destination to eliminate acoustic feedback).
+  - Automated analysis & audio conditioning (`fieldAnalyze`):
+    - Lead-in and trailing silence trimming with energy envelope thresholding.
+    - 40Hz 1-pole high-pass rumble & DC offset filter.
+    - RMS dynamic level matching with soft tanh saturation limiting.
+    - 160-bin waveform thumbnail calculation with real-time VU glow.
+    - High-frequency transient slicing (isolating 12 distinct attack clicks/consonants).
+    - Voiced sustain loop extraction with equal-power crossfading and autocorrelation pitch detection (`fieldDetectPitch`) storing reference MIDI pitch.
+- **Generative Splicing & Sideloading into Noise Module (Module 5)**:
+  - Added dedicated Field Recorder control card inside Module 5 with real-time waveform display, Weave Mode selector (`ALL`, `GHOST`, `CHOIR`, `TRANS`, `OFF`), and dedicated level control (`#knobFieldVol`).
+  - Splicing Modes:
+    - **Ghost Phrases (Hauntology)**: Spoken phrase entries on bar turnarounds through tempo-locked tape delay and 4.8s convolution reverb wash.
+    - **Scale Choirs**: Granular loop retuned dynamically to the live chord notes (`recentChordNotes`) with stereo chorusing and slow attack/release swells.
+    - **Percussive Ghost Hits**: Consonant slices triggered on off-beat groove subdivisions in sync with drum engine dynamics.
