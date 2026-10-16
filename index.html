@@ -21999,7 +21999,7 @@ window.addEventListener("keydown", (e) => {
     sample: null, mode: "ALL", level: 0.7,
     rec: null, holding: false,
     graph: null, graphCtx: null, bufs: null, bufsCtx: null,
-    ghostUntil: 0, choirUntil: 0, tmpCtx: null, statusTimer: 0
+    ghostUntil: 0, choirUntil: 0, fullUntil: 0, tmpCtx: null, statusTimer: 0
   };
   const $ = (id) => document.getElementById(id);
   const all = (sel) => Array.from(document.querySelectorAll(sel));
@@ -22495,6 +22495,70 @@ window.addEventListener("keydown", (e) => {
     src.start(now);
   }
 
+  function playFullSample(opts) {
+    const g = ensureGraph(), b = getBufs(); if (!g || !b || !b.phrase) return;
+    const c = audioCtx, now = c.currentTime + 0.04;
+
+    // Tempo-synced delay timing for the effects wash
+    const delayDiv = (randFloat() < 0.5) ? 0.75 : 0.5; // dotted-eighth or quarter note
+    const delayTime = Math.min(2.4, (60 / Math.max(40, bpm)) * delayDiv);
+    g.delay.delayTime.setTargetAtTime(delayTime, now, 0.08);
+
+    const src = c.createBufferSource();
+    src.buffer = b.phrase;
+
+    // Natural playback rate (mostly 1.0 original speed; occasional subtle organic tape drift)
+    const isSlow = randFloat() < 0.18;
+    const drift = (opts && opts.force) ? 1.0 : (isSlow ? 0.94 : (randFloat() < 0.20 ? 1.03 : 1.0));
+    const rate = (opts && typeof opts.rate === "number") ? opts.rate : drift;
+    src.playbackRate.value = rate;
+
+    // Studio conditioning: clean sub-rumble (<55Hz) and smooth highs (<13.5kHz) for warm tape fidelity
+    const hp = c.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 55; hp.Q.value = 0.7;
+    const lp = c.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 13500; lp.Q.value = 0.7;
+
+    // Acoustic presence lift
+    const presence = c.createBiquadFilter();
+    presence.type = "peaking";
+    presence.frequency.value = 2800;
+    presence.Q.value = 1.0;
+    presence.gain.value = 1.8;
+
+    const vg = c.createGain();
+    const dur = src.buffer.duration / rate;
+    const peak = (opts && typeof opts.gain === "number") ? opts.gain : 0.54;
+
+    // Full sample envelope: clean attack, sustained natural body, smooth tail
+    vg.gain.setValueAtTime(0.0001, now);
+    vg.gain.linearRampToValueAtTime(peak, now + 0.03);
+    vg.gain.setValueAtTime(peak, now + Math.max(0.04, dur - 0.07));
+    vg.gain.linearRampToValueAtTime(0.0001, now + dur);
+
+    src.connect(hp); hp.connect(presence); presence.connect(lp); lp.connect(vg);
+
+    // Dynamic spatial routing: clear direct presence with lush ambient delay wash & convolution reverb
+    const panVal = (opts && typeof opts.pan === "number") ? opts.pan : (randFloat() - 0.5) * 0.5;
+    const r = route(vg, g, {
+      dry: 0.85,
+      wash: 0.48,
+      verb: 0.52,
+      pan: panVal
+    });
+
+    cleanupLater(src, [hp, presence, lp, vg, r]);
+
+    const durMs = dur * 1000;
+    S.fullUntil = performance.now() + durMs + 1800;
+    // Keep ghost phrase from colliding over the top of the full sample
+    S.ghostUntil = Math.max(S.ghostUntil, performance.now() + durMs * 0.8);
+
+    src.start(now);
+
+    if (!S.rec) {
+      flashStatus("FULL SAMPLE · FX");
+    }
+  }
+
   function choirNotes(ref) {
     let pcs = [];
     try { pcs = Array.from(recentChordNotes).map(m => ((m % 12) + 12) % 12); } catch (e) {}
@@ -22547,7 +22611,19 @@ window.addEventListener("keydown", (e) => {
     const tpb = (ts && ts.ticksPerBeat) || 4, nowMs = performance.now();
     const rate = (typeof noiseRateVal === "number") ? noiseRateVal : 0.45;
     if (isDownbeat) {
-      if (modeHas("GHOST") && barCount % 4 === 3 && nowMs > S.ghostUntil && randFloat() < 0.22 + rate * 0.40) playGhost();
+      // Chance for the ENTIRE sample to play back with effects added
+      // in addition to being cut up and randomized
+      const canPlayFull = (modeHas("ALL") || modeHas("GHOST")) &&
+                          nowMs > (S.fullUntil || 0) &&
+                          nowMs > S.ghostUntil;
+      if (canPlayFull && (barCount % 4 === 0)) {
+        const fullProb = 0.28 + rate * 0.35;
+        if (randFloat() < fullProb) {
+          playFullSample();
+        }
+      }
+
+      if (modeHas("GHOST") && barCount % 4 === 3 && nowMs > S.ghostUntil && nowMs > (S.fullUntil || 0) && randFloat() < 0.22 + rate * 0.40) playGhost();
       if (modeHas("CHOIR") && barCount % 4 === 1 && nowMs > S.choirUntil && randFloat() < 0.35 + rate * 0.35) playChoir();
     }
     if (modeHas("TRANS") && typeof drumVol === "number" && drumVol > 0.02 && isChannelAudible("drum")) {
@@ -22574,8 +22650,9 @@ window.addEventListener("keydown", (e) => {
     if (typeof audioCtx === "undefined" || !audioCtx) { flashStatus("PRESS START FIRST"); return; }
     const g = ensureGraph(); if (!g) return;
     g.bus.gain.setTargetAtTime(S.level * 0.9, audioCtx.currentTime, 0.02);
-    playGhost();
+    playFullSample({ force: true });
   };
+  window.fieldPlayFullSample = playFullSample;
 
   /* ---------- Wiring (delegated, covers phone floating bar, header, and module panels) ---------- */
   let activePointerId = null;

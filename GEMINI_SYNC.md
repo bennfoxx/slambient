@@ -1543,6 +1543,17 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
     - Space (Reverb & Chorus): `randomizeReverbChorus()`
     - Master Out: `randomizeSpace()` (Master EQ & saturation/drive)
 
+## Update — 2026-10-16 (Field Recorder Full Sample Playback with Effects)
 
-
-
+- **Full Sample Playback Engine (`playFullSample`)**:
+  - Implemented `playFullSample(opts)` allowing the entire captured/imported recording (`b.phrase`) to play back from start to finish with studio processing, rather than only ever being heard in sliced, granular, or bandpassed fragments.
+  - Studio Effects Chain:
+    - Dedicated analog-style tape conditioning with 55 Hz high-pass (sub-rumble rejection), 13.5 kHz low-pass (warm analog roll-off), and +1.8 dB presence boost at 2.8 kHz for vocal and environmental clarity.
+    - Tempo-synced stereo tape delay reflections via `g.washIn` (dotted-eighth or quarter note division calculated dynamically from `bpm`).
+    - 4.8s convolution reverb halo via `g.verbIn`.
+    - Dynamic stereo pan offset and smooth de-clicked envelope (25ms attack, full sustain, 70ms tail release).
+    - Natural playback rate (1.0 default with occasional subtle 0.94/1.03 tape drift).
+- **Generative Scheduling in `fieldRecorderTick`**:
+  - Added probabilistic trigger on downbeat phrase turnarounds (`barCount % 4 === 0`) during `ALL` and `GHOST` modes when no conflicting voice is active (`nowMs > S.fullUntil && nowMs > S.ghostUntil`).
+  - Coexists harmoniously with the existing cut-up voices (rhythmic transient drum hits and tuned chord choir loops).
+  - Wired into `window.fieldPreview()` so manual preview plays the entire sample in full fidelity with effects.
