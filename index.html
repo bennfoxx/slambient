@@ -320,13 +320,12 @@
   }
   .preset-bar .btn-preset-chip { padding: 0 12px; }
   .patch-bank-section {
-    margin-left: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 5px;
-    padding: 5px 10px;
+    gap: 4px;
+    padding: 5px 8px;
     background: #080a11;
     border: 1px solid var(--border-light);
     border-radius: 5px;
@@ -335,30 +334,31 @@
     align-self: center;
   }
   .patch-bank-section > .preset-label {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 1.2px;
     color: var(--accent);
     line-height: 1;
     margin: 0;
+    text-transform: uppercase;
   }
   .preset-io-stack {
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
     flex-shrink: 0;
   }
   .btn-preset-io {
     background: #0f121c;
     color: var(--color-drone);
     border: 1px solid rgba(var(--rgb-drone), 0.42);
-    padding: 0 12px;
-    height: 25px;
-    min-width: 78px;
+    padding: 0 8px;
+    height: 24px;
+    min-width: 66px;
     box-sizing: border-box;
-    border-radius: 4px;
-    font-size: 13px;
+    border-radius: 3px;
+    font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.8px;
     text-transform: uppercase;
@@ -368,7 +368,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 5px;
     white-space: nowrap;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
   }
@@ -377,6 +377,10 @@
     color: #ffffff;
     border-color: var(--color-drone);
     box-shadow: 0 0 10px rgba(var(--rgb-drone), 0.35);
+  }
+  .btn-preset-io svg {
+    width: 10px;
+    height: 10px;
   }
   .btn-preset-chip {
     background: #0f121c;
@@ -4031,8 +4035,8 @@
     .btn-preset-chip { padding: 0 5px; font-size: 12px; letter-spacing: 0.2px; }
     .preset-bar { gap: 4px; }
     .brand-row { gap: 12px; }
-    .patch-bank-section { padding-left: 10px; gap: 6px; }
-    .btn-preset-io { min-width: 0; padding: 0 8px; }
+    .patch-bank-section { padding: 4px 6px; gap: 4px; }
+    .btn-preset-io { min-width: 0; padding: 0 6px; font-size: 10.5px; }
   }
   /* Narrower than ~1240px (or ~150% browser zoom): there isn't room for brand
      + a 5-wide preset grid whose chips fit their full names + BANK on one
@@ -6723,20 +6727,21 @@
             <button class="btn-preset-chip user-slot-chip" id="btnUserSlot6" onclick="handleUserSlotClick(6, event)" oncontextmenu="handleUserSlotContextMenu(event, 6)" title="Slot U6 — Click to load / Shift-click to save">U6: Empty</button>
             <button class="btn-preset-chip btn-store-user" onclick="storeToUserSlotPrompt()" title="Save current console & synth state into a user patch slot">+ STORE</button>
           </div>
-        </div>
 
-        <div class="patch-bank-section">
-          <span class="preset-label">BANK</span>
-          <div class="preset-io-stack">
-            <button class="btn-preset-io" onclick="savePresetBankJson()" title="Export current console & DSP chain patch as a JSON file">
-              <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 1.5V8M6 8L3.2 5.2M6 8L8.8 5.2M2 10.5H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span>SAVE</span>
-            </button>
-            <button class="btn-preset-io" onclick="triggerLoadPresetBankJson()" title="Import a saved JSON patch & restore console + DSP chain routing">
-              <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 8.5V2M6 2L3.2 4.8M6 2L8.8 4.8M2 10.5H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span>LOAD</span>
-            </button>
-            <input type="file" id="inputPresetJson" accept=".json,application/json" style="display:none;" onchange="loadPresetBankJson(event)">
+          <!-- UNIFIED PATCH BANK MODULE (Save/Load stacked next to presets) -->
+          <div class="patch-bank-section">
+            <span class="preset-label">BANK</span>
+            <div class="preset-io-stack">
+              <button class="btn-preset-io" onclick="savePresetBankJson()" title="Export current console & DSP chain patch as a JSON file">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 1.5V8M6 8L3.2 5.2M6 8L8.8 5.2M2 10.5H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>SAVE</span>
+              </button>
+              <button class="btn-preset-io" onclick="triggerLoadPresetBankJson()" title="Import a saved JSON patch & restore console + DSP chain routing">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 8.5V2M6 2L3.2 4.8M6 2L8.8 4.8M2 10.5H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>LOAD</span>
+              </button>
+              <input type="file" id="inputPresetJson" accept=".json,application/json" style="display:none;" onchange="loadPresetBankJson(event)">
+            </div>
           </div>
         </div>
       </div>

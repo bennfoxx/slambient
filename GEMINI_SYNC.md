@@ -1381,7 +1381,7 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
 - **Desktop Header Formatting & Eurorack Chassis Symmetry**:
   - Moved Section 3 (Workspace Utilities: Fullscreen, Palette, ?) and Section 4 (Generative Engine: Randomize All, Undo) out of `.transport-row` into `.readout-row` inside `.header-util-gen-cluster`.
   - Created a balanced 2-row chassis layout: Row 1 houses Transport & Audio on the left and Harmony & Master Clock on the right (`justify-content: space-between`); Row 2 houses Telemetry HUD on the left and Utilities & Generative Engine on the right (`justify-content: space-between`).
-  - Redesigned `.patch-bank-section` as a dedicated bordered card with `BANK` title centered above side-by-side `SAVE` and `LOAD` buttons, eliminating all text overlap and collision with preset names (`AIRPORTS`).
+  - Redesigned `.patch-bank-section` as a dedicated unified module nested inside `.preset-group` directly adjacent to the preset grid with `SAVE` and `LOAD` stacked vertically on top of each other. This eliminates horizontal wrapping issues, avoids blank voids, and creates a perfectly proportioned ~80px auxiliary card matching the 3-row preset grid height.
 - **Mobile Transport 2-Row Symmetry & Auto-Fill Elements**:
   - Re-architected `.header-sec-transport` across portrait (`@media (max-width: 640px)`) and landscape (`@media (orientation: landscape) and (max-height: 550px)`) into two 12-column rows:
     - **Row 1**: `START` button (cols 1–6, 50%) + `RECORD` button with format dropdown (cols 7–12, 50%).
