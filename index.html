@@ -6876,38 +6876,246 @@ function createDidgeridooBuzzWave(ctx) {
   return ctx.createPeriodicWave(real, imag, { disableNormalization: false });
 }
 
-// iPhone: Web Audio is "ambient" by default, so the ring/silent switch mutes
-// it. Mark the page as media playback (like a music app) so it plays with the
-// switch on silent. iOS 16.4+ has navigator.audioSession; older iOS only
-// treats the page as media while an <audio> element is playing, so loop an
-// inaudible one (iOS only, so desktop browsers never show media controls).
-// Must run inside a user gesture (first tap); also re-asserted when the page
-// comes back to the foreground.
+// Disconnects per-note Web Audio voice chains from summing buses as soon as
+// the source oscillator/buffer finishes, preventing dead nodes from
+// accumulating on drumBusGain / chordBusGain / arpBusGain / noiseBusGain.
+function disconnectOnEnded(sourceNode, tailNode) {
+  if (!sourceNode) return;
+  sourceNode.onended = () => {
+    try { sourceNode.disconnect(); } catch (e) {}
+    try { if (tailNode && tailNode !== sourceNode) tailNode.disconnect(); } catch (e) {}
+  };
+}
+
+// OS Music Player / Media Session integration & silent audio carrier:
+// 1. iOS ring/silent switch: Web Audio is "ambient" by default and muted by the
+//    hardware silent switch unless navigator.audioSession.type = "playback" and
+//    an <audio> element is actively playing.
+// 2. System media controls (iOS Lock Screen / Control Center / Dynamic Island,
+//    Android notification shade, macOS/Windows media keys & Now Playing, AirPods):
+//    Browsers only promote a page to an OS-level media player when an <audio>
+//    element >= 5 seconds long is playing alongside navigator.mediaSession.
 let silentMediaEl = null;
-function enableMediaPlaybackSession() {
+let syncingSilentMediaEl = false;
+let mediaSessionHandlersBound = false;
+const mediaArtworkCache = {};
+
+function getMediaSessionArtworkUrl() {
+  const themeId = (typeof activeTheme !== "undefined" && activeTheme && activeTheme.id) ? activeTheme.id : "slambient";
+  if (mediaArtworkCache[themeId]) return mediaArtworkCache[themeId];
   try {
-    if (navigator.audioSession && navigator.audioSession.type !== "playback") navigator.audioSession.type = "playback";
-  } catch (e) {}
-  const ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  if (!ios) return;
+    const c = document.createElement("canvas");
+    c.width = 512; c.height = 512;
+    const ctx = c.getContext("2d");
+    const bg = ctx.createRadialGradient(256, 256, 24, 256, 256, 260);
+    bg.addColorStop(0, "#121521");
+    bg.addColorStop(1, "#06070b");
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, 512, 512);
+
+    const colors = (typeof activeTheme !== "undefined" && activeTheme && Array.isArray(activeTheme.colors) && activeTheme.colors.length >= 5)
+      ? activeTheme.colors
+      : ["#00e5ff", "#ff3838", "#fed330", "#7d5fff", "#1dd1a1"];
+    const radii = [74, 112, 150, 188, 220];
+    radii.forEach((r, i) => {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(256, 256, r, 0, Math.PI * 2);
+      ctx.strokeStyle = colors[i % colors.length];
+      ctx.lineWidth = 4.5;
+      ctx.globalAlpha = 0.82;
+      ctx.shadowColor = colors[i % colors.length];
+      ctx.shadowBlur = 18;
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    ctx.fillStyle = colors[0];
+    ctx.beginPath();
+    ctx.arc(256, 256, 10, 0, Math.PI * 2);
+    ctx.fill();
+
+    const url = c.toDataURL("image/png");
+    mediaArtworkCache[themeId] = url;
+    return url;
+  } catch (e) {
+    return "";
+  }
+}
+
+function stepMediaSessionPreset(dir) {
+  const chips = Array.from(document.querySelectorAll(".preset-bar .btn-preset-chip"));
+  if (!chips.length || typeof applyPreset !== "function") return;
+  let cur = chips.findIndex(b => b.classList.contains("active"));
+  if (cur < 0) cur = dir > 0 ? -1 : 0;
+  const nextIdx = (cur + dir + chips.length) % chips.length;
+  applyPreset(nextIdx);
+}
+
+function updateMediaSessionMetadata() {
+  if (typeof navigator === "undefined" || !("mediaSession" in navigator) || typeof MediaMetadata === "undefined") return;
   try {
-    if (!silentMediaEl) {
-      const n = 8000, bytes = new Uint8Array(44 + n);
-      const dv = new DataView(bytes.buffer);
-      const str = (o, t) => { for (let i = 0; i < t.length; i++) bytes[o + i] = t.charCodeAt(i); };
-      str(0, "RIFF"); dv.setUint32(4, 36 + n, true); str(8, "WAVE"); str(12, "fmt ");
-      dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
-      dv.setUint32(24, 8000, true); dv.setUint32(28, 8000, true); dv.setUint16(32, 1, true); dv.setUint16(34, 8, true);
-      str(36, "data"); dv.setUint32(40, n, true);
-      bytes.fill(128, 44);   // 8-bit PCM silence
-      silentMediaEl = new Audio(URL.createObjectURL(new Blob([bytes], { type: "audio/wav" })));
-      silentMediaEl.loop = true;
-      silentMediaEl.preload = "auto";
-      silentMediaEl.setAttribute("playsinline", "");
-    }
-    if (silentMediaEl.paused) { const pr = silentMediaEl.play(); if (pr && pr.catch) pr.catch(() => {}); }
+    const activeChip = document.querySelector(".preset-bar .btn-preset-chip.active");
+    const rawName = activeChip ? (activeChip.getAttribute("title") || activeChip.textContent || "").trim() : "";
+    const presetTitle = rawName ? rawName.split(":")[0].trim() : "Generative Ambient Patch";
+    const keyName = (typeof NOTE_NAMES !== "undefined" && typeof rootNote === "number") ? (NOTE_NAMES[rootNote] || "C") : "C";
+    const scaleName = (typeof activeScaleKey === "string") ? activeScaleKey.replace(/_/g, " ") : "DORIAN";
+    const curBpm = (typeof bpm === "number") ? bpm : 72;
+    const meter = (typeof currentTimeSig === "string") ? currentTimeSig : "7/4";
+    const artUrl = getMediaSessionArtworkUrl();
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: presetTitle,
+      artist: "Slambient · Meander Engine",
+      album: `${keyName} ${scaleName} · ${curBpm} BPM · ${meter}`,
+      artwork: artUrl ? [{ src: artUrl, sizes: "512x512", type: "image/png" }] : []
+    });
   } catch (e) {}
 }
+
+function bindMediaSessionHandlers() {
+  if (mediaSessionHandlersBound || typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
+  mediaSessionHandlersBound = true;
+  const safeSet = (action, fn) => {
+    try { navigator.mediaSession.setActionHandler(action, fn); } catch (e) {}
+  };
+  safeSet("play", () => { if (!isPlaying && typeof togglePlay === "function") togglePlay(); });
+  safeSet("pause", () => { if (isPlaying && typeof togglePlay === "function") togglePlay(); });
+  safeSet("stop", () => { if (isPlaying && typeof togglePlay === "function") togglePlay(); });
+  safeSet("previoustrack", () => stepMediaSessionPreset(-1));
+  safeSet("nexttrack", () => stepMediaSessionPreset(1));
+  safeSet("seekbackward", null);
+  safeSet("seekforward", null);
+}
+
+function ensureSilentMediaElement() {
+  if (silentMediaEl) return silentMediaEl;
+  try {
+    // 10-second looping 8 kHz 8-bit mono PCM silence (>= 5s required by Chrome/Android/iOS for lock-screen controls)
+    const sampleRate = 8000;
+    const n = sampleRate * 10;
+    const bytes = new Uint8Array(44 + n);
+    const dv = new DataView(bytes.buffer);
+    const str = (o, t) => { for (let i = 0; i < t.length; i++) bytes[o + i] = t.charCodeAt(i); };
+    str(0, "RIFF"); dv.setUint32(4, 36 + n, true); str(8, "WAVE"); str(12, "fmt ");
+    dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
+    dv.setUint32(24, sampleRate, true); dv.setUint32(28, sampleRate, true);
+    dv.setUint16(32, 1, true); dv.setUint16(34, 8, true);
+    str(36, "data"); dv.setUint32(40, n, true);
+    bytes.fill(128, 44);
+    silentMediaEl = new Audio(URL.createObjectURL(new Blob([bytes], { type: "audio/wav" })));
+    silentMediaEl.loop = true;
+    silentMediaEl.preload = "auto";
+    silentMediaEl.volume = 0.01;
+    silentMediaEl.setAttribute("playsinline", "");
+    silentMediaEl.setAttribute("webkit-playsinline", "");
+
+    // Keep Slambient transport synced if the OS pauses/resumes the media element directly
+    silentMediaEl.addEventListener("play", () => {
+      if (syncingSilentMediaEl) return;
+      if (!isPlaying && typeof togglePlay === "function") togglePlay();
+    });
+    silentMediaEl.addEventListener("pause", () => {
+      if (syncingSilentMediaEl) return;
+      // Ignore natural loop seam or page unload; only pause engine if OS paused while playing
+      if (isPlaying && silentMediaEl.paused && !silentMediaEl.ended && typeof togglePlay === "function") {
+        togglePlay();
+      }
+    });
+  } catch (e) {}
+  return silentMediaEl;
+}
+
+function syncMediaSessionPlaybackState() {
+  try {
+    if (navigator.audioSession && navigator.audioSession.type !== "playback") {
+      navigator.audioSession.type = "playback";
+    }
+  } catch (e) {}
+  bindMediaSessionHandlers();
+  const el = ensureSilentMediaElement();
+  if (el) {
+    syncingSilentMediaEl = true;
+    try {
+      if (isPlaying) {
+        if (el.paused) {
+          const pr = el.play();
+          if (pr && pr.catch) pr.catch(() => {});
+        }
+      } else {
+        if (!el.paused) el.pause();
+      }
+    } catch (e) {}
+    setTimeout(() => { syncingSilentMediaEl = false; }, 0);
+  }
+  if (typeof navigator !== "undefined" && "mediaSession" in navigator) {
+    try {
+      navigator.mediaSession.playbackState = isPlaying ? "playing" : "paused";
+      if (isPlaying) updateMediaSessionMetadata();
+    } catch (e) {}
+  }
+}
+
+function enableMediaPlaybackSession() {
+  try {
+    if (navigator.audioSession && navigator.audioSession.type !== "playback") {
+      navigator.audioSession.type = "playback";
+    }
+  } catch (e) {}
+  bindMediaSessionHandlers();
+  ensureSilentMediaElement();
+  if (typeof isPlaying !== "undefined" && isPlaying) {
+    syncMediaSessionPlaybackState();
+  }
+}
+
+// Web Audio hardware-thread clock fallback so generative sequencers keep steady
+// tempo when the phone screen is locked or the browser tab is backgrounded
+// (where setInterval is throttled to >= 1000ms).
+let audioClockNode = null;
+let audioClockSilentBuf = null;
+let nextAudioClockTime = 0;
+
+function stopAudioClockFallback() {
+  if (audioClockNode) {
+    try { audioClockNode.onended = null; audioClockNode.stop(); audioClockNode.disconnect(); } catch (e) {}
+    audioClockNode = null;
+  }
+}
+
+function scheduleAudioClockFallback() {
+  stopAudioClockFallback();
+  if (!isPlaying || !audioCtx) return;
+  try {
+    if (!audioClockSilentBuf || audioClockSilentBuf.sampleRate !== audioCtx.sampleRate) {
+      audioClockSilentBuf = audioCtx.createBuffer(1, 1, audioCtx.sampleRate);
+    }
+    const tickSec = (60 / Math.max(40, bpm)) / 4;
+    const now = audioCtx.currentTime;
+    if (nextAudioClockTime <= now + 0.005 || nextAudioClockTime > now + tickSec * 2.5) {
+      nextAudioClockTime = now + tickSec;
+    }
+    const src = audioCtx.createBufferSource();
+    src.buffer = audioClockSilentBuf;
+    src.connect(audioCtx.destination);
+    audioClockNode = src;
+    src.onended = () => {
+      if (audioClockNode !== src) return;
+      audioClockNode = null;
+      if (!isPlaying || !audioCtx) return;
+      const tickMs = (60000 / Math.max(40, bpm)) / 4;
+      const elapsedMs = performance.now() - (typeof lastClockTickTime === "number" ? lastClockTickTime : 0);
+      // Fire clockTick from the Web Audio thread when backgrounded/locked or when setInterval lags
+      if (document.hidden || elapsedMs >= tickMs * 1.45) {
+        clockTick();
+      }
+      nextAudioClockTime += (60 / Math.max(40, bpm)) / 4;
+      scheduleAudioClockFallback();
+    };
+    src.start(nextAudioClockTime);
+    src.stop(nextAudioClockTime + 0.001);
+  } catch (e) {}
+}
+
 // Create the audio engine if needed and make sure it is running. Call it from a
 // tap/click/key handler: phone browsers only let a page start or resume audio
 // from inside a gesture (the Invaders game uses it, so its sounds work even
@@ -6922,12 +7130,17 @@ function ensureAudioReady() {
 ["touchend", "click", "keydown"].forEach((evt) =>
   window.addEventListener(evt, () => {
     enableMediaPlaybackSession();
-    if (audioCtx && audioCtx.state !== "running") audioCtx.resume().catch(() => {});
+    if (audioCtx && audioCtx.state !== "running" && (typeof isPlaying === "undefined" || isPlaying || heldMidiNotes.size > 0 || arcadeActive)) {
+      audioCtx.resume().catch(() => {});
+    }
   }, { capture: true, passive: true }));
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState !== "visible") return;
+  if (document.visibilityState !== "visible") {
+    if (isPlaying && audioCtx) scheduleAudioClockFallback();
+    return;
+  }
   enableMediaPlaybackSession();
-  if (audioCtx && audioCtx.state !== "running") audioCtx.resume().catch(() => {});
+  if (isPlaying && audioCtx && audioCtx.state !== "running") audioCtx.resume().catch(() => {});
 });
 
 function initAudio() {
@@ -7295,8 +7508,8 @@ function rewireDspChain(newOrder, immediate = false) {
   if (newOrder && Array.isArray(newOrder) && newOrder.length === 3) {
     dspChainOrder = [...newOrder];
   }
+  if (typeof updatePedalsOrderUI === 'function') updatePedalsOrderUI();
   if (!audioCtx || !masterBusPre || !masterBusPost) {
-    if (typeof updatePedalsOrderUI === 'function') updatePedalsOrderUI();
     return;
   }
 
@@ -7363,6 +7576,18 @@ const PEDAL_BASE_NAMES = {
   SPACE:  "SPACE"
 };
 
+function swapPedalOrbPositions(keyA, keyB) {
+  if (typeof PEDAL_KEY_TO_ORBITAL_ID === "undefined" || typeof ORBITAL_MODULES === "undefined") return;
+  const orbA = ORBITAL_MODULES.find(o => o.id === PEDAL_KEY_TO_ORBITAL_ID[keyA]);
+  const orbB = ORBITAL_MODULES.find(o => o.id === PEDAL_KEY_TO_ORBITAL_ID[keyB]);
+  if (!orbA || !orbB) return;
+  const tx = orbA.x, ty = orbA.y, tvx = orbA.vx, tvy = orbA.vy, th = orbA.heading;
+  orbA.x = orbB.x; orbA.y = orbB.y; orbA.vx = orbB.vx; orbA.vy = orbB.vy; orbA.heading = orbB.heading;
+  orbB.x = tx; orbB.y = ty; orbB.vx = tvx; orbB.vy = tvy; orbB.heading = th;
+  orbA.bump = Math.min(0.8, (orbA.bump || 0) + 0.25);
+  orbB.bump = Math.min(0.8, (orbB.bump || 0) + 0.25);
+}
+
 function updatePedalsOrderUI() {
   const container = document.getElementById("masterDeckUnified") || document.getElementById("pedalsGrid");
   if (!container) return;
@@ -7380,11 +7605,17 @@ function updatePedalsOrderUI() {
       titleEl.textContent = `${chainNum}. ${PEDAL_BASE_NAMES[key] || key}`;
     }
 
-    // Synchronize corresponding orb number in ORBITAL_MODULES
+    // Synchronize corresponding orb number in ORBITAL_MODULES & active orbital modal/sheet header
     if (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && typeof ORBITAL_MODULES !== "undefined") {
       const orbId = PEDAL_KEY_TO_ORBITAL_ID[key];
       const orb = ORBITAL_MODULES.find(o => o.id === orbId);
-      if (orb) orb.num = String(chainNum);
+      if (orb) {
+        orb.num = String(chainNum);
+        if (typeof expandedOrbId !== "undefined" && expandedOrbId === orbId) {
+          const modalTitle = document.getElementById("orbitalModalTitle");
+          if (modalTitle) modalTitle.textContent = `${orb.num}. ${orb.name}`;
+        }
+      }
     }
 
     const slotBadge = document.getElementById("slotBadge_" + key);
@@ -7415,9 +7646,10 @@ function updatePedalsOrderUI() {
 function shiftPedalLeft(key) {
   const idx = dspChainOrder.indexOf(key);
   if (idx > 0) {
-    const temp = dspChainOrder[idx - 1];
+    const otherKey = dspChainOrder[idx - 1];
     dspChainOrder[idx - 1] = dspChainOrder[idx];
-    dspChainOrder[idx] = temp;
+    dspChainOrder[idx] = otherKey;
+    swapPedalOrbPositions(key, otherKey);
     rewireDspChain(dspChainOrder, false);
   }
 }
@@ -7425,9 +7657,10 @@ function shiftPedalLeft(key) {
 function shiftPedalRight(key) {
   const idx = dspChainOrder.indexOf(key);
   if (idx >= 0 && idx < dspChainOrder.length - 1) {
-    const temp = dspChainOrder[idx + 1];
+    const otherKey = dspChainOrder[idx + 1];
     dspChainOrder[idx + 1] = dspChainOrder[idx];
-    dspChainOrder[idx] = temp;
+    dspChainOrder[idx] = otherKey;
+    swapPedalOrbPositions(key, otherKey);
     rewireDspChain(dspChainOrder, false);
   }
 }
@@ -7526,6 +7759,7 @@ function reorderDspChainModules(sourceKey, targetKey) {
   if (fromIdx !== -1 && toIdx !== -1) {
     dspChainOrder.splice(fromIdx, 1);
     dspChainOrder.splice(toIdx, 0, sourceKey);
+    swapPedalOrbPositions(sourceKey, targetKey);
     rewireDspChain(dspChainOrder, false);
   }
 }
@@ -7661,7 +7895,9 @@ function applyReverbMode(mode) {
     const p = REVERB_MODE_PARAMS[mode] || REVERB_MODE_PARAMS.HALL;
     reverbImpulseCache[mode] = generateReverbImpulseBuffer(p.duration, p.decayExp);
   }
-  reverbNode.buffer = reverbImpulseCache[mode];
+  if (reverbNode.buffer !== reverbImpulseCache[mode]) {
+    reverbNode.buffer = reverbImpulseCache[mode];
+  }
 }
 
 // Chorus "modes" -- which of the 3 pre-built voices are active, their rate
@@ -8139,6 +8375,7 @@ function stopNoteLive(midi, instant = false) {
       voice.gain.gain.setTargetAtTime(0.0001, now, relSec * 0.35);
 
       const stopTime = now + relSec + 0.15;
+      disconnectOnEnded(voice.osc1, voice.tremGain || voice.gain);
       voice.osc1.stop(stopTime);
       if (voice.osc2) voice.osc2.stop(stopTime);
       if (voice.tremOsc) voice.tremOsc.stop(stopTime);
@@ -8188,6 +8425,7 @@ function triggerSympatheticStrings(pluckedMidi, startTime, vel, targetBus) {
     filter.connect(g);
     g.connect(targetBus);
 
+    disconnectOnEnded(osc, g);
     osc.start(t0);
     osc.stop(t0 + ringDur + 0.05);
   });
@@ -8381,6 +8619,7 @@ function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0,
   if (tremGain) { gain.connect(tremGain); tremGain.connect(busTarget); }
   else { gain.connect(busTarget); }
 
+  disconnectOnEnded(osc1, tremGain || gain);
   osc1.start(now); osc2.start(now);
   osc1.stop(now + duration + 0.1); osc2.stop(now + duration + 0.1);
   if (tremOsc) { tremOsc.start(now); tremOsc.stop(now + duration + 0.1); }
@@ -8493,6 +8732,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
   gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
   arpVoiceFilter.connect(gain);
 
+  let primaryArpOsc = null;
   if (arpTimbre === "BANSURI_FLUTE") {
     const osc = audioCtx.createOscillator(); osc.type = "sine";
     const oscOctave = audioCtx.createOscillator(); oscOctave.type = "sine";
@@ -8531,6 +8771,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
     osc.start(now); oscOctave.start(now); vibrato.start(now); breath.start(now, Math.random() * 0.5);
     osc.stop(now + durationSec + 0.05); oscOctave.stop(now + durationSec + 0.05);
     vibrato.stop(now + durationSec + 0.05); breath.stop(now + 0.09);
+    primaryArpOsc = osc;
   } else if (arpTimbre === "GLASS_FM") {
     const carrier = audioCtx.createOscillator(); const mod = audioCtx.createOscillator();
     const modGain = audioCtx.createGain();
@@ -8540,6 +8781,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
     mod.connect(modGain); modGain.connect(carrier.frequency);
     carrier.connect(arpVoiceFilter); carrier.start(now); mod.start(now);
     carrier.stop(now + durationSec + 0.05); mod.stop(now + durationSec + 0.05);
+    primaryArpOsc = carrier;
   } else if (arpTimbre === "KALIMBA") {
     const osc1 = audioCtx.createOscillator(); const osc2 = audioCtx.createOscillator();
     const tineGain = audioCtx.createGain();
@@ -8551,6 +8793,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
     osc1.connect(arpVoiceFilter); osc2.connect(tineGain); tineGain.connect(arpVoiceFilter);
     osc1.start(now); osc2.start(now);
     osc1.stop(now + durationSec + 0.05); osc2.stop(now + durationSec + 0.05);
+    primaryArpOsc = osc1;
   } else if (arpTimbre === "ANALOG_PULSE") {
     const osc1 = audioCtx.createOscillator(); const osc2 = audioCtx.createOscillator();
     const pulseGain = audioCtx.createGain();
@@ -8563,6 +8806,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
     osc1.connect(arpVoiceFilter); osc2.connect(pulseGain); pulseGain.connect(arpVoiceFilter);
     osc1.start(now); osc2.start(now);
     osc1.stop(now + durationSec + 0.05); osc2.stop(now + durationSec + 0.05);
+    primaryArpOsc = osc1;
   } else if (arpTimbre === "SINE_CRYSTAL") {
     const osc = audioCtx.createOscillator(); osc.type = "sine";
     const shimmer = audioCtx.createOscillator(); shimmer.type = "sine";
@@ -8574,6 +8818,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
     osc.connect(arpVoiceFilter); shimmer.connect(shimmerGain); shimmerGain.connect(arpVoiceFilter);
     osc.start(now); shimmer.start(now);
     osc.stop(now + durationSec + 0.05); shimmer.stop(now + durationSec + 0.05);
+    primaryArpOsc = osc;
   } else if (arpTimbre === "MUSIC_BOX") {
     const osc1 = audioCtx.createOscillator(); const osc2 = audioCtx.createOscillator();
     osc1.type = "sine"; osc2.type = "sine";
@@ -8586,6 +8831,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
     osc1.connect(arpVoiceFilter);
     osc1.start(now); osc2.start(now);
     osc1.stop(now + durationSec + 0.05); osc2.stop(now + durationSec + 0.05);
+    primaryArpOsc = osc1;
   } else if (arpTimbre === "CONCERT_HARP") {
     const osc = audioCtx.createOscillator(); const body = audioCtx.createOscillator();
     osc.type = "triangle"; body.type = "sine";
@@ -8598,6 +8844,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
     osc.connect(arpVoiceFilter);
     osc.start(now); body.start(now);
     osc.stop(now + durationSec + 0.05); body.stop(now + durationSec + 0.05);
+    primaryArpOsc = osc;
   } else if (arpTimbre === "WATER_DROPLET") {
     const osc = audioCtx.createOscillator();
     osc.type = "sine";
@@ -8605,6 +8852,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
     osc.frequency.exponentialRampToValueAtTime(freq, now + 0.022);
     osc.connect(arpVoiceFilter);
     osc.start(now); osc.stop(now + durationSec + 0.05);
+    primaryArpOsc = osc;
   } else if (arpTimbre === "PIZZICATO_STRING") {
     const osc = audioCtx.createOscillator(); const pluck = audioCtx.createOscillator();
     osc.type = "triangle"; pluck.type = "triangle";
@@ -8617,14 +8865,17 @@ function playArpNote(midi, vel = 85, isLive = false) {
     osc.connect(arpVoiceFilter);
     osc.start(now); pluck.start(now);
     osc.stop(now + durationSec + 0.05); pluck.stop(now + durationSec + 0.05);
+    primaryArpOsc = osc;
   } else {
     const osc = audioCtx.createOscillator(); osc.type = "sine";
     osc.frequency.setValueAtTime(freq, now);
     osc.connect(arpVoiceFilter); osc.start(now); osc.stop(now + durationSec + 0.05);
+    primaryArpOsc = osc;
   }
 
   if (pan) { gain.connect(pan); pan.connect(arpBusGain); }
   else { gain.connect(arpBusGain); }
+  disconnectOnEnded(primaryArpOsc, pan || gain);
 
   midiNoteTimed(MIDI_CH.ARP, midi, vel, durationSec);
 }
@@ -8678,6 +8929,7 @@ function playKick(drive = 1.0) {
   clickGain.gain.setValueAtTime(0.60 * drumVol * effDrive, now);
   clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035 * kit.decayMult);
   clickOsc.connect(clickGain); clickGain.connect(drumBusGain);
+  disconnectOnEnded(clickOsc, clickGain);
   clickOsc.start(now); clickOsc.stop(now + 0.04 * kit.decayMult);
 
   const subOsc = audioCtx.createOscillator(); const subGain = audioCtx.createGain();
@@ -8688,6 +8940,7 @@ function playKick(drive = 1.0) {
   subGain.gain.setValueAtTime(vol, now);
   subGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35 * kit.decayMult);
   subOsc.connect(subGain); subGain.connect(drumBusGain);
+  disconnectOnEnded(subOsc, subGain);
   subOsc.start(now); subOsc.stop(now + 0.38 * kit.decayMult);
 
   if (ringDynamics.drum) {
@@ -8749,6 +9002,7 @@ function playSnare(hard = false) {
   bodyGain.gain.setValueAtTime((hard ? 0.68 : 0.45) * drumVol * kit.drive, now);
   bodyGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12 * kit.decayMult);
   bodyOsc.connect(bodyGain); bodyGain.connect(drumBusGain);
+  disconnectOnEnded(bodyOsc, bodyGain);
   bodyOsc.start(now); bodyOsc.stop(now + 0.14 * kit.decayMult);
 
   const whiteNoise = audioCtx.createBufferSource(); whiteNoise.buffer = getNoiseBuffer();
@@ -8760,6 +9014,7 @@ function playSnare(hard = false) {
   noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + (hard ? 0.22 : 0.16) * kit.decayMult);
 
   whiteNoise.connect(filter); filter.connect(noiseGain); noiseGain.connect(drumBusGain);
+  disconnectOnEnded(whiteNoise, noiseGain);
   whiteNoise.start(now, Math.random() * 0.7); whiteNoise.stop(now + 0.25 * kit.decayMult);
 
   if (ringDynamics.drum) {
@@ -8779,6 +9034,7 @@ function playWoodblock(pitchMult = 1.0) {
   gain.gain.setValueAtTime(0.50 * drumVol * kit.drive, now);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.065 * kit.decayMult);
   osc.connect(gain); gain.connect(drumBusGain);
+  disconnectOnEnded(osc, gain);
   osc.start(now); osc.stop(now + 0.075 * kit.decayMult);
 
   if (ringDynamics.drum) {
@@ -8802,6 +9058,7 @@ function playHiHat(accent = false) {
   gain.gain.exponentialRampToValueAtTime(0.0001, now + (accent ? 0.06 : 0.04) * kit.decayMult);
 
   source.connect(filter); filter.connect(gain); gain.connect(drumBusGain);
+  disconnectOnEnded(source, gain);
   source.start(now, Math.random() * 0.7); source.stop(now + 0.07 * kit.decayMult);
 }
 
@@ -8852,6 +9109,7 @@ function playDayan(stroke = "TUN", hard = 1.0) {
     osc3.connect(g3); g3.connect(filter);
     filter.connect(gain); gain.connect(drumBusGain);
 
+    disconnectOnEnded(osc1, gain);
     osc1.start(now); osc2.start(now); osc3.start(now);
     osc1.stop(now + decay + 0.05); osc2.stop(now + decay + 0.05); osc3.stop(now + decay + 0.05);
   } else if (isNa) {
@@ -8876,6 +9134,7 @@ function playDayan(stroke = "TUN", hard = 1.0) {
 
     noise.connect(noiseFilter); noiseFilter.connect(noiseGain);
     noiseGain.connect(drumBusGain);
+    disconnectOnEnded(noise, noiseGain);
     noise.start(now, Math.random() * 0.5); noise.stop(now + 0.06);
 
     const decay = 0.21 * kit.decayMult;
@@ -8887,6 +9146,7 @@ function playDayan(stroke = "TUN", hard = 1.0) {
     g2.gain.value = 0.35;
     osc1.connect(gain); osc2.connect(g2); g2.connect(gain);
     gain.connect(drumBusGain);
+    disconnectOnEnded(osc1, gain);
     osc1.start(now); osc2.start(now);
     osc1.stop(now + decay + 0.04); osc2.stop(now + decay + 0.04);
   } else if (isTiRe) {
@@ -8910,9 +9170,11 @@ function playDayan(stroke = "TUN", hard = 1.0) {
     slapG.gain.setValueAtTime(0.24 * drumVol * hard, now);
     slapG.gain.exponentialRampToValueAtTime(0.0001, now + 0.022);
     slap.connect(slapF); slapF.connect(slapG); slapG.connect(drumBusGain);
+    disconnectOnEnded(slap, slapG);
     slap.start(now, Math.random() * 0.5); slap.stop(now + 0.03);
 
     osc1.connect(gain); gain.connect(drumBusGain);
+    disconnectOnEnded(osc1, gain);
     osc1.start(now); osc1.stop(now + decay + 0.015);
   }
 
@@ -8935,6 +9197,7 @@ function playBayan(stroke = "GHE", slide = true, hard = 1.0) {
     gain.gain.setValueAtTime(0.52 * drumVol * hard * kit.drive, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.052);
     osc.connect(gain); gain.connect(drumBusGain);
+    disconnectOnEnded(osc, gain);
     osc.start(now); osc.stop(now + 0.06);
     return;
   }
@@ -8997,6 +9260,7 @@ function playBayan(stroke = "GHE", slide = true, hard = 1.0) {
   resonantFilter.connect(gain);
   gain.connect(drumBusGain);
 
+  disconnectOnEnded(oscMain, gain);
   oscMain.start(now);
   oscSub.start(now);
   oscMain.stop(now + decay + 0.04);
@@ -9500,6 +9764,7 @@ function triggerNoiseEvent(intensity = 1.0) {
       g.gain.linearRampToValueAtTime(pk, t0 + 0.004);
       g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.021);
       osc1.connect(g); osc2.connect(g); g.connect(pan); pan.connect(noiseBusGain);
+      disconnectOnEnded(osc1, pan);
       osc1.start(t0); osc2.start(t0);
       osc1.stop(t0 + 0.024); osc2.stop(t0 + 0.024);
     }
@@ -9521,6 +9786,7 @@ function triggerNoiseEvent(intensity = 1.0) {
       g.gain.linearRampToValueAtTime(0.22 * intensity, t0 + 0.005);
       g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.055);
       osc.connect(g); g.connect(pan); pan.connect(noiseBusGain);
+      disconnectOnEnded(osc, pan);
       osc.start(t0); osc.stop(t0 + 0.062);
     }
   } else if (noiseProfile === "THUNDER") {
@@ -9540,6 +9806,7 @@ function triggerNoiseEvent(intensity = 1.0) {
     g.gain.linearRampToValueAtTime(0.55 * intensity, now + 0.08 + randFloat() * 0.18);
     g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
     src.connect(lp); lp.connect(g); g.connect(noiseBusGain);
+    disconnectOnEnded(src, g);
     src.start(now, randFloat() * 1.2);
     src.stop(now + dur + 0.05);
   } else if (noiseProfile === "RAIN" || noiseProfile === "WHITE_TAPE") {
@@ -9560,6 +9827,7 @@ function triggerNoiseEvent(intensity = 1.0) {
       g.gain.setValueAtTime(0.26 * intensity, t0);
       g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
       src.connect(bp); bp.connect(g); g.connect(pan); pan.connect(noiseBusGain);
+      disconnectOnEnded(src, pan);
       src.start(t0, randFloat() * 0.8);
       src.stop(t0 + dur + 0.01);
     }
@@ -9581,6 +9849,7 @@ function triggerNoiseEvent(intensity = 1.0) {
     g.gain.linearRampToValueAtTime(0.32 * intensity, now + dur * 0.38);
     g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
     src.connect(bp); bp.connect(g); g.connect(noiseBusGain);
+    disconnectOnEnded(src, g);
     src.start(now, randFloat() * 1.0);
     src.stop(now + dur + 0.05);
   }
@@ -9593,6 +9862,7 @@ function updateTimeSignature() {
   measureTick = 0; barCount = 0;
   const ts = TIME_SIGNATURES[currentTimeSig] || TIME_SIGNATURES["7/4"];
   document.getElementById("hudMeter").textContent = `${currentTimeSig} [1/${ts.beats}]`;
+  if (typeof updateMediaSessionMetadata === "function") updateMediaSessionMetadata();
 }
 
 function cycleTimeSignature() {
@@ -9854,28 +10124,39 @@ let scopeAngle = 0;
 let scopeRotationAngle = 0;
 let lastScopeFrameTs = null;
 
-let cachedScopeW = 0, cachedScopeH = 0;
+let cachedScopeW = 0, cachedScopeH = 0, scopeNeedsResize = true;
+let scopeCanvasVisible = true;
+if (typeof IntersectionObserver !== "undefined" && scopeCanvas) {
+  try {
+    new IntersectionObserver((entries) => {
+      if (entries[0]) scopeCanvasVisible = entries[0].isIntersecting;
+    }, { threshold: 0.01 }).observe(scopeCanvas);
+  } catch (err) {}
+}
+window.addEventListener("resize", () => { scopeNeedsResize = true; });
+window.addEventListener("orientationchange", () => { scopeNeedsResize = true; });
+
 function updateCanvasDimensions() {
-  // Fullscreen's CSS-pixel dimensions are already much larger than the
-  // windowed panel's, so the same devicePixelRatio there produces a far
-  // bigger pixel buffer for every canvas op (shadowBlur especially) to
-  // fill -- cap it in fullscreen only, where it was the difference between
-  // a ~1.3M-pixel and a ~13M-pixel canvas on a 1920x1080 HiDPI display.
+  // Cap DPR to 1.5 in fullscreen and on mobile phones so high-DPI mobile GPUs
+  // aren't forced to fill 3x/9x pixel buffers with shadowBlur every frame.
   const rawDpr = window.devicePixelRatio || 1;
-  const dpr = scopeFullscreen ? Math.min(1.5, rawDpr) : rawDpr;
+  const isPhone = typeof PHONE_LAYOUT_MQ !== "undefined" && PHONE_LAYOUT_MQ.matches;
+  const dpr = (scopeFullscreen || isPhone) ? Math.min(1.5, rawDpr) : Math.min(2, rawDpr);
   const parent = scopeCanvas.parentElement;
-  const rect = parent.getBoundingClientRect();
-  const w = Math.round(parent.clientWidth || rect.width || 460);
-  const h = Math.round(parent.clientHeight || rect.height || 290);
-  if (Math.abs(w - cachedScopeW) > 1 || Math.abs(h - cachedScopeH) > 1) {
-    cachedScopeW = w;
-    cachedScopeH = h;
-    scopeCanvas.width = w * dpr;
-    scopeCanvas.height = h * dpr;
+  if (scopeNeedsResize || !cachedScopeW || !cachedScopeH) {
+    const w = Math.round(parent.clientWidth || 460);
+    const h = Math.round(parent.clientHeight || 290);
+    if (Math.abs(w - cachedScopeW) > 1 || Math.abs(h - cachedScopeH) > 1 || scopeCanvas.width !== Math.round(w * dpr)) {
+      cachedScopeW = w;
+      cachedScopeH = h;
+      scopeCanvas.width = Math.round(w * dpr);
+      scopeCanvas.height = Math.round(h * dpr);
+    }
+    scopeNeedsResize = false;
   }
   scopeCtx.resetTransform();
   scopeCtx.scale(dpr, dpr);
-  return { w: cachedScopeW || w, h: cachedScopeH || h, cx: (cachedScopeW || w) / 2, cy: (cachedScopeH || h) / 2 };
+  return { w: cachedScopeW, h: cachedScopeH, cx: cachedScopeW / 2, cy: cachedScopeH / 2 };
 }
 
 const RING_CONFIGS = [
@@ -11190,7 +11471,7 @@ function pickRoadsideColor() {
 }
 
 function triggerMusical3DObject(type) {
-  if (!roadsideEnabled || !isPlaying) return;
+  if (!roadsideEnabled || !isPlaying || document.hidden || !scopeCanvasVisible) return;
   const cfg = MUSICAL_3D_TYPES[type];
   if (!cfg) return;
 
@@ -11201,7 +11482,11 @@ function triggerMusical3DObject(type) {
   if (now - (lastMusical3DSpawnTimes[type] || 0) < ROADSIDE_BASE_DEBOUNCE_MS / density) return;
   lastMusical3DSpawnTimes[type] = now;
 
-  if (roadsideObjects.length >= Math.round(ROADSIDE_BASE_MAX_OBJECTS * density)) {
+  const maxObjects = Math.round(ROADSIDE_BASE_MAX_OBJECTS * density);
+  while (roadsideObjects.length >= maxObjects * 2) {
+    roadsideObjects.shift();
+  }
+  if (roadsideObjects.length >= maxObjects) {
     // Gracefully speed up the oldest object to exit cleanly
     roadsideObjects[0].progress = Math.max(roadsideObjects[0].progress, 0.90);
   }
@@ -11313,27 +11598,27 @@ function draw3DDiamond(cx, cy, scale, rgb, alpha, rx, ry, rz) {
 
 // 4. 3D Wireframe Sphere (Sub & Drone / Cyan #00e5ff)
 const SPHERE_RING_PTS = 16;
+const SPHERE_UNIT_RINGS = [
+  // Equator (XZ plane)
+  Array.from({ length: SPHERE_RING_PTS }, (_, i) => {
+    const a = (i / SPHERE_RING_PTS) * Math.PI * 2;
+    return [Math.cos(a), 0, Math.sin(a)];
+  }),
+  // Prime Meridian (YZ plane)
+  Array.from({ length: SPHERE_RING_PTS }, (_, i) => {
+    const a = (i / SPHERE_RING_PTS) * Math.PI * 2;
+    return [0, Math.sin(a), Math.cos(a)];
+  }),
+  // Axial (XY plane)
+  Array.from({ length: SPHERE_RING_PTS }, (_, i) => {
+    const a = (i / SPHERE_RING_PTS) * Math.PI * 2;
+    return [Math.cos(a), Math.sin(a), 0];
+  })
+];
 function draw3DSphere(cx, cy, scale, rgb, alpha, rx, ry, rz) {
   const r = scale * 0.58;
-  const rings = [
-    // Equator (XZ plane)
-    Array.from({ length: SPHERE_RING_PTS }, (_, i) => {
-      const a = (i / SPHERE_RING_PTS) * Math.PI * 2;
-      return [Math.cos(a), 0, Math.sin(a)];
-    }),
-    // Prime Meridian (YZ plane)
-    Array.from({ length: SPHERE_RING_PTS }, (_, i) => {
-      const a = (i / SPHERE_RING_PTS) * Math.PI * 2;
-      return [0, Math.sin(a), Math.cos(a)];
-    }),
-    // Axial (XY plane)
-    Array.from({ length: SPHERE_RING_PTS }, (_, i) => {
-      const a = (i / SPHERE_RING_PTS) * Math.PI * 2;
-      return [Math.cos(a), Math.sin(a), 0];
-    })
-  ];
 
-  rings.forEach(ring => {
+  SPHERE_UNIT_RINGS.forEach(ring => {
     const projected = ring.map(p => project3D(p[0], p[1], p[2], rx, ry, rz, r, cx, cy));
     for (let i = 0; i < projected.length; i++) {
       const p1 = projected[i];
@@ -11459,44 +11744,55 @@ function drawReferenceTracks(cx, cy) {
   scopeCtx.restore();
 }
 
+// Per-frame analyser sampler so rings, meters, and orbital view don't call
+// getByteTimeDomainData / getByteFrequencyData multiple times per frame on the
+// same AnalyserNode.
+let currentAnalyserFrameId = 0;
+const analyserFrameCache = new WeakMap();
+function sampleAnalyserForFrame(analyser) {
+  if (!analyser) return null;
+  let entry = analyserFrameCache.get(analyser);
+  const n = analyser.frequencyBinCount;
+  if (!entry || entry.time.length !== n) {
+    entry = { time: new Uint8Array(n), freq: new Uint8Array(n), frameId: -1 };
+    analyserFrameCache.set(analyser, entry);
+  }
+  if (entry.frameId !== currentAnalyserFrameId) {
+    analyser.getByteTimeDomainData(entry.time);
+    analyser.getByteFrequencyData(entry.freq);
+    entry.frameId = currentAnalyserFrameId;
+  }
+  return entry;
+}
+
 function drawSymmetricalRing(cfg, cx, cy) {
   const analyser = cfg.getAnalyser();
   const dyn = ringDynamics[cfg.id];
   if (!dyn) return;
 
-  const bufLen = analyser ? analyser.frequencyBinCount : 256;
-  // Reuse one scratch buffer pair per ring across frames instead of
-  // allocating two new Uint8Arrays every frame -- 5 rings at 60+fps meant
-  // hundreds of allocations/sec, adding GC pressure on top of the
-  // shadowBlur cost that was the main source of fullscreen jank.
-  if (!dyn.rawData || dyn.rawData.length !== bufLen) {
-    dyn.rawData = new Uint8Array(bufLen);
-    dyn.freqData = new Uint8Array(bufLen);
-  }
-  const rawData = dyn.rawData, freqData = dyn.freqData;
-  if (analyser) {
-    analyser.getByteTimeDomainData(rawData);
-    analyser.getByteFrequencyData(freqData);
-  } else {
-    rawData.fill(128);
-    freqData.fill(0);
-  }
+  const sampled = isPlaying ? sampleAnalyserForFrame(analyser) : null;
+  const bufLen = sampled ? sampled.time.length : 256;
 
-  let sumSquare = 0; let freqEnergy = 0;
-  for (let i = 0; i < bufLen; i++) {
-    const diff = (rawData[i] - 128) / 128.0;
-    sumSquare += diff * diff;
-    if (i >= cfg.fLow && i <= cfg.fHigh) freqEnergy += freqData[i];
+  let combinedEnergy = 0;
+  if (sampled) {
+    const rawData = sampled.time, freqData = sampled.freq;
+    let sumSquare = 0, freqEnergy = 0;
+    for (let i = 0; i < bufLen; i++) {
+      const diff = (rawData[i] - 128) / 128.0;
+      sumSquare += diff * diff;
+      if (i >= cfg.fLow && i <= cfg.fHigh) freqEnergy += freqData[i];
+    }
+    const instantRms = Math.sqrt(sumSquare / bufLen);
+    const avgFreq = freqEnergy / ((cfg.fHigh - cfg.fLow + 1) * 255);
+    combinedEnergy = (instantRms * 0.55 + avgFreq * 0.45);
   }
-  const instantRms = Math.sqrt(sumSquare / bufLen);
-  const avgFreq = freqEnergy / ((cfg.fHigh - cfg.fLow + 1) * 255);
-  const combinedEnergy = (instantRms * 0.55 + avgFreq * 0.45);
   dyn.energy = dyn.energy * 0.76 + combinedEnergy * 0.24;
 
   const M = HALF_POINTS;
   for (let i = 0; i <= M; i++) {
     let target = 0;
-    if (isPlaying) {
+    if (sampled) {
+      const rawData = sampled.time, freqData = sampled.freq;
       const fBin = Math.min(bufLen - 1, cfg.fLow + Math.floor((i / M) * (cfg.fHigh - cfg.fLow)));
       const fNorm = freqData[fBin] / 255.0;
       const centerIdx = Math.min(bufLen - 1, Math.floor((i / M) * (bufLen * 0.6)));
@@ -11512,16 +11808,25 @@ function drawSymmetricalRing(cfg, cx, cy) {
 
   dyn.impulse *= 0.88;
 
-  const points = [];
+  const totalPts = M * 2;
+  if (!dyn.points || dyn.points.length !== totalPts) {
+    dyn.points = Array.from({ length: totalPts }, () => ({ x: 0, y: 0 }));
+  }
+  const points = dyn.points;
+  let pIdx = 0;
   for (let i = 0; i <= M; i++) {
     const frac = i / M; const angle = -Math.PI / 2 + frac * Math.PI;
     const r = cfg.baseRadius + dyn.offsets[i];
-    points.push({ x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r });
+    points[pIdx].x = cx + Math.cos(angle) * r;
+    points[pIdx].y = cy + Math.sin(angle) * r;
+    pIdx++;
   }
   for (let i = M - 1; i >= 1; i--) {
     const frac = i / M; const angle = -Math.PI / 2 - frac * Math.PI;
     const r = cfg.baseRadius + dyn.offsets[i];
-    points.push({ x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r });
+    points[pIdx].x = cx + Math.cos(angle) * r;
+    points[pIdx].y = cy + Math.sin(angle) * r;
+    pIdx++;
   }
 
   const numPts = points.length;
@@ -11544,11 +11849,9 @@ function drawSymmetricalRing(cfg, cx, cy) {
   }
 
   scopeCtx.save();
-  scopeCtx.strokeStyle = "rgba(8, 10, 14, 0.72)";
+  scopeCtx.strokeStyle = "rgba(8, 10, 14, 0.78)";
   scopeCtx.lineWidth = cfg.baseLineWidth + 1.8;
   scopeCtx.globalAlpha = Math.max(0.60, currentAlpha * 0.85);
-  scopeCtx.shadowColor = "rgba(0, 0, 0, 0.75)";
-  scopeCtx.shadowBlur = 4;
   tracePath();
   scopeCtx.stroke();
   scopeCtx.restore();
@@ -11558,7 +11861,8 @@ function drawSymmetricalRing(cfg, cx, cy) {
   scopeCtx.lineWidth = cfg.baseLineWidth;
   scopeCtx.globalAlpha = currentAlpha;
   scopeCtx.shadowColor = cfg.color;
-  const bloomRadius = 8 + dyn.energy * 14;
+  const isPhone = typeof PHONE_LAYOUT_MQ !== "undefined" && PHONE_LAYOUT_MQ.matches;
+  const bloomRadius = (isPhone ? 5 : 8) + dyn.energy * (isPhone ? 9 : 14);
   scopeCtx.shadowBlur = bloomRadius;
   tracePath();
   scopeCtx.stroke();
@@ -11569,8 +11873,6 @@ function drawSymmetricalRing(cfg, cx, cy) {
     scopeCtx.strokeStyle = "rgba(255, 255, 255, 0.65)";
     scopeCtx.lineWidth = Math.max(0.7, cfg.baseLineWidth * 0.32);
     scopeCtx.globalAlpha = Math.min(0.75, dyn.energy * 1.8 + 0.15);
-    scopeCtx.shadowColor = cfg.color;
-    scopeCtx.shadowBlur = 4;
     tracePath();
     scopeCtx.stroke();
     scopeCtx.restore();
@@ -11592,12 +11894,24 @@ function drawVisualizerCenterCore(cx, cy) {
   scopeCtx.restore();
 }
 
+let lastChordWheelSignature = "";
 function drawChordWheelCard() {
   if (!chordWheelCanvas || !chordWheelCtx) return;
 
-  const dpr = window.devicePixelRatio || 1;
+  updateInstrumentMeters();
+
+  const isPhone = typeof PHONE_LAYOUT_MQ !== "undefined" && PHONE_LAYOUT_MQ.matches;
+  const manualSig = (isManualChordActive && liveActiveChord)
+    ? `${liveActiveChord.rootMidi}:${liveActiveChord.chordQuality}:${liveActiveChord.sortedNotes.join(",")}`
+    : "auto";
+  const themeSig = (typeof activeTheme !== "undefined" && activeTheme) ? `${activeTheme.id}:${themeHex("chord")}` : "";
+  const sig = `${rootNote}|${activeScaleKey}|${currentChordVoicing}|${currentChordRootStep}|${currentChordDeg}|${manualSig}|${themeSig}|${isPhone ? 1 : 0}`;
+  if (sig === lastChordWheelSignature) return;
+  lastChordWheelSignature = sig;
+
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
   // Phones draw the wheel 1.55x so its 6.5px note names reach 10px.
-  const wheelK = PHONE_LAYOUT_MQ.matches ? 1.55 : 1;
+  const wheelK = isPhone ? 1.55 : 1;
   const size = 124; const cssSize = Math.round(size * wheelK); const targetBuffer = Math.round(cssSize * dpr);
   if (chordWheelCanvas.width !== targetBuffer || chordWheelCanvas.height !== targetBuffer) {
     chordWheelCanvas.width = targetBuffer; chordWheelCanvas.height = targetBuffer;
@@ -11723,130 +12037,174 @@ function drawChordWheelCard() {
 
   if (document.getElementById("telemTones")) document.getElementById("telemTones").textContent = toneNames;
   if (document.getElementById("telemIntervals")) document.getElementById("telemIntervals").textContent = intervalLabels;
-
-  updateInstrumentMeters();
 }
 
-// Chord Analysis activity bars. These used to read ringDynamics[].energy,
-// which is only updated while the oscilloscope rings are being drawn, so the
-// bars froze whenever the rings layer was off or Invaders was running. They
-// now measure the instrument analysers themselves, every frame. "ref" is the
-// energy that fills ~100% of the bar (chords and arp are far quieter on their
-// analysers than drone and drums); the curve is compressed so quiet parts
-// still show.
+// Chord Analysis activity bars. Reuses the per-frame analyser sampler so
+// droneAnalyser / drumAnalyser / chordAnalyser / arpAnalyser are only read
+// once per frame even when both the oscilloscope rings and meters are active.
 const INSTRUMENT_METERS = [
-  { el: "lvlDrone", ring: "drone",    ref: 0.30, e: 0 },
-  { el: "lvlDrum",  ring: "drum",     ref: 0.30, e: 0 },
-  { el: "lvlChord", ring: "chord",    ref: 0.08, e: 0 },
-  { el: "lvlArp",   ring: "arp_main", ref: 0.04, e: 0 }
+  { el: "lvlDrone", ring: "drone",    ref: 0.30, e: 0, barEl: null, lastPct: -1 },
+  { el: "lvlDrum",  ring: "drum",     ref: 0.30, e: 0, barEl: null, lastPct: -1 },
+  { el: "lvlChord", ring: "chord",    ref: 0.08, e: 0, barEl: null, lastPct: -1 },
+  { el: "lvlArp",   ring: "arp_main", ref: 0.04, e: 0, barEl: null, lastPct: -1 }
 ];
-let meterTimeBuf = null, meterFreqBuf = null;
 function updateInstrumentMeters() {
   for (const m of INSTRUMENT_METERS) {
-    const bar = document.getElementById(m.el);
+    if (!m.barEl) m.barEl = document.getElementById(m.el);
+    const bar = m.barEl;
     if (!bar) continue;
     const cfg = RING_CONFIGS.find(c => c.id === m.ring);
-    const analyser = cfg && cfg.getAnalyser();
+    const analyser = isPlaying && cfg ? cfg.getAnalyser() : null;
     let energy = 0;
-    if (analyser) {
-      const n = analyser.frequencyBinCount;
-      if (!meterTimeBuf || meterTimeBuf.length !== n) { meterTimeBuf = new Uint8Array(n); meterFreqBuf = new Uint8Array(n); }
-      analyser.getByteTimeDomainData(meterTimeBuf);
-      analyser.getByteFrequencyData(meterFreqBuf);
+    const sampled = sampleAnalyserForFrame(analyser);
+    if (sampled && cfg) {
+      const timeBuf = sampled.time, freqBuf = sampled.freq;
+      const n = timeBuf.length;
       let sumSq = 0, band = 0;
       for (let i = 0; i < n; i++) {
-        const d = (meterTimeBuf[i] - 128) / 128;
+        const d = (timeBuf[i] - 128) / 128;
         sumSq += d * d;
-        if (i >= cfg.fLow && i <= cfg.fHigh) band += meterFreqBuf[i];
+        if (i >= cfg.fLow && i <= cfg.fHigh) band += freqBuf[i];
       }
       energy = Math.sqrt(sumSq / n) * 0.55 + (band / ((cfg.fHigh - cfg.fLow + 1) * 255)) * 0.45;
     }
     m.e = m.e * 0.76 + energy * 0.24;
-    bar.style.width = Math.min(100, Math.round(Math.pow(m.e / m.ref, 0.65) * 100)) + "%";
+    const pct = Math.min(100, Math.round(Math.pow(m.e / m.ref, 0.65) * 100));
+    if (m.lastPct !== pct) {
+      m.lastPct = pct;
+      bar.style.width = pct + "%";
+    }
   }
 }
 
 function drawScope(ts) {
-  updateWaterfallSpectrogram();
-  const { w, h, cx, cy } = updateCanvasDimensions();
-  scopeCtx.fillStyle = "#0c0d11"; scopeCtx.fillRect(0, 0, w, h);
-
-  if (arcadeActive) {
-    drawArcadeGame(w, h, ts || performance.now());
-    syncArcadePad();
-  } else if (fractalModeEnabled) {
-    drawFractalVisualizer(w, h, ts || performance.now());
-  } else {
-    drawWaterfallSpectrogram(w, h);
-    drawFlightTerrainGrid(w, h);
-    drawRoadsideObjects(w, h);
-  }
-
-  // Tempo-synced rotation speed: a full revolution takes a fixed number of
-  // beats, so the angular speed itself scales with bpm -- faster music spins
-  // visibly faster. Keeps a faint drift (not a hard stop) while paused, to
-  // match how the rest of the visualizer dims rather than freezes when idle.
-  if (lastScopeFrameTs === null) lastScopeFrameTs = ts || performance.now();
-  const dtSec = Math.min(0.1, ((ts || performance.now()) - lastScopeFrameTs) / 1000);
-  lastScopeFrameTs = ts || performance.now();
-  const beatsPerSec = bpm / 60;
-  const revolutionBeats = 480; // one full 360 deg turn every 480 beats -- slow, "slight" rotation
-  scopeRotationAngle += dtSec * beatsPerSec * (Math.PI * 2 / revolutionBeats) * (isPlaying ? 1 : 0.15);
-
-  if (oscilloscopeRingsEnabled && !arcadeActive) {
-    // Capped at 2.3x -- uncapped, a large/HiDPI fullscreen viewport scaled
-    // the rings (and their shadowBlur glow, the single most expensive
-    // canvas op here) up 4x+, which is what made fullscreen choppy: blur
-    // cost grows with both the blur radius and the area it's spread over,
-    // and both were scaling with fit here.
-    const fit = scopeFullscreen ? Math.min(2.3, Math.min(w, h) / 330) : Math.min(1, Math.min(w, h) / 360);
-    scopeCtx.save();
-    scopeCtx.translate(cx, cy); scopeCtx.scale(fit, fit); scopeCtx.rotate(scopeRotationAngle); scopeCtx.translate(-cx, -cy);
-    drawReferenceTracks(cx, cy);
-    RING_CONFIGS.forEach(cfg => { drawSymmetricalRing(cfg, cx, cy); });
-    drawVisualizerCenterCore(cx, cy);
-    scopeCtx.restore();
-  }
-  drawChordWheelCard();
-  scopeAngle += 0.008;
-  renderKeyboardHighlights();
-
+  currentAnalyserFrameId++;
   const now = performance.now();
   for (const [midi, info] of activeMidiNotes) {
     if (now > info.expiry) activeMidiNotes.delete(midi);
   }
 
+  if (document.hidden) {
+    requestAnimationFrame(drawScope);
+    return;
+  }
+
+  if (scopeCanvasVisible || scopeFullscreen) {
+    updateWaterfallSpectrogram();
+    const { w, h, cx, cy } = updateCanvasDimensions();
+    scopeCtx.fillStyle = "#0c0d11"; scopeCtx.fillRect(0, 0, w, h);
+
+    if (arcadeActive) {
+      drawArcadeGame(w, h, ts || now);
+      syncArcadePad();
+    } else if (fractalModeEnabled) {
+      drawFractalVisualizer(w, h, ts || now);
+    } else {
+      drawWaterfallSpectrogram(w, h);
+      drawFlightTerrainGrid(w, h);
+      drawRoadsideObjects(w, h);
+    }
+
+    // Tempo-synced rotation speed: a full revolution takes a fixed number of
+    // beats, so the angular speed itself scales with bpm -- faster music spins
+    // visibly faster. Keeps a faint drift (not a hard stop) while paused, to
+    // match how the rest of the visualizer dims rather than freezes when idle.
+    if (lastScopeFrameTs === null) lastScopeFrameTs = ts || now;
+    const dtSec = Math.min(0.1, ((ts || now) - lastScopeFrameTs) / 1000);
+    lastScopeFrameTs = ts || now;
+    const beatsPerSec = bpm / 60;
+    const revolutionBeats = 480; // one full 360 deg turn every 480 beats -- slow, "slight" rotation
+    scopeRotationAngle += dtSec * beatsPerSec * (Math.PI * 2 / revolutionBeats) * (isPlaying ? 1 : 0.15);
+
+    if (oscilloscopeRingsEnabled && !arcadeActive) {
+      const fit = scopeFullscreen ? Math.min(2.3, Math.min(w, h) / 330) : Math.min(1, Math.min(w, h) / 360);
+      scopeCtx.save();
+      scopeCtx.translate(cx, cy); scopeCtx.scale(fit, fit); scopeCtx.rotate(scopeRotationAngle); scopeCtx.translate(-cx, -cy);
+      drawReferenceTracks(cx, cy);
+      RING_CONFIGS.forEach(cfg => { drawSymmetricalRing(cfg, cx, cy); });
+      drawVisualizerCenterCore(cx, cy);
+      scopeCtx.restore();
+    }
+    scopeAngle += 0.008;
+  }
+
+  drawChordWheelCard();
+  renderKeyboardHighlights();
+
   requestAnimationFrame(drawScope);
 }
 requestAnimationFrame(drawScope);
 
+// Track active pointer -> midi note mapping so touch glissando (sliding a
+// finger across keys on mobile) smoothly releases the previous key and plays
+// the newly entered key without leaving stuck notes.
+const pointerActiveMidi = new Map();
+
 function bindKeyEvents(el, midi) {
   el.addEventListener("pointerdown", (e) => {
     e.preventDefault();
+    pointerActiveMidi.set(e.pointerId, midi);
     startNoteLive(midi, 90);
   });
   el.addEventListener("pointerup", (e) => {
     e.preventDefault();
-    stopNoteLive(midi);
+    const activeMidi = pointerActiveMidi.get(e.pointerId);
+    pointerActiveMidi.delete(e.pointerId);
+    stopNoteLive(activeMidi !== undefined ? activeMidi : midi);
   });
   el.addEventListener("pointerleave", (e) => {
-    if (heldMidiNotes.has(midi)) {
+    if (e.pointerType !== "touch" && heldMidiNotes.has(midi)) {
       stopNoteLive(midi);
     }
   });
   el.addEventListener("pointercancel", (e) => {
-    stopNoteLive(midi);
+    const activeMidi = pointerActiveMidi.get(e.pointerId);
+    pointerActiveMidi.delete(e.pointerId);
+    stopNoteLive(activeMidi !== undefined ? activeMidi : midi);
+  });
+  el.addEventListener("lostpointercapture", (e) => {
+    const activeMidi = pointerActiveMidi.get(e.pointerId);
+    if (activeMidi !== undefined) {
+      pointerActiveMidi.delete(e.pointerId);
+      stopNoteLive(activeMidi);
+    }
   });
   el.addEventListener("pointerenter", (e) => {
-    if (e.buttons === 1 && !heldMidiNotes.has(midi)) {
+    if (e.pointerType !== "touch" && e.buttons === 1 && !heldMidiNotes.has(midi)) {
       startNoteLive(midi, 90);
     }
   });
 }
 
+(function bindTouchKeyboardGlissando() {
+  const container = document.getElementById("keyboardContainer");
+  if (!container) return;
+  container.addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "touch" || !pointerActiveMidi.has(e.pointerId)) return;
+    const hit = document.elementFromPoint(e.clientX, e.clientY);
+    const keyEl = hit && hit.closest ? hit.closest(".black-key, .white-key") : null;
+    const prevMidi = pointerActiveMidi.get(e.pointerId);
+    if (!keyEl) {
+      if (prevMidi !== undefined) {
+        pointerActiveMidi.delete(e.pointerId);
+        stopNoteLive(prevMidi);
+      }
+      return;
+    }
+    const nextMidi = parseInt(keyEl.dataset.midi, 10);
+    if (!isNaN(nextMidi) && nextMidi !== prevMidi) {
+      if (prevMidi !== undefined) stopNoteLive(prevMidi);
+      pointerActiveMidi.set(e.pointerId, nextMidi);
+      startNoteLive(nextMidi, 90);
+    }
+  }, { passive: true });
+})();
+
+let cachedKeyElements = [];
 function buildKeyboard() {
   const container = document.getElementById("keyboardContainer");
   container.innerHTML = "";
+  cachedKeyElements = [];
 
   const whiteKeysLayer = document.createElement("div"); whiteKeysLayer.className = "white-keys-layer";
   const blackKeysLayer = document.createElement("div"); blackKeysLayer.className = "black-keys-layer";
@@ -11886,6 +12244,7 @@ function buildKeyboard() {
       whiteIdx++;
       bindKeyEvents(keyEl, midi);
       whiteKeysLayer.appendChild(keyEl);
+      cachedKeyElements.push({ el: keyEl, midi, lastClass: "" });
     }
   }
 
@@ -11902,6 +12261,7 @@ function buildKeyboard() {
   topLabel.textContent = `C${Math.floor(topMidi / 12) - 1}`; topKey.appendChild(topLabel);
   bindKeyEvents(topKey, topMidi);
   whiteKeysLayer.appendChild(topKey);
+  cachedKeyElements.push({ el: topKey, midi: topMidi, lastClass: "" });
 
   for (let oct = 0; oct < 2; oct++) {
     blackKeyOffsets.forEach((bk, bIdx) => {
@@ -11928,6 +12288,7 @@ function buildKeyboard() {
 
       bindKeyEvents(bKeyEl, midi);
       blackKeysLayer.appendChild(bKeyEl);
+      cachedKeyElements.push({ el: bKeyEl, midi, lastClass: "" });
     });
   }
 
@@ -11942,29 +12303,35 @@ function shiftOctave(delta) {
 
 function renderKeyboardHighlights() {
   const now = performance.now();
-  const allKeyEls = document.querySelectorAll(".white-key, .black-key");
 
-  allKeyEls.forEach(el => {
-    const midi = parseInt(el.dataset.midi);
-    el.classList.toggle("in-scale", isKeyLedLit(midi));
+  for (let i = 0; i < cachedKeyElements.length; i++) {
+    const item = cachedKeyElements[i];
+    const el = item.el;
+    const midi = item.midi;
+    const inScale = isKeyLedLit(midi);
+    let activeClass = "";
+
     if (activeMidiNotes.has(midi)) {
       const info = activeMidiNotes.get(midi);
       if (now < info.expiry) {
-        el.classList.remove("active-chord", "active-arp", "active-live");
-        if (info.source === "CHORD") el.classList.add("active-chord");
-        else if (info.source === "ARP") el.classList.add("active-arp");
-        else el.classList.add("active-live");
+        if (info.source === "CHORD") activeClass = "active-chord";
+        else if (info.source === "ARP") activeClass = "active-arp";
+        else activeClass = "active-live";
       } else {
-        el.classList.remove("active-chord", "active-arp", "active-live");
         activeMidiNotes.delete(midi);
       }
     } else if (heldMidiNotes.has(midi)) {
-      el.classList.remove("active-chord", "active-arp", "active-live");
-      el.classList.add(keyboardRoute === "CHORD" ? "active-chord" : "active-live");
-    } else {
-      el.classList.remove("active-chord", "active-arp", "active-live");
+      activeClass = keyboardRoute === "CHORD" ? "active-chord" : "active-live";
     }
-  });
+
+    const sig = (inScale ? "1:" : "0:") + activeClass;
+    if (item.lastClass !== sig) {
+      item.lastClass = sig;
+      el.classList.toggle("in-scale", inScale);
+      el.classList.remove("active-chord", "active-arp", "active-live");
+      if (activeClass) el.classList.add(activeClass);
+    }
+  }
 }
 
 const QWERTY_MAP = {
@@ -11992,6 +12359,8 @@ window.addEventListener('keyup', (e) => {
   }
 });
 
+let lastAppliedMasterDriveVal = null;
+
 function updateBpm(sourceEl) {
   bpm = parseInt((sourceEl || document.getElementById("knobBpm")).value);
   document.getElementById("knobBpm").value = bpm;
@@ -12004,12 +12373,14 @@ function updateBpm(sourceEl) {
     clearInterval(clockInterval);
     const ms = (60000 / bpm) / 4;
     clockInterval = setInterval(clockTick, ms);
+    scheduleAudioClockFallback();
     document.getElementById("footerStatus").textContent = "Engine: Running (" + bpm + " BPM)";
   } else if (liveArpTimer) {
     clearInterval(liveArpTimer);
     const ms = (60000 / bpm) / 4;
     liveArpTimer = setInterval(triggerLiveArpStep, ms);
   }
+  updateMediaSessionMetadata();
   // Keep a tempo-synced delay time locked to the new tempo immediately,
   // not just the next time some other control is touched.
   if (delayTempoSyncEnabled) updateAudioParams();
@@ -12270,6 +12641,28 @@ function updateAudioParams() {
   document.getElementById("lblArpGate").textContent = arpGateMs + " ms";
   document.getElementById("lblArpVol").textContent = Math.round(arpVol * 100) + "%";
 
+  // Read Master EQ & Tape Saturation UI values before checking audioCtx so
+  // moving these sliders while stopped still updates their DOM readout labels.
+  if (document.getElementById("knobEqLow")) {
+    masterEqLowVal = parseFloat(document.getElementById("knobEqLow").value);
+    document.getElementById("lblEqLow").textContent = (masterEqLowVal > 0 ? "+" : "") + masterEqLowVal.toFixed(1) + " dB";
+  }
+  if (document.getElementById("knobEqMid")) {
+    masterEqMidVal = parseFloat(document.getElementById("knobEqMid").value);
+    document.getElementById("lblEqMid").textContent = (masterEqMidVal > 0 ? "+" : "") + masterEqMidVal.toFixed(1) + " dB";
+  }
+  if (document.getElementById("knobEqHigh")) {
+    masterEqHighVal = parseFloat(document.getElementById("knobEqHigh").value);
+    document.getElementById("lblEqHigh").textContent = (masterEqHighVal > 0 ? "+" : "") + masterEqHighVal.toFixed(1) + " dB";
+  }
+  if (document.getElementById("knobMasterDrive")) {
+    masterDriveVal = parseFloat(document.getElementById("knobMasterDrive").value);
+    document.getElementById("lblMasterDrive").textContent = Math.round(masterDriveVal) + "%";
+  }
+  if (typeof syncAllSmartDropdowns === 'function') {
+    syncAllSmartDropdowns();
+  }
+
   if (!audioCtx) return;
 
   if (drumBusGain) drumBusGain.gain.setTargetAtTime(isChannelAudible('drum') ? drumVol * 0.78 : 0, audioCtx.currentTime, 0.05);
@@ -12322,21 +12715,25 @@ function updateAudioParams() {
     noiseDryGain.gain.setTargetAtTime(1.0 - (effNoiseFx * 0.5), audioCtx.currentTime, 0.05);
   }
 
-  // Phase 4: Cascaded 24dB/oct Filter Fine-Tuning (staggered Q + automatic resonance headroom compensation)
+  // Phase 4: Cascaded 24dB/oct Filter Fine-Tuning (respecting FILTER pedal bypass state)
+  const filterBypassed = typeof pedalBypassState !== "undefined" && pedalBypassState.FILTER;
   if (masterFilter1 && masterFilter2) {
-    masterFilter1.frequency.setTargetAtTime(masterBaseCutoff, audioCtx.currentTime, 0.04);
-    masterFilter2.frequency.setTargetAtTime(masterBaseCutoff, audioCtx.currentTime, 0.04);
-    masterFilter1.Q.setTargetAtTime(masterResonance, audioCtx.currentTime, 0.04);
-    masterFilter2.Q.setTargetAtTime(Math.max(0.5, masterResonance * 0.72), audioCtx.currentTime, 0.04);
+    const effCutoff = filterBypassed ? 20000 : masterBaseCutoff;
+    const effRes1 = filterBypassed ? 0.5 : masterResonance;
+    const effRes2 = filterBypassed ? 0.5 : Math.max(0.5, masterResonance * 0.72);
+    masterFilter1.frequency.setTargetAtTime(effCutoff, audioCtx.currentTime, 0.04);
+    masterFilter2.frequency.setTargetAtTime(effCutoff, audioCtx.currentTime, 0.04);
+    masterFilter1.Q.setTargetAtTime(effRes1, audioCtx.currentTime, 0.04);
+    masterFilter2.Q.setTargetAtTime(effRes2, audioCtx.currentTime, 0.04);
     if (masterFilterCompGain) {
-      const resExcess = Math.max(0, masterResonance - 1.5);
+      const resExcess = filterBypassed ? 0 : Math.max(0, masterResonance - 1.5);
       const compGain = 1.0 / (1.0 + resExcess * 0.058);
       masterFilterCompGain.gain.setTargetAtTime(compGain, audioCtx.currentTime, 0.05);
     }
   }
   if (filterLFO) filterLFO.frequency.setTargetAtTime(filterLfoRateHz, audioCtx.currentTime, 0.1);
   if (filterLFODepthGain) {
-    const safeLfoExcursion = Math.min(masterBaseCutoff * 0.78, masterBaseCutoff * filterLfoDepth * 0.55);
+    const safeLfoExcursion = filterBypassed ? 0 : Math.min(masterBaseCutoff * 0.78, masterBaseCutoff * filterLfoDepth * 0.55);
     filterLFODepthGain.gain.setTargetAtTime(safeLfoExcursion, audioCtx.currentTime, 0.1);
   }
 
@@ -12353,39 +12750,23 @@ function updateAudioParams() {
   if (delayFeedbackGain) delayFeedbackGain.gain.setTargetAtTime(delayLoopGain(), audioCtx.currentTime, 0.12);
   if (delayDampingFilter) delayDampingFilter.frequency.setTargetAtTime(delayToneHz, audioCtx.currentTime, 0.08);
   if (delayLFOGain) delayLFOGain.gain.setTargetAtTime(0.0035 * (delayFlutterVal / 100), audioCtx.currentTime, 0.08);
+  const delayBypassed = typeof pedalBypassState !== "undefined" && pedalBypassState.DELAY;
   if (delayDryGain && delayWetGain) {
-    delayDryGain.gain.setTargetAtTime(1.0 - (delayMixVal * 0.45), audioCtx.currentTime, 0.08);
-    delayWetGain.gain.setTargetAtTime(delayMixVal * 0.85, audioCtx.currentTime, 0.08);
+    delayDryGain.gain.setTargetAtTime(delayBypassed ? 1.0 : 1.0 - (delayMixVal * 0.45), audioCtx.currentTime, 0.08);
+    delayWetGain.gain.setTargetAtTime(delayBypassed ? 0 : delayMixVal * 0.85, audioCtx.currentTime, 0.08);
   }
-  if (reverbSend) reverbSend.gain.setTargetAtTime(weatherVal * reverbMixVal, audioCtx.currentTime, 0.1);
+  const spaceBypassed = typeof pedalBypassState !== "undefined" && pedalBypassState.SPACE;
+  if (reverbSend) reverbSend.gain.setTargetAtTime(spaceBypassed ? 0 : weatherVal * reverbMixVal, audioCtx.currentTime, 0.1);
   if (reverbToneFilter) reverbToneFilter.frequency.setTargetAtTime(reverbToneHz, audioCtx.currentTime, 0.08);
-  if (chorusWetGain) chorusWetGain.gain.setTargetAtTime(chorusMixVal, audioCtx.currentTime, 0.08);
+  if (chorusWetGain) chorusWetGain.gain.setTargetAtTime(spaceBypassed ? 0 : chorusMixVal, audioCtx.currentTime, 0.08);
 
-  // Master EQ & Out Parameters (with Phase 4 Asymmetric Analog Tape Saturation Curve)
-  if (document.getElementById("knobEqLow")) {
-    masterEqLowVal = parseFloat(document.getElementById("knobEqLow").value);
-    document.getElementById("lblEqLow").textContent = (masterEqLowVal > 0 ? "+" : "") + masterEqLowVal.toFixed(1) + " dB";
-    if (masterEqLow && audioCtx) masterEqLow.gain.setTargetAtTime(masterEqLowVal, audioCtx.currentTime, 0.05);
-  }
-  if (document.getElementById("knobEqMid")) {
-    masterEqMidVal = parseFloat(document.getElementById("knobEqMid").value);
-    document.getElementById("lblEqMid").textContent = (masterEqMidVal > 0 ? "+" : "") + masterEqMidVal.toFixed(1) + " dB";
-    if (masterEqMid && audioCtx) masterEqMid.gain.setTargetAtTime(masterEqMidVal, audioCtx.currentTime, 0.05);
-  }
-  if (document.getElementById("knobEqHigh")) {
-    masterEqHighVal = parseFloat(document.getElementById("knobEqHigh").value);
-    document.getElementById("lblEqHigh").textContent = (masterEqHighVal > 0 ? "+" : "") + masterEqHighVal.toFixed(1) + " dB";
-    if (masterEqHigh && audioCtx) masterEqHigh.gain.setTargetAtTime(masterEqHighVal, audioCtx.currentTime, 0.05);
-  }
-  if (document.getElementById("knobMasterDrive")) {
-    masterDriveVal = parseFloat(document.getElementById("knobMasterDrive").value);
-    document.getElementById("lblMasterDrive").textContent = Math.round(masterDriveVal) + "%";
-    if (masterDriveNode && audioCtx) {
-      masterDriveNode.curve = makeAnalogTapeCurve(masterDriveVal, 1024);
-    }
-  }
-  if (typeof syncAllSmartDropdowns === 'function') {
-    syncAllSmartDropdowns();
+  // Apply Master EQ & Tape Saturation Curve (only regenerating the 1024-sample Float32Array when drive changes)
+  if (masterEqLow) masterEqLow.gain.setTargetAtTime(masterEqLowVal, audioCtx.currentTime, 0.05);
+  if (masterEqMid) masterEqMid.gain.setTargetAtTime(masterEqMidVal, audioCtx.currentTime, 0.05);
+  if (masterEqHigh) masterEqHigh.gain.setTargetAtTime(masterEqHighVal, audioCtx.currentTime, 0.05);
+  if (masterDriveNode && lastAppliedMasterDriveVal !== masterDriveVal) {
+    lastAppliedMasterDriveVal = masterDriveVal;
+    masterDriveNode.curve = makeAnalogTapeCurve(masterDriveVal, 1024);
   }
 }
 
@@ -12563,6 +12944,7 @@ function randomizeKeyScale(triggerSound = false) {
   buildKeyboard();
   updateChordHud();
   updateDronePitches(true);
+  if (typeof updateMediaSessionMetadata === "function") updateMediaSessionMetadata();
   if (isPlaying && triggerSound) {
     setTimeout(() => { if (isPlaying) triggerCurrentChord(); }, 40);
   }
@@ -13954,6 +14336,7 @@ function togglePlay() {
     status.textContent = "Engine: Running (" + bpm + " BPM)";
     stopLiveArp();
     const ms = (60000 / bpm) / 4; clockInterval = setInterval(clockTick, ms);
+    scheduleAudioClockFallback();
     triggerCurrentChord();
     startSessionTimer();
     midiSubSync();
@@ -13976,6 +14359,7 @@ function togglePlay() {
   } else {
     btn.classList.remove("active"); label.textContent = "Start";
     status.textContent = "Engine: Paused"; clearInterval(clockInterval);
+    stopAudioClockFallback();
     stopSessionTimer();
     midiAllNotesOff();
 
@@ -14003,10 +14387,12 @@ function togglePlay() {
   // note-triggered instruments) actually starts/stops right away instead of
   // waiting for the next unrelated param change.
   updateAudioParams();
+  syncMediaSessionPlaybackState();
 }
 
 function panicMute() {
   if (isPlaying) togglePlay();
+  stopAudioClockFallback();
   stopLiveArp();
   for (const [m] of Array.from(activeLiveVoices.entries())) {
     stopNoteLive(m, true);
@@ -14015,7 +14401,9 @@ function panicMute() {
   activeLiveVoices.clear();
   activeMidiNotes.clear();
   recentChordNotes.clear();
+  if (typeof pointerActiveMidi !== "undefined") pointerActiveMidi.clear();
   if (audioCtx) audioCtx.suspend();
+  syncMediaSessionPlaybackState();
   document.getElementById("footerStatus").textContent = "Engine: Muted";
 }
 
@@ -14985,7 +15373,7 @@ window.addEventListener("keydown", (e) => {
   function mount(canvas, userOpts) {
     const opt = Object.assign({ size: 0, color: '#33ff33', speed: 0.22, quality: 'auto' }, userOpts || {});
     const ctx = canvas.getContext('2d');
-    let cssSize = opt.size || canvas.clientWidth || 340;
+    let cssSize = canvas.clientWidth || opt.size || 128;
     const q = opt.quality === 'auto' ? (cssSize < 220 ? 'low' : 'high') : opt.quality;
     const meshOpts = q === 'low' ? { cols: 56, rowStep: 0.085, domeRows: 11, detail: 0.6 } : { cols: 66, rowStep: 0.072, domeRows: 13, detail: 0.9 };
     const mesh = root.EnoHeadCore.buildMesh(meshOpts);
@@ -14993,24 +15381,42 @@ window.addEventListener("keydown", (e) => {
 
     let rotY = 0.95, rotX = 0.05, speed = opt.speed, rgb = hexToRgb(opt.color);
     let energy = 0, pulse = 0, kick = 0, dragging = false, lx = 0, ly = 0, analyser = null, buf = null, avgLow = 0, lastBeat = 0, raf = 0, last = performance.now();
+    let needsResize = true, cachedDpr = Math.min(2, root.devicePixelRatio || 1), isVisible = true;
+
+    if (typeof IntersectionObserver !== 'undefined') {
+      try {
+        new IntersectionObserver((entries) => {
+          if (entries[0]) isVisible = entries[0].isIntersecting;
+        }, { threshold: 0.01 }).observe(canvas);
+      } catch (err) {}
+    }
+    root.addEventListener && root.addEventListener('resize', () => { needsResize = true; });
+    root.addEventListener && root.addEventListener('orientationchange', () => { needsResize = true; });
 
     function resize() {
-      cssSize = opt.size || canvas.clientWidth || cssSize;
-      const dpr = Math.min(2, root.devicePixelRatio || 1), px = Math.round(cssSize * dpr);
+      if (!needsResize && canvas.width > 0) return cachedDpr;
+      cssSize = canvas.clientWidth || opt.size || cssSize || 128;
+      cachedDpr = Math.min(2, root.devicePixelRatio || 1);
+      const px = Math.round(cssSize * cachedDpr);
       if (canvas.width !== px) { canvas.width = px; canvas.height = px; }
       rend.o.size = cssSize; rend.o.scale = cssSize * 0.34;
-      return dpr;
+      needsResize = false;
+      return cachedDpr;
     }
 
     canvas.addEventListener('pointerdown', (e) => { dragging = true; lx = e.clientX; ly = e.clientY; canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId); });
     canvas.addEventListener('pointerup', () => { dragging = false; });
+    canvas.addEventListener('pointercancel', () => { dragging = false; });
     canvas.addEventListener('pointermove', (e) => {
       if (!dragging) return;
       rotY += (e.clientX - lx) * 0.01; rotX = Math.max(-0.6, Math.min(0.6, rotX + (e.clientY - ly) * 0.006)); lx = e.clientX; ly = e.clientY;
     });
 
     function pollAnalyser(now) {
-      if (!analyser) return;
+      if (!analyser || (typeof isPlaying !== 'undefined' && !isPlaying)) {
+        energy *= 0.85;
+        return;
+      }
       if (!buf || buf.length !== analyser.frequencyBinCount) buf = new Uint8Array(analyser.frequencyBinCount);
       analyser.getByteFrequencyData(buf);
       let low = 0, all = 0; const nLow = Math.max(3, Math.floor(buf.length * 0.06));
@@ -15024,7 +15430,10 @@ window.addEventListener("keydown", (e) => {
     function beat(s) { pulse = Math.max(pulse, s == null ? 1 : s); kick += 0.05 * (s == null ? 1 : s); }
 
     function frame(now) {
-      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      raf = requestAnimationFrame(frame);
+      if (document.hidden || !isVisible) { last = now; return; }
+      if (!dragging && (now - last) < 31) return; // Smooth ~30fps cap for 3D software z-buffer
+      const dt = Math.min(0.06, (now - last) / 1000); last = now;
       pollAnalyser(now);
       const dpr = resize();
       if (!dragging) { rotY += (speed * (0.6 + energy * 2.2) + kick * 6) * dt * 2.2; }
@@ -15046,7 +15455,6 @@ window.addEventListener("keydown", (e) => {
       ctx.strokeStyle = col(Math.min(1, 0.38 * flare + 0.22)); ctx.lineWidth = 0.7 * lw; trace(res.visible);
       ctx.strokeStyle = col(0.95); ctx.lineWidth = 1.3 * lw; trace(res.rim);
       ctx.globalCompositeOperation = 'source-over';
-      raf = requestAnimationFrame(frame);
     }
     raf = requestAnimationFrame(frame);
 
@@ -15056,6 +15464,7 @@ window.addEventListener("keydown", (e) => {
       attachAnalyser(node) { analyser = node; },
       setColor(c) { opt.color = c; rgb = hexToRgb(c); },
       setSpeed(s) { speed = s; },
+      requestResize() { needsResize = true; },
       destroy() { cancelAnimationFrame(raf); }
     };
   }
@@ -15074,7 +15483,7 @@ let enoHeadController = null;
   const enoCanvasEl = document.getElementById("enoWidgetCanvas");
   if (enoCanvasEl) {
     const enoEngine = (typeof EnoHead !== "undefined") ? EnoHead : (typeof window !== "undefined" && window.EnoHead ? window.EnoHead : null);
-    if (enoEngine) enoHeadController = enoEngine.mount(enoCanvasEl, { size: 128, color: ENO_PHOSPHORS[0].color, speed: 0.22, quality: 'high' });
+    if (enoEngine) enoHeadController = enoEngine.mount(enoCanvasEl, { size: 128, color: ENO_PHOSPHORS[0].color, speed: 0.22, quality: 'low' });
     updateHeaderEnoGlow(ENO_PHOSPHORS[enoPhosIndex].color);
     if (typeof masterAnalyser !== "undefined" && masterAnalyser) enoHeadController.attachAnalyser(masterAnalyser);
   }
@@ -15691,6 +16100,7 @@ function expandModuleOrb(orbId) {
   title.style.color = orb.color;
 
   body.innerHTML = "";
+  body.scrollTop = 0;
   const sourceStrip = getOrbModuleElement(orb);
   if (sourceStrip) {
     body.appendChild(sourceStrip);
@@ -15770,28 +16180,51 @@ function restoreStripsToRack() {
   if (movedAPedal && typeof updatePedalsOrderUI === "function") updatePedalsOrderUI();
 }
 
+let cachedOrbitalW = 0, cachedOrbitalH = 0, orbitalNeedsResize = true;
+let orbitalCanvasVisible = true, orbitalVisibilityObserverBound = false;
+window.addEventListener("resize", () => { orbitalNeedsResize = true; });
+window.addEventListener("orientationchange", () => { orbitalNeedsResize = true; });
+
 function loopOrbitalPhysics() {
-  if (activeModuleView === "orbital" && orbitalCanvas && orbitalCtx) {
-    updateAndDrawOrbitalCanvas();
+  if (activeModuleView === "orbital" && orbitalCanvas && orbitalCtx && !document.hidden) {
+    if (!orbitalVisibilityObserverBound && typeof IntersectionObserver !== "undefined") {
+      orbitalVisibilityObserverBound = true;
+      try {
+        new IntersectionObserver((entries) => {
+          if (entries[0]) orbitalCanvasVisible = entries[0].isIntersecting;
+        }, { threshold: 0.01 }).observe(orbitalCanvas);
+      } catch (err) {}
+    }
+    // Skip canvas redraw when scrolled off-screen or when the phone module sheet
+    // covers 100% of the orbital arena (once initial orb positions are ready).
+    const coveredByPhoneSheet = PHONE_ORB_MQ.matches && orbitalPanelActive && ORBITAL_MODULES[0] && ORBITAL_MODULES[0].initialized;
+    if (orbitalCanvasVisible && !coveredByPhoneSheet) {
+      updateAndDrawOrbitalCanvas();
+    }
   }
   requestAnimationFrame(loopOrbitalPhysics);
 }
 
-let cachedOrbitalW = 0, cachedOrbitalH = 0;
 function updateAndDrawOrbitalCanvas() {
-  const dpr = window.devicePixelRatio || 1;
+  const onPhone = PHONE_ORB_MQ.matches;
+  const rawDpr = window.devicePixelRatio || 1;
+  const dpr = onPhone ? Math.min(1.5, rawDpr) : Math.min(2, rawDpr);
   const parent = orbitalCanvas.parentElement;
-  const rect = parent.getBoundingClientRect();
-  const w = Math.round(parent.clientWidth || rect.width || 800);
-  const h = Math.round(parent.clientHeight || rect.height || 380);
 
-  if (Math.abs(w - cachedOrbitalW) > 1 || Math.abs(h - cachedOrbitalH) > 1) {
-    cachedOrbitalW = w;
-    cachedOrbitalH = h;
-    orbitalCanvas.width = w * dpr;
-    orbitalCanvas.height = h * dpr;
-    initStars(w, h);
+  if (orbitalNeedsResize || !cachedOrbitalW || !cachedOrbitalH) {
+    const w = Math.round(parent.clientWidth || 800);
+    const h = Math.round(parent.clientHeight || 380);
+    if (Math.abs(w - cachedOrbitalW) > 1 || Math.abs(h - cachedOrbitalH) > 1 || orbitalCanvas.width !== Math.round(w * dpr)) {
+      cachedOrbitalW = w;
+      cachedOrbitalH = h;
+      orbitalCanvas.width = Math.round(w * dpr);
+      orbitalCanvas.height = Math.round(h * dpr);
+      initStars(w, h);
+    }
+    orbitalNeedsResize = false;
   }
+  const w = cachedOrbitalW;
+  const h = cachedOrbitalH;
 
   orbitalCtx.resetTransform();
   orbitalCtx.scale(dpr, dpr);
@@ -15831,17 +16264,13 @@ function updateAndDrawOrbitalCanvas() {
     orbitalCtx.stroke();
   }
 
-  const tempBuf = new Uint8Array(64);
   const padding = 20;
 
   let leftPad = padding;
-  if (orbitalPanelActive) {
+  if (orbitalPanelActive && !onPhone) {
     const panelEl = document.getElementById("orbitalSidePanel");
-    // On phones (<=640px) the panel overlays the full arena card (100% width),
-    // not a left side panel, so it shouldn't push the orbs sideways.
-    const isPhoneLayout = typeof window.matchMedia === "function" && window.matchMedia("(max-width: 640px)").matches;
-    if (panelEl && !isPhoneLayout && getComputedStyle(panelEl).position !== "fixed") {
-      leftPad = (panelEl.offsetWidth || panelEl.getBoundingClientRect().width) + 24;
+    if (panelEl && getComputedStyle(panelEl).position !== "fixed") {
+      leftPad = (panelEl.offsetWidth || 320) + 24;
     }
   }
 
@@ -15866,23 +16295,18 @@ function updateAndDrawOrbitalCanvas() {
     let energy = 0;
     if (isPlaying) {
       const an = orb.analyser();
-      if (an) {
-        an.getByteFrequencyData(tempBuf);
+      const sampled = typeof sampleAnalyserForFrame === "function" ? sampleAnalyserForFrame(an) : null;
+      if (sampled) {
+        const freqBuf = sampled.freq;
         let sum = 0;
-        for (let k = 1; k < 16; k++) sum += tempBuf[k];
-        energy = sum / (15 * 255.0);
+        const limit = Math.min(16, freqBuf.length);
+        for (let k = 1; k < limit; k++) sum += freqBuf[k];
+        energy = sum / (Math.max(1, limit - 1) * 255.0);
       }
     }
     orb.pulse = orb.pulse * 0.91 + energy * 0.14;
-    // Bump decays much slower than the audio pulse -- a chill, cushioned
-    // fade for collisions/wall bounces instead of a quick flash, while the
-    // audio-reactive pulse above keeps its own snappier rhythm untouched.
     orb.bump *= 0.965;
 
-    // Organic celestial wander: each orb meanders independently along smooth
-    // curved paths -- skipped entirely while the orb is being dragged, since
-    // handleOrbitalPointerMove is already driving its x/y directly and this
-    // would otherwise fight the pointer every frame.
     if (orb.id !== draggedOrbId) {
       if (orb.heading === undefined) {
         orb.heading = Math.atan2(orb.vy || 0.15, orb.vx || 0.15);
@@ -15890,8 +16314,6 @@ function updateAndDrawOrbitalCanvas() {
       const wanderFreq = 0.0007 + (i * 0.00025);
       orb.heading += Math.sin(now * wanderFreq + i * 1.9) * 0.007;
 
-      // Split the difference: perfectly balanced gentle celestial drift (~18 px/sec when paused).
-      // orbFloatSpeedMult (Float Speed slider) scales the whole thing, 0 = frozen in place.
       const currentSpeed = (isPlaying
         ? (0.40 + energy * 0.55 + orb.pulse * 0.20)
         : 0.30) * orbFloatSpeedMult;
@@ -15902,7 +16324,6 @@ function updateAndDrawOrbitalCanvas() {
       orb.x += orb.vx;
       orb.y += orb.vy;
 
-      // Subtle fluid wave undulation responding to audio track energy
       if (isPlaying && energy > 0.03) {
         const wave = Math.sin(now * 0.0018 + orb.baseR) * energy * 0.16 * orbFloatSpeedMult;
         orb.x += -Math.sin(orb.heading) * wave;
@@ -15938,14 +16359,6 @@ function updateAndDrawOrbitalCanvas() {
     }
   });
 
-  // Inter-orb soft-spring separation. minDist carries a generous extra
-  // buffer beyond simple contact (was +6, now +22) so orbs keep real
-  // distance between each other instead of constantly grazing -- this also
-  // gives the constellation chain lines more visible length/room to read as
-  // actual lines instead of disappearing between near-touching orbs. The
-  // overlap-resolution strength is also higher (0.25 -> 0.38) so when orbs
-  // do get crowded they untangle in a frame or two instead of lingering
-  // stuck against each other.
   for (let i = 0; i < ORBITAL_MODULES.length; i++) {
     for (let j = i + 1; j < ORBITAL_MODULES.length; j++) {
       const o1 = ORBITAL_MODULES[i];
@@ -15980,9 +16393,6 @@ function updateAndDrawOrbitalCanvas() {
         o1.heading = Math.atan2(o1.vy, o1.vx);
         o2.heading = Math.atan2(o2.vy, o2.vx);
 
-        // Chill bounce: a modest bump that decays slowly (see the 0.965
-        // falloff above), instead of the old sharp pulse spike that read as
-        // a flash rather than a cushioned collision.
         const bumpAmt = isPlaying ? 0.16 : 0.05;
         o1.bump = Math.min(0.8, o1.bump + bumpAmt);
         o2.bump = Math.min(0.8, o2.bump + bumpAmt);
@@ -16012,8 +16422,10 @@ function updateAndDrawOrbitalCanvas() {
 
     orbitalCtx.strokeStyle = orb.color;
     orbitalCtx.lineWidth = 1.6 + excite * 1.4;
-    orbitalCtx.shadowColor = orb.color;
-    orbitalCtx.shadowBlur = 10 + excite * 16;
+    if (!onPhone) {
+      orbitalCtx.shadowColor = orb.color;
+      orbitalCtx.shadowBlur = 10 + excite * 16;
+    }
     orbitalCtx.beginPath();
     orbitalCtx.arc(orb.x, orb.y, curR, 0, Math.PI * 2);
     orbitalCtx.stroke();
@@ -16029,8 +16441,10 @@ function updateAndDrawOrbitalCanvas() {
     if (orb.id === expandedOrbId) {
       orbitalCtx.strokeStyle = orb.color;
       orbitalCtx.lineWidth = 2.4;
-      orbitalCtx.shadowColor = orb.color;
-      orbitalCtx.shadowBlur = 12;
+      if (!onPhone) {
+        orbitalCtx.shadowColor = orb.color;
+        orbitalCtx.shadowBlur = 12;
+      }
       orbitalCtx.beginPath();
       orbitalCtx.arc(orb.x, orb.y, curR + 8, 0, Math.PI * 2);
       orbitalCtx.stroke();
@@ -16043,7 +16457,6 @@ function updateAndDrawOrbitalCanvas() {
     orbitalCtx.arc(orb.x, orb.y, curR * 0.65, 0, Math.PI * 2);
     orbitalCtx.stroke();
 
-    const onPhone = PHONE_ORB_MQ.matches;
     if (!onPhone) {   // phones show just the number and name, no centre crosshair
       orbitalCtx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.45)`;
       orbitalCtx.beginPath();
@@ -16526,12 +16939,13 @@ window.addEventListener("keydown", (e) => {
     const body = document.getElementById("orbitalModalBody");
     if (body) { body.style.transition = ""; body.style.transform = ""; body.style.opacity = ""; }
   }
-  // Step to the neighbouring module, sliding its controls in from the swipe side.
+  // Step to the neighbouring module in the live signal chain, sliding its controls in from the swipe side.
   function stepModule(dir) {
     if (typeof ORBITAL_MODULES === "undefined" || typeof expandModuleOrb !== "function") return;
-    const idx = ORBITAL_MODULES.findIndex((o) => o.id === expandedOrbId);
+    const chain = (typeof getOrbitalConnectionChain === "function") ? getOrbitalConnectionChain() : ORBITAL_MODULES;
+    const idx = chain.findIndex((o) => o.id === expandedOrbId);
     if (idx < 0) return;
-    const next = ORBITAL_MODULES[(idx + dir + ORBITAL_MODULES.length) % ORBITAL_MODULES.length];
+    const next = chain[(idx + dir + chain.length) % chain.length];
     expandModuleOrb(next.id);
     const body = document.getElementById("orbitalModalBody");
     if (body && body.animate) {
@@ -16586,62 +17000,27 @@ window.addEventListener("keydown", (e) => {
     header.addEventListener("pointercancel", end);
   }
 
-  //    Opening another orb while the sheet is up swaps its content in place;
-  //    start the new module at the top instead of the old scroll position.
-  function initSheetScrollReset() {
-    const title = document.getElementById("orbitalModalTitle");
-    const body = document.getElementById("orbitalModalBody");
-    if (!title || !body || !("MutationObserver" in window)) return;
-    new MutationObserver(() => { if (mq.matches) body.scrollTop = 0; })
-      .observe(title, { childList: true, characterData: true, subtree: true });
-  }
-
   // 4. Dropdown menus opened inside the sheet live in its scrolling body, so
   //    anything past the body's edges is clipped. On open, scroll the control
-  //    up to the top of the body (room to open downward), then -- after any
-  //    other placement code has run -- cap the menu to the room left inside
-  //    the body if it still doesn't fit (the menu then scrolls itself).
-  const FIT_PROPS = ["top", "bottom", "maxHeight", "overflowY"];
-  function fitMenuInSheet(menu, body, trigger) {
-    if (!mq.matches || !menu.classList.contains("open")) return;
-    const b = body.getBoundingClientRect();
-    const top = b.top + 4, bottom = b.bottom - 4;
-    const m = menu.getBoundingClientRect();
-    if (m.top >= top - 1 && m.bottom <= bottom + 1) return;
-    const a = trigger.getBoundingClientRect();
-    const below = Math.floor(bottom - a.bottom - 2), above = Math.floor(a.top - top - 2);
-    const up = above > below;
-    menu.dataset.sheetFit = "1";
-    menu.style.top = up ? "auto" : "calc(100% + 2px)";
-    menu.style.bottom = up ? "calc(100% + 2px)" : "auto";
-    menu.style.maxHeight = Math.max(96, up ? above : below) + "px";
-    menu.style.overflowY = "auto";
-  }
+  //    up toward the top of the body before placeMenu() measures and sizes it.
   document.addEventListener("click", (e) => {
     if (!mq.matches || !e.target || !e.target.closest) return;
     const trigger = e.target.closest("#orbitalModalBody .custom-dropdown-trigger");
     const body = document.getElementById("orbitalModalBody");
     const menu = trigger && trigger.parentElement ? trigger.parentElement.querySelector(".custom-dropdown-menu") : null;
     if (!trigger || !body || !menu || menu.classList.contains("open")) return;
-    if (menu.dataset.sheetFit) { FIT_PROPS.forEach((p) => { menu.style[p] = ""; }); delete menu.dataset.sheetFit; }
     const row = trigger.closest(".control-row") || trigger;
     const lift = row.getBoundingClientRect().top - body.getBoundingClientRect().top - 12;
     if (lift > 0) body.scrollTop += lift;
-    requestAnimationFrame(() => requestAnimationFrame(() => fitMenuInSheet(menu, body, trigger)));
   }, true);
 
   function onMq() {
     if (!mq.matches) {
       resetDrag();
-      document.querySelectorAll(".custom-dropdown-menu[data-sheet-fit]").forEach((menu) => {
-        FIT_PROPS.forEach((p) => { menu.style[p] = ""; });
-        delete menu.dataset.sheetFit;
-      });
     }
   }
 
   try { initSheetSwipe(); } catch (e) {}
-  try { initSheetScrollReset(); } catch (e) {}
   onMqChange(onMq);
   onMq();
   if (mq.matches) stretchInitialLayout();

@@ -789,3 +789,45 @@ Still unverified on a real iPhone: phone portrait layout, orb sheet width, silen
   - `Velvet Horizon` (`applyPreset(4)`) ➔ `Velvet`
   - `Khan Lineage` (`applyPreset(7)`) ➔ `Lineage`
   - `Aphex Twin` (`applyPreset(11)`) ➔ `Twinning`
+
+## Update — 2026-10-15 (OS Music Player MediaSession, Orbital Pedal Switching, Mobile & Engine Optimizations)
+
+1. **OS-Level Music Player / Media Session Integration**:
+   - Integrated full `navigator.mediaSession` controller:
+     - Shows `"Slambient Meander Engine"` as artist, active preset as track title, and active musical scale, meter, and BPM in the album field (e.g. `D Dorian · 7/4 · 72 BPM`).
+     - Added dynamic `512×512` canvas artwork generation (`getMediaSessionArtworkUrl`) themed to the active color palette with seed/oscilloscope visualizer art for OS Lock Screen, Dynamic Island, and Control Center.
+     - Bound OS media action handlers for `play`, `pause`, `stop`, `previoustrack`, and `nexttrack` (cycles through preset bank from lock screen, AirPods, or hardware media keys).
+   - Added a 10-second looping silent PCM WAV `<audio>` element (`ensureSilentMediaElement()`) synced to `isPlaying`, satisfying iOS/Android background audio policies requiring an active media element playback session (`>= 5s`) to keep lock screen controls active.
+   - Added a hardware-threaded Web Audio clock fallback (`scheduleAudioClockFallback()`) using single-sample `AudioBufferSourceNode` chains so Slambient maintains exact tempo and clock timing even when the screen is locked or the browser tab is backgrounded (`document.hidden`).
+
+2. **Orbital View Pedal Chain Switching Fixes**:
+   - Fixed the module shift arrows (`◀` / `▶`) in pedal chassis modules (`FILTER`, `DELAY`, `SPACE`) for Orbital View:
+     - Added `swapPedalOrbPositions(keyA, keyB)`: shifting a pedal in the DSP chain now swaps the two orbs' `(x, y, vx, vy, heading)` canvas coordinates and gives them a soft visual bump.
+     - Updated `rewireDspChain()` to invoke `updatePedalsOrderUI()` synchronously at the start of reordering, immediately updating pedal slot badges, shift button states, and modal header titles (`6. FILTER` ➔ `7. FILTER`).
+     - Updated phone bottom sheet swipe handling (`stepModule(dir)`) to traverse `getOrbitalConnectionChain()` instead of the static module array, ensuring that swiping left/right on the bottom sheet navigates through the live reordered pedal chain.
+     - Set `body.scrollTop = 0` directly inside `expandModuleOrb()` and removed the sheet title `MutationObserver` that was causing unexpected scroll resets during pedal shifts.
+
+3. **Audio Engine Performance & Drag Latency Optimizations**:
+   - **Eliminated `ConvolverNode` Re-partitioning on Slider Drag**:
+     - Fixed `applyReverbMode(mode)`: guarded `reverbNode.buffer = reverbImpulseCache[mode]` with `if (reverbNode.buffer !== reverbImpulseCache[mode])`. Previously, moving any slider in the application caused `updateAudioParams()` to reassign the impulse response buffer every single frame, forcing the browser's audio thread to re-partition a 3.5s–7.0s stereo FFT convolution kernel on every slider drag!
+   - **Cached Analog Tape Saturation Curve**:
+     - Guarded `masterDriveNode.curve = makeAnalogTapeCurve(masterDriveVal, 1024)` so it only regenerates the Float32Array curve when `masterDriveVal` actually changes.
+   - **Automatic Voice Disconnection & Node Pooling**:
+     - Added `disconnectOnEnded(sourceNode, tailNode)` helper and wired it to all per-note voices (`stopNoteLive`, `triggerSympatheticStrings`, `playSynthVoice`, `playArpNote`, `playKick`, `playSnare`, `playWoodblock`, `playHiHat`, `playDayan`, `playBayan`, `triggerNoiseEvent`). Short-lived voice nodes and filters disconnect from summing buses upon decay, eliminating memory leaks and Web Audio node graph bloat.
+   - **Preserved Pedal Bypass in Audio Updates**:
+     - Updated `updateAudioParams()` to check `pedalBypassState.FILTER`, `pedalBypassState.DELAY`, and `pedalBypassState.SPACE` so touching unrelated sliders does not overwrite bypassed pedal parameters. Moved Master EQ/Drive UI label sync above `if (!audioCtx) return;` so slider values update their readouts before audio is started.
+
+4. **Visualizer, Canvas & Mobile UI Smoothness**:
+   - **Per-Frame `AnalyserNode` Sampler**:
+     - Added `sampleAnalyserForFrame(analyser)` so the oscilloscope rings, instrument meters, and orbital canvas share a single sample per frame per analyser instead of making multiple redundant Web Audio API calls.
+   - **Off-Screen & Background Rendering Gating**:
+     - Added `IntersectionObserver` visibility listeners to `#scopeCanvas` and `#orbitalCanvas`. Canvas drawing and geometry calculations are skipped when scrolled out of view, when the tab is hidden, or on mobile when the bottom sheet modal covers 100% of the orbital arena.
+   - **Mobile DPR Cap**:
+     - Capped canvas DPR at `1.5` on mobile devices (`PHONE_LAYOUT_MQ` / `PHONE_ORB_MQ`), preventing mobile GPUs from filling oversized pixel buffers with expensive `shadowBlur`.
+   - **Chord Wheel & Instrument Meters Dirty-Checking**:
+     - Added state signature dirty-checking to `drawChordWheelCard()` so the Circle-of-Fifths canvas and text telemetry only redraw when harmony, voicing, or root step actually changes. Cached instrument meter element references and only updated `bar.style.width` when integer percentages change.
+   - **Touch Keyboard Glissando**:
+     - Added touch sliding support on the keyboard (`pointermove` with `document.elementFromPoint`), enabling smooth finger sweeps across piano keys on phones and tablets with proper note handoff and zero stuck notes.
+   - **Eno 3D Pod Optimization**:
+     - Switched default model configuration to the low-poly mesh, throttled software depth buffer rendering to 30fps when not actively being dragged, and added visibility gating.
+
