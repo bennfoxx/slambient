@@ -7267,6 +7267,8 @@ let masterVolumeGain;
 let masterVolumeVal = 0.85;
 let masterMuted = false;
 let drumBusGain, arpBusGain, noiseBusGain;
+let spatialChord = null, spatialArp = null, spatialNoise = null, spatialTanpura = null;
+let lastSpatialDriftTime = 0;
 let noiseDryGain, noiseFxSendGain, noiseAnalyser;
 let noiseBedSource, noiseBedFilter1, noiseBedFilter2, noiseBedPan, noiseBedGain;
 let noiseGustLFO, noiseGustLFOGain, noiseSweepLFO, noiseSweepLFOGain, noisePanLFO, noisePanLFOGain;
@@ -7581,6 +7583,140 @@ function enableMediaPlaybackSession() {
 }
 
 // ==========================================================================
+// BINAURAL SPATIAL DRIFT & ACOUSTIC ORBIT ENGINE
+// Psychoacoustic ITD (Interaural Time Difference), head-shadow ILD,
+// and slow coprime orbital LFO sweeps across the soundstage.
+// ==========================================================================
+
+class BinauralSpatialPanner {
+  constructor(audioCtx, options = {}) {
+    this.ctx = audioCtx;
+    this.channelName = options.channelName || 'voice';
+    this.driftSpeed = options.driftSpeed || 0.05; // Hz
+    this.maxSpread = options.maxSpread || 0.65;   // 0.0 to 1.0 pan breadth
+    this.centerAnchor = options.centerAnchor || 0.0;
+
+    // Signal Graph
+    this.input = audioCtx.createGain();
+    this.input.channelCount = 2;
+    this.input.channelCountMode = "explicit";
+    this.splitter = audioCtx.createChannelSplitter(2);
+    
+    // Left & Right Ear Paths
+    this.gainL = audioCtx.createGain();
+    this.gainR = audioCtx.createGain();
+    
+    // ITD Micro-Delays (max 0.65 ms Haas phase effect)
+    this.delayL = audioCtx.createDelay(0.002);
+    this.delayR = audioCtx.createDelay(0.002);
+    this.delayL.delayTime.value = 0.0001;
+    this.delayR.delayTime.value = 0.0001;
+
+    // Head-Shadow Damping Filter (rolls off high frequencies on opposite ear)
+    this.shadowL = audioCtx.createBiquadFilter();
+    this.shadowR = audioCtx.createBiquadFilter();
+    this.shadowL.type = 'highshelf';
+    this.shadowR.type = 'highshelf';
+    this.shadowL.frequency.value = 3500;
+    this.shadowR.frequency.value = 3500;
+
+    this.merger = audioCtx.createChannelMerger(2);
+    this.output = audioCtx.createGain();
+
+    // Wiring
+    this.input.connect(this.splitter);
+    
+    // Left ear path
+    this.splitter.connect(this.delayL, 0);
+    this.delayL.connect(this.shadowL);
+    this.shadowL.connect(this.gainL);
+    this.gainL.connect(this.merger, 0, 0);
+
+    // Right ear path
+    this.splitter.connect(this.delayR, 1);
+    this.delayR.connect(this.shadowR);
+    this.shadowR.connect(this.gainR);
+    this.gainR.connect(this.merger, 0, 1);
+
+    this.merger.connect(this.output);
+
+    this.currentPan = 0;
+    this.phase = Math.random() * Math.PI * 2;
+  }
+
+  // Called on each frame or clock tick to update spatial drift
+  updateDrift(dtSec, macroWeather = 50) {
+    // Weather macro accelerates drift velocity and widens the stereo orbit
+    const weatherMult = 0.5 + (macroWeather / 100);
+    this.phase += dtSec * this.driftSpeed * weatherMult * Math.PI * 2;
+    
+    // Smooth sinusoidal orbit with subtle organic wobble
+    const wobble = Math.sin(this.phase * 0.37) * 0.15;
+    const pan = Math.max(-1, Math.min(1, Math.sin(this.phase) * this.maxSpread + wobble + this.centerAnchor));
+    this.setPan(pan);
+  }
+
+  setPan(pan) {
+    this.currentPan = pan;
+    const now = this.ctx.currentTime;
+    const tConst = 0.04; // Smooth click-free interpolation
+
+    // 1. Equal-power gain balance
+    const angle = (pan + 1) * (Math.PI / 4); // 0 to PI/2
+    const gL = Math.cos(angle);
+    const gR = Math.sin(angle);
+    this.gainL.gain.setTargetAtTime(gL, now, tConst);
+    this.gainR.gain.setTargetAtTime(gR, now, tConst);
+
+    // 2. Interaural Time Difference (ITD): up to 0.65ms opposite ear delay
+    const maxItd = 0.00065; // 650 microseconds
+    if (pan < 0) {
+      // Sound on Left -> Right ear is delayed
+      this.delayL.delayTime.setTargetAtTime(0.00002, now, tConst);
+      this.delayR.delayTime.setTargetAtTime(Math.abs(pan) * maxItd, now, tConst);
+      // Head shadow rolls off highs on the far ear (up to -4.5 dB shelf)
+      this.shadowR.gain.setTargetAtTime(pan * 4.5, now, tConst);
+      this.shadowL.gain.setTargetAtTime(0, now, tConst);
+    } else {
+      // Sound on Right -> Left ear is delayed
+      this.delayR.delayTime.setTargetAtTime(0.00002, now, tConst);
+      this.delayL.delayTime.setTargetAtTime(pan * maxItd, now, tConst);
+      this.shadowL.gain.setTargetAtTime(-pan * 4.5, now, tConst);
+      this.shadowR.gain.setTargetAtTime(0, now, tConst);
+    }
+  }
+
+  disconnect() {
+    try {
+      this.input.disconnect();
+      this.splitter.disconnect();
+      this.delayL.disconnect(); this.delayR.disconnect();
+      this.shadowL.disconnect(); this.shadowR.disconnect();
+      this.gainL.disconnect(); this.gainR.disconnect();
+      this.merger.disconnect();
+      this.output.disconnect();
+    } catch (e) {}
+  }
+}
+
+function updateSpatialDrift(nowMs) {
+  if (!isPlaying || !spatialChord) return;
+  const now = nowMs || performance.now();
+  if (!lastSpatialDriftTime) {
+    lastSpatialDriftTime = now;
+    return;
+  }
+  const dtSec = Math.min(0.2, (now - lastSpatialDriftTime) / 1000);
+  lastSpatialDriftTime = now;
+  if (dtSec <= 0) return;
+  const macroWeather = (typeof weatherVal === "number" ? weatherVal * 100 : 50);
+  if (spatialChord) spatialChord.updateDrift(dtSec, macroWeather);
+  if (spatialArp) spatialArp.updateDrift(dtSec, macroWeather);
+  if (spatialNoise) spatialNoise.updateDrift(dtSec, macroWeather);
+  if (spatialTanpura) spatialTanpura.updateDrift(dtSec, macroWeather);
+}
+
+// ==========================================================================
 // MASTER CLOCK: SAMPLE-ACCURATE AUDIOWORKLET ENGINE + FALLBACK
 // ==========================================================================
 let workletClockNode = null;
@@ -7850,7 +7986,9 @@ function initAudio() {
   noiseBusGain = audioCtx.createGain(); noiseBusGain.gain.value = 0.0001; // soft startup gated until play
 
   chordBusGain = audioCtx.createGain(); chordBusGain.gain.value = chordVol;
-  chordBusGain.connect(masterGain);
+  spatialChord = new BinauralSpatialPanner(audioCtx, { channelName: 'chord', maxSpread: 0.45, driftSpeed: 0.043 });
+  chordBusGain.connect(spatialChord.input);
+  spatialChord.output.connect(masterGain);
 
   droneOsc1 = audioCtx.createOscillator();
   droneOsc2 = audioCtx.createOscillator();
@@ -7958,7 +8096,9 @@ function initAudio() {
 
   tanpuraBusGain = audioCtx.createGain();
   tanpuraBusGain.gain.value = 0.0001; // soft startup: gated until transport engagement
-  tanpuraBusGain.connect(droneAnalyser);
+  spatialTanpura = new BinauralSpatialPanner(audioCtx, { channelName: 'tanpura', maxSpread: 0.25, driftSpeed: 0.017 });
+  tanpuraBusGain.connect(spatialTanpura.input);
+  spatialTanpura.output.connect(droneAnalyser);
 
   // 5. ATMOSPHERE & NOISE Continuous Bed Engine
   noiseBedSource = audioCtx.createBufferSource();
@@ -8033,12 +8173,18 @@ function initAudio() {
   chordFxSendGain.connect(masterBusPre);
 
   arpDryGain = audioCtx.createGain(); arpFxSendGain = audioCtx.createGain();
-  arpBusGain.connect(arpAnalyser); arpAnalyser.connect(arpDryGain);
+  spatialArp = new BinauralSpatialPanner(audioCtx, { channelName: 'arp', maxSpread: 0.75, driftSpeed: 0.071 });
+  arpBusGain.connect(spatialArp.input);
+  spatialArp.output.connect(arpAnalyser);
+  arpAnalyser.connect(arpDryGain);
   arpDryGain.connect(masterBusPost); arpAnalyser.connect(arpFxSendGain);
   arpFxSendGain.connect(masterBusPre);
 
   noiseDryGain = audioCtx.createGain(); noiseFxSendGain = audioCtx.createGain();
-  noiseBusGain.connect(noiseAnalyser); noiseAnalyser.connect(noiseDryGain);
+  spatialNoise = new BinauralSpatialPanner(audioCtx, { channelName: 'noise', maxSpread: 0.85, driftSpeed: 0.031 });
+  noiseBusGain.connect(spatialNoise.input);
+  spatialNoise.output.connect(noiseAnalyser);
+  noiseAnalyser.connect(noiseDryGain);
   noiseDryGain.connect(masterBusPost); noiseAnalyser.connect(noiseFxSendGain);
   noiseFxSendGain.connect(masterBusPre);
 
@@ -12952,6 +13098,8 @@ function drawScope(ts) {
   for (const [midi, info] of activeMidiNotes) {
     if (now > info.expiry) activeMidiNotes.delete(midi);
   }
+
+  if (typeof updateSpatialDrift === "function") updateSpatialDrift(ts || now);
 
   if (document.hidden) {
     requestAnimationFrame(drawScope);
