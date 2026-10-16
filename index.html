@@ -169,7 +169,7 @@
     gap: 14px;
     position: sticky;
     top: 0;
-    z-index: 3000;
+    z-index: 10002;
     overflow: visible;
     /* Break out of body's own padding so the frosted backdrop reaches the
        true viewport edges while scrolled, then restore that spacing with
@@ -296,7 +296,7 @@
   .preset-bank-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     width: 100%;
     gap: 8px;
     box-sizing: border-box;
@@ -2455,20 +2455,25 @@
 
   .orbital-side-panel {
     position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 620px;
-    max-width: 88vw;
+    top: calc(var(--header-bottom, 106px) + 8px);
+    height: calc(100vh - var(--header-bottom, 106px) - 20px);
+    height: calc(100dvh - var(--header-bottom, 106px) - 20px);
+    max-height: calc(100vh - var(--header-bottom, 106px) - 20px);
+    left: 50%;
+    transform: translate(-50%, -8px) scale(0.98);
+    opacity: 0;
+    width: 640px;
+    max-width: calc(100vw - 32px);
     background: linear-gradient(145deg, rgba(var(--modal-accent-rgb, 0, 229, 255), 0.08) 0%, rgba(9, 12, 20, 0.98) 42%, #070910 100%);
-    border-right: 2px solid var(--modal-accent-color, var(--color-drone));
-    box-shadow: 14px 0 36px var(--modal-accent-glow, rgba(var(--rgb-drone), 0.35)), inset -1px 0 0 rgba(var(--modal-accent-rgb, 0, 229, 255), 0.25), inset 0 0 20px rgba(0,0,0,0.8);
+    border: 1px solid var(--modal-accent-color, var(--color-drone));
+    border-radius: 8px;
+    box-shadow: 0 14px 44px rgba(0, 0, 0, 0.85), 0 0 28px var(--modal-accent-glow, rgba(var(--rgb-drone), 0.35)), inset 0 0 20px rgba(0,0,0,0.8);
     padding: 16px 18px;
     overflow-y: auto;
     z-index: 10000;
-    transform: translateX(-100%);
-    transition: transform 0.26s cubic-bezier(0.18, 0.89, 0.32, 1.1);
+    transition: transform 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.1), opacity 0.2s ease;
     pointer-events: none;
+    box-sizing: border-box;
   }
   @media (max-width: 900px) {
     .orbital-side-panel {
@@ -2476,8 +2481,12 @@
     }
   }
   .orbital-side-panel.active {
-    transform: translateX(0);
+    transform: translate(-50%, 0) scale(1);
+    opacity: 1;
     pointer-events: auto;
+  }
+  .orbital-side-panel .orbital-modal-actions-slot .pedal-drag-handle {
+    display: none !important;
   }
   .orbital-modal-header {
     display: grid;
@@ -3013,8 +3022,41 @@
     gap: 4px;
     flex-shrink: 0;
   }
+  .mini-pedal-drag-handle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 20px;
+    color: var(--text-tertiary);
+    cursor: grab;
+    opacity: 0.5;
+    transition: opacity 0.12s ease, color 0.12s ease;
+    flex-shrink: 0;
+  }
+  .mini-pedal-drag-handle:hover,
+  .mini-pedal-card:hover .mini-pedal-drag-handle {
+    opacity: 1;
+    color: var(--card-accent, #00e5ff);
+  }
+  .mini-pedal-card[draggable="true"] {
+    cursor: grab;
+  }
+  .mini-pedal-card.mini-pedal-dragging {
+    opacity: 0.45;
+    transform: scale(0.97);
+    cursor: grabbing !important;
+    border-color: var(--card-accent, #00e5ff);
+    box-shadow: 0 0 16px rgba(var(--card-rgb, 0, 229, 255), 0.45);
+  }
+  .mini-pedal-card.mini-pedal-drag-over {
+    border-color: #00e5ff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 0 14px rgba(0, 229, 255, 0.45), 0 4px 12px rgba(0, 0, 0, 0.7);
+  }
+
   .btn-mini-shift {
-    width: 20px;
+    width: 18px;
     height: 22px;
     padding: 0;
     display: inline-flex;
@@ -3023,7 +3065,7 @@
     background: #101420;
     border: 1px solid var(--border-light);
     color: var(--text-secondary);
-    border-radius: 2px;
+    border-radius: 3px;
     font-size: 8.5px;
     cursor: pointer;
     transition: all 0.1s ease;
@@ -3044,18 +3086,57 @@
     font-family: "JetBrains Mono", ui-monospace, monospace;
     font-size: 9px;
     font-weight: 800;
-    border-radius: 2px;
+    letter-spacing: 0.5px;
+    border-radius: 3px;
     background: #090c14;
     border: 1px solid var(--border-light);
-    color: var(--text-secondary);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.12s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn-mini-power.active {
+    background: rgba(var(--card-rgb, 0, 229, 255), 0.22);
+    border-color: var(--card-accent, #00e5ff);
+    color: var(--card-accent, #00e5ff);
+    box-shadow: 0 0 8px rgba(var(--card-rgb, 0, 229, 255), 0.4);
+  }
+  .btn-mini-power:hover:not(.active) {
+    color: #fff;
+    border-color: var(--border-bright);
+    background: #141926;
+  }
+
+  .btn-mini-randomize {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #090c14;
+    border: 1px solid var(--border-light);
+    color: var(--card-accent, var(--text-secondary));
+    border-radius: 3px;
     cursor: pointer;
     transition: all 0.12s ease;
   }
-  .btn-mini-power.active {
-    background: rgba(var(--card-rgb, 0, 229, 255), 0.18);
+  .btn-mini-randomize:hover {
+    color: #fff;
     border-color: var(--card-accent, #00e5ff);
-    color: var(--card-accent, #00e5ff);
-    box-shadow: 0 0 8px rgba(var(--card-rgb, 0, 229, 255), 0.35);
+    background: rgba(var(--card-rgb, 0, 229, 255), 0.2);
+    box-shadow: 0 0 8px rgba(var(--card-rgb, 0, 229, 255), 0.4);
+  }
+  .btn-mini-randomize:active {
+    transform: scale(0.92);
+  }
+  .btn-mini-randomize svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
   }
 
   .btn-mini-inspect {
@@ -3064,12 +3145,15 @@
     font-family: "JetBrains Mono", ui-monospace, monospace;
     font-size: 9.5px;
     font-weight: 800;
-    border-radius: 2px;
+    border-radius: 3px;
     background: rgba(var(--card-rgb, 0, 229, 255), 0.08);
     border: 1px solid rgba(var(--card-rgb, 0, 229, 255), 0.4);
     color: var(--card-accent, #00e5ff);
     cursor: pointer;
     transition: all 0.12s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
   .btn-mini-inspect:hover {
     background: rgba(var(--card-rgb, 0, 229, 255), 0.22);
@@ -3085,7 +3169,7 @@
     background: rgba(168, 85, 247, 0.15);
     border: 1px solid rgba(168, 85, 247, 0.35);
     padding: 2px 5px;
-    border-radius: 2px;
+    border-radius: 3px;
   }
 
   .strip-channel {
@@ -5377,7 +5461,7 @@
     .preset-bank-header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-start;
       width: 100%;
       margin-bottom: 2px;
       gap: 8px;
@@ -10348,8 +10432,11 @@ function renderBirdsEyePedalRack() {
     const canShiftDown = idx < order.length - 1;
 
     html += `
-      <div class="mini-pedal-card ${meta.class} ${isBypassed ? 'bypassed' : 'active'}" data-pedal="${key}" onclick="openMiniPedalInspector('${meta.orbId}', event)" title="Open ${meta.name} controls">
+      <div class="mini-pedal-card ${meta.class} ${isBypassed ? 'bypassed' : 'active'}" data-pedal="${key}" draggable="true" title="Drag to reorder • Click EDIT to inspect">
         <div class="mini-pedal-left">
+          <span class="mini-pedal-drag-handle" title="Click and drag to reorder effects in DSP chain">
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg>
+          </span>
           <span class="mini-pedal-badge">${num}</span>
           <div class="mini-pedal-info">
             <span class="mini-pedal-name">${meta.name}</span>
@@ -10357,10 +10444,11 @@ function renderBirdsEyePedalRack() {
           </div>
         </div>
         <div class="mini-pedal-actions" onclick="event.stopPropagation()">
-          <button type="button" class="btn-mini-shift" onclick="shiftPedalLeft('${key}', event)" ${!canShiftUp ? 'disabled' : ''} title="Move earlier in chain">▲</button>
-          <button type="button" class="btn-mini-shift" onclick="shiftPedalRight('${key}', event)" ${!canShiftDown ? 'disabled' : ''} title="Move later in chain">▼</button>
-          <button type="button" class="btn-mini-power ${isBypassed ? '' : 'active'}" onclick="togglePedalBypass('${key}', event)" title="${isBypassed ? 'Engage ' + meta.name : 'Bypass ' + meta.name}">
-            ${isBypassed ? 'BYP' : 'ON'}
+          <button type="button" class="btn-mini-power btn-power ${isBypassed ? '' : 'active'}" onclick="togglePedalBypass('${key}', event)" title="${isBypassed ? 'Turn ON ' + meta.name : 'Turn OFF ' + meta.name}">
+            PWR
+          </button>
+          <button type="button" class="badge-tag btn-mini-randomize" onclick="randomizePedalModule('${key}', event)" title="Randomize ${meta.name} parameters">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg>
           </button>
           <button type="button" class="btn-mini-inspect" onclick="openMiniPedalInspector('${meta.orbId}', event)" title="Inspect full controls">EDIT ↗</button>
         </div>
@@ -10370,7 +10458,7 @@ function renderBirdsEyePedalRack() {
 
   // Terminal Master EQ & Out Node (Node 10)
   html += `
-    <div class="mini-pedal-card mini-card-master active" data-pedal="MASTER" onclick="openMiniPedalInspector('space', event)" title="Open Master EQ & Out controls">
+    <div class="mini-pedal-card mini-card-master active" data-pedal="MASTER" title="Terminal Master Node • Click EDIT to inspect">
       <div class="mini-pedal-left">
         <span class="mini-pedal-badge">10</span>
         <div class="mini-pedal-info">
@@ -10379,13 +10467,18 @@ function renderBirdsEyePedalRack() {
         </div>
       </div>
       <div class="mini-pedal-actions" onclick="event.stopPropagation()">
-        <span class="mini-pedal-status-tag">ACTIVE</span>
+        <button type="button" class="badge-tag btn-mini-randomize" onclick="randomizePedalModule('MASTER', event)" title="Randomize Master EQ & Out parameters">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg>
+        </button>
         <button type="button" class="btn-mini-inspect" onclick="openMiniPedalInspector('space', event)" title="Inspect Master EQ & Out">EDIT ↗</button>
       </div>
     </div>
   `;
 
   rack.innerHTML = html;
+  if (typeof initMiniPedalDragAndDrop === "function") {
+    initMiniPedalDragAndDrop();
+  }
 }
 
 function shiftPedalLeft(key, ev) {
@@ -10461,6 +10554,137 @@ function togglePedalBypass(key, ev) {
   if (typeof renderBirdsEyePedalRack === "function") {
     renderBirdsEyePedalRack();
   }
+}
+
+function randomizePedalModule(key, ev) {
+  if (ev) {
+    if (typeof ev.stopPropagation === "function") ev.stopPropagation();
+    if (typeof ev.preventDefault === "function") ev.preventDefault();
+  }
+  if (key === 'FILTER') {
+    if (typeof randomizeFilter === "function") randomizeFilter();
+  } else if (key === 'DELAY') {
+    if (typeof randomizeDelay === "function") randomizeDelay();
+  } else if (key === 'SPACE') {
+    if (typeof randomizeReverbChorus === "function") randomizeReverbChorus();
+  } else if (key === 'MASTER') {
+    if (typeof randomizeSpace === "function") randomizeSpace();
+  }
+}
+
+function initMiniPedalDragAndDrop() {
+  const rack = document.getElementById("pedalBirdsEyeRack");
+  if (!rack) return;
+  const cards = rack.querySelectorAll(".mini-pedal-card[data-pedal]:not([data-pedal='MASTER'])");
+  let draggedKey = null;
+
+  cards.forEach(card => {
+    // 1. HTML5 Drag and Drop
+    card.addEventListener("dragstart", (e) => {
+      if (e.target.closest("button, a, input, select")) {
+        e.preventDefault();
+        return;
+      }
+      draggedKey = card.getAttribute("data-pedal");
+      card.classList.add("mini-pedal-dragging");
+      document.body.classList.add("pedal-dragging");
+      if (e.dataTransfer) {
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", draggedKey);
+      }
+    });
+
+    card.addEventListener("dragend", () => {
+      card.classList.remove("mini-pedal-dragging");
+      document.body.classList.remove("pedal-dragging");
+      cards.forEach(c => c.classList.remove("mini-pedal-drag-over"));
+      draggedKey = null;
+    });
+
+    card.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
+      const targetCard = e.currentTarget;
+      if (targetCard && targetCard.getAttribute("data-pedal") !== "MASTER") {
+        targetCard.classList.add("mini-pedal-drag-over");
+      }
+    });
+
+    card.addEventListener("dragleave", (e) => {
+      e.currentTarget.classList.remove("mini-pedal-drag-over");
+    });
+
+    card.addEventListener("drop", (e) => {
+      e.preventDefault();
+      e.currentTarget.classList.remove("mini-pedal-drag-over");
+      const targetKey = e.currentTarget.getAttribute("data-pedal");
+      if (draggedKey && targetKey && targetKey !== "MASTER" && draggedKey !== targetKey) {
+        reorderDspChainModules(draggedKey, targetKey);
+      }
+    });
+
+    // 2. Tactile Pointer Drag & Tap
+    let startX = 0, startY = 0, isDragging = false, dragPointerId = null;
+
+    card.addEventListener("pointerdown", (e) => {
+      if (e.target.closest("button, a, input, select")) return;
+      startX = e.clientX;
+      startY = e.clientY;
+      isDragging = false;
+      dragPointerId = e.pointerId;
+
+      const onPointerMove = (ev) => {
+        if (ev.pointerId !== dragPointerId) return;
+        const dist = Math.hypot(ev.clientX - startX, ev.clientY - startY);
+        if (dist > 6) {
+          if (!isDragging) {
+            isDragging = true;
+            draggedKey = card.getAttribute("data-pedal");
+            card.classList.add("mini-pedal-dragging");
+            document.body.classList.add("pedal-dragging");
+            try { card.setPointerCapture(dragPointerId); } catch(err) {}
+          }
+          const elUnder = document.elementFromPoint(ev.clientX, ev.clientY);
+          const overCard = elUnder ? elUnder.closest(".mini-pedal-card[data-pedal]:not([data-pedal='MASTER'])") : null;
+          cards.forEach(c => c.classList.toggle("mini-pedal-drag-over", c === overCard && c !== card));
+        }
+      };
+
+      const onPointerUp = (ev) => {
+        if (ev.pointerId !== dragPointerId) return;
+        window.removeEventListener("pointermove", onPointerMove);
+        window.removeEventListener("pointerup", onPointerUp);
+        window.removeEventListener("pointercancel", onPointerUp);
+
+        if (isDragging) {
+          try { card.releasePointerCapture(ev.pointerId); } catch(err) {}
+          card.classList.remove("mini-pedal-dragging");
+          document.body.classList.remove("pedal-dragging");
+          cards.forEach(c => c.classList.remove("mini-pedal-drag-over"));
+          const elUnder = document.elementFromPoint(ev.clientX, ev.clientY);
+          const targetCard = elUnder ? elUnder.closest(".mini-pedal-card[data-pedal]:not([data-pedal='MASTER'])") : null;
+          const targetKey = targetCard ? targetCard.getAttribute("data-pedal") : null;
+          if (draggedKey && targetKey && targetKey !== "MASTER" && draggedKey !== targetKey) {
+            reorderDspChainModules(draggedKey, targetKey);
+          }
+          isDragging = false;
+          draggedKey = null;
+        } else {
+          // Plain click on card body (outside buttons) -> open inspector
+          if (!e.target.closest("button, a, input, select")) {
+            const pedalKey = card.getAttribute("data-pedal");
+            const orbId = (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && PEDAL_KEY_TO_ORBITAL_ID[pedalKey])
+              ? PEDAL_KEY_TO_ORBITAL_ID[pedalKey] : pedalKey.toLowerCase();
+            openMiniPedalInspector(orbId, ev);
+          }
+        }
+      };
+
+      window.addEventListener("pointermove", onPointerMove);
+      window.addEventListener("pointerup", onPointerUp);
+      window.addEventListener("pointercancel", onPointerUp);
+    });
+  });
 }
 
 // Drag & drop handlers with unified Pointer Events + HTML5 drag fallback
@@ -10657,7 +10881,7 @@ function initPedalDragAndDrop() {
   });
 
   const isInteractive = (target) => {
-    return !!target.closest('input, select, button, .custom-dropdown-wrap, .custom-dropdown-trigger, .custom-dropdown-menu, label, canvas, .pedal-drag-handle, .btn-pedal-shift, .btn-power, .btn-mute, .btn-solo, .badge-tag, .module-drawer-toggle, .mini-pedal-card, .pedal-birds-eye-rack, .btn-pedal-action, .birds-eye-flow-bar');
+    return !!target.closest('input, select, button, .custom-dropdown-wrap, .custom-dropdown-trigger, .custom-dropdown-menu, label, canvas, .pedal-drag-handle, .btn-pedal-shift, .btn-power, .btn-mute, .btn-solo, .badge-tag, .module-drawer-toggle, .btn-pedal-action, .birds-eye-flow-bar');
   };
 
   allModuleCards.forEach(card => {
@@ -10668,8 +10892,8 @@ function initPedalDragAndDrop() {
     let activeKey = null;
 
     card.addEventListener("pointerdown", (e) => {
-      // Don't intercept if inside orbital view modal or on an interactive control
-      if (card.closest("#orbitalSidePanel")) return;
+      // Don't intercept if inside orbital view modal or on an interactive control or pedal-chain-module
+      if (card.closest("#orbitalSidePanel") || card.classList.contains("pedal-chain-module")) return;
       if (isInteractive(e.target)) return;
 
       startX = e.clientX;
@@ -20125,6 +20349,12 @@ function expandModuleOrb(orbId) {
     }
   }
 
+  const headerEl = document.querySelector(".header-bar-wrapper");
+  if (headerEl) {
+    const bottom = headerEl.getBoundingClientRect().bottom;
+    document.documentElement.style.setProperty("--header-bottom", `${Math.round(bottom)}px`);
+  }
+
   panel.classList.add("active");
 
   const backdrop = document.getElementById("orbitalModalBackdrop");
@@ -20156,7 +20386,8 @@ function collapseOrbitalToPedals() {
   const panel = document.getElementById("orbitalSidePanel");
   if (panel && panel.classList.contains("active")) {
     panel.style.transition = "transform 0.18s ease-in, opacity 0.16s ease-in";
-    panel.style.transform = "scale(0.92)";
+    const isMobile = window.matchMedia && window.matchMedia("(max-width: 640px)").matches;
+    panel.style.transform = isMobile ? "scale(0.92)" : "translate(-50%, -10px) scale(0.94)";
     panel.style.opacity = "0";
   }
   setTimeout(() => {
@@ -21137,7 +21368,7 @@ window.addEventListener("keydown", (e) => {
     if (!panel || !header) return;
     header.addEventListener("pointerdown", (e) => {
       if (!mq.matches || pid !== null || !panel.classList.contains("active")) return;
-      if (e.pointerType === "mouse" && e.button !== 0) return;
+      if (e.pointerType === "mouse") return;
       if (e.target.closest && e.target.closest("button, a, input, select, label, .custom-dropdown-wrap, .pedal-slot-badge")) return;
       pid = e.pointerId; startX = e.clientX; startY = e.clientY; dx = 0; dy = 0; axis = null; t0 = performance.now();
       try { header.setPointerCapture(pid); } catch (err) {}
