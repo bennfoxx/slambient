@@ -2800,15 +2800,60 @@
   }
   .lower-deck {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(280px, 320px);
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "sub   chord noise fx"
+      "drum  arp   field fx";
+    gap: 12px;
     align-items: stretch;
   }
-  @media (max-width: 1024px) {
-    .lower-deck { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .strip-channel.drone-ch  { grid-area: sub; }
+  .strip-channel.drum-ch   { grid-area: drum; }
+  .strip-channel.chord-ch  { grid-area: chord; }
+  .strip-channel.arp-ch    { grid-area: arp; }
+  .strip-channel.noise-ch  { grid-area: noise; }
+  .strip-channel.field-ch  { grid-area: field; }
+  .strip-channel.pedal-chain-module { grid-area: fx; }
+
+  @media (max-width: 1200px) {
+    .lower-deck {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(260px, 300px);
+      grid-template-areas:
+        "sub   chord fx"
+        "drum  arp   fx"
+        "noise field fx";
+      gap: 10px;
+    }
   }
+
+  @media (max-width: 900px) {
+    .lower-deck {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-areas:
+        "sub   chord"
+        "drum  arp"
+        "noise field"
+        "fx    fx";
+      gap: 10px;
+    }
+  }
+
   @media (max-width: 640px) {
-    .lower-deck { grid-template-columns: 1fr; gap: 10px; }
+    .lower-deck {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .strip-channel.drone-ch,
+    .strip-channel.drum-ch,
+    .strip-channel.chord-ch,
+    .strip-channel.arp-ch,
+    .strip-channel.noise-ch,
+    .strip-channel.field-ch,
+    .strip-channel.pedal-chain-module {
+      grid-area: auto;
+    }
   }
 
   /* =====================================================================
@@ -2832,24 +2877,42 @@
   .pedal-chain-module .panel-header-actions {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
   }
   .pedal-chain-module .btn-pedal-action {
-    background: #101420;
+    height: 24px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: #0d0f17;
     border: 1px solid var(--border-light);
     color: var(--text-secondary);
-    border-radius: 3px;
-    padding: 3px 6px;
-    font-size: 9px;
+    border-radius: 4px;
+    padding: 0 7px;
+    font-size: 9.5px;
     font-weight: 800;
-    font-family: "JetBrains Mono", ui-monospace, monospace;
+    letter-spacing: 0.5px;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     cursor: pointer;
     transition: all 0.12s ease;
+    line-height: 1;
+    white-space: nowrap;
   }
   .pedal-chain-module .btn-pedal-action:hover {
     color: #fff;
     border-color: #00e5ff;
     background: rgba(0, 229, 255, 0.12);
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.35);
+  }
+  .pedal-chain-module .btn-pedal-action:active {
+    transform: scale(0.95);
+  }
+  .pedal-chain-module .btn-pedal-action svg {
+    width: 11px;
+    height: 11px;
+    flex-shrink: 0;
   }
 
   .birds-eye-flow-bar {
@@ -2890,8 +2953,9 @@
   .pedal-birds-eye-rack {
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 8px;
     flex: 1 1 auto;
+    justify-content: space-between;
   }
 
   .mini-pedal-card {
@@ -2902,10 +2966,13 @@
     border: 1px solid var(--border-light);
     border-left: 3px solid var(--card-accent, #00e5ff);
     border-radius: 4px;
-    padding: 6px 8px;
+    padding: 8px 10px;
     gap: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     transition: all 0.14s ease;
+    flex: 1 1 auto;
+    min-height: 54px;
+    cursor: pointer;
   }
   .mini-pedal-card:hover {
     border-color: var(--card-accent, #00e5ff);
@@ -3086,6 +3153,11 @@
     border-color: rgba(var(--rgb-noise), 0.38);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--rgb-noise), 0.16);
   }
+  .strip-channel.field-ch  {
+    border-top: 3px solid var(--color-field);
+    border-color: rgba(var(--rgb-field), 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--rgb-field), 0.16);
+  }
   .strip-channel.filter-ch {
     border-top: 3px solid var(--color-filter);
     border-color: rgba(var(--rgb-filter), 0.38);
@@ -3116,6 +3188,7 @@
   .strip-channel.chord-ch  .panel-header { border-bottom-color: rgba(var(--rgb-chord), 0.25); }
   .strip-channel.arp-ch    .panel-header { border-bottom-color: rgba(var(--rgb-arp), 0.25); }
   .strip-channel.noise-ch  .panel-header { border-bottom-color: rgba(var(--rgb-noise), 0.25); }
+  .strip-channel.field-ch  .panel-header { border-bottom-color: rgba(var(--rgb-field), 0.25); }
   .strip-channel.filter-ch .panel-header { border-bottom-color: rgba(var(--rgb-filter), 0.25); }
   .strip-channel.delay-ch  .panel-header { border-bottom-color: rgba(var(--rgb-delay), 0.25); }
   .strip-channel.reverb-ch .panel-header { border-bottom-color: rgba(var(--rgb-reverb), 0.25); }
@@ -3131,10 +3204,48 @@
   .strip-channel.chord-ch  .panel-header > span:first-child { color: var(--color-chord);  text-shadow: 0 0 8px rgba(var(--rgb-chord), 0.35); }
   .strip-channel.arp-ch    .panel-header > span:first-child { color: var(--color-arp);    text-shadow: 0 0 8px rgba(var(--rgb-arp), 0.35); }
   .strip-channel.noise-ch  .panel-header > span:first-child { color: var(--color-noise);  text-shadow: 0 0 8px rgba(var(--rgb-noise), 0.35); }
+  .strip-channel.field-ch  .panel-header > span:first-child { color: var(--color-field);  text-shadow: 0 0 8px rgba(var(--rgb-field), 0.35); }
   .strip-channel.filter-ch .panel-header > span:first-child { color: var(--color-filter); text-shadow: 0 0 8px rgba(var(--rgb-filter), 0.35); }
   .strip-channel.delay-ch  .panel-header > span:first-child { color: var(--color-delay);  text-shadow: 0 0 8px rgba(var(--rgb-delay), 0.35); }
   .strip-channel.reverb-ch .panel-header > span:first-child { color: var(--color-reverb); text-shadow: 0 0 8px rgba(var(--rgb-reverb), 0.35); }
   .strip-channel.space-ch  .panel-header > span:first-child { color: var(--color-space);  text-shadow: 0 0 8px rgba(var(--rgb-space), 0.35); }
+
+  .strip-channel.field-ch .field-panel-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .strip-channel.field-ch .field-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .strip-channel.field-ch .field-actions .btn-field {
+    flex: 1;
+    height: 30px;
+    padding: 0 4px;
+    font-size: 10px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .strip-channel.field-ch .field-wave {
+    width: 100%;
+    height: 52px;
+    background: #060810;
+    border: 1px solid rgba(var(--rgb-field), 0.25);
+    border-radius: 4px;
+    display: block;
+  }
+  .strip-channel.field-ch .field-hint {
+    font-size: 9.5px;
+    color: var(--text-tertiary);
+    line-height: 1.35;
+    margin-top: 2px;
+  }
 
   .control-row {
     display: flex;
@@ -3160,6 +3271,7 @@
   .control-val.chord-val  { color: var(--color-chord); }
   .control-val.arp-val    { color: var(--color-arp); }
   .control-val.noise-val  { color: var(--color-noise); }
+  .control-val.field-val  { color: var(--color-field); }
   .control-val.filter-val { color: var(--color-filter); }
   .control-val.delay-val  { color: var(--color-delay); }
   .control-val.reverb-val { color: var(--color-reverb); }
@@ -3564,6 +3676,10 @@
     border: 1px solid var(--border-light);
     height: 28px;
     box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     padding: 0 12px;
     border-radius: 4px;
     font-size: 12.5px;
@@ -3572,6 +3688,11 @@
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     cursor: pointer;
     transition: all 0.12s ease;
+  }
+  .btn-pedal-action svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
   }
   .btn-pedal-action:hover {
     background: #181f32;
@@ -7921,13 +8042,21 @@
         <div class="control-label"><span>Noise Master Volume</span><span class="control-val noise-val" id="lblNoiseVol">32%</span></div>
         <input type="range" id="knobNoiseVol" min="0" max="100" value="32" oninput="updateAudioParams()">
       </div>
+    </div>
 
-      <!-- Phase 10: Pocket Field Recorder -->
-      <div class="field-panel" id="fieldPanel">
-        <div class="field-head">
-          <span class="control-label" style="margin:0;">Field Recorder (Mic / Found Sound)</span>
-          <span class="control-val noise-val" data-field-status>EMPTY</span>
+    <!-- 6. POCKET FIELD RECORDER (Dedicated Instrument Module) -->
+    <div class="strip-channel field-ch" id="fieldModule">
+      <div class="panel-header">
+        <span onclick="openModuleInOrbital(this.closest('.strip-channel'))" style="cursor: pointer;" title="6. FIELD — Click to open in orbital view">6. FIELD</span>
+        <div class="panel-header-actions">
+          <span class="control-val field-val" data-field-status style="font-size:10px;margin-right:2px;">EMPTY</span>
+          <button class="btn-power active" id="btnPower_field" onclick="toggleChannelPower('field')" title="Toggle Field Recorder Power (On / Off)">PWR</button>
+          <button class="btn-mute" id="btnMute_field" onclick="toggleMute('field')" title="Mute Field Recorder">M</button>
+          <button class="btn-solo" id="btnSolo_field" onclick="toggleSolo('field')" title="Solo Field Recorder">S</button>
+          <button class="badge-tag" style="color: var(--color-field); border-color: rgba(43,203,186,0.35);" onclick="randomizeField()" title="Randomize Field Recorder"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
         </div>
+      </div>
+      <div class="field-panel-body field-panel" id="fieldPanel">
         <canvas class="field-wave" data-field-wave width="480" height="68"></canvas>
         <div class="field-actions">
           <button type="button" class="btn-field" data-field-hold aria-label="Hold to record from the microphone"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>Hold to Rec</span></button>
@@ -7947,20 +8076,37 @@
           </select>
         </div>
         <div class="control-row">
-          <div class="control-label"><span>Field Sample Level</span><span class="control-val noise-val" id="lblFieldVol">70%</span></div>
+          <div class="control-label">
+            <span>FX Send (Filter/Delay)</span>
+            <span style="display:inline-flex;align-items:center;"><span class="control-val field-val" id="lblFieldFx">70%</span><button type="button" class="btn-aux-toggle active" id="btnAux_field" onclick="toggleChannelAux('field')" title="Toggle Aux FX Bus Routing for Field Recorder">AUX</button></span>
+          </div>
+          <input type="range" id="knobFieldFx" min="0" max="100" value="70" oninput="updateAudioParams()">
+        </div>
+        <div class="control-row">
+          <div class="control-label"><span>Field Master Volume</span><span class="control-val field-val" id="lblFieldVol">70%</span></div>
           <input type="range" id="knobFieldVol" min="0" max="100" value="70" oninput="fieldLevelChanged()">
         </div>
-        <div class="field-hint">Hold to record (a quick tap records 5 s, max 8 s). Phrases enter on bar turnarounds, the choir retunes to the live chord, and clicks/consonants ghost into the drums.</div>
+        <div class="field-hint">Hold to record (a quick tap records 5 s, max 8 s). Phrases enter on bar turnarounds, choir retunes to live chord, and clicks ghost into drums.</div>
       </div>
     </div>
 
-    <!-- 6. BIRDS-EYE VIEW PEDAL CHAIN MODULE (Entire chain in one instrument-sized module) -->
+    <!-- BIRDS-EYE VIEW PEDAL CHAIN MODULE (Entire chain in one instrument-sized module) -->
     <div class="strip-channel pedal-chain-module" id="pedalChainModule">
       <div class="panel-header">
-        <span onclick="openModuleInOrbital(this.closest('.strip-channel'))" style="cursor: pointer;" title="6. FX CHAIN — Click to open modular inspector">6. FX CHAIN</span>
+        <span onclick="openModuleInOrbital(this.closest('.strip-channel'))" style="cursor: pointer;" title="DSP FX CHAIN — Click to open modular inspector">DSP FX CHAIN</span>
         <div class="panel-header-actions">
-          <button type="button" class="btn-pedal-action" onclick="randomizeDspChain()" title="Shuffle DSP insert chain order">⟲ SHUFFLE</button>
-          <button type="button" class="btn-pedal-action" onclick="resetDspChain()" title="Reset order to Filter ➔ Delay ➔ Space">RESET</button>
+          <button type="button" class="btn-pedal-action btn-pedal-shuffle" onclick="randomizeDspChain(event)" title="Shuffle DSP insert chain order">
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/>
+              <polyline points="21 3 21 8 16 8"/>
+              <path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/>
+              <polyline points="3 21 3 16 8 16"/>
+            </svg>
+            <span>SHUFFLE</span>
+          </button>
+          <button type="button" class="btn-pedal-action btn-pedal-reset" onclick="resetDspChain(event)" title="Reset order to Filter ➔ Delay ➔ Space">
+            <span>RESET</span>
+          </button>
         </div>
       </div>
 
@@ -7998,8 +8144,18 @@
         <span class="routing-node-badge" style="color: var(--color-space); border-color: rgba(75, 123, 236, 0.4);">OUT</span>
       </div>
       <div class="pedals-header-actions">
-        <button class="btn-pedal-action" onclick="randomizeDspChain()" title="Randomly shuffle pedal insert order">⟲ SHUFFLE</button>
-        <button class="btn-pedal-action" onclick="resetDspChain()" title="Reset order to Filter ➔ Delay ➔ Space">RESET (F-D-S)</button>
+        <button type="button" class="btn-pedal-action btn-pedal-shuffle" onclick="randomizeDspChain(event)" title="Randomly shuffle pedal insert order">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/>
+            <polyline points="21 3 21 8 16 8"/>
+            <path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/>
+            <polyline points="3 21 3 16 8 16"/>
+          </svg>
+          <span>SHUFFLE</span>
+        </button>
+        <button type="button" class="btn-pedal-action btn-pedal-reset" onclick="resetDspChain(event)" title="Reset order to Filter ➔ Delay ➔ Space">
+          <span>RESET</span>
+        </button>
       </div>
     </div>
 
@@ -8211,7 +8367,7 @@
       <!-- 4. FINAL ELEMENT: MASTER EQ & OUT -->
       <div class="strip-channel master-eq-ch space-ch" id="masterEqOutStrip">
         <div class="panel-header">
-          <span>9. OUT</span>
+          <span>10. OUT</span>
           <button class="badge-tag" style="color: var(--color-space); border-color: rgba(75,123,236,0.3);" onclick="randomizeSpace()" title="Randomize Out"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
         </div>
         <div class="control-row">
@@ -8489,6 +8645,7 @@ let noiseRateVal = 0.45;
 let noiseDriftVal = 0.60;
 let noiseVol = 0.32;
 let noiseFxSend = 0.65;
+let fieldFxSend = 0.70;
 
 let arpPattern = "SHIMMER";
 let arpTimbre = "GLASS_FM";
@@ -8954,6 +9111,7 @@ let drumBusGain, arpBusGain, noiseBusGain;
 let spatialChord = null, spatialArp = null, spatialNoise = null, spatialTanpura = null;
 let lastSpatialDriftTime = 0;
 let noiseDryGain, noiseFxSendGain, noiseAnalyser;
+let fieldDryGain, fieldFxSendGain, fieldAnalyser;
 let noiseBedSource, noiseBedFilter1, noiseBedFilter2, noiseBedPan, noiseBedGain;
 let noiseGustLFO, noiseGustLFOGain, noiseSweepLFO, noiseSweepLFOGain, noisePanLFO, noisePanLFOGain;
 let droneOsc1, droneOsc2, droneGain, droneFilter;
@@ -9662,6 +9820,7 @@ function initAudio() {
   arpAnalyser = audioCtx.createAnalyser(); arpAnalyser.fftSize = 512;
   droneAnalyser = audioCtx.createAnalyser(); droneAnalyser.fftSize = 512;
   noiseAnalyser = audioCtx.createAnalyser(); noiseAnalyser.fftSize = 512;
+  fieldAnalyser = audioCtx.createAnalyser(); fieldAnalyser.fftSize = 512;
   masterAnalyser = audioCtx.createAnalyser(); masterAnalyser.fftSize = 1024;
 
   masterGain = audioCtx.createGain(); masterGain.gain.value = 0.75;
@@ -9871,6 +10030,12 @@ function initAudio() {
   noiseAnalyser.connect(noiseDryGain);
   noiseDryGain.connect(masterBusPost); noiseAnalyser.connect(noiseFxSendGain);
   noiseFxSendGain.connect(masterBusPre);
+
+  fieldDryGain = audioCtx.createGain(); fieldFxSendGain = audioCtx.createGain();
+  fieldAnalyser.connect(fieldDryGain);
+  fieldDryGain.connect(masterBusPost);
+  fieldAnalyser.connect(fieldFxSendGain);
+  fieldFxSendGain.connect(masterBusPre);
 
   // 1. FILTER Module boundary & internal wiring (staggered Q + resonance gain compensation)
   filterModuleInput = audioCtx.createGain();
@@ -10112,12 +10277,12 @@ function updatePedalsOrderUI() {
   const container = document.getElementById("masterDeckUnified") || document.getElementById("pedalsGrid");
   if (!container) return;
 
-  // Append each pedal in current dspChainOrder, updating dynamic numbers (6, 7, 8 after 5. Atmosphere & Noise)
+  // Append each pedal in current dspChainOrder, updating dynamic numbers (7, 8, 9 after 6. Field Recorder)
   dspChainOrder.forEach((key, idx) => {
     const el = document.getElementById("pedalCard_" + key);
     if (el && !el.closest("#orbitalModalBody")) container.appendChild(el);
 
-    const chainNum = 6 + idx; // Slot 0 -> 6, Slot 1 -> 7, Slot 2 -> 8
+    const chainNum = 7 + idx; // Slot 0 -> 7, Slot 1 -> 8, Slot 2 -> 9
 
     // Update pedal card header title
     const titleEl = document.getElementById("pedalTitle_" + key) || (el ? el.querySelector(".panel-header > span:first-child") : null);
@@ -10185,44 +10350,44 @@ function renderBirdsEyePedalRack() {
     if (!meta) return;
     const isBypassed = !!(typeof pedalBypassState !== "undefined" && pedalBypassState[key]);
     const slotLabel = idx === 0 ? "IN" : (idx === order.length - 1 ? "OUT" : "INSERT");
-    const num = 6 + idx;
+    const num = 7 + idx;
     const canShiftUp = idx > 0;
     const canShiftDown = idx < order.length - 1;
 
     html += `
-      <div class="mini-pedal-card ${meta.class} ${isBypassed ? 'bypassed' : 'active'}" data-pedal="${key}">
-        <div class="mini-pedal-left" onclick="openMiniPedalInspector('${meta.orbId}')" title="Open ${meta.name} controls">
+      <div class="mini-pedal-card ${meta.class} ${isBypassed ? 'bypassed' : 'active'}" data-pedal="${key}" onclick="openMiniPedalInspector('${meta.orbId}', event)" title="Open ${meta.name} controls">
+        <div class="mini-pedal-left">
           <span class="mini-pedal-badge">${num}</span>
           <div class="mini-pedal-info">
             <span class="mini-pedal-name">${meta.name}</span>
             <span class="mini-pedal-slot">${slotLabel}</span>
           </div>
         </div>
-        <div class="mini-pedal-actions">
-          <button type="button" class="btn-mini-shift" onclick="shiftPedalLeft('${key}')" ${!canShiftUp ? 'disabled' : ''} title="Move earlier in chain">▲</button>
-          <button type="button" class="btn-mini-shift" onclick="shiftPedalRight('${key}')" ${!canShiftDown ? 'disabled' : ''} title="Move later in chain">▼</button>
-          <button type="button" class="btn-mini-power ${isBypassed ? '' : 'active'}" onclick="togglePedalBypass('${key}')" title="${isBypassed ? 'Engage ' + meta.name : 'Bypass ' + meta.name}">
+        <div class="mini-pedal-actions" onclick="event.stopPropagation()">
+          <button type="button" class="btn-mini-shift" onclick="shiftPedalLeft('${key}', event)" ${!canShiftUp ? 'disabled' : ''} title="Move earlier in chain">▲</button>
+          <button type="button" class="btn-mini-shift" onclick="shiftPedalRight('${key}', event)" ${!canShiftDown ? 'disabled' : ''} title="Move later in chain">▼</button>
+          <button type="button" class="btn-mini-power ${isBypassed ? '' : 'active'}" onclick="togglePedalBypass('${key}', event)" title="${isBypassed ? 'Engage ' + meta.name : 'Bypass ' + meta.name}">
             ${isBypassed ? 'BYP' : 'ON'}
           </button>
-          <button type="button" class="btn-mini-inspect" onclick="openMiniPedalInspector('${meta.orbId}')" title="Inspect full controls">EDIT ↗</button>
+          <button type="button" class="btn-mini-inspect" onclick="openMiniPedalInspector('${meta.orbId}', event)" title="Inspect full controls">EDIT ↗</button>
         </div>
       </div>
     `;
   });
 
-  // Terminal Master EQ & Out Node (Node 9)
+  // Terminal Master EQ & Out Node (Node 10)
   html += `
-    <div class="mini-pedal-card mini-card-master active" data-pedal="MASTER">
-      <div class="mini-pedal-left" onclick="openMiniPedalInspector('space')" title="Open Master EQ & Out controls">
-        <span class="mini-pedal-badge">9</span>
+    <div class="mini-pedal-card mini-card-master active" data-pedal="MASTER" onclick="openMiniPedalInspector('space', event)" title="Open Master EQ & Out controls">
+      <div class="mini-pedal-left">
+        <span class="mini-pedal-badge">10</span>
         <div class="mini-pedal-info">
           <span class="mini-pedal-name">MASTER OUT</span>
           <span class="mini-pedal-slot">BUS TERM</span>
         </div>
       </div>
-      <div class="mini-pedal-actions">
+      <div class="mini-pedal-actions" onclick="event.stopPropagation()">
         <span class="mini-pedal-status-tag">ACTIVE</span>
-        <button type="button" class="btn-mini-inspect" onclick="openMiniPedalInspector('space')" title="Inspect Master EQ & Out">EDIT ↗</button>
+        <button type="button" class="btn-mini-inspect" onclick="openMiniPedalInspector('space', event)" title="Inspect Master EQ & Out">EDIT ↗</button>
       </div>
     </div>
   `;
@@ -10230,7 +10395,8 @@ function renderBirdsEyePedalRack() {
   rack.innerHTML = html;
 }
 
-function shiftPedalLeft(key) {
+function shiftPedalLeft(key, ev) {
+  if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
   const idx = dspChainOrder.indexOf(key);
   if (idx > 0) {
     const otherKey = dspChainOrder[idx - 1];
@@ -10241,7 +10407,8 @@ function shiftPedalLeft(key) {
   }
 }
 
-function shiftPedalRight(key) {
+function shiftPedalRight(key, ev) {
+  if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
   const idx = dspChainOrder.indexOf(key);
   if (idx >= 0 && idx < dspChainOrder.length - 1) {
     const otherKey = dspChainOrder[idx + 1];
@@ -10252,16 +10419,19 @@ function shiftPedalRight(key) {
   }
 }
 
-function randomizeDspChain() {
+function randomizeDspChain(ev) {
+  if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
   const shuffled = ['FILTER', 'DELAY', 'SPACE'].sort(() => Math.random() - 0.5);
   rewireDspChain(shuffled, false);
 }
 
-function resetDspChain() {
+function resetDspChain(ev) {
+  if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
   rewireDspChain(['FILTER', 'DELAY', 'SPACE'], false);
 }
 
-function togglePedalBypass(key) {
+function togglePedalBypass(key, ev) {
+  if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
   pedalBypassState[key] = !pedalBypassState[key];
   const isBypassed = pedalBypassState[key];
   const card = document.getElementById("pedalCard_" + key);
@@ -10449,6 +10619,7 @@ function openModuleInOrbital(moduleEl) {
   else if (moduleEl.classList.contains("chord-ch")) orbId = "chord";
   else if (moduleEl.classList.contains("arp-ch")) orbId = "arp";
   else if (moduleEl.classList.contains("noise-ch")) orbId = "noise";
+  else if (moduleEl.classList.contains("field-ch")) orbId = "field";
   else if (moduleEl.classList.contains("pedal-chain-module")) {
     const firstPedal = (Array.isArray(dspChainOrder) && dspChainOrder[0]) ? dspChainOrder[0] : "FILTER";
     orbId = (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && PEDAL_KEY_TO_ORBITAL_ID[firstPedal]) ? PEDAL_KEY_TO_ORBITAL_ID[firstPedal] : "filter";
@@ -10463,7 +10634,11 @@ function openModuleInOrbital(moduleEl) {
   }
 }
 
-function openMiniPedalInspector(orbId) {
+function openMiniPedalInspector(orbId, ev) {
+  if (ev) {
+    if (typeof ev.stopPropagation === "function") ev.stopPropagation();
+    if (typeof ev.preventDefault === "function") ev.preventDefault();
+  }
   if (orbId && typeof expandModuleOrb === "function") {
     expandModuleOrb(orbId);
   }
@@ -10489,7 +10664,7 @@ function initPedalDragAndDrop() {
   });
 
   const isInteractive = (target) => {
-    return !!target.closest('input, select, button, .custom-dropdown-wrap, .custom-dropdown-trigger, .custom-dropdown-menu, label, canvas, .pedal-drag-handle, .btn-pedal-shift, .btn-power, .btn-mute, .btn-solo, .badge-tag, .module-drawer-toggle');
+    return !!target.closest('input, select, button, .custom-dropdown-wrap, .custom-dropdown-trigger, .custom-dropdown-menu, label, canvas, .pedal-drag-handle, .btn-pedal-shift, .btn-power, .btn-mute, .btn-solo, .badge-tag, .module-drawer-toggle, .mini-pedal-card, .pedal-birds-eye-rack, .btn-pedal-action, .birds-eye-flow-bar');
   };
 
   allModuleCards.forEach(card => {
@@ -15460,6 +15635,11 @@ function updateAudioParams() {
     noiseVol = parseInt(document.getElementById("knobNoiseVol").value) / 100;
     document.getElementById("lblNoiseVol").textContent = Math.round(noiseVol * 100) + "%";
   }
+  if (document.getElementById("knobFieldFx")) {
+    fieldFxSend = parseInt(document.getElementById("knobFieldFx").value) / 100;
+    const lbl = document.getElementById("lblFieldFx");
+    if (lbl) lbl.textContent = Math.round(fieldFxSend * 100) + "%";
+  }
 
   if (document.getElementById("knobDroneFx")) {
     droneFxSend = parseInt(document.getElementById("knobDroneFx").value) / 100;
@@ -15701,6 +15881,7 @@ function updateAudioParams() {
   const effChordFx = (channelAux.chord !== false) ? chordFxSend : 0;
   const effArpFx   = (channelAux.arp   !== false) ? arpFxSend   : 0;
   const effNoiseFx = (channelAux.noise !== false) ? noiseFxSend : 0;
+  const effFieldFx = (channelAux.field !== false) ? fieldFxSend : 0;
 
   if (droneFxSendGain && droneDryGain) {
     droneFxSendGain.gain.setTargetAtTime(effDroneFx, audioCtx.currentTime, 0.05);
@@ -15721,6 +15902,10 @@ function updateAudioParams() {
   if (noiseFxSendGain && noiseDryGain) {
     noiseFxSendGain.gain.setTargetAtTime(effNoiseFx, audioCtx.currentTime, 0.05);
     noiseDryGain.gain.setTargetAtTime(1.0 - (effNoiseFx * 0.5), audioCtx.currentTime, 0.05);
+  }
+  if (fieldFxSendGain && fieldDryGain) {
+    fieldFxSendGain.gain.setTargetAtTime(effFieldFx, audioCtx.currentTime, 0.05);
+    fieldDryGain.gain.setTargetAtTime(1.0 - (effFieldFx * 0.5), audioCtx.currentTime, 0.05);
   }
 
   // Phase 4: Cascaded 24dB/oct Filter Fine-Tuning (respecting FILTER pedal bypass state)
@@ -15933,6 +16118,15 @@ function randomizeNoise() {
   }
 }
 
+function randomizeField() {
+  randomizeSelect("selFieldMode");
+  randomizeRange("knobFieldVol");
+  randomizeRange("knobFieldFx");
+  if (typeof fieldModeChanged === "function") fieldModeChanged();
+  if (typeof fieldLevelChanged === "function") fieldLevelChanged();
+  updateAudioParams();
+}
+
 const PLEASANT_SCALES = ["DORIAN", "LYDIAN", "MAJOR9", "MAJ_PENTATONIC", "MIXOLYDIAN", "BILAWAL", "AEOLIAN", "PENTATONIC", "HIRAJOSHI"];
 
 function randomizeKeyScale(triggerSound = false) {
@@ -16047,6 +16241,7 @@ function randomizeEverything() {
   randomizeDrums();
   randomizeArp();
   randomizeNoise();
+  randomizeField();
   randomizeFilter();
   randomizeDelay();
   randomizeReverbChorus();
@@ -16065,10 +16260,10 @@ function randomizeEverything() {
 }
 
 let droneEnabled = true;
-let channelPower = { drone: true, drum: true, chord: true, arp: true, noise: true };
-let channelAux   = { drone: true, drum: true, chord: true, arp: true, noise: true };
-let channelMute  = { drone: false, drum: false, chord: false, arp: false, noise: false };
-let channelSolo  = { drone: false, drum: false, chord: false, arp: false, noise: false };
+let channelPower = { drone: true, drum: true, chord: true, arp: true, noise: true, field: true };
+let channelAux   = { drone: true, drum: true, chord: true, arp: true, noise: true, field: true };
+let channelMute  = { drone: false, drum: false, chord: false, arp: false, noise: false, field: false };
+let channelSolo  = { drone: false, drum: false, chord: false, arp: false, noise: false, field: false };
 
 function isChannelAudible(ch) {
   if (channelPower[ch] === false) return false;
@@ -16081,6 +16276,7 @@ function isChannelAudible(ch) {
 function toggleChannelPower(ch) {
   channelPower[ch] = !channelPower[ch];
   if (ch === 'drone') droneEnabled = channelPower.drone;
+  if (ch === 'field' && typeof fieldRecorderSync === "function") fieldRecorderSync();
   const pwrBtn = document.getElementById('btnPower_' + ch);
   if (pwrBtn) {
     pwrBtn.classList.toggle('active', channelPower[ch]);
@@ -16098,7 +16294,7 @@ function toggleChannelAux(ch) {
 }
 
 function updateMuteSoloUI() {
-  ["drone", "drum", "chord", "arp", "noise"].forEach(ch => {
+  ["drone", "drum", "chord", "arp", "noise", "field"].forEach(ch => {
     const mBtn = document.getElementById("btnMute_" + ch);
     const sBtn = document.getElementById("btnSolo_" + ch);
     const pBtn = document.getElementById("btnPower_" + ch);
@@ -18499,8 +18695,8 @@ function undoPatchChange() {
 [
   "applyPreset", "randomizeEverything", "newSeed", "randomizeDspChain",
   "randomizeDrone", "randomizeDrums", "randomizeChords", "randomizeNoise",
-  "randomizeKeyScale", "randomizeArp", "randomizeFilter", "randomizeDelay",
-  "randomizeReverbChorus", "randomizeSpace", "randomizeMeter"
+  "randomizeField", "randomizeKeyScale", "randomizeArp", "randomizeFilter",
+  "randomizeDelay", "randomizeReverbChorus", "randomizeSpace", "randomizeMeter"
 ].forEach(name => {
   const orig = window[name];
   if (typeof orig !== "function") return;
@@ -19475,10 +19671,11 @@ const ORBITAL_MODULES = [
   { id: "chord",  name: "CHORDS", num: "3", color: "#fed330", rgb: [254, 211, 48],  baseR: 48, x: 0, y: 0, vx: 0.15,  vy: -0.19, chClass: "chord-ch",  analyser: () => chordAnalyser,  pulse: 0, bump: 0 },
   { id: "arp",    name: "ARP",    num: "4", color: "#7d5fff", rgb: [125, 95, 255],  baseR: 42, x: 0, y: 0, vx: -0.16, vy: -0.14, chClass: "arp-ch",    analyser: () => arpAnalyser,    pulse: 0, bump: 0 },
   { id: "noise",  name: "NOISE",  num: "5", color: "#1dd1a1", rgb: [29, 209, 161],  baseR: 40, x: 0, y: 0, vx: 0.16,  vy: -0.15, chClass: "noise-ch",  analyser: () => noiseAnalyser,  pulse: 0, bump: 0 },
-  { id: "filter", name: "FILTER", num: "6", color: "#2ed573", rgb: [46, 213, 115],  baseR: 37, x: 0, y: 0, vx: 0.14,  vy: 0.17,  chClass: "filter-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
-  { id: "delay",  name: "DELAY",  num: "7", color: "#ff793f", rgb: [255, 121, 63],  baseR: 35, x: 0, y: 0, vx: -0.18, vy: 0.12,  chClass: "delay-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 },
-  { id: "reverb", name: "SPACE",  num: "8", color: "#ff5fc4", rgb: [255, 95, 196],  baseR: 38, x: 0, y: 0, vx: 0.17,  vy: 0.13,  chClass: "reverb-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
-  { id: "space",  name: "OUT",    num: "9", color: "#4b7bec", rgb: [75, 123, 236],  baseR: 37, x: 0, y: 0, vx: 0.12,  vy: -0.16, chClass: "space-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 }
+  { id: "field",  name: "FIELD",  num: "6", color: "#2bcbba", rgb: [43, 203, 186],  baseR: 41, x: 0, y: 0, vx: -0.15, vy: 0.16,  chClass: "field-ch",  analyser: () => (typeof fieldAnalyser !== "undefined" ? fieldAnalyser : noiseAnalyser), pulse: 0, bump: 0 },
+  { id: "filter", name: "FILTER", num: "7", color: "#2ed573", rgb: [46, 213, 115],  baseR: 37, x: 0, y: 0, vx: 0.14,  vy: 0.17,  chClass: "filter-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
+  { id: "delay",  name: "DELAY",  num: "8", color: "#ff793f", rgb: [255, 121, 63],  baseR: 35, x: 0, y: 0, vx: -0.18, vy: 0.12,  chClass: "delay-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 },
+  { id: "reverb", name: "SPACE",  num: "9", color: "#ff5fc4", rgb: [255, 95, 196],  baseR: 38, x: 0, y: 0, vx: 0.17,  vy: 0.13,  chClass: "reverb-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
+  { id: "space",  name: "OUT",    num: "10", color: "#4b7bec", rgb: [75, 123, 236], baseR: 37, x: 0, y: 0, vx: 0.12,  vy: -0.16, chClass: "space-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 }
 ];
 
 // Maps a dspChainOrder pedal key to the orbital orb it corresponds to --
@@ -19982,7 +20179,7 @@ function collapseOrbitalToPedals() {
 function getSignalChainOrbList() {
   const pedals = (Array.isArray(dspChainOrder) ? dspChainOrder : ["FILTER", "DELAY", "SPACE"])
     .map(k => (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && PEDAL_KEY_TO_ORBITAL_ID[k]) ? PEDAL_KEY_TO_ORBITAL_ID[k] : k.toLowerCase());
-  return ["drone", "drum", "chord", "arp", "noise", ...pedals, "space"];
+  return ["drone", "drum", "chord", "arp", "noise", "field", ...pedals, "space"];
 }
 
 function cycleOrbitalModule(dir) {
@@ -20087,7 +20284,7 @@ function initOrbitalGestures() {
   });
 }
 
-const ORBITAL_LOWER_DECK_IDS = ["drone", "drum", "chord", "arp", "noise"];
+const ORBITAL_LOWER_DECK_IDS = ["drone", "drum", "chord", "arp", "noise", "field"];
 
 function restoreStripsToRack() {
   const lowerRack = document.querySelector(".lower-deck");
@@ -20521,22 +20718,22 @@ if (document.readyState === "loading") {
    localStorage, which is optional: the page works the same without it.
    The Bio-Scan CRT pod's border-color cycling is separate and still works on top.
    ========================================================================== */
-const THEME_KEYS = ["drone", "drum", "chord", "arp", "noise", "filter", "delay", "reverb", "space"];
+const THEME_KEYS = ["drone", "drum", "chord", "arp", "noise", "field", "filter", "delay", "reverb", "space"];
 const COLOR_THEMES = [
   { id: "slambient", name: "Slambient",     desc: "The original phosphor set",
-    colors: ["#00e5ff", "#ff3838", "#fed330", "#7d5fff", "#1dd1a1", "#2ed573", "#ff793f", "#ff5fc4", "#4b7bec"],
+    colors: ["#00e5ff", "#ff3838", "#fed330", "#7d5fff", "#1dd1a1", "#2bcbba", "#2ed573", "#ff793f", "#ff5fc4", "#4b7bec"],
     uiColor: "SLAM · Y" },
   { id: "kankyo",    name: "Kankyō Pastel", desc: "Soft 80s Japanese ambient",
-    colors: ["#7fc8d6", "#e07a5f", "#f2cc8f", "#a99bd8", "#8fc0a9", "#a8d672", "#e9a06b", "#eaa1c0", "#7b9fd9"],
+    colors: ["#7fc8d6", "#e07a5f", "#f2cc8f", "#a99bd8", "#8fc0a9", "#7ec2aa", "#a8d672", "#e9a06b", "#eaa1c0", "#7b9fd9"],
     uiColor: "SLAM · P" },
   { id: "aurora",    name: "Aurora",        desc: "Electric greens, violets and magentas",
-    colors: ["#3cf2c2", "#ff4f8b", "#c6f35a", "#9d7bff", "#5ee6ff", "#54f08a", "#ffb347", "#f572ff", "#5a8cff"],
+    colors: ["#3cf2c2", "#ff4f8b", "#c6f35a", "#9d7bff", "#5ee6ff", "#38ef7d", "#54f08a", "#ffb347", "#f572ff", "#5a8cff"],
     uiColor: "SLAM · G" },
   { id: "sodium",    name: "Sodium Tape",   desc: "Warm amber CRT and worn tape",
-    colors: ["#ffb000", "#ff4a1c", "#ffd56b", "#ff7f6e", "#e9c46a", "#cddc6b", "#ff8c42", "#ff6f91", "#f4a261"],
+    colors: ["#ffb000", "#ff4a1c", "#ffd56b", "#ff7f6e", "#e9c46a", "#f4a261", "#cddc6b", "#ff8c42", "#ff6f91", "#f4a261"],
     uiColor: "SLAM · Y" },
   { id: "glacier",   name: "Glacier",       desc: "Cold blues with a pink pulse",
-    colors: ["#9be7ff", "#ff6b8b", "#e3f4ff", "#8ab4ff", "#7fe7d4", "#6ee7b7", "#a5b4fc", "#d0b5fd", "#60a5fa"],
+    colors: ["#9be7ff", "#ff6b8b", "#e3f4ff", "#8ab4ff", "#7fe7d4", "#5eead4", "#6ee7b7", "#a5b4fc", "#d0b5fd", "#60a5fa"],
     uiColor: "SLAM · W" }
 ];
 const THEME_STORAGE_KEY = "slambient.colorTheme";
@@ -20693,6 +20890,9 @@ window.addEventListener("keydown", (e) => {
 (function initColorTheme() {
   let saved = null;
   try { saved = JSON.parse(localStorage.getItem(THEME_STORAGE_KEY) || "null"); } catch (err) {}
+  if (saved && Array.isArray(saved.colors) && saved.colors.length === 9) {
+    saved.colors.splice(5, 0, "#2bcbba");
+  }
   const valid = saved && Array.isArray(saved.colors) && saved.colors.length === THEME_KEYS.length &&
     saved.colors.every(c => /^#[0-9a-f]{6}$/i.test(c));
   if (valid && saved) {
@@ -21975,10 +22175,15 @@ window.addEventListener("keydown", (e) => {
     return ir;
   }
   function ensureGraph() {
-    if (typeof audioCtx === "undefined" || !audioCtx || typeof noiseAnalyser === "undefined" || !noiseAnalyser) return null;
+    if (typeof audioCtx === "undefined" || !audioCtx) return null;
     if (S.graph && S.graphCtx === audioCtx) return S.graph;
     const c = audioCtx, g = {};
-    g.bus = c.createGain(); g.bus.gain.value = 0.0001; g.bus.connect(noiseAnalyser);
+    g.bus = c.createGain(); g.bus.gain.value = 0.0001;
+    if (typeof fieldAnalyser !== "undefined" && fieldAnalyser) {
+      g.bus.connect(fieldAnalyser);
+    } else if (typeof noiseAnalyser !== "undefined" && noiseAnalyser) {
+      g.bus.connect(noiseAnalyser);
+    }
     g.washIn = c.createGain();
     g.delay = c.createDelay(2.5); g.delay.delayTime.value = 0.45;
     g.fb = c.createGain(); g.fb.gain.value = 0.46;
@@ -22033,7 +22238,7 @@ window.addEventListener("keydown", (e) => {
   }
   function sync() {
     const g = ensureGraph(); if (!g) return;
-    const on = !!S.sample && S.mode !== "OFF" && isPlaying && isChannelAudible("noise");
+    const on = !!S.sample && S.mode !== "OFF" && isPlaying && isChannelAudible("field");
     g.bus.gain.setTargetAtTime(on ? S.level * 0.9 : 0.0001, audioCtx.currentTime, on ? 0.05 : 0.35);
   }
 
@@ -22107,7 +22312,7 @@ window.addEventListener("keydown", (e) => {
 
   window.fieldRecorderTick = function (measureTick, isDownbeat, ts) {
     if (!S.sample || S.mode === "OFF" || !isPlaying || !audioCtx) return;
-    if (!isChannelAudible("noise")) return;
+    if (!isChannelAudible("field")) return;
     const tpb = (ts && ts.ticksPerBeat) || 4, nowMs = performance.now();
     const rate = (typeof noiseRateVal === "number") ? noiseRateVal : 0.45;
     if (isDownbeat) {

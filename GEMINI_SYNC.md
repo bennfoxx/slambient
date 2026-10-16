@@ -1457,6 +1457,36 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Inserted `<span class="transport-sep" aria-hidden="true">|</span>` immediately after the record format dropdown (`MP3 ∨`) before the `SAMPLE` group.
   - Inserted `<span class="transport-sep" aria-hidden="true">|</span>` immediately after the `DROP` sample button before the `MIDI` button.
   - Styled `.transport-sep` with `opacity: 0.45`, `color: var(--border-light)`, `font-family: "JetBrains Mono"`, and `height: 32px; align-items: center`.
-  - Added `.header-sec-transport > .transport-sep { display: none; }` in mobile landscape and portrait media queries so dividers do not pollute mobile 2-row CSS grids.
+## Update — 2026-10-16 (Dedicated Field Recorder Instrument Module & 2-Row Lower Deck Grid)
 
+- **Dedicated Pocket Field Recorder Instrument Module (`6. FIELD`)**:
+  - Extracted the Pocket Field Recorder out of the `NOISE` module into an independent, full-fledged 6th instrument channel strip (`.strip-channel.field-ch` with `id="fieldModule"`).
+  - Designed with matching Eurorack aesthetics: `--color-field: #2bcbba` (electric turquoise), header controls (`6. FIELD`, real-time `data-field-status`, `PWR`, `M`, `S`, and randomize `badge-tag`).
+  - Contains complete sampling suite: live waveform display canvas, 4 tactile action buttons (`Hold to Rec`, `Drop / Load`, `Play`, `Eject`), Weave Mode dropdown (`ALL`, `GHOST`, `CHOIR`, `TRANS`, `OFF`), dedicated `knobFieldFx` FX send slider with `btnAux_field` toggle, and master sample volume slider (`knobFieldVol`).
+  - Added dedicated `fieldDryGain`, `fieldFxSendGain`, and `fieldAnalyser` in the Web Audio API graph. Field audio can now be routed dry to `masterBusPost` or wet to `masterBusPre` into the live DSP chain (Filter ➔ Delay ➔ Space).
+  - Integrated `field` into `channelPower`, `channelAux`, `channelMute`, `channelSolo`, `updateMuteSoloUI()`, `toggleChannelPower()`, and patch serialization.
+  - Implemented `randomizeField()` hooked into `randomizeEverything()` and patch undo stack.
+- **Two-Row Lower Deck Matrix with Full-Height Studio FX Chain Rack**:
+  - Reorganized `.lower-deck` into an ergonomic two-row grid layout:
+    ```
+    SUB (1)       CHORDS (3)   NOISE (5)       [ DSP FX CHAIN ]
+    DRUMS (2)     ARP (4)      FIELD (6)       [ (Full Height) ]
+    ```
+  - Grid definition:
+    - Row 1: `sub chord noise fx`
+    - Row 2: `drum arp field fx`
+    - Right side: `.pedal-chain-module` spans both rows (`grid-area: fx`), with its 4 mini pedal cards (`FILTER`, `DELAY`, `SPACE`, `MASTER OUT`) proportionately flex-filling the vertical studio rack.
+    - Tablet (`max-width: 1200px`): wraps to 2 instrument columns + FX rack.
+    - Mobile (`max-width: 900px`): wraps to 2 instrument columns with full-width FX rack below.
+    - Phone portrait (`max-width: 640px`): clean 1-column flex layout.
+  - Sizing unification: Removing the field recorder panel from `NOISE` unified its height to match `SUB` and `CHORDS` in Row 1. The new `FIELD` module in Row 2 perfectly balances `DRUMS` and `ARP`. All module widths are increased and heights unified.
+- **Orbital Constellation & Signal Chain Renumbering**:
+  - Added `field` orb to `ORBITAL_MODULES` as Orb #6 (`#2bcbba`, 41px radius), with live audio visualization driven by `fieldAnalyser`.
+  - Renumbered DSP insert chain in `ORBITAL_MODULES`, `updatePedalsOrderUI()`, and `renderBirdsEyePedalRack()`:
+    - 7: Filter
+    - 8: Delay
+    - 9: Space
+    - 10: Master Out
+  - Included `field` in `ORBITAL_LOWER_DECK_IDS` and `getSignalChainOrbList()` for seamless swipe cycling.
+  - Added `field` to `THEME_KEYS` and updated all 5 color theme presets in `COLOR_THEMES`.
 
