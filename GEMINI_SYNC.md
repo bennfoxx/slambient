@@ -999,3 +999,17 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
 - **Floating Bottom Bar Button Labeled "SAMPLE"**:
   - Updated `.btn-mic-mini` in `.mini-transport` to include `<span>SAMPLE</span>` with the mic icon.
   - Styled with equal `flex: 1 1 0` sizing (40px height, 12px JetBrains Mono bold text), perfectly matching the `[ ▶ Start ]` and `[ ● Record ]` buttons in the bottom floating toolbar.
+
+## Update — 2026-10-16 (Mic Capture: Zero Audio Bleed & Stream Authorization Caching)
+
+- **Eliminated Jarring Audio Playback on Mic Button Press**:
+  - Previously, `beginCapture()` resumed `audioCtx` (which flushed suspended synthesizer notes) and connected `rec.proc` to `ctx.destination` through a mute gain node that leaked during initialization.
+  - Now uses an **isolated capture AudioContext** (`getCaptureContext()`) completely decoupled from `audioCtx`, so the master synth is never unintentionally resumed.
+  - Replaced the speaker connection with a completely silent dummy sink (`ctx.createMediaStreamDestination()`) with zero physical route to the speakers.
+  - Explicitly zeroed `ev.outputBuffer.getChannelData(0).fill(0)` on every audio quantum to prevent any buffer bleed.
+  - Removed `navigator.audioSession.type = "play-and-record"` toggling, preventing iOS Safari hardware audio route re-configuration clicks and ducking.
+- **Microphone Authorization Caching (No Repeated Prompts)**:
+  - Previously called `t.stop()` on every track at the end of recording, destroying the capture session and causing Safari/Chrome to prompt for microphone permission on every single take.
+  - Now caches the active stream in `S.micStream` and puts the audio track into hardware-muted standby (`track.enabled = false`) when idle.
+  - Subsequent presses immediately re-enable the existing live track (`track.enabled = true`), starting recording instantly with zero permission dialogs during the session.
+
