@@ -1229,5 +1229,24 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
     - **Analog Pulse**: Square wave pulse level reduces from 0.28 to 0.08 above MIDI 72 with tighter low-pass filtering.
   - **Live Keyboard Parity (`startNoteLive`)**: Applied identical damping, filter scaling, and FM index attenuation so real-time playing across all 88 keys maintains consistent warmth.
 
+## Update — 2026-10-16 (Color Palette System: Paired SLAM UI Colors & Randomized Phosphors)
+
+- **Palette-to-UI Color Pairing**:
+  - Each color theme in `COLOR_THEMES` now carries an assigned primary SLAM UI phosphor color (`uiColor`):
+    - **Slambient**: `SLAM · Y` (Warm Phosphor Yellow, `#fed330`)
+    - **Kankyō Pastel**: `SLAM · P` (Pastel Purple, `#a855f7`)
+    - **Aurora**: `SLAM · G` (Electric Phosphor Green, `#2ed573`)
+    - **Sodium Tape**: `SLAM · Y` (Amber Tape Warmth, `#fed330`)
+    - **Glacier**: `SLAM · W` (Crisp Polar White, `#ffffff`)
+  - Selecting any palette automatically triggers `setEnoPhosphor(theme.uiColor)`, synchronizing the wireframe head, module border glows (`--eno-glow-border`), and box shadows (`--eno-glow-shadow`) in real time.
+- **Randomize Palette & UI Randomization**:
+  - `makeRandomTheme()` now also randomly selects one of the 4 primary SLAM UI phosphors (Yellow, Green, Purple, White).
+  - Clicking **Randomize** in the palette popover generates a fresh 9-color module harmony AND assigns a randomized SLAM UI phosphor color.
+- **Persistence & Telemetry**:
+  - `activeTheme.uiColor` is persisted in `localStorage["slambient.colorTheme"]` and seamlessly restored on boot.
+  - Footer status readout displays active palette and UI phosphor (e.g. `Palette: Glacier (SLAM · W)`).
+  - Palette popover buttons carry informative tooltips indicating both description and associated UI color.
+
+
 
 
