@@ -831,3 +831,31 @@ Still unverified on a real iPhone: phone portrait layout, orb sheet width, silen
    - **Eno 3D Pod Optimization**:
      - Switched default model configuration to the low-poly mesh, throttled software depth buffer rendering to 30fps when not actively being dragged, and added visibility gating.
 
+## Update — 2026-10-16 (High-Detail Fractal Visualizer, Symbiotic Scope Rendering, Vertical Rain Icon)
+
+1. **Vertical Rain Visualizer Icon**:
+   - Fixed `btnToggleWaterfall` SVG icon in `#scopePanel`: replaced horizontal lines with 5 vertical cascading dashed lines (`stroke-linecap="round"`, varied dash offsets and lengths) in the 5 instrument channel colors (`#e0c3ff`, `#ff6b81`, `#fed330`, `#2ed573`, `#00e5ff`), properly depicting vertical digital rain / phosphor waterfall cascades.
+   - Updated button tooltip to `"Toggle Phosphor Digital Rain / Waterfall Spectrogram"`.
+
+2. **Symbiotic Multi-Layer Visualizer Composition**:
+   - Decoupled `drawFractalVisualizer` from mutually excluding the other visualizer layers in `drawScope`:
+     - When Fractal Mode is active, it renders as a deep ambient cosmic nebula backdrop.
+     - Phosphor Waterfall / Digital Rain (`drawWaterfallSpectrogram`), Vintage Vector Flight Terrain Grid (`drawFlightTerrainGrid`), Floating 3D Vector Geometry (`drawRoadsideObjects`), and Concentric Oscilloscope Rings all render concurrently and symbiotically on top.
+     - Each layer's button toggle operates completely independently.
+   - Removed `roadsideObjects.length = 0` from `toggleFractalMode()` so 3D vector cubes, pyramids, diamonds, and spheres glide continuously across the fractal universe without getting cleared or stuck.
+   - Updated `btnToggleFractal` tooltip to `"Toggle Deep Fractal Cosmos (Symbiotic with waterfall, grid & shapes)"`.
+
+3. **High-Definition Fractal Zoom Engine**:
+   - **Curated Boundary Targets**: Added the legendary Seahorse Valley Triple Spiral Hub (`[-0.7436438870371587, 0.131825904205312]`) and refined coordinates for Elephant Valley, Scepter Valley, and Antenna Minibrot.
+   - **512-Step Hermite Palette**: Replaced the 256-step linear palette with a 512-entry smooth Hermite interpolated color table with rich cosmic velvet undertones (`[10, 12, 20]`), theme accents, and brilliant starlight highlights (`[240, 246, 255]`).
+   - **Multi-Harmonic Shading & Micro-Filaments**:
+     - Increased iteration ceiling to `Math.round(135 + fractalDepth * 52)`.
+     - Added sinusoidal micro-filament wave modulation (`filament = 0.5 + 0.5 * Math.sin(smoothIter * 0.75 + ...)`) that carves out individual spiral hairs and dendritic structures with crystal clarity.
+     - Added electric starlight shimmer (`shimmer = Math.pow(..., 3) * (0.15 + e.arp * 0.7)`) responsive to Arp note cascades and drum hits.
+     - Replaced flat black set interior with a living, breathing obsidian/indigo core (`coreBreath`) that expands and contracts in sync with Sub-Drone and Drum energy.
+     - Tuned outer nebula floor to `0.28` ambient luminosity, creating deep cosmic space rather than crushed black mud, ensuring high contrast for overlaid vector lines and rain droplets.
+   - **Bailout & Analyser Optimization**:
+     - Reduced bailout radius to 64 for 10-15% faster escapes while preserving smooth logarithm math.
+     - Connected `readFractalBandEnergy` to `sampleAnalyserForFrame(analyser)` to reuse cached FFT data without extra Web Audio API calls.
+     - Dynamic frame governor (`FRACTAL_FRAME_BUDGET_MS = 10`, buffer width `180` to `400`) automatically maintains 60fps across mobile and desktop.
+
