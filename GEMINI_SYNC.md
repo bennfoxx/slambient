@@ -993,7 +993,9 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Kept waveform preview canvas and eject (`×`) button fully functional within the pod.
 - **Mobile Top Bar Integration (Phone Portrait & Landscape)**:
   - Removed previous `@media` display suppression that hid `.sample-ctrl` on mobile.
-  - Added `.global-transport > .sample-ctrl` to the 40px full-width row grid in phone portrait, matching the boxed styling of `KEY / SCALE`, `METER`, and `TEMPO` (`<span class="tag">SAMPLE</span>`, `[ 🎙 MIC ]`, `[ 📼 IMPORT ]`, waveform thumbnail, and eject).
+  - Positioned `.sample-ctrl` immediately following `ALL` so that on mobile portrait it occupies Row 2 directly underneath `START` and `RECORD`.
+  - Configured `.global-transport > .sample-ctrl` with `grid-column: 1 / 3; width: 100%; box-sizing: border-box;`, precisely extending the pill bar from the left edge of `START` to the right edge of the `RECORD` button.
+  - Sized inner buttons (`MIC` and `DROP`) with `flex: 1 1 0; min-width: 0;` to evenly fill the pill bar across to the edge of `RECORD`.
 - **Floating Bottom Bar Button Labeled "SAMPLE"**:
   - Updated `.btn-mic-mini` in `.mini-transport` to include `<span>SAMPLE</span>` with the mic icon.
   - Styled with equal `flex: 1 1 0` sizing (40px height, 12px JetBrains Mono bold text), perfectly matching the `[ ▶ Start ]` and `[ ● Record ]` buttons in the bottom floating toolbar.

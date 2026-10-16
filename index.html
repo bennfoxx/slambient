@@ -3767,8 +3767,7 @@
     }
     .global-transport > .root-scale-ctrl,
     .global-transport > .time-sig-ctrl,
-    .global-transport > .tempo-ctrl,
-    .global-transport > .sample-ctrl {
+    .global-transport > .tempo-ctrl {
       grid-column: 1 / -1;
       min-width: 0;
     }
@@ -3838,26 +3837,37 @@
       border-radius: 4px;
     }
 
-    /* SAMPLE: dedicated full-width mobile row with MIC, IMPORT, waveform thumbnail, and eject */
+    /* SAMPLE: extends from left of START to the right edge of RECORD (columns 1 & 2) */
     .global-transport > .sample-ctrl {
+      grid-column: 1 / 3;
+      width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
       padding: 0 8px;
       gap: 7px;
     }
     .global-transport > .sample-ctrl .tag {
       font-size: 10px;
       letter-spacing: 1px;
+      flex: 0 0 auto;
       min-width: 42px;
     }
     .global-transport > .sample-ctrl .btn-field {
       height: 32px;
-      padding: 0 9px;
+      padding: 0 8px;
       font-size: 11px;
+      flex: 1 1 0;
+      min-width: 0;
+    }
+    .global-transport > .sample-ctrl.has-sample .btn-field,
+    .global-transport > .sample-ctrl.is-recording .btn-field {
       flex: 0 0 auto;
+      padding: 0 8px;
     }
     .global-transport > .sample-ctrl .field-wave {
       flex: 1 1 auto;
       min-width: 40px;
-      max-width: 140px;
       height: 24px;
     }
     .global-transport > .sample-ctrl .btn-field-eject {
@@ -5212,6 +5222,20 @@
 
           <button class="btn-preset-chip btn-randomize-all" onclick="randomizeEverything()" title="Randomize every module"><svg class="rand-all-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20.5 3.5v5h-5"/></svg><span>ALL</span></button>
 
+          <div class="sample-ctrl field-badge" id="fieldBadge" title="Pocket Field Recorder: hold MIC to sample (tap records 5 s), or DROP audio file. Woven into Noise module.">
+            <span class="tag">SAMPLE</span>
+            <button type="button" class="btn-field btn-field-mic" data-field-hold aria-label="Hold to record from the microphone">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+              <span>MIC</span>
+            </button>
+            <button type="button" class="btn-field btn-field-drop" data-field-load aria-label="Load or drop an audio file">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><path d="M9 16h6"/></svg>
+              <span>DROP</span>
+            </button>
+            <canvas class="field-wave" data-field-wave width="84" height="20"></canvas>
+            <button type="button" class="btn-field-eject" data-field-eject title="Eject sample" aria-label="Eject sample">&times;</button>
+          </div>
+
           <div class="root-scale-ctrl">
             <span class="tag">KEY</span>
             <select id="topRootKey" onchange="syncRootKey(this.value)">
@@ -5267,20 +5291,6 @@
             <input type="range" id="knobBpmHeader" min="45" max="115" value="72" oninput="updateBpm(this)" title="Master Tempo (BPM)">
             <span class="tempo-val" id="lblBpmHeader">72 BPM</span>
             <button class="btn-tap-tempo" id="btnTapTempo" onclick="tapTempo()" title="Tap tempo: tap 3+ times in rhythm to set the BPM">TAP</button>
-          </div>
-
-          <div class="sample-ctrl field-badge" id="fieldBadge" title="Pocket Field Recorder: hold MIC to sample (tap records 5 s), or IMPORT audio file. Woven into Noise module.">
-            <span class="tag">SAMPLE</span>
-            <button type="button" class="btn-field btn-field-mic" data-field-hold aria-label="Hold to record from the microphone">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
-              <span>MIC</span>
-            </button>
-            <button type="button" class="btn-field btn-field-drop" data-field-load aria-label="Load or import an audio file">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><path d="M9 16h6"/></svg>
-              <span>IMPORT</span>
-            </button>
-            <canvas class="field-wave" data-field-wave width="84" height="20"></canvas>
-            <button type="button" class="btn-field-eject" data-field-eject title="Eject sample" aria-label="Eject sample">&times;</button>
           </div>
         </div>
 
