@@ -1135,3 +1135,15 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
     - `session_info.txt` (Session metadata with BPM, meter, key/scale, seed, and track notes).
   - Bundled and downloaded automatically as `slambient-stems-[TIMESTAMP].zip`.
 
+## Update — 2026-10-16 (Comprehensive README Manual & 5-Tab In-App Field Guide)
+
+- **Comprehensive Project README (`README.md`)**:
+  - Authored a full-scale user manual and field guide covering core architecture (Eno coprime loops, AudioWorklet sample-accurate clock, Live vs. Auto takeover), the 9 sound modules, physical modeling (Tanpura, Tabla, Sitar), reorderable pedals, presets, User Bank U1–U6, Web MIDI hardware CC mappings, Stems export, PWA installation, and keyboard shortcuts.
+- **In-App '?' Modal Expansion (`buildShortcutsPanel`)**:
+  - Replaced the simple keyboard shortcuts list with an interactive, responsive **5-tab Slambient Field Manual**:
+    - **⚡ Shortcuts**: Transport, keyboard notes, CRT visualizer controls, Void Raiders arcade minigame, app installation.
+    - **🪐 Field Guide**: Eno coprime loop ecosystem explanation (7, 11, 13, 17, 19, 23 steps), Live vs Auto takeover mechanics, 14 scales/ragas, and Orbital vs Console perspective.
+    - **🎛️ Sound Modules**: Breakdown of all 9 modules (Sub/Tanpura, Tabla/Drums, Sitar/Chords, Arp, Pocket Field Recorder, 3-pedal chain).
+    - **💾 Patches & MIDI**: User Bank U1–U6 guide (click to load, shift-click to overwrite, right-click context menu), MIDI CC map, and multi-format audio/stems export.
+    - **✨ Secrets**: Hidden features documented (MU-TH-UR 6000 Eno CRT phosphor cycler, Void Raiders arcade minigame, planetary orb momentum flinging, 60 FPS fullscreen CRT mode, instant Ctrl/⌘+Z patch undo).
+  - Unlocked `#btnShortcuts` on touch/mobile devices so phone and tablet users can access the Field Manual anytime.
