@@ -383,6 +383,93 @@
     box-shadow: 0 0 16px rgba(var(--rgb-chord), 0.4);
   }
 
+  .preset-bank-tabs {
+    display: inline-flex;
+    align-items: center;
+    background: #080a11;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    padding: 2px;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  .btn-bank-tab {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .btn-bank-tab:hover {
+    color: #ffffff;
+  }
+  .btn-bank-tab.active {
+    background: rgba(var(--rgb-chord), 0.15);
+    color: var(--accent);
+    box-shadow: 0 0 6px rgba(var(--rgb-chord), 0.2);
+  }
+  .btn-store-user {
+    background: rgba(var(--rgb-filter), 0.12) !important;
+    border-color: rgba(var(--rgb-filter), 0.5) !important;
+    color: var(--color-filter) !important;
+  }
+  .btn-store-user:hover {
+    background: rgba(var(--rgb-filter), 0.25) !important;
+    color: #fff !important;
+  }
+  .rec-ctrl-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .record-format-select {
+    height: 32px;
+    box-sizing: border-box;
+    background: #101420;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 0 6px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .record-format-select:hover, .record-format-select:focus {
+    border-color: var(--border-bright);
+    color: #fff;
+    background: #161c2c;
+  }
+  .btn-header-midi {
+    gap: 6px;
+  }
+  .midi-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #525c74;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+  }
+  .btn-header-midi.connected .midi-status-dot {
+    background: #2ed573;
+    box-shadow: 0 0 8px rgba(46, 213, 115, 0.8);
+  }
+  .btn-header-midi.activity .midi-status-dot {
+    background: #ffffff !important;
+    box-shadow: 0 0 10px #ffffff !important;
+  }
+
   .global-transport {
     display: flex;
     align-items: center;
@@ -5183,8 +5270,11 @@
         </div>
 
         <div class="preset-group">
-          <span class="preset-label">PRESETS</span>
-          <div class="preset-bar">
+          <div class="preset-bank-tabs">
+            <button class="btn-bank-tab active" id="tabBankFactory" onclick="switchPresetBank('factory')" title="Factory curated presets">PRESETS</button>
+            <button class="btn-bank-tab" id="tabBankUser" onclick="switchPresetBank('user')" title="User saved patch bank (U1-U6)">USER [U1–U6]</button>
+          </div>
+          <div class="preset-bar" id="presetBarFactory">
             <button class="btn-preset-chip" onclick="applyPreset(0)" title="Nostalgic Drift — 7/4 warm tape pads, music box arp, drifting sub">Nostalgia</button>
             <button class="btn-preset-chip" onclick="applyPreset(1)" title="Organic Glitch — 5/8 intricate woodblocks, lofi keys, kalimba pendulum">Organic</button>
             <button class="btn-preset-chip" onclick="applyPreset(2)" title="Shimmer Cascade — 7/8 Lydian string swells, glass FM chimes, cathedral wash">Shimmer</button>
@@ -5200,6 +5290,15 @@
             <button class="btn-preset-chip" onclick="applyPreset(12)" title="Tangerine — 4/4 Berlin School sequences, analog pulse arp, Filter ➔ Delay ➔ Space">Tangerine</button>
             <button class="btn-preset-chip" onclick="applyPreset(13)" title="Disintegration — 3/4 tape loops, pitch drift, Space ➔ Delay ➔ Filter dark repeats">Disintegration</button>
             <button class="btn-preset-chip" onclick="applyPreset(14)" title="Chillhop — 4/4 boom-bap pocket, dusty tine keys, rain crackle, tape warmth">Chillhop</button>
+          </div>
+          <div class="preset-bar" id="presetBarUser" style="display:none;">
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot1" onclick="handleUserSlotClick(1, event)" oncontextmenu="handleUserSlotContextMenu(event, 1)" title="Slot U1 — Click to load / Shift-click to save">U1: Empty</button>
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot2" onclick="handleUserSlotClick(2, event)" oncontextmenu="handleUserSlotContextMenu(event, 2)" title="Slot U2 — Click to load / Shift-click to save">U2: Empty</button>
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot3" onclick="handleUserSlotClick(3, event)" oncontextmenu="handleUserSlotContextMenu(event, 3)" title="Slot U3 — Click to load / Shift-click to save">U3: Empty</button>
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot4" onclick="handleUserSlotClick(4, event)" oncontextmenu="handleUserSlotContextMenu(event, 4)" title="Slot U4 — Click to load / Shift-click to save">U4: Empty</button>
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot5" onclick="handleUserSlotClick(5, event)" oncontextmenu="handleUserSlotContextMenu(event, 5)" title="Slot U5 — Click to load / Shift-click to save">U5: Empty</button>
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot6" onclick="handleUserSlotClick(6, event)" oncontextmenu="handleUserSlotContextMenu(event, 6)" title="Slot U6 — Click to load / Shift-click to save">U6: Empty</button>
+            <button class="btn-preset-chip btn-store-user" onclick="storeToUserSlotPrompt()" title="Save current console & synth state into a user patch slot">+ STORE</button>
           </div>
         </div>
 
@@ -5234,10 +5333,17 @@
             <span id="btnPlayLabel">Start</span>
           </button>
 
-          <button class="btn-record" id="btnRecord" onclick="toggleRecord()" title="Record the master output; saves a 320 kbps MP3 when you stop">
-            <div class="rec-dot"></div>
-            <span id="btnRecordLabel">Record</span>
-          </button>
+          <div class="rec-ctrl-wrap">
+            <button class="btn-record" id="btnRecord" onclick="toggleRecord()" title="Record master output or multi-track stems">
+              <div class="rec-dot"></div>
+              <span id="btnRecordLabel">Record</span>
+            </button>
+            <select id="selRecordFormat" class="record-format-select" title="Output format: 320k MP3, Lossless WAV, or 5-Track Stems ZIP">
+              <option value="MP3">MP3</option>
+              <option value="WAV">WAV</option>
+              <option value="STEMS">STEMS</option>
+            </select>
+          </div>
 
           <button class="btn-preset-chip btn-randomize-all" onclick="randomizeEverything()" title="Randomize every module"><svg class="rand-all-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20.5 3.5v5h-5"/></svg><span>ALL</span></button>
 
@@ -5321,6 +5427,10 @@
             </button>
             <div class="palette-menu" id="paletteMenu" role="menu"></div>
           </div>
+          <button class="btn-header-util btn-header-midi" id="btnHeaderMidi" onclick="toggleMidiConnectionPrompt()" title="Web MIDI hardware connection">
+            <span class="midi-status-dot" id="midiStatusDot"></span>
+            <span id="midiHeaderLabel">MIDI</span>
+          </button>
           <button class="btn-header-util" id="btnUndoPatch" onclick="undoPatchChange()" title="Undo the last randomize / preset / new seed (Ctrl/⌘+Z)" disabled>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.5 3.5L2 7L5.5 10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 7H10a4 4 0 0 1 0 8H7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
             <span>Undo</span>
@@ -8708,6 +8818,14 @@ function startNoteLive(midi, vel = 90) {
     tremOsc.start(now);
   } else {
     gain.connect(targetBus);
+  }
+
+  if (typeof midiPitchBendCents === "number" && midiPitchBendCents !== 0) {
+    if (osc1.detune) osc1.detune.setValueAtTime(midiPitchBendCents, now);
+    if (osc2.detune) {
+      const curDetune = osc2.detune.value || 0;
+      osc2.detune.setValueAtTime(curDetune + midiPitchBendCents, now);
+    }
   }
 
   osc1.start(now);
@@ -14835,6 +14953,145 @@ function loadPresetBankJson(event) {
   reader.readAsText(file);
 }
 
+/* ==========================================================================
+   USER PATCH BANK & PRESET SLOTS (U1-U6)
+   ========================================================================== */
+const USER_PATCHES_KEY = "slambient_user_patches_v1";
+
+function getUserPatches() {
+  try {
+    const raw = localStorage.getItem(USER_PATCHES_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveUserPatches(patches) {
+  try {
+    localStorage.setItem(USER_PATCHES_KEY, JSON.stringify(patches));
+  } catch (e) {
+    console.error("Failed to persist user patches:", e);
+  }
+}
+
+function switchPresetBank(bank) {
+  const isUser = bank === "user";
+  const tabF = document.getElementById("tabBankFactory");
+  const tabU = document.getElementById("tabBankUser");
+  const barF = document.getElementById("presetBarFactory");
+  const barU = document.getElementById("presetBarUser");
+  if (tabF) tabF.classList.toggle("active", !isUser);
+  if (tabU) tabU.classList.toggle("active", isUser);
+  if (barF) barF.style.display = isUser ? "none" : "";
+  if (barU) barU.style.display = isUser ? "" : "none";
+  if (isUser) renderUserPatchSlots();
+}
+
+function renderUserPatchSlots() {
+  const patches = getUserPatches();
+  for (let i = 1; i <= 6; i++) {
+    const btn = document.getElementById(`btnUserSlot${i}`);
+    if (!btn) continue;
+    const entry = patches[i];
+    if (entry && entry.name) {
+      btn.textContent = `U${i}: ${entry.name}`;
+      btn.title = `Slot U${i} (${entry.name}) — Click to load, Shift-click to overwrite`;
+    } else {
+      btn.textContent = `U${i}: Empty`;
+      btn.title = `Slot U${i} (Empty) — Click to store current soundscape`;
+    }
+  }
+}
+
+function handleUserSlotClick(slotNum, event) {
+  const patches = getUserPatches();
+  const entry = patches[slotNum];
+  const isShift = event && event.shiftKey;
+
+  if (!entry || !entry.data || isShift) {
+    const defName = (document.getElementById("hudScale") ? document.getElementById("hudScale").textContent : `Patch ${slotNum}`).trim();
+    const name = window.prompt(`Save current soundscape to User Slot U${slotNum}:`, (entry && entry.name) || defName);
+    if (name === null) return;
+    const finalName = name.trim() || `Patch ${slotNum}`;
+    patches[slotNum] = {
+      name: finalName,
+      data: serializeCurrentPatch(),
+      savedAt: Date.now()
+    };
+    saveUserPatches(patches);
+    renderUserPatchSlots();
+    highlightActiveUserSlot(slotNum);
+    const status = document.getElementById("footerStatus");
+    if (status) status.textContent = `Saved User Slot U${slotNum}: ${finalName}`;
+  } else {
+    applyPatchData(entry.data);
+    highlightActiveUserSlot(slotNum);
+    const status = document.getElementById("footerStatus");
+    if (status) status.textContent = `Loaded User Slot U${slotNum}: ${entry.name}`;
+  }
+}
+
+function handleUserSlotContextMenu(event, slotNum) {
+  if (event) event.preventDefault();
+  const patches = getUserPatches();
+  const entry = patches[slotNum];
+  if (!entry) {
+    handleUserSlotClick(slotNum, event);
+    return;
+  }
+  const action = window.prompt(`Slot U${slotNum}: "${entry.name}"\nType 1 to Rename, 2 to Overwrite with current sound, 3 to Clear slot:`, "1");
+  if (action === "1") {
+    const newName = window.prompt("New patch name:", entry.name);
+    if (newName && newName.trim()) {
+      entry.name = newName.trim();
+      saveUserPatches(patches);
+      renderUserPatchSlots();
+    }
+  } else if (action === "2") {
+    entry.data = serializeCurrentPatch();
+    entry.savedAt = Date.now();
+    saveUserPatches(patches);
+    renderUserPatchSlots();
+    highlightActiveUserSlot(slotNum);
+    const status = document.getElementById("footerStatus");
+    if (status) status.textContent = `Overwrote Slot U${slotNum}: ${entry.name}`;
+  } else if (action === "3") {
+    if (window.confirm(`Clear User Slot U${slotNum} (${entry.name})?`)) {
+      delete patches[slotNum];
+      saveUserPatches(patches);
+      renderUserPatchSlots();
+      highlightActiveUserSlot(null);
+    }
+  }
+}
+
+function storeToUserSlotPrompt() {
+  const patches = getUserPatches();
+  let suggested = 1;
+  for (let i = 1; i <= 6; i++) {
+    if (!patches[i]) { suggested = i; break; }
+  }
+  const input = window.prompt("Store current soundscape into User Slot (1-6):", String(suggested));
+  if (!input) return;
+  const slotNum = parseInt(input.trim(), 10);
+  if (isNaN(slotNum) || slotNum < 1 || slotNum > 6) {
+    alert("Please enter a valid slot number between 1 and 6.");
+    return;
+  }
+  handleUserSlotClick(slotNum, { shiftKey: true });
+}
+
+function highlightActiveUserSlot(slotNum) {
+  for (let i = 1; i <= 6; i++) {
+    const btn = document.getElementById(`btnUserSlot${i}`);
+    if (btn) btn.classList.toggle("active", i === slotNum);
+  }
+  if (slotNum !== null) {
+    document.querySelectorAll("#presetBarFactory .btn-preset-chip").forEach(b => b.classList.remove("active"));
+  }
+}
+
 let sessionSeconds = 0;
 let sessionTimerInterval = null;
 
@@ -15137,8 +15394,8 @@ async function encodeMp3(left, right, sampleRate, onProgress) {
   return new Blob(parts, { type: "audio/mpeg" });
 }
 
-function encodeWav(left, right, sampleRate) {
-  const n = left.length;
+function encodeWavBuffer(left, right, sampleRate) {
+  const n = left ? left.length : 0;
   const buf = new ArrayBuffer(44 + n * 4);
   const v = new DataView(buf);
   const str = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
@@ -15149,14 +15406,185 @@ function encodeWav(left, right, sampleRate) {
   str(36, "data"); v.setUint32(40, n * 4, true);
   let o = 44;
   for (let i = 0; i < n; i++) {
-    const l = Math.max(-1, Math.min(1, left[i])), r = Math.max(-1, Math.min(1, right[i]));
+    const l = Math.max(-1, Math.min(1, left[i])), r = Math.max(-1, Math.min(1, right ? right[i] : left[i]));
     v.setInt16(o, l < 0 ? l * 0x8000 : l * 0x7fff, true); o += 2;
     v.setInt16(o, r < 0 ? r * 0x8000 : r * 0x7fff, true); o += 2;
   }
-  return new Blob([buf], { type: "audio/wav" });
+  return buf;
 }
 
-async function finishRecording(left, right, sampleRate) {
+function encodeWav(left, right, sampleRate) {
+  return new Blob([encodeWavBuffer(left, right, sampleRate)], { type: "audio/wav" });
+}
+
+function buildZip(files) {
+  const crcTable = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+    crcTable[n] = c >>> 0;
+  }
+  function calcCrc32(bytes) {
+    let crc = 0 ^ (-1);
+    for (let i = 0; i < bytes.length; i++) crc = (crc >>> 8) ^ crcTable[(crc ^ bytes[i]) & 0xFF];
+    return (crc ^ (-1)) >>> 0;
+  }
+  const entries = [];
+  let offset = 0;
+  const encoder = new TextEncoder();
+  for (const file of files) {
+    const nameBytes = encoder.encode(file.name);
+    const dataBytes = file.data instanceof Uint8Array ? file.data : new Uint8Array(file.data);
+    const crc = calcCrc32(dataBytes);
+    const size = dataBytes.length;
+    const header = new Uint8Array(30 + nameBytes.length);
+    const hv = new DataView(header.buffer);
+    hv.setUint32(0, 0x04034b50, true);
+    hv.setUint16(4, 20, true);
+    hv.setUint16(6, 0, true);
+    hv.setUint16(8, 0, true);
+    hv.setUint16(10, 0, true);
+    hv.setUint16(12, 0, true);
+    hv.setUint32(14, crc, true);
+    hv.setUint32(18, size, true);
+    hv.setUint32(22, size, true);
+    hv.setUint16(26, nameBytes.length, true);
+    hv.setUint16(28, 0, true);
+    header.set(nameBytes, 30);
+    entries.push({ nameBytes, dataBytes, header, crc, size, offset });
+    offset += header.length + dataBytes.length;
+  }
+  const cdStart = offset;
+  let cdSize = 0;
+  const cdEntries = [];
+  for (const entry of entries) {
+    const cdh = new Uint8Array(46 + entry.nameBytes.length);
+    const cv = new DataView(cdh.buffer);
+    cv.setUint32(0, 0x02014b50, true);
+    cv.setUint16(4, 20, true);
+    cv.setUint16(6, 20, true);
+    cv.setUint16(8, 0, true);
+    cv.setUint16(10, 0, true);
+    cv.setUint16(12, 0, true);
+    cv.setUint16(14, 0, true);
+    cv.setUint32(16, entry.crc, true);
+    cv.setUint32(20, entry.size, true);
+    cv.setUint32(24, entry.size, true);
+    cv.setUint16(28, entry.nameBytes.length, true);
+    cv.setUint16(30, 0, true);
+    cv.setUint16(32, 0, true);
+    cv.setUint16(34, 0, true);
+    cv.setUint16(36, 0, true);
+    cv.setUint32(38, 0, true);
+    cv.setUint32(42, entry.offset, true);
+    cdh.set(entry.nameBytes, 46);
+    cdEntries.push(cdh);
+    cdSize += cdh.length;
+  }
+  const eocd = new Uint8Array(22);
+  const ev = new DataView(eocd.buffer);
+  ev.setUint32(0, 0x06054b50, true);
+  ev.setUint16(4, 0, true);
+  ev.setUint16(6, 0, true);
+  ev.setUint16(8, entries.length, true);
+  ev.setUint16(10, entries.length, true);
+  ev.setUint32(12, cdSize, true);
+  ev.setUint32(16, cdStart, true);
+  ev.setUint16(20, 0, true);
+  const totalLength = offset + cdSize + 22;
+  const result = new Uint8Array(totalLength);
+  let p = 0;
+  for (const entry of entries) {
+    result.set(entry.header, p);
+    p += entry.header.length;
+    result.set(entry.dataBytes, p);
+    p += entry.dataBytes.length;
+  }
+  for (const cdh of cdEntries) {
+    result.set(cdh, p);
+    p += cdh.length;
+  }
+  result.set(eocd, p);
+  return result;
+}
+
+let currentRecordFormat = "MP3";
+let stemProcessors = [];
+let stemChunks = {
+  masterL: [], masterR: [],
+  droneL: [], droneR: [],
+  drumL: [], drumR: [],
+  chordL: [], chordR: [],
+  arpL: [], arpR: []
+};
+
+async function finishStemsRecording(sampleRate) {
+  const btn = document.getElementById("btnRecord");
+  const lbl = document.getElementById("btnRecordLabel");
+  recordEncoding = true;
+  if (btn) btn.disabled = true;
+  if (lbl) lbl.textContent = "Packing ZIP…";
+
+  try {
+    const masterL = mergeChunks(stemChunks.masterL), masterR = mergeChunks(stemChunks.masterR);
+    if (!masterL.length) { setRecordStatus("Recording was empty -- nothing saved"); return; }
+    const droneL = mergeChunks(stemChunks.droneL), droneR = mergeChunks(stemChunks.droneR);
+    const drumL = mergeChunks(stemChunks.drumL), drumR = mergeChunks(stemChunks.drumR);
+    const chordL = mergeChunks(stemChunks.chordL), chordR = mergeChunks(stemChunks.chordR);
+    const arpL = mergeChunks(stemChunks.arpL), arpR = mergeChunks(stemChunks.arpR);
+    stemChunks = { masterL: [], masterR: [], droneL: [], droneR: [], drumL: [], drumR: [], chordL: [], chordR: [], arpL: [], arpR: [] };
+
+    setRecordStatus("Encoding 5 stems to 16-bit PCM WAV…");
+    const wavMaster = encodeWavBuffer(masterL, masterR, sampleRate);
+    const wavDrone  = encodeWavBuffer(droneL, droneR, sampleRate);
+    const wavDrum   = encodeWavBuffer(drumL, drumR, sampleRate);
+    const wavChord  = encodeWavBuffer(chordL, chordR, sampleRate);
+    const wavArp    = encodeWavBuffer(arpL, arpR, sampleRate);
+
+    const patchJson = JSON.stringify(serializeCurrentPatch(), null, 2);
+    const hex = "#" + seed.toString(16).toUpperCase().padStart(8, '0').slice(0, 4) + "-" + seed.toString(16).toUpperCase().padStart(8, '0').slice(4);
+    const metaTxt = `Slambient Meander Engine -- Multi-Track Stems Take\n`
+      + `Date: ${new Date().toISOString()}\n`
+      + `BPM: ${bpm}\n`
+      + `Time Signature: ${currentTimeSig}\n`
+      + `Root Key / Scale: ${document.getElementById("hudScale") ? document.getElementById("hudScale").textContent : ""}\n`
+      + `Seed: ${hex}\n\n`
+      + `Tracks:\n`
+      + `01_master_mix.wav  - Full stereo master output (limiter / post-DSP)\n`
+      + `02_sub_drone.wav    - Sub drone & Tanpura acoustic model\n`
+      + `03_drums.wav        - Percussion, tabla, clicks & kicks\n`
+      + `04_chords_lead.wav  - Harmonic chord voicings & sitar acoustic model\n`
+      + `05_shimmer_arp.wav  - Pentatonic generative shimmer arpeggio\n`
+      + `patch.json          - Exact recallable synth patch & DSP chain parameters\n`;
+
+    const encoder = new TextEncoder();
+    const zipFiles = [
+      { name: "01_master_mix.wav", data: new Uint8Array(wavMaster) },
+      { name: "02_sub_drone.wav", data: new Uint8Array(wavDrone) },
+      { name: "03_drums.wav", data: new Uint8Array(wavDrum) },
+      { name: "04_chords_lead.wav", data: new Uint8Array(wavChord) },
+      { name: "05_shimmer_arp.wav", data: new Uint8Array(wavArp) },
+      { name: "patch.json", data: encoder.encode(patchJson) },
+      { name: "session_info.txt", data: encoder.encode(metaTxt) }
+    ];
+
+    setRecordStatus("Compressing stems archive…");
+    const zipBytes = buildZip(zipFiles);
+    const zipBlob = new Blob([zipBytes], { type: "application/zip" });
+    const fileName = `slambient-stems-${Date.now()}.zip`;
+    downloadBlob(zipBlob, fileName);
+    setRecordStatus(`Saved ${fileName} (${(zipBlob.size / 1048576).toFixed(1)} MB, 5 tracks + patch)`);
+  } catch (err) {
+    console.error("Failed to build stems zip:", err);
+    setRecordStatus("Error building stems archive: " + err.message);
+  } finally {
+    recordEncoding = false;
+    if (btn) btn.disabled = false;
+    if (lbl) lbl.textContent = "Record";
+  }
+}
+
+async function finishSingleRecording(left, right, sampleRate, format) {
   const btn = document.getElementById("btnRecord");
   const lbl = document.getElementById("btnRecordLabel");
   recordEncoding = true;
@@ -15165,6 +15593,16 @@ async function finishRecording(left, right, sampleRate) {
   const secs = (left.length / sampleRate).toFixed(1);
   try {
     if (!left.length) { setRecordStatus("Recording was empty -- nothing saved"); return; }
+    
+    if (format === "WAV") {
+      setRecordStatus(`Encoding ${secs}s take to Lossless WAV…`);
+      const blob = encodeWav(left, right, sampleRate);
+      const name = recordingFileName("wav");
+      downloadBlob(blob, name);
+      setRecordStatus(`Saved ${name} (${(blob.size / 1048576).toFixed(1)} MB Lossless WAV)`);
+      return;
+    }
+
     setRecordStatus(`Encoding ${secs}s take to MP3…`);
     let blob, name;
     try {
@@ -15194,46 +15632,170 @@ function toggleRecord() {
 
   const btn = document.getElementById("btnRecord");
   const lbl = document.getElementById("btnRecordLabel");
+  const selFmt = document.getElementById("selRecordFormat");
+  currentRecordFormat = (selFmt ? selFmt.value : "MP3").toUpperCase();
 
   if (!isRecording) {
-    loadLameJs().catch(() => {}); // warm up the encoder while recording
+    if (currentRecordFormat === "MP3") loadLameJs().catch(() => {});
+    
     recordChunksL = []; recordChunksR = [];
-    // ScriptProcessor rather than an AudioWorklet: a worklet module can't be
-    // loaded from a blob/file:// URL in every browser, and this page is
-    // meant to run by double-clicking index.html.
-    recordTap = audioCtx.createScriptProcessor(4096, 2, 2);
-    recordTap.channelCount = 2;
-    recordTap.channelCountMode = "explicit";
-    recordTap.onaudioprocess = (e) => {
-      if (!isRecording) return;
-      recordChunksL.push(new Float32Array(e.inputBuffer.getChannelData(0)));
-      recordChunksR.push(new Float32Array(e.inputBuffer.getChannelData(1)));
-      // Safe memory cap: 45 minutes (~31,600 chunks at 48kHz stereo, ~1GB raw PCM)
-      if (recordChunksL.length >= 31600) {
-        setRecordStatus("45-min recording limit reached — saving take to protect memory…");
-        setTimeout(() => { if (isRecording) toggleRecord(); }, 10);
-      }
+    stemChunks = {
+      masterL: [], masterR: [],
+      droneL: [], droneR: [],
+      drumL: [], drumR: [],
+      chordL: [], chordR: [],
+      arpL: [], arpR: []
     };
-    // A ScriptProcessor only runs while connected to the destination; route
-    // it through a silent gain so it adds nothing to what you hear.
+    stemProcessors = [];
+
     recordSilentOut = audioCtx.createGain();
     recordSilentOut.gain.value = 0;
-    limiterNode.connect(recordTap);
-    recordTap.connect(recordSilentOut);
     recordSilentOut.connect(audioCtx.destination);
 
+    if (currentRecordFormat === "STEMS") {
+      const buses = [
+        { node: limiterNode, l: stemChunks.masterL, r: stemChunks.masterR },
+        { node: droneAnalyser, l: stemChunks.droneL, r: stemChunks.droneR },
+        { node: drumAnalyser, l: stemChunks.drumL, r: stemChunks.drumR },
+        { node: chordAnalyser, l: stemChunks.chordL, r: stemChunks.chordR },
+        { node: arpAnalyser, l: stemChunks.arpL, r: stemChunks.arpR }
+      ];
+
+      buses.forEach(b => {
+        if (!b.node) return;
+        const proc = audioCtx.createScriptProcessor(4096, 2, 2);
+        proc.channelCount = 2;
+        proc.channelCountMode = "explicit";
+        proc.onaudioprocess = (e) => {
+          if (!isRecording) return;
+          b.l.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+          b.r.push(new Float32Array(e.inputBuffer.getChannelData(1)));
+          if (b.l.length >= 31600) {
+            setRecordStatus("45-min recording limit reached — saving take…");
+            setTimeout(() => { if (isRecording) toggleRecord(); }, 10);
+          }
+        };
+        try {
+          b.node.connect(proc);
+          proc.connect(recordSilentOut);
+          stemProcessors.push({ node: b.node, proc });
+        } catch (e) {
+          console.warn("Failed to tap bus for stems:", e);
+        }
+      });
+    } else {
+      recordTap = audioCtx.createScriptProcessor(4096, 2, 2);
+      recordTap.channelCount = 2;
+      recordTap.channelCountMode = "explicit";
+      recordTap.onaudioprocess = (e) => {
+        if (!isRecording) return;
+        recordChunksL.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+        recordChunksR.push(new Float32Array(e.inputBuffer.getChannelData(1)));
+        if (recordChunksL.length >= 31600) {
+          setRecordStatus("45-min recording limit reached — saving take to protect memory…");
+          setTimeout(() => { if (isRecording) toggleRecord(); }, 10);
+        }
+      };
+      limiterNode.connect(recordTap);
+      recordTap.connect(recordSilentOut);
+    }
+
     isRecording = true;
-    btn.classList.add("recording"); lbl.textContent = "Stop & Save";
-    setRecordStatus("Recording…");
+    btn.classList.add("recording");
+    lbl.textContent = "Stop & Save";
+    setRecordStatus(`Recording (${currentRecordFormat})…`);
   } else {
     isRecording = false;
-    try { limiterNode.disconnect(recordTap); } catch (e) {}
-    try { recordTap.disconnect(); recordSilentOut.disconnect(); } catch (e) {}
-    recordTap = null; recordSilentOut = null;
     btn.classList.remove("recording");
-    const left = mergeChunks(recordChunksL), right = mergeChunks(recordChunksR);
-    recordChunksL = []; recordChunksR = [];
-    finishRecording(left, right, audioCtx.sampleRate);
+
+    if (stemProcessors.length) {
+      stemProcessors.forEach(sp => {
+        try { sp.node.disconnect(sp.proc); } catch (e) {}
+        try { sp.proc.disconnect(); } catch (e) {}
+      });
+      stemProcessors = [];
+    }
+    if (recordTap) {
+      try { limiterNode.disconnect(recordTap); } catch (e) {}
+      try { recordTap.disconnect(); } catch (e) {}
+      recordTap = null;
+    }
+    if (recordSilentOut) {
+      try { recordSilentOut.disconnect(); } catch (e) {}
+      recordSilentOut = null;
+    }
+
+    if (currentRecordFormat === "STEMS") {
+      finishStemsRecording(audioCtx.sampleRate);
+    } else {
+      const left = mergeChunks(recordChunksL), right = mergeChunks(recordChunksR);
+      recordChunksL = []; recordChunksR = [];
+      finishSingleRecording(left, right, audioCtx.sampleRate, currentRecordFormat);
+    }
+  }
+}
+
+/* ==========================================================================
+   WEB MIDI HARDWARE INTEGRATION & CC MAP
+   ========================================================================== */
+let midiAccess = null;
+let midiSustainActive = false;
+const midiSustainedNotes = new Set();
+let midiPitchBendCents = 0;
+let midiActivityTimer = null;
+
+function flashMidiActivityIndicator() {
+  const btn = document.getElementById("btnHeaderMidi");
+  if (!btn) return;
+  btn.classList.add("activity");
+  clearTimeout(midiActivityTimer);
+  midiActivityTimer = setTimeout(() => {
+    btn.classList.remove("activity");
+  }, 100);
+}
+
+function updateMidiStatusUI() {
+  const btn = document.getElementById("btnHeaderMidi");
+  const lbl = document.getElementById("midiHeaderLabel");
+  const hasAccess = !!midiAccess;
+  const numInputs = midiAccess ? midiAccess.inputs.size : 0;
+  const numOutputs = midiAccess ? midiAccess.outputs.size : 0;
+  const isConnected = hasAccess && (numInputs > 0 || numOutputs > 0);
+
+  if (btn) {
+    btn.classList.toggle("connected", isConnected);
+    btn.title = isConnected
+      ? `Web MIDI Active — ${numInputs} In / ${numOutputs} Out (Click for options)`
+      : `Web MIDI Offline (Click to connect MIDI keyboard / controller)`;
+  }
+  if (lbl) {
+    if (isConnected) {
+      let firstInName = "";
+      for (const input of midiAccess.inputs.values()) {
+        firstInName = input.name || "";
+        break;
+      }
+      lbl.textContent = firstInName ? firstInName.slice(0, 8).toUpperCase() : "MIDI ON";
+    } else {
+      lbl.textContent = "MIDI";
+    }
+  }
+}
+
+function toggleMidiConnectionPrompt() {
+  if (!navigator.requestMIDIAccess) {
+    alert("Web MIDI API is not supported in this browser. Please use Chrome, Edge, or a browser with Web MIDI support.");
+    return;
+  }
+  if (!midiAccess) {
+    connectMidi();
+  } else {
+    const inNames = Array.from(midiAccess.inputs.values()).map(i => i.name).join(", ") || "None";
+    const outNames = Array.from(midiAccess.outputs.values()).map(o => o.name).join(", ") || "None";
+    const msg = `Web MIDI Status:\n• Inputs: ${inNames}\n• Outputs: ${outNames}\n\nRe-scan devices?`;
+    if (window.confirm(msg)) {
+      connectMidi();
+    }
   }
 }
 
@@ -15242,29 +15804,99 @@ function attachMidiInputs(access) {
     input.onmidimessage = (event) => {
       if (!event.data || event.data.length < 2) return;
       const status = event.data[0];
-      const note = event.data[1];
-      const velocity = event.data.length > 2 ? event.data[2] : 90;
       const cmd = status >> 4;
+      const note = event.data[1];
+      const vel = event.data.length > 2 ? event.data[2] : 90;
 
-      if (cmd === 9) {
-        if (velocity > 0) {
-          startNoteLive(note, velocity);
+      flashMidiActivityIndicator();
+
+      if (cmd === 9) { // Note On
+        if (vel > 0) {
+          if (midiSustainedNotes.has(note)) midiSustainedNotes.delete(note);
+          startNoteLive(note, vel);
+        } else {
+          if (midiSustainActive) {
+            midiSustainedNotes.add(note);
+          } else {
+            stopNoteLive(note);
+          }
+        }
+      } else if (cmd === 8) { // Note Off
+        if (midiSustainActive) {
+          midiSustainedNotes.add(note);
         } else {
           stopNoteLive(note);
         }
-      } else if (cmd === 8) {
-        stopNoteLive(note);
+      } else if (cmd === 11) { // CC (Control Change)
+        const cc = event.data[1];
+        const val = event.data.length > 2 ? event.data[2] : 0;
+        // CC 64: Sustain Pedal
+        if (cc === 64) {
+          if (val >= 64) {
+            midiSustainActive = true;
+          } else {
+            midiSustainActive = false;
+            for (const n of midiSustainedNotes) {
+              stopNoteLive(n);
+            }
+            midiSustainedNotes.clear();
+          }
+        }
+        // CC 74: Master Filter Cutoff
+        else if (cc === 74) {
+          const k = document.getElementById("knobMasterCutoff");
+          if (k) {
+            k.value = ((val / 127) * 100).toFixed(1);
+            updateAudioParams();
+          }
+        }
+        // CC 71: Master Filter Resonance
+        else if (cc === 71) {
+          const k = document.getElementById("knobMasterRes");
+          if (k) {
+            k.value = (0.5 + (val / 127) * 7.5).toFixed(1);
+            updateAudioParams();
+          }
+        }
+        // CC 1: Reverb / Weather Space
+        else if (cc === 1) {
+          const k = document.getElementById("knobWeather");
+          if (k) {
+            k.value = Math.round((val / 127) * 100);
+            updateAudioParams();
+          }
+        }
+        // CC 7: Master Volume
+        else if (cc === 7) {
+          const k = document.getElementById("knobMasterVolume");
+          if (k) {
+            k.value = Math.round((val / 127) * 100);
+            updateMasterVolume(k.value);
+          }
+        }
+      } else if (cmd === 14) { // Pitch Bend (0xE0)
+        const lsb = event.data[1];
+        const msb = event.data.length > 2 ? event.data[2] : 64;
+        const raw = ((msb << 7) | lsb) - 8192;
+        midiPitchBendCents = (raw / 8192) * 200; // +/- 200 cents
+        if (audioCtx) {
+          const now = audioCtx.currentTime;
+          for (const voice of activeLiveVoices.values()) {
+            if (voice.osc1 && voice.osc1.detune) voice.osc1.detune.setValueAtTime(midiPitchBendCents, now);
+            if (voice.osc2 && voice.osc2.detune) {
+              const baseD = chordTimbre === "SAW_SYNTH" ? 7 : (chordTimbre === "DIGITAL_STRINGS" ? 6.5 : 0);
+              voice.osc2.detune.setValueAtTime(baseD + midiPitchBendCents, now);
+            }
+          }
+        }
       }
     };
   }
 }
 
-// Web MIDI is opt-in: asking for it on page load makes browsers show a
-// "wants to control your MIDI devices" prompt to every first-time visitor.
-// Instead the Hardware MIDI Output menu offers "Connect MIDI Device..." and the
-// browser is only asked once the user picks it.
-let midiAccess = null;
 function populateMidiSelect(select, keepId) {
+  if (!select) select = document.getElementById("selMidiOut");
+  if (!select || !midiAccess) return;
   select.innerHTML = '<option value="">' + (midiAccess.outputs.size ? 'No Output Selected' : 'No Hardware Device Connected') + '</option>';
   for (let output of midiAccess.outputs.values()) {
     const opt = document.createElement("option");
@@ -15274,24 +15906,36 @@ function populateMidiSelect(select, keepId) {
   select.value = (keepId && midiAccess.outputs.has(keepId)) ? keepId : "";
   midiOutput = select.value ? midiAccess.outputs.get(select.value) : null;
 }
+
 function connectMidi(select) {
+  if (!select) select = document.getElementById("selMidiOut");
   if (!navigator.requestMIDIAccess) {
-    select.value = "";
+    if (select) select.value = "";
+    updateMidiStatusUI();
     return;
   }
   navigator.requestMIDIAccess().then((access) => {
     midiAccess = access;
-    populateMidiSelect(select, null);
-    select.dispatchEvent(new Event("change", { bubbles: true }));
+    if (select) {
+      populateMidiSelect(select, null);
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    }
     attachMidiInputs(access);
+    updateMidiStatusUI();
     access.onstatechange = () => {
       attachMidiInputs(access);
-      populateMidiSelect(select, midiOutput && midiOutput.id);
-      select.dispatchEvent(new Event("change", { bubbles: true }));
+      if (select) {
+        populateMidiSelect(select, midiOutput && midiOutput.id);
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      updateMidiStatusUI();
     };
   }).catch(() => {
-    select.value = "";
-    select.dispatchEvent(new Event("change", { bubbles: true }));
+    if (select) {
+      select.value = "";
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    updateMidiStatusUI();
   });
 }
 (function setupMidiSelect() {
@@ -15406,6 +16050,8 @@ function newSeed() {
 }
 
 setupRandomInitialState();
+renderUserPatchSlots();
+updateMidiStatusUI();
 
 /* ==========================================================================
    HEADER UTILITIES (Phase 7): UNDO, TAP TEMPO, SHORTCUTS PANEL

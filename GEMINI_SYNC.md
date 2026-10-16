@@ -1099,3 +1099,39 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - **Module 5 Field Sampler Aux Sends**: Fixed `route()` to track auxiliary send gain nodes (`sends`) and updated `cleanupLater` to disconnect all 3 send gains alongside panners and filters.
   - **Master Output Recording Cap**: Added a 45-minute (~1 GB raw PCM) safe buffer guard in `recordTap.onaudioprocess` to auto-stop and save long takes, preventing runaway memory exhaustion.
 
+## Update — 2026-10-16 (Master AudioWorklet Clock, User Patch Bank, Web MIDI & Stems Export)
+
+- **AudioWorklet Master Clock Engine (`clock-processor.js`)**:
+  - Sample-accurate real-time audio thread timing driven by audio sample rate counting rather than UI `setInterval` timers.
+  - Zero timing jitter, immune to background tab throttling, heavy canvas animations, and garbage collection pauses.
+  - Seamless fallback to buffer scheduler for sandboxed/file:// environments without worklet permissions.
+  - Precached in Service Worker cache (`slambient-v2`) for offline PWA operation.
+- **User Patch Bank & Preset Slots (U1–U6)**:
+  - Added segmented bank tabs (`FACTORY` / `USER [U1–U6]`) in the header preset bar.
+  - 6 dedicated custom patch slots (`U1`..`U6`) persisted in `localStorage["slambient_user_patches_v1"]`.
+  - Single-click to load, click empty slot to save current soundscape with name prompt, Shift-click to overwrite, and right-click/contextmenu to rename, overwrite, or clear.
+  - `+ STORE` quick button to save current sound to next available slot.
+  - Full interoperability with JSON file export/import in the BANK section.
+- **Web MIDI Hardware Integration & CC Controls**:
+  - Header Web MIDI connection button (`#btnHeaderMidi`) with status indicator dot and device name display.
+  - Momentary activity LED flash on incoming MIDI messages.
+  - Full CC mappings:
+    - **CC 74**: Master Filter Cutoff (`knobMasterCutoff`, 0-100)
+    - **CC 71**: Master Filter Resonance (`knobMasterRes`, 0.5-8.0)
+    - **CC 1**: Diffusion Master Space / Weather (`knobWeather`, 0-100)
+    - **CC 7**: Master Output Volume (`knobMasterVolume`, 0-100)
+    - **CC 64**: Sustain Pedal (>= 64 sustains notes in `midiSustainedNotes`, < 64 releases)
+    - **Pitch Bend**: 14-bit pitch bend mapped to +/- 200 cents (+/- 2 semitones) across live synth voices.
+- **Multi-Track Stems & Lossless WAV Export**:
+  - Recording format selector in header transport: `MP3 (320k)`, `WAV (Lossless 16-bit PCM)`, and `STEMS (.ZIP)`.
+  - Pure JavaScript zero-dependency ZIP archive builder (`buildZip`) with CRC-32 checksum calculation.
+  - Multi-bus isolated taps simultaneously recording:
+    - `01_master_mix.wav` (Master stereo mix post-limiter)
+    - `02_sub_drone.wav` (Sub-drone & Tanpura acoustic model)
+    - `03_drums.wav` (Tabla, organic percussion, kicks, and clicks)
+    - `04_chords_lead.wav` (Chord voicings & Sitar physical model)
+    - `05_shimmer_arp.wav` (Generative shimmer arpeggio)
+    - `patch.json` (Exact serialized state of all synth engines, sliders, and DSP pedal routing)
+    - `session_info.txt` (Session metadata with BPM, meter, key/scale, seed, and track notes).
+  - Bundled and downloaded automatically as `slambient-stems-[TIMESTAMP].zip`.
+
