@@ -3186,7 +3186,10 @@
     border: 1px solid var(--eno-glow-border, var(--border-light));
     border-radius: 6px;
     padding: 8px 10px;
+    align-self: stretch;
+    height: auto;
     aspect-ratio: 1 / 1;
+    width: auto;
     box-sizing: border-box;
     flex-shrink: 0;
     min-height: 0;
@@ -16552,6 +16555,12 @@ if (document.readyState === "loading") {
 function syncEnoPodSquare() {
   const pod = document.querySelector(".eno-standalone-pod");
   if (!pod) return;
+  // Modern browsers natively resolve aspect-ratio with flex stretch at subpixel precision
+  if (window.CSS && CSS.supports && CSS.supports("aspect-ratio", "1 / 1")) {
+    pod.style.width = "";
+    pod.style.height = "";
+    return;
+  }
   if (window.matchMedia && window.matchMedia("(max-width: 640px)").matches) {
     pod.style.width = "";
     pod.style.height = "";
@@ -16559,9 +16568,7 @@ function syncEnoPodSquare() {
   }
   const topBar = document.querySelector("header.top-bar");
   if (topBar) {
-    pod.style.height = "0px";
-    pod.style.width = "0px";
-    const h = topBar.offsetHeight;
+    const h = topBar.getBoundingClientRect().height;
     if (h > 0) {
       pod.style.height = h + "px";
       pod.style.width = h + "px";
@@ -16571,7 +16578,7 @@ function syncEnoPodSquare() {
     }
   } else {
     pod.style.width = "auto";
-    const h = pod.offsetHeight;
+    const h = pod.getBoundingClientRect().height;
     if (h > 0) pod.style.width = h + "px";
   }
 }
