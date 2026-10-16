@@ -1362,6 +1362,17 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
 - **Solution**:
   - Relocated `.scope-layer-toggles` from `.panel-header.scope-panel-header` to the bottom of the visualizer card, directly beneath `.scope-left-viz`.
   - Converted `.scope-layer-toggles` to a full-width 7-column CSS grid (`grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; width: 100%; box-sizing: border-box;`).
-  - Configured each toggle button to span `width: 100%` of its column with equal height (26px desktop, 24px landscape mobile, 36px portrait mobile), providing perfect uniform symmetry and edge-to-edge justification with zero wrapping or overflow.
-  - In fullscreen mode, centered `.scope-layer-toggles` as a sleek bottom dock (`max-width: 680px; margin: 0 auto; width: 100%;`).
   - Cleaned up `.scope-panel > .panel-header` to a clean single row (`[::] VISUALIZER • SUB • DRUMS • CHORDS • ARP`) with generous horizontal breathing room across all screen sizes.
+
+## Update — 2026-10-16 (Canonical Brand Guidelines & Design System Master Specification)
+
+- **Creation of `BRAND_GUIDELINES.md`**:
+  - Established a formal, standalone design system specification at `/Users/benfox/Documents/Development/slambient_dev/BRAND_GUIDELINES.md` to serve as the definitive checklist for all UI, color, typography, audio aesthetic, and component changes.
+- **Key Tenets & Enforced Standards**:
+  - **The Symmetry Law**: Disciplined geometric divisions ($50/50$, $60/40$, $33/33/33$), identical heights for sibling controls in horizontal rows (40px portrait, 30px landscape, 34px desktop), and mathematically centered header anchors.
+  - **Zero Text Overwrapping Rule**: Absolute ban on button text or badges wrapping into multi-line fragments or colliding with adjacent icons (`white-space: nowrap !important; text-overflow: clip;`).
+  - **Modular Element Completeness**: Every component (pedal chassis, strip channel, toolbar section, telemetry pill) must render as a complete, self-contained modular entity with complete border definitions, inset drop shadows, and full state implementations (Default, Hover, Active, Bypassed).
+  - **Design Token Registry**: Codified complete chassis neutrals (`#040507` through `#3b4460`), typography neutrals (`#e6ebf5`, `#8e9bb5`, `#525c74`), and the 9 semantic neon module accents.
+  - **Typography Rules**: `JetBrains Mono` for all controls, badges, readouts, and titles; `Inter` for descriptive copy; explicit font loading to prevent system font metric discrepancies on non-Mac devices.
+  - **Quality Checklist**: 7-point pre-flight checklist for all future PRs and code modifications.
+

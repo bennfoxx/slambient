@@ -18,6 +18,7 @@ This master architecture document serves as the authoritative single-source-of-t
 * **Part IV (Sections 16–19):** FM-1 Hardware Conversion Planning & Physical Control Mapping Specification: complete physical surface translation (27 silicone keys, continuous rotary encoders, 24 FPS SPI display), dual-mode parameter dispatch (Macro vs. Module Page), AUTO-to-LIVE downbeat hand-off state machine, and comprehensive 8-phase embedded engineering roadmap.
 * **Part V (Sections 20–23):** Commercialization, Monetization Strategy & Native Release Roadmap: market landscape, competitive moats, Step 1 (iOS/iPadOS App Store via Capacitor), Step 2 (Desktop Studio & Royalty-Free Stem Generator via Tauri), distribution storefronts, 3-week execution schedule, and revenue financial models.
 * **Part VI (Sections 24–27):** Hardware-Inspired Pedal Board & Eurorack UI Architecture: standardized 32 HP / 64 HP grid system, Pedals Mode dashboard with bezier patch cables, edge-to-edge orbital swipe navigation, multi-topology filter intensity scale, modular multi-delay engine (Tape/BBD/Digital/Ping-Pong), and 3-phase implementation roadmap.
+* **Brand Guidelines & Design System:** Refer to the authoritative companion standard in [`BRAND_GUIDELINES.md`](file:///Users/benfox/Documents/Development/slambient_dev/BRAND_GUIDELINES.md) for strict visual symmetry laws, zero text-overwrapping rules, modular element completeness, color token specs, and typography standards.
 
 ---
 
