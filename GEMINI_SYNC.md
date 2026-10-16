@@ -987,6 +987,13 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
 - **Dedicated Capsule & Section Tag**:
   - Styled as `.sample-ctrl.field-badge`, matching the boxed aesthetic of `.root-scale-ctrl`, `.time-sig-ctrl`, and `.tempo-ctrl` (32px height, `#080a11` dark inset, 1px subtle border).
   - Added `<span class="tag">SAMPLE</span>` header tag colored with `var(--color-noise)` to visually unify with Module 5 (Noise).
-- **Renamed Button from "REC" to "MIC"**:
+- **Renamed Button from "REC" to "MIC" & "DROP" to "IMPORT"**:
   - Replaced the button text `REC` with `MIC` (with microphone icon) to eliminate user confusion with the master output recording `[ Record ]` button.
-  - Kept `[ 📼 DROP ]`, the waveform preview canvas, and eject (`×`) button fully functional within the pod.
+  - Replaced `DROP` with `IMPORT` for clear semantics across mobile touch devices and desktop.
+  - Kept waveform preview canvas and eject (`×`) button fully functional within the pod.
+- **Mobile Top Bar Integration (Phone Portrait & Landscape)**:
+  - Removed previous `@media` display suppression that hid `.sample-ctrl` on mobile.
+  - Added `.global-transport > .sample-ctrl` to the 40px full-width row grid in phone portrait, matching the boxed styling of `KEY / SCALE`, `METER`, and `TEMPO` (`<span class="tag">SAMPLE</span>`, `[ 🎙 MIC ]`, `[ 📼 IMPORT ]`, waveform thumbnail, and eject).
+- **Floating Bottom Bar Button Labeled "SAMPLE"**:
+  - Updated `.btn-mic-mini` in `.mini-transport` to include `<span>SAMPLE</span>` with the mic icon.
+  - Styled with equal `flex: 1 1 0` sizing (40px height, 12px JetBrains Mono bold text), perfectly matching the `[ ▶ Start ]` and `[ ● Record ]` buttons in the bottom floating toolbar.

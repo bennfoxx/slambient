@@ -3588,11 +3588,12 @@
     }
     header.top-bar:has(.palette-menu.open) { z-index: 9000; }
 
-    /* Shared look for the boxed "TAG + controls" rows (BANK, KEY, METER, TEMPO) */
+    /* Shared look for the boxed "TAG + controls" rows (BANK, KEY, METER, TEMPO, SAMPLE) */
     .patch-bank-section,
     .global-transport > .root-scale-ctrl,
     .global-transport > .time-sig-ctrl,
-    .global-transport > .tempo-ctrl {
+    .global-transport > .tempo-ctrl,
+    .global-transport > .sample-ctrl {
       display: flex;
       align-items: center;
       height: 40px;
@@ -3766,7 +3767,8 @@
     }
     .global-transport > .root-scale-ctrl,
     .global-transport > .time-sig-ctrl,
-    .global-transport > .tempo-ctrl {
+    .global-transport > .tempo-ctrl,
+    .global-transport > .sample-ctrl {
       grid-column: 1 / -1;
       min-width: 0;
     }
@@ -3834,6 +3836,35 @@
       margin-left: 0;
       font-size: 11px;
       border-radius: 4px;
+    }
+
+    /* SAMPLE: dedicated full-width mobile row with MIC, IMPORT, waveform thumbnail, and eject */
+    .global-transport > .sample-ctrl {
+      padding: 0 8px;
+      gap: 7px;
+    }
+    .global-transport > .sample-ctrl .tag {
+      font-size: 10px;
+      letter-spacing: 1px;
+      min-width: 42px;
+    }
+    .global-transport > .sample-ctrl .btn-field {
+      height: 32px;
+      padding: 0 9px;
+      font-size: 11px;
+      flex: 0 0 auto;
+    }
+    .global-transport > .sample-ctrl .field-wave {
+      flex: 1 1 auto;
+      min-width: 40px;
+      max-width: 140px;
+      height: 24px;
+    }
+    .global-transport > .sample-ctrl .btn-field-eject {
+      width: 28px;
+      height: 28px;
+      font-size: 18px;
+      flex: 0 0 28px;
     }
 
     /* Utility buttons: equal-width row of icon buttons */
@@ -4016,7 +4047,8 @@
       transition: opacity 0.2s ease, visibility 0s;
     }
     .mini-transport .btn-main-play,
-    .mini-transport .btn-record {
+    .mini-transport .btn-record,
+    .mini-transport .btn-mic-mini {
       flex: 1 1 0;
       min-width: 0;
       height: 40px;
@@ -5237,15 +5269,15 @@
             <button class="btn-tap-tempo" id="btnTapTempo" onclick="tapTempo()" title="Tap tempo: tap 3+ times in rhythm to set the BPM">TAP</button>
           </div>
 
-          <div class="sample-ctrl field-badge" id="fieldBadge" title="Pocket Field Recorder: hold MIC to sample (tap records 5 s), or DROP audio file. Woven into Noise module.">
+          <div class="sample-ctrl field-badge" id="fieldBadge" title="Pocket Field Recorder: hold MIC to sample (tap records 5 s), or IMPORT audio file. Woven into Noise module.">
             <span class="tag">SAMPLE</span>
             <button type="button" class="btn-field btn-field-mic" data-field-hold aria-label="Hold to record from the microphone">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
               <span>MIC</span>
             </button>
-            <button type="button" class="btn-field btn-field-drop" data-field-load aria-label="Load or drop an audio file">
+            <button type="button" class="btn-field btn-field-drop" data-field-load aria-label="Load or import an audio file">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><path d="M9 16h6"/></svg>
-              <span>DROP</span>
+              <span>IMPORT</span>
             </button>
             <canvas class="field-wave" data-field-wave width="84" height="20"></canvas>
             <button type="button" class="btn-field-eject" data-field-eject title="Eject sample" aria-label="Eject sample">&times;</button>
@@ -17082,7 +17114,7 @@ window.addEventListener("keydown", (e) => {
         '</span><span data-mt="play-label">Start</span>' +
       '</button>' +
       '<button type="button" class="btn-record" data-mt="rec"><div class="rec-dot"></div><span data-mt="rec-label">Record</span></button>' +
-      '<button type="button" class="btn-mic-mini" data-field-hold aria-label="Hold to record a sound sample" title="Hold to record from the microphone (a quick tap records 5 s)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>' +
+      '<button type="button" class="btn-mic-mini" data-field-hold aria-label="Hold to sample from microphone" title="Hold to record from the microphone (a quick tap records 5 s)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>SAMPLE</span></button>' +
       '<div class="mt-bpm" aria-label="Tempo"><span class="mt-bpm-k">BPM</span><span class="mt-bpm-v" data-mt="bpm">--</span></div>';
     document.body.appendChild(bar);
 
@@ -17638,16 +17670,19 @@ window.addEventListener("keydown", (e) => {
   }
   .field-panel .field-hint { font-size: 11px; line-height: 1.35; color: var(--text-tertiary); margin-top: 4px; }
 
-  /* Phone: header badge would not fit -- use the floating bar + noise module */
-  @media (max-width: 640px), (max-height: 500px) {
-    .sample-ctrl, .field-badge { display: none !important; }
+  /* Phone landscape / short screens: keep sample pod compact */
+  @media (max-height: 500px) {
+    .sample-ctrl .btn-field { height: 26px; padding: 0 6px; font-size: 11px; }
   }
+
+  /* Phone floating transport bar: SAMPLE mic button */
   @media (max-width: 640px) {
     .mini-transport .btn-mic-mini {
-      flex: 0 0 44px;
-      width: 44px;
+      flex: 1 1 0;
+      min-width: 0;
       height: 40px;
-      padding: 0;
+      padding: 0 8px;
+      gap: 5px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -17655,8 +17690,21 @@ window.addEventListener("keydown", (e) => {
       color: var(--text-secondary);
       border: 1px solid var(--border-light);
       border-radius: 4px;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
       cursor: pointer;
+      transition: all 0.12s ease;
     }
+    .mini-transport .btn-mic-mini:hover {
+      color: #ffffff;
+      border-color: var(--border-bright);
+    }
+    .mini-transport .btn-mic-mini svg { flex: none; }
     .mini-transport .btn-mic-mini.recording {
       background: rgba(var(--rgb-drum), 0.22);
       border-color: var(--color-drum);
