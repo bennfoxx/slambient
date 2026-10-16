@@ -21,6 +21,21 @@ fi
 if ! pgrep -x git >/dev/null 2>&1; then
   find .git -maxdepth 2 -name '*.lock' -type f -delete 2>/dev/null
 fi
+# Check for parallel branch/worktree changes in slambient_dev-thread2 (feature-thread2)
+THREAD2_DIR="../slambient_dev-thread2"
+if [ -d "$THREAD2_DIR/.git" ] || [ -f "$THREAD2_DIR/.git" ]; then
+  if [ -n "$(git -C "$THREAD2_DIR" status --porcelain 2>/dev/null)" ]; then
+    echo "⚠️  Note: uncommitted working tree changes detected in $THREAD2_DIR"
+  fi
+fi
+
+if git show-ref --verify --quiet refs/heads/feature-thread2; then
+  UNMERGED_THREAD2=$(git rev-list --count main..feature-thread2 2>/dev/null || echo "0")
+  if [ "$UNMERGED_THREAD2" -gt 0 ]; then
+    echo "Merging $UNMERGED_THREAD2 commit(s) from feature-thread2 into main..."
+    git "${IDENT[@]}" merge --no-ff feature-thread2 -m "Merge branch 'feature-thread2' into main" || fail "Merge conflict merging feature-thread2 into main. Please resolve before pushing."
+  fi
+fi
 
 if [ -n "$(git status --porcelain)" ]; then
   echo
