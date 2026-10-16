@@ -1039,6 +1039,31 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
 - **Full Sonic Audit Across All 15 Presets**:
   - Re-calibrated cutoffs and gain staging across all 15 presets to align with the new 60 Hz – 16 kHz scale. Verified zero clipping and balanced LUFS headroom across the entire patch bank.
 
+## Update — 2026-10-16 (Public Distribution Hardening: Comprehensive Trademark, Artist & Brand Name Scrub)
+
+- **Mandatory Intellectual Property & Trademark Sanitization**:
+  - Conducted a comprehensive audit across all UI elements, tooltips, option labels, HTML attributes, and internal developer comments to sanitize any mentions of trademarks, copyrighted product names, hardware model numbers, or artist/celebrity names.
+  - Sanitized presets, groove algorithms, timbres, and effect options:
+    - `Four Tet Woodblock & Glitch` ➔ **`Organic Woodblock & Glitch`**
+    - `Granular Shimmer (Four Tet)` ➔ **`Granular Shimmer & Swell`**
+    - `Industrial 909 Heavy Drive` ➔ **`Industrial Heavy Drive`**
+    - `Analog 808 / 909 (Punchy)` ➔ **`Analog Rhythm Box (Punchy)`**
+    - `Warm Analog Pad (Eno / BOC)` ➔ **`Warm Analog Pad (Lush Drift)`**
+    - `Pure Mineral Glass (Yoshimura / Budd)` ➔ **`Pure Mineral Glass (Transparent Sine)`**
+    - `Chamber Woods & Flute (Pastoral Mellotron)` ➔ **`Chamber Woods & Flute (Pastoral Tape)`**
+    - `Celestial Flute Organ (Cathedral / Frahm)` ➔ **`Celestial Flute Organ (Cathedral Ambient)`**
+    - `Quartal Stack (McCoy Fourths)` ➔ **`Quartal Stack (Modal Fourths)`**
+    - `Ensemble (3-Voice Lush Juno)` ➔ **`Ensemble (3-Voice Lush Chorus)`**
+    - `Khan Lineage` ➔ **`Classical Lineage`** (Preset 7 title & Tanpura drone switch tooltip)
+    - `Airports (Brian Eno Tape Loop & Piano)` ➔ **`Airports (Generative Tape Loops & Glass Diffusion)`**
+    - `Twin Peaks / Badalamenti` ➔ **`Douglas Firs (Noir Vibraphone Ballad & Rain Mist)`**
+    - `Aphex Twin (Selected Ambient Works / IDM)` ➔ **`Twinning (Braindance Micro-Poly & IDM Breakbeat Pocket)`**
+    - `Tangerine Dream (Phaedra / Berlin School)` ➔ **`Tangerine (Berlin School Analog Sequencer)`**
+    - `William Basinski (The Disintegration Loops)` ➔ **`Disintegration (Degraded Tape Loops & Muffled Repeats)`**
+    - `Slambient Invaders` / `Space Invaders` ➔ **`Void Raiders`** (Arcade title screen, cheat sheet modal, pad `aria-label`, and code comments)
+    - Hardware references (DL4 MkII, Juno chorus, 808/909) sanitized in comments to generic acoustic/DSP descriptions (`clock-synced delay`, `multi-voice wash`).
+  - **Acoustic Integrity Preserved**: Zero changes to the underlying DSP algorithms, scales, math formulas, or sonic calibration. All 15 presets sound bit-for-bit identical while presenting 100% clean, original naming.
+
 ### Phase 12: Production Hosting, PWA, Audio Stability & Privacy
 *Focus: Seamless installation on mobile, edge-accelerated delivery, rock-solid audio execution, and zero-leak privacy.*
 1. **PWA Standalone & Offline Caching**:
