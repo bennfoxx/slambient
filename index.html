@@ -3419,15 +3419,31 @@
     .tempo-ctrl input[type="range"] { width: 70px; }
   }
 
-  /* Phone landscape / short windows (641px+ wide, under 500px tall): the
-     sticky desktop header would cover most or all of the screen. */
+  /* Phone landscape / short windows (under 500px tall):
+     Keeps the header compact and prevents the Eno pod from taking over the
+     short screen. Dropping the standalone Eno pod in phone landscape gives
+     the header full width so presets and transport stay on 2 sleek rows. */
   @media (min-width: 641px) and (max-height: 500px) {
-    .header-bar-wrapper { position: relative; }
-  }
-  /* 641-740px (phone landscape, narrow windows): the square Eno pod squeezes
-     the header card until the utils cover TEMPO/TAP; drop the pod there. */
-  @media (min-width: 641px) and (max-width: 740px) {
-    .eno-standalone-pod { display: none; }
+    .header-bar-wrapper {
+      position: relative;
+      padding: 8px 16px 6px 16px;
+      gap: 10px;
+    }
+    header.top-bar {
+      padding: 8px 12px;
+      gap: 6px;
+    }
+    .transport-row {
+      padding-top: 6px;
+      gap: 8px;
+    }
+    .master-vol-pod {
+      width: 68px;
+      padding: 6px 8px;
+    }
+    .eno-standalone-pod {
+      display: none !important;
+    }
   }
   /* viewport-fit=cover (for the phone layout) also applies in landscape, so
      keep the desktop layout clear of the notch there. html has zoom 0.75
@@ -16554,37 +16570,31 @@ function syncEnoPodSquare() {
   if (isSyncingEno) return;
   const pod = document.querySelector(".eno-standalone-pod");
   if (!pod) return;
-  if (window.matchMedia && window.matchMedia("(max-width: 640px)").matches) {
+
+  // Phone portrait (<= 640px) or phone landscape (<= 500px tall):
+  // Let CSS rules handle the layout directly, do not apply square desktop dimensions.
+  if (window.matchMedia && (window.matchMedia("(max-width: 640px)").matches || window.matchMedia("(max-height: 500px)").matches)) {
     pod.style.width = "";
     pod.style.height = "";
     pod.style.flex = "";
     return;
   }
+
   const topBar = document.querySelector("header.top-bar");
+  const masterVol = document.querySelector(".master-vol-pod");
   if (!topBar) return;
 
   isSyncingEno = true;
   try {
-    const masterVol = document.querySelector(".master-vol-pod");
-    const getTargetH = () => {
-      const h1 = topBar ? topBar.getBoundingClientRect().height : 0;
-      const h2 = masterVol ? masterVol.getBoundingClientRect().height : 0;
-      return Math.round(Math.max(h1, h2));
-    };
+    // Measure unzoomed CSS layout height via offsetHeight (NEVER getBoundingClientRect which is scaled by CSS zoom: 0.75)
+    const h1 = topBar.offsetHeight || 0;
+    const h2 = masterVol ? masterVol.offsetHeight : 0;
+    const h = Math.max(h1, h2);
 
-    let h = getTargetH();
     if (h > 0) {
       pod.style.width = h + "px";
       pod.style.height = h + "px";
       pod.style.flex = "0 0 " + h + "px";
-
-      // Re-verify after width assignment in case topBar's transport row wrapped/unwrapped
-      const hNext = getTargetH();
-      if (hNext > 0 && Math.abs(hNext - h) > 1) {
-        pod.style.width = hNext + "px";
-        pod.style.height = hNext + "px";
-        pod.style.flex = "0 0 " + hNext + "px";
-      }
     }
   } finally {
     isSyncingEno = false;

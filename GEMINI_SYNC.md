@@ -859,13 +859,15 @@ Still unverified on a real iPhone: phone portrait layout, orb sheet width, silen
      - Connected `readFractalBandEnergy` to `sampleAnalyserForFrame(analyser)` to reuse cached FFT data without extra Web Audio API calls.
      - Dynamic frame governor (`FRACTAL_FRAME_BUDGET_MS = 10`, buffer width `180` to `400`) automatically maintains 60fps across mobile and desktop.
 
-4. **Scope Render Loop Restoration & Eno Pod Landscape Alignment**:
+4. **Scope Render Loop Restoration, Desktop Eno Pod Alignment & Mobile Landscape Header**:
    - **Scope Render Loop (`drawScope`)**:
-     - Restored `const { w, h, cx, cy } = updateCanvasDimensions();` in `drawScope()` which was inadvertently omitted in a previous edit, resolving an uncaught `ReferenceError: w is not defined` that had temporarily halted the canvas requestAnimationFrame loop (black visualizer and inactive chord wheel).
-   - **Eno Pod Landscape Sizing & Alignment**:
-     - In `syncEnoPodSquare()`, measured `getTargetH()` as `Math.max(topBar.getBoundingClientRect().height, masterVol.getBoundingClientRect().height)` so the Eno pod matches the true stretched height of `.header-bar-wrapper` (which expands to fit the taller of the two header elements).
-     - Applied explicit `flex: 0 0 ${h}px`, `width: ${h}px`, and `height: ${h}px` with a 2-pass layout check to detect and adapt if assigning the width triggers transport row wrapping in `header.top-bar`.
-     - Attached `ResizeObserver` to both `header.top-bar` and `.master-vol-pod` to guarantee instantaneous, subpixel-accurate re-synchronization across orientations and resizes without squishing.
-
-
-
+     - Restored `const { w, h, cx, cy } = updateCanvasDimensions();` in `drawScope()`, resolving an uncaught `ReferenceError: w is not defined` that had temporarily halted the canvas requestAnimationFrame loop (black visualizer and inactive chord wheel).
+   - **Desktop Eno Pod Sizing Under CSS `zoom: 0.75`**:
+     - Desktop stylesheet applies `html { zoom: 0.75; }`. In WebKit/Blink, `getBoundingClientRect().height` returns zoomed viewport pixels (`layoutPixels * 0.75`), whereas setting `element.style.height = px` interprets `px` in unzoomed CSS layout pixels. This was creating an ~30px vertical gap, misaligning the Eno pod with the Master Volume pod and top-bar.
+     - Switched `syncEnoPodSquare()` to measure unzoomed CSS layout height using `offsetHeight`: `Math.max(topBar.offsetHeight, masterVol ? masterVol.offsetHeight : 0)`, perfectly locking the Eno pod square with zero top/bottom gaps.
+   - **Phone Landscape Header Compaction & Feedback Prevention**:
+     - Modern iPhones in landscape (844px–932px width, <=500px height) previously ran desktop sizing logic, triggering a runaway feedback loop where setting the Eno pod width wrapped `header.top-bar` into 5 crowded rows and inflated the Eno pod to over 200px tall (>70% screen takeover).
+     - Added dedicated `@media (min-width: 641px) and (max-height: 500px)` rule:
+       - Hides `.eno-standalone-pod` (`display: none !important`), freeing full horizontal width for presets and transport.
+       - Compacts header padding (`8px 16px 6px 16px`), topBar padding (`8px 12px; gap: 6px`), transport row padding (`6px; gap: 8px`), and master volume pod (`width: 68px; padding: 6px 8px`).
+     - Added early exit guard `(window.matchMedia("(max-height: 500px)").matches)` in `syncEnoPodSquare()`, clearing inline styles and delegating completely to CSS on phone landscape.
