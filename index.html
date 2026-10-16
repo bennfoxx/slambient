@@ -3461,25 +3461,26 @@
       grid-column: 2;
       grid-row: 2;
       width: 76px;
-      height: 34px;
-      padding: 4px 6px;
-      gap: 6px;
+      height: 58px;
+      padding: 4px 8px;
+      gap: 8px;
       flex-direction: row;
       align-items: center;
       justify-content: center;
     }
     .master-vol-title, .master-vol-val { display: none; }
     .master-vol-slider-wrap {
-      flex: 1 1 auto;
-      width: auto;
+      flex: 0 0 28px;
+      width: 28px;
+      height: 100%;
       min-height: 0;
       min-width: 0;
     }
     .master-vol-slider-wrap input[type="range"] {
-      width: 100%;
-      transform: none;
+      width: 46px;
+      transform: rotate(-90deg);
     }
-    .master-vol-mute { width: 22px; height: 22px; flex: 0 0 22px; }
+    .master-vol-mute { width: 24px; height: 24px; flex: 0 0 24px; }
   }
   /* viewport-fit=cover (for the phone layout) also applies in landscape, so
      keep the desktop layout clear of the notch there. html has zoom 0.75
