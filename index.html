@@ -472,6 +472,39 @@
     align-items: center;
     gap: 4px;
   }
+  .rec-ctrl-wrap .custom-dropdown-wrap {
+    min-width: 0;
+  }
+  .rec-ctrl-wrap .custom-dropdown-trigger {
+    justify-content: center;
+    text-align: center;
+    gap: 5px;
+    padding: 0 6px;
+  }
+  .rec-ctrl-wrap .custom-dropdown-trigger .trigger-label {
+    text-align: center;
+    flex: 0 0 auto;
+    font-weight: 800;
+  }
+  .rec-ctrl-wrap .custom-dropdown-menu {
+    text-align: center;
+    min-width: 100%;
+  }
+  .rec-ctrl-wrap .custom-dropdown-item {
+    justify-content: center;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+  }
+  .rec-ctrl-wrap .custom-dropdown-item .item-main {
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+  }
+  .rec-ctrl-wrap .custom-dropdown-item .item-check {
+    display: none;
+  }
   .record-format-select {
     height: 32px;
     box-sizing: border-box;
@@ -486,6 +519,7 @@
     padding: 0 6px;
     outline: none;
     cursor: pointer;
+    text-align: center;
     transition: all 0.12s ease;
   }
   .record-format-select:hover, .record-format-select:focus {
@@ -6777,11 +6811,11 @@
           <div class="sample-ctrl field-badge" id="fieldBadge" title="Pocket Field Recorder: hold MIC to sample (tap records 5 s), or DROP audio file. Woven into Noise module.">
             <span class="tag">SAMPLE</span>
             <button type="button" class="btn-field btn-field-mic" data-field-hold aria-label="Hold to record from the microphone">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
               <span>MIC</span>
             </button>
             <button type="button" class="btn-field btn-field-drop" data-field-load aria-label="Load or drop an audio file">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><path d="M9 16h6"/></svg>
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><path d="M9 16h6"/></svg>
               <span>DROP</span>
             </button>
             <canvas class="field-wave" data-field-wave width="84" height="20"></canvas>
@@ -7133,7 +7167,7 @@
   <div class="orbital-deck-header">
     <div class="view-switcher-group">
       <button class="btn-view-mode active" id="btnViewOrbital" onclick="setModuleView('orbital')" title="Floating Planetary Orb Constellation">Orbital View</button>
-      <button class="btn-view-mode" id="btnViewConsole" onclick="setModuleView('console')" title="Pedalboard &amp; Console Rack View">Pedal View</button>
+      <button class="btn-view-mode" id="btnViewConsole" onclick="setModuleView('console')" title="Modular Rack &amp; Signal Chain View">Rack View</button>
     </div>
 
     <div class="orbital-bar-center">
@@ -7173,26 +7207,28 @@
 
   <div class="orbital-arena-wrapper" id="orbitalArenaWrapper">
     <canvas id="orbitalCanvas"></canvas>
-    <div class="orbital-hint" id="orbitalHint">Click any celestial module orb to expand controls • Physics bumping & audio buoyancy active</div>
+    <div class="orbital-hint" id="orbitalHint">Click any celestial module orb to expand controls • Physics bumping &amp; audio buoyancy active</div>
+  </div>
 
-    <div class="orbital-side-panel" id="orbitalSidePanel">
-      <div class="orbital-modal-header">
-        <button class="btn-orbital-back" id="btnOrbitalBack" onclick="collapseOrbitalToPedals()" title="Back to Pedals / Console Mode (Pinch-in)">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-          <span>PEDALS</span>
-        </button>
-        <div class="orbital-nav-group">
-          <button class="btn-orbital-nav" id="btnOrbitalPrev" onclick="cycleOrbitalModule(-1)" title="Previous Module in Signal Chain (Swipe Right)">‹</button>
-          <span class="orbital-modal-title" id="orbitalModalTitle">MODULE CONTROLS</span>
-          <button class="btn-orbital-nav" id="btnOrbitalNext" onclick="cycleOrbitalModule(1)" title="Next Module in Signal Chain (Swipe Left)">›</button>
-        </div>
-        <div class="orbital-modal-header-right">
-          <div class="orbital-modal-actions-slot" id="orbitalModalActions"></div>
-          <button class="orbital-modal-close" onclick="closeOrbitalModal()" title="Close Controls (ESC)">✕</button>
-        </div>
+  <!-- UNIVERSAL MODULAR INSPECTOR OVERLAY (Opens on Orbital View or Rack View) -->
+  <div class="orbital-modal-backdrop" id="orbitalModalBackdrop" onclick="closeOrbitalModal()"></div>
+  <div class="orbital-side-panel" id="orbitalSidePanel">
+    <div class="orbital-modal-header">
+      <button class="btn-orbital-back" id="btnOrbitalBack" onclick="collapseOrbitalToPedals()" title="Close Inspector (ESC)">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        <span id="btnOrbitalBackLabel">RACK</span>
+      </button>
+      <div class="orbital-nav-group">
+        <button class="btn-orbital-nav" id="btnOrbitalPrev" onclick="cycleOrbitalModule(-1)" title="Previous Module in Signal Chain (Swipe Right)">‹</button>
+        <span class="orbital-modal-title" id="orbitalModalTitle">MODULE CONTROLS</span>
+        <button class="btn-orbital-nav" id="btnOrbitalNext" onclick="cycleOrbitalModule(1)" title="Next Module in Signal Chain (Swipe Left)">›</button>
       </div>
-      <div class="orbital-modal-body" id="orbitalModalBody"></div>
+      <div class="orbital-modal-header-right">
+        <div class="orbital-modal-actions-slot" id="orbitalModalActions"></div>
+        <button class="orbital-modal-close" onclick="closeOrbitalModal()" title="Close Controls (ESC)">✕</button>
+      </div>
     </div>
+    <div class="orbital-modal-body" id="orbitalModalBody"></div>
   </div>
 
   <div class="lower-deck view-grid-hidden">
@@ -7593,10 +7629,34 @@
         <div class="field-hint">Hold to record (a quick tap records 5 s, max 8 s). Phrases enter on bar turnarounds, the choir retunes to the live chord, and clicks/consonants ghost into the drums.</div>
       </div>
     </div>
+
+    <!-- 6. BIRDS-EYE VIEW PEDAL CHAIN MODULE (Entire chain in one instrument-sized module) -->
+    <div class="strip-channel pedal-chain-module" id="pedalChainModule">
+      <div class="panel-header">
+        <span onclick="openModuleInOrbital(this.closest('.strip-channel'))" style="cursor: pointer;" title="6. FX CHAIN — Click to open modular inspector">6. FX CHAIN</span>
+        <div class="panel-header-actions">
+          <button type="button" class="btn-pedal-action" onclick="randomizeDspChain()" title="Shuffle DSP insert chain order">⟲ SHUFFLE</button>
+          <button type="button" class="btn-pedal-action" onclick="resetDspChain()" title="Reset order to Filter ➔ Delay ➔ Space">RESET</button>
+        </div>
+      </div>
+
+      <div class="birds-eye-flow-bar">
+        <span class="flow-bus-node">BUS PRE</span>
+        <span class="flow-arrow">➔</span>
+        <span class="flow-bus-label">LIVE INSERT MATRIX</span>
+        <span class="flow-arrow">➔</span>
+        <span class="flow-bus-node out-node">OUT</span>
+      </div>
+
+      <!-- Birds-eye list of rectangular pedal cards -->
+      <div class="pedal-birds-eye-rack" id="pedalBirdsEyeRack">
+        <!-- Kept dynamically rendered and synchronized by updatePedalsOrderUI() -->
+      </div>
+    </div>
   </div>
 
-    <!-- UNIFIED MASTER DECK: 3 Insert Pedals + Master EQ & Out Strip -->
-  <div class="pedals-deck view-grid-hidden" id="pedalsContainer" style="margin-top: 14px;">
+  <!-- BACKING STORE FOR PEDAL CONTROLS (Borrowed into popup on inspection) -->
+  <div class="pedals-deck view-grid-hidden" id="pedalsContainer" style="display: none !important;">
     <div class="pedals-routing-header">
       <div class="pedals-header-left">
         <span class="pedals-deck-title">DSP INSERT CHAIN // LIVE REWIRING MATRIX</span>
