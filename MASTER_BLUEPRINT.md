@@ -993,26 +993,26 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
 
 #### 27. Implementation Phasing & Roadmap
 
-##### UI Fixes & Visual Polish (TOP PRIORITY / ACTIVE)
-* [ ] **Orbital Modal Opacity Bleed Fix:** Prevent top UI header, borders, and backdrop from going transparent when swiping or switching between modules in Orbital Mode by scoping opacity transitions (`.swiping-left`, `.swiping-right`) to `#orbitalModalBody` rather than `#orbitalSidePanel`.
-* [ ] **Center-Justify Orbital Module Title & Nav Arrows:** Center-justify `#orbitalModalTitle` and navigation cycle arrows (`#btnOrbitalPrev`, `#btnOrbitalNext`) across desktop and mobile, ensuring balanced layout between `[PEDALS]` back button and `[ACTIONS] [✕]` controls.
+##### UI Fixes & Visual Polish (COMPLETED)
+* [x] **Orbital Modal Opacity Bleed Fix:** Prevent top UI header, borders, and backdrop from going transparent when swiping or switching between modules in Orbital Mode by scoping opacity transitions (`.swiping-left`, `.swiping-right`) to `#orbitalModalBody` rather than `#orbitalSidePanel`.
+* [x] **Center-Justify Orbital Module Title & Nav Arrows:** Center-justify `#orbitalModalTitle` and navigation cycle arrows (`#btnOrbitalPrev`, `#btnOrbitalNext`) across desktop and mobile, ensuring balanced layout between `[PEDALS]` back button and `[ACTIONS] [✕]` controls.
 
-##### Phase 0: Mobile Microphone & Pocket Field Recorder Resiliency (PRIORITY 1 / ACTIVE)
-* [ ] **Pointer Capture & Touch Physics:** Implement `setPointerCapture(e.pointerId)` on `pointerdown` for all `[data-field-hold]` elements, combined with dedicated `touchstart`/`touchend` hooks to prevent iOS Safari `pointercancel` micro-jitter aborts.
-* [ ] **AudioContext Synchronous Gesture Pre-Warm:** Pre-warm and resume `captureCtx` synchronously within user touch dispatch before entering asynchronous `getUserMedia()` queries to prevent WebKit gesture token expiration.
-* [ ] **MediaRecorder Modernization & ScriptProcessor Fallback:** Wrap capture in native `MediaRecorder` (`audio/webm` or `audio/mp4` / AAC/Opus) with `AudioContext.decodeAudioData`, completely bypassing iOS 17+ `createScriptProcessor` silent thread throttling while retaining `Float32Array` fallbacks for older browsers.
-* [ ] **AudioSession Type Guarding:** Soften `navigator.audioSession.type = "play-and-record"` toggling with automated output restore to prevent mobile Safari background audio muting.
-* [ ] **High-Visibility Status & Denied Feedback:** Explicit visual state machine on `[data-field-hold]` (`HOLD TO REC`, `REC 0.0s`, `TAP TO STOP`, `MIC PERMISSION BLOCKED`) with user-friendly toast guidance.
+##### Phase 0: Mobile Microphone & Pocket Field Recorder Resiliency (COMPLETED)
+* [x] **Pointer Capture & Touch Physics:** Implement `setPointerCapture(e.pointerId)` on `pointerdown` for all `[data-field-hold]` elements, combined with dedicated `touchstart`/`touchend` hooks to prevent iOS Safari `pointercancel` micro-jitter aborts.
+* [x] **AudioContext Synchronous Gesture Pre-Warm:** Pre-warm and resume `captureCtx` synchronously within user touch dispatch before entering asynchronous `getUserMedia()` queries to prevent WebKit gesture token expiration.
+* [x] **MediaRecorder Modernization & ScriptProcessor Fallback:** Wrap capture in native `MediaRecorder` (`audio/webm` or `audio/mp4` / AAC/Opus) with `AudioContext.decodeAudioData`, completely bypassing iOS 17+ `createScriptProcessor` silent thread throttling while retaining `Float32Array` fallbacks for older browsers.
+* [x] **AudioSession Type Guarding:** Soften `navigator.audioSession.type = "play-and-record"` toggling with automated output restore to prevent mobile Safari background audio muting.
+* [x] **High-Visibility Status & Denied Feedback:** Explicit visual state machine on `[data-field-hold]` (`HOLD TO REC`, `REC 0.0s`, `TAP TO STOP`, `MIC PERMISSION BLOCKED`) with user-friendly toast guidance.
 
 ##### Phase 1: Grid Foundation & Pedals Mode Layout (Front-End)
 * [ ] Implement the Eurorack HP sizing grid and CSS/layout token framework across mobile (32 HP) and desktop (64 HP) viewports.
 * [ ] Build the macro Pedals Mode container to replace the legacy mobile console view.
 * [ ] Code the metallic jack anchor points and dynamic bezier-curve SVG "patch cables" for audio and CV routing.
 
-##### Phase 2: Orbital View & Gesture Navigation
-* [ ] Implement the tap-to-focus transition from macro overview to single-module Orbital View.
-* [ ] Program horizontal edge-to-edge swipe gesture listeners to cycle adjacent modules seamlessly.
-* [ ] Build the accordion drawer component for collapsible sub-parameters.
+##### Phase 2: Orbital View & Gesture Navigation (COMPLETED)
+* [x] Implement the tap-to-focus transition from macro overview to single-module Orbital View.
+* [x] Program horizontal edge-to-edge swipe gesture listeners to cycle adjacent modules seamlessly.
+* [x] Build the accordion drawer component for collapsible sub-parameters.
 
 ##### Phase 3: DSP & Parameter Integration (Filter & Multi-Delay)
 * [ ] Code the multi-topology filter DSP engine (Ladder, State-Variable, Formant, Comb) with pre-filter saturation and the Filter Intensity Scale.
