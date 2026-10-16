@@ -1488,6 +1488,11 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
     - 9: Space
     - 10: Master Out
   - Included `field` in `ORBITAL_LOWER_DECK_IDS` and `getSignalChainOrbList()` for seamless swipe cycling.
+- **Field Recorder Visual Formatting Polish**:
+  - Removed nested `.field-panel` inner card container and double borders inside `#fieldModule`; waveform, buttons, dropdowns, and sliders now sit directly as native `.control-row` items matching `2. DRUMS` and `4. ARP`.
+  - Replaced wrapping button text (`Hold to \n Rec`, `Drop / \n Load`) with crisp single-line hardware labels and icons in a 4-column CSS grid: `[ 🎙 REC ] [ 📂 LOAD ] [ ▶ PLAY ] [ ⏏ EJECT ]`.
+  - Scoped legacy embedded `.field-panel` rules to `:not(.strip-channel)` to eliminate style bleed into the standalone channel strip.
+  - Updated `drawWaves` to render waveforms using `--color-field` (`#2bcbba`) matching the instrument's visual identity.
   - Added `field` to `THEME_KEYS` and updated all 5 color theme presets in `COLOR_THEMES`.
 
 ## Update — 2026-10-16 (FX Chain Button Inspector Navigation & Header Button Standardization)
