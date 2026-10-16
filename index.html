@@ -3210,35 +3210,80 @@
   .strip-channel.reverb-ch .panel-header > span:first-child { color: var(--color-reverb); text-shadow: 0 0 8px rgba(var(--rgb-reverb), 0.35); }
   .strip-channel.space-ch  .panel-header > span:first-child { color: var(--color-space);  text-shadow: 0 0 8px rgba(var(--rgb-space), 0.35); }
 
-  .strip-channel.field-ch .field-panel-body {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 4px;
+  .strip-channel.field-ch.field-panel,
+  .strip-channel.field-ch {
+    margin-top: 0;
+    padding: 10px 10px;
+  }
+  .strip-channel.field-ch.drop-active {
+    border-color: var(--color-field) !important;
+    box-shadow: 0 0 20px rgba(var(--rgb-field), 0.65), 0 4px 16px rgba(0, 0, 0, 0.6) !important;
+  }
+  .strip-channel.field-ch .field-wave {
+    width: 100%;
+    height: 48px;
+    background: #05070d;
+    border: 1px solid rgba(var(--rgb-field), 0.28);
+    border-radius: 4px;
+    display: block;
+    box-sizing: border-box;
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.7);
+    margin: 0;
   }
   .strip-channel.field-ch .field-actions {
-    display: flex;
-    gap: 6px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
     align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
   }
   .strip-channel.field-ch .field-actions .btn-field {
-    flex: 1;
-    height: 30px;
-    padding: 0 4px;
-    font-size: 10px;
+    width: 100%;
+    height: 28px;
+    padding: 0 2px;
+    font-size: 10.5px;
     font-weight: 700;
+    letter-spacing: 0.5px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 4px;
+    white-space: nowrap;
+    border-radius: 3px;
+    background: #101420;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: all 0.12s ease;
+    box-sizing: border-box;
   }
-  .strip-channel.field-ch .field-wave {
-    width: 100%;
-    height: 52px;
-    background: #060810;
-    border: 1px solid rgba(var(--rgb-field), 0.25);
-    border-radius: 4px;
-    display: block;
+  .strip-channel.field-ch .field-actions .btn-field span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .strip-channel.field-ch .field-actions .btn-field svg {
+    flex-shrink: 0;
+  }
+  .strip-channel.field-ch .field-actions .btn-field:hover:not(:disabled) {
+    color: #fff;
+    border-color: var(--border-bright);
+    background: #161c2c;
+  }
+  .strip-channel.field-ch .field-actions .btn-field:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+  .strip-channel.field-ch .field-actions .btn-field.recording {
+    background: rgba(var(--rgb-field), 0.22);
+    border-color: var(--color-field);
+    color: var(--color-field);
+    box-shadow: 0 0 calc(4px + var(--field-vu, 0) * 14px) rgba(var(--rgb-field), calc(0.35 + var(--field-vu, 0) * 0.55));
+  }
+  .strip-channel.field-ch .field-actions .btn-field.recording svg {
+    animation: blinkRec 0.8s infinite;
   }
   .strip-channel.field-ch .field-hint {
     font-size: 9.5px;
@@ -8045,7 +8090,7 @@
     </div>
 
     <!-- 6. POCKET FIELD RECORDER (Dedicated Instrument Module) -->
-    <div class="strip-channel field-ch" id="fieldModule">
+    <div class="strip-channel field-ch field-panel" id="fieldModule">
       <div class="panel-header">
         <span onclick="openModuleInOrbital(this.closest('.strip-channel'))" style="cursor: pointer;" title="6. FIELD — Click to open in orbital view">6. FIELD</span>
         <div class="panel-header-actions">
@@ -8056,38 +8101,36 @@
           <button class="badge-tag" style="color: var(--color-field); border-color: rgba(43,203,186,0.35);" onclick="randomizeField()" title="Randomize Field Recorder"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
         </div>
       </div>
-      <div class="field-panel-body field-panel" id="fieldPanel">
-        <canvas class="field-wave" data-field-wave width="480" height="68"></canvas>
-        <div class="field-actions">
-          <button type="button" class="btn-field" data-field-hold aria-label="Hold to record from the microphone"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>Hold to Rec</span></button>
-          <button type="button" class="btn-field" data-field-load aria-label="Load an audio file"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><path d="M9 16h6"/></svg><span>Drop / Load</span></button>
-          <button type="button" class="btn-field" onclick="fieldPreview()" title="Play the sample once through the ghost chain">Play</button>
-          <button type="button" class="btn-field" data-field-eject disabled>Eject</button>
-        </div>
-        <input type="file" id="inputFieldAudio" accept="audio/*,.wav,.m4a,.mp3,.aac,.ogg,.flac" style="display:none;">
-        <div class="control-row">
-          <div class="control-label">Weave Mode</div>
-          <select id="selFieldMode" onchange="fieldModeChanged()">
-            <option value="ALL" selected>Weave All (Ghosts + Choir + Ticks)</option>
-            <option value="GHOST">Ghost Phrases (Hauntology)</option>
-            <option value="CHOIR">Scale Choir (Granular Vowels)</option>
-            <option value="TRANS">Percussive Ghost Hits (Drum Groove)</option>
-            <option value="OFF">Off (Sample Parked)</option>
-          </select>
-        </div>
-        <div class="control-row">
-          <div class="control-label">
-            <span>FX Send (Filter/Delay)</span>
-            <span style="display:inline-flex;align-items:center;"><span class="control-val field-val" id="lblFieldFx">70%</span><button type="button" class="btn-aux-toggle active" id="btnAux_field" onclick="toggleChannelAux('field')" title="Toggle Aux FX Bus Routing for Field Recorder">AUX</button></span>
-          </div>
-          <input type="range" id="knobFieldFx" min="0" max="100" value="70" oninput="updateAudioParams()">
-        </div>
-        <div class="control-row">
-          <div class="control-label"><span>Field Master Volume</span><span class="control-val field-val" id="lblFieldVol">70%</span></div>
-          <input type="range" id="knobFieldVol" min="0" max="100" value="70" oninput="fieldLevelChanged()">
-        </div>
-        <div class="field-hint">Hold to record (a quick tap records 5 s, max 8 s). Phrases enter on bar turnarounds, choir retunes to live chord, and clicks ghost into drums.</div>
+      <canvas class="field-wave" data-field-wave width="480" height="68"></canvas>
+      <div class="field-actions">
+        <button type="button" class="btn-field" data-field-hold title="Hold to record from microphone (tap records 5s)" aria-label="Hold to record from microphone"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>REC</span></button>
+        <button type="button" class="btn-field" data-field-load title="Drop or load an audio file" aria-label="Drop or load audio file"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><path d="M9 16h6"/></svg><span>LOAD</span></button>
+        <button type="button" class="btn-field" onclick="fieldPreview()" title="Play sample preview through ghost chain" aria-label="Play sample preview"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" aria-hidden="true"><polygon points="6,4 20,12 6,20"/></svg><span>PLAY</span></button>
+        <button type="button" class="btn-field" data-field-eject disabled title="Eject current sample" aria-label="Eject current sample"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" aria-hidden="true"><polygon points="12,5 5,14 19,14"/><rect x="5" y="16" width="14" height="2.5" rx="0.5"/></svg><span>EJECT</span></button>
       </div>
+      <input type="file" id="inputFieldAudio" accept="audio/*,.wav,.m4a,.mp3,.aac,.ogg,.flac" style="display:none;">
+      <div class="control-row">
+        <div class="control-label">Weave Mode</div>
+        <select id="selFieldMode" onchange="fieldModeChanged()">
+          <option value="ALL" selected>Weave All (Ghosts + Choir + Ticks)</option>
+          <option value="GHOST">Ghost Phrases (Hauntology)</option>
+          <option value="CHOIR">Scale Choir (Granular Vowels)</option>
+          <option value="TRANS">Percussive Ghost Hits (Drum Groove)</option>
+          <option value="OFF">Off (Sample Parked)</option>
+        </select>
+      </div>
+      <div class="control-row">
+        <div class="control-label">
+          <span>FX Send (Filter/Delay)</span>
+          <span style="display:inline-flex;align-items:center;"><span class="control-val field-val" id="lblFieldFx">70%</span><button type="button" class="btn-aux-toggle active" id="btnAux_field" onclick="toggleChannelAux('field')" title="Toggle Aux FX Bus Routing for Field Recorder">AUX</button></span>
+        </div>
+        <input type="range" id="knobFieldFx" min="0" max="100" value="70" oninput="updateAudioParams()">
+      </div>
+      <div class="control-row">
+        <div class="control-label"><span>Field Master Volume</span><span class="control-val field-val" id="lblFieldVol">70%</span></div>
+        <input type="range" id="knobFieldVol" min="0" max="100" value="70" oninput="fieldLevelChanged()">
+      </div>
+      <div class="field-hint">Hold to record (a quick tap records 5 s, max 8 s). Phrases enter on bar turnarounds, choir retunes to live chord, and clicks ghost into drums.</div>
     </div>
 
     <!-- BIRDS-EYE VIEW PEDAL CHAIN MODULE (Entire chain in one instrument-sized module) -->
@@ -21504,14 +21547,21 @@ window.addEventListener("keydown", (e) => {
   .btn-field-eject:hover { color: var(--color-drum); border-color: var(--border-light); }
   .sample-ctrl.has-sample .btn-field-eject, .field-badge.has-sample .btn-field-eject { display: inline-flex; align-items: center; justify-content: center; }
 
-  /* Noise module panel */
-  .field-panel {
+  /* Embedded field-panel fallback (when not standalone strip-channel) */
+  .field-panel:not(.strip-channel) {
     margin-top: 6px;
     padding: 8px 10px 10px;
     background: #080a11;
     border: 1px solid var(--border-light);
     border-radius: 4px;
     box-sizing: border-box;
+  }
+  .strip-channel.field-panel,
+  .strip-channel .field-panel {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    margin: 0;
   }
   .field-panel .field-head {
     display: flex;
@@ -21520,16 +21570,16 @@ window.addEventListener("keydown", (e) => {
     gap: 8px;
     margin-bottom: 6px;
   }
-  .field-panel .field-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
-  .field-panel .btn-field { height: 32px; flex: 1 1 auto; font-size: 12.5px; }
+  .field-panel:not(.strip-channel) .field-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+  .field-panel:not(.strip-channel) .btn-field { height: 32px; flex: 1 1 auto; font-size: 12.5px; }
   .field-panel .btn-field[disabled] { opacity: 0.4; cursor: default; }
-  .field-panel .field-wave {
+  .field-panel:not(.strip-channel) .field-wave {
     display: block;
     width: 100%;
     height: 34px;
     margin-bottom: 8px;
   }
-  .field-panel .field-hint { font-size: 11px; line-height: 1.35; color: var(--text-tertiary); margin-top: 4px; }
+  .field-panel:not(.strip-channel) .field-hint { font-size: 11px; line-height: 1.35; color: var(--text-tertiary); margin-top: 4px; }
 
   /* Phone landscape / short screens: keep sample pod compact */
   @media (max-height: 500px) {
@@ -21806,7 +21856,7 @@ window.addEventListener("keydown", (e) => {
       }
       if (isTapMode) {
         const def = btn.dataset.defaultLabel.toUpperCase();
-        span.textContent = (def === "SAMPLE" || def === "MIC") ? "STOP" : "TAP TO STOP";
+        span.textContent = (def === "SAMPLE" || def === "MIC" || def === "REC") ? "STOP" : "TAP TO STOP";
       } else {
         const def = btn.dataset.defaultLabel.toUpperCase();
         span.textContent = (def === "SAMPLE" || def === "MIC") ? "REC" : statusText;
@@ -21821,7 +21871,7 @@ window.addEventListener("keydown", (e) => {
     S.statusTimer = setTimeout(updateUI, 2600);
   }
   function drawWaves(live) {
-    const color = (getComputedStyle(document.documentElement).getPropertyValue("--color-noise") || "#1dd1a1").trim();
+    const color = (getComputedStyle(document.documentElement).getPropertyValue("--color-field") || "#2bcbba").trim();
     all("canvas[data-field-wave]").forEach(cv => {
       const c = cv.getContext("2d");
       if (!c) return;
