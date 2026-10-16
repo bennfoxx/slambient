@@ -7074,11 +7074,33 @@ function createDidgeridooBuzzWave(ctx) {
 // Disconnects per-note Web Audio voice chains from summing buses as soon as
 // the source oscillator/buffer finishes, preventing dead nodes from
 // accumulating on drumBusGain / chordBusGain / arpBusGain / noiseBusGain.
-function disconnectOnEnded(sourceNode, tailNode) {
+// Upgraded to accept any number of nodes (oscillators, filters, modulators, gains)
+// so WebKit / Safari completely garbage-collects the entire voice graph.
+function disconnectOnEnded(sourceNode, ...nodesToDisconnect) {
   if (!sourceNode) return;
+  const nodes = [];
+  const collect = (item) => {
+    if (!item) return;
+    if (Array.isArray(item)) item.forEach(collect);
+    else if (typeof item.disconnect === "function" && !nodes.includes(item)) nodes.push(item);
+  };
+  collect(sourceNode);
+  nodesToDisconnect.forEach(collect);
+
+  let cleaned = false;
+  const cleanup = () => {
+    if (cleaned) return;
+    cleaned = true;
+    try { sourceNode.onended = null; } catch (e) {}
+    nodes.forEach(n => {
+      try { n.disconnect(); } catch (e) {}
+    });
+  };
+
+  const prevOnEnded = sourceNode.onended;
   sourceNode.onended = () => {
-    try { sourceNode.disconnect(); } catch (e) {}
-    try { if (tailNode && tailNode !== sourceNode) tailNode.disconnect(); } catch (e) {}
+    if (prevOnEnded) { try { prevOnEnded(); } catch (e) {} }
+    cleanup();
   };
 }
 
@@ -7294,6 +7316,7 @@ function scheduleAudioClockFallback() {
     src.connect(audioCtx.destination);
     audioClockNode = src;
     src.onended = () => {
+      try { src.disconnect(); } catch (e) {}
       if (audioClockNode !== src) return;
       audioClockNode = null;
       if (!isPlaying || !audioCtx) return;
@@ -8650,7 +8673,7 @@ function triggerSympatheticStrings(pluckedMidi, startTime, vel, targetBus) {
     filter.connect(g);
     g.connect(targetBus);
 
-    disconnectOnEnded(osc, g);
+    disconnectOnEnded(osc, filter, g);
     osc.start(t0);
     osc.stop(t0 + ringDur + 0.05);
   });
@@ -8685,7 +8708,8 @@ function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0,
   voiceFilter.frequency.setValueAtTime(Math.min(3200, freq * 5.8), now);
   voiceFilter.Q.setValueAtTime(0.7, now);
   const gain = audioCtx.createGain();
-  let tremOsc = null, tremGain = null;
+  let tremOsc = null, tremGain = null, tremDepth = null, fmGain = null;
+  let jawariShaper = null, formantBody = null, formantBuzz = null;
 
   const highNoteDamp = Math.max(0.50, 1.0 - Math.max(0, midi - 58) * 0.020);
   let attackTime = isLead ? 0.08 : (0.14 + (strumMs / 400));
@@ -8711,7 +8735,7 @@ function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0,
     osc1.type = "sine"; osc2.type = "sine";
     osc1.frequency.setValueAtTime(freq, now);
     osc2.frequency.setValueAtTime(freq * 2.0, now);
-    const fmGain = audioCtx.createGain();
+    fmGain = audioCtx.createGain();
     fmGain.gain.setValueAtTime(freq * 0.65, now);
     fmGain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
     osc2.connect(fmGain); fmGain.connect(osc1.frequency);
@@ -8721,7 +8745,7 @@ function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0,
     osc1.type = "sine"; osc2.type = "sine";
     osc1.frequency.setValueAtTime(freq, now);
     osc2.frequency.setValueAtTime(freq * 2.0, now);
-    const fmGain = audioCtx.createGain();
+    fmGain = audioCtx.createGain();
     fmGain.gain.setValueAtTime(freq * 0.60, now);
     fmGain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
     osc2.connect(fmGain); fmGain.connect(osc1.frequency);
@@ -8730,7 +8754,7 @@ function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0,
 
     tremOsc = audioCtx.createOscillator(); tremOsc.type = "sine";
     tremOsc.frequency.setValueAtTime(4.8, now);
-    const tremDepth = audioCtx.createGain(); tremDepth.gain.value = 0.14;
+    tremDepth = audioCtx.createGain(); tremDepth.gain.value = 0.14;
     tremGain = audioCtx.createGain(); tremGain.gain.value = 0.92;
     tremOsc.connect(tremDepth); tremDepth.connect(tremGain.gain);
   } else if (chordTimbre === "LOFI_KEYS") {
@@ -8768,7 +8792,7 @@ function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0,
     osc1.type = "sine"; osc2.type = "sine";
     osc1.frequency.setValueAtTime(freq, now);
     osc2.frequency.setValueAtTime(freq * 3.0, now);
-    const fmGain = audioCtx.createGain();
+    fmGain = audioCtx.createGain();
     fmGain.gain.setValueAtTime(freq * 0.45, now);
     fmGain.gain.exponentialRampToValueAtTime(0.001, now + 0.30);
     osc2.connect(fmGain); fmGain.connect(osc1.frequency);
@@ -8815,15 +8839,15 @@ function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0,
   const busTarget = sourceTag === "LIVE" ? masterGain : chordBusGain;
 
   if (chordTimbre === "SITAR_STRINGS") {
-    const jawariShaper = audioCtx.createWaveShaper();
+    jawariShaper = audioCtx.createWaveShaper();
     jawariShaper.curve = getJawariCurve(isLead ? 0.75 : 0.55);
-    const formantBody = audioCtx.createBiquadFilter();
+    formantBody = audioCtx.createBiquadFilter();
     formantBody.type = "peaking";
     formantBody.frequency.setValueAtTime(920, now);
     formantBody.Q.setValueAtTime(2.4, now);
     formantBody.gain.setValueAtTime(3.5, now);
 
-    const formantBuzz = audioCtx.createBiquadFilter();
+    formantBuzz = audioCtx.createBiquadFilter();
     formantBuzz.type = "peaking";
     formantBuzz.frequency.setValueAtTime(2750, now);
     formantBuzz.Q.setValueAtTime(3.4, now);
@@ -8848,7 +8872,7 @@ function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0,
     clickGain.gain.setValueAtTime(clickPeak, now);
     clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.022);
     clickSrc.connect(clickBP); clickBP.connect(clickGain); clickGain.connect(busTarget);
-    disconnectOnEnded(clickSrc, clickGain);
+    disconnectOnEnded(clickSrc, clickBP, clickGain);
     clickSrc.start(now, Math.random() * 0.5); clickSrc.stop(now + 0.03);
 
     if (isLead || randFloat() < 0.55) {
@@ -8863,7 +8887,7 @@ function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0,
   if (tremGain) { gain.connect(tremGain); tremGain.connect(busTarget); }
   else { gain.connect(busTarget); }
 
-  disconnectOnEnded(osc1, tremGain || gain);
+  disconnectOnEnded(osc1, osc2, voiceFilter, gain, tremGain, tremOsc, tremDepth, fmGain, jawariShaper, formantBody, formantBuzz);
   osc1.start(now); osc2.start(now);
   osc1.stop(now + duration + 0.1); osc2.stop(now + duration + 0.1);
   if (tremOsc) { tremOsc.start(now); tremOsc.stop(now + duration + 0.1); }
@@ -8976,6 +9000,9 @@ function playArpNote(midi, vel = 85, isLive = false) {
   gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
   arpVoiceFilter.connect(gain);
 
+  const extraVoiceNodes = [arpVoiceFilter, gain];
+  if (pan) extraVoiceNodes.push(pan);
+
   let primaryArpOsc = null;
   if (arpTimbre === "BANSURI_FLUTE") {
     const osc = audioCtx.createOscillator(); osc.type = "sine";
@@ -9015,6 +9042,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
     osc.start(now); oscOctave.start(now); vibrato.start(now); breath.start(now, Math.random() * 0.5);
     osc.stop(now + durationSec + 0.05); oscOctave.stop(now + durationSec + 0.05);
     vibrato.stop(now + durationSec + 0.05); breath.stop(now + 0.09);
+    extraVoiceNodes.push(oscOctave, vibrato, vibratoGain, breath, breathFilter, breathGain, octGain);
     primaryArpOsc = osc;
   } else if (arpTimbre === "GLASS_FM") {
     const carrier = audioCtx.createOscillator(); const mod = audioCtx.createOscillator();
@@ -9025,6 +9053,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
     mod.connect(modGain); modGain.connect(carrier.frequency);
     carrier.connect(arpVoiceFilter); carrier.start(now); mod.start(now);
     carrier.stop(now + durationSec + 0.05); mod.stop(now + durationSec + 0.05);
+    extraVoiceNodes.push(mod, modGain);
     primaryArpOsc = carrier;
   } else if (arpTimbre === "KALIMBA") {
     const osc1 = audioCtx.createOscillator(); const osc2 = audioCtx.createOscillator();
@@ -9037,6 +9066,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
     osc1.connect(arpVoiceFilter); osc2.connect(tineGain); tineGain.connect(arpVoiceFilter);
     osc1.start(now); osc2.start(now);
     osc1.stop(now + durationSec + 0.05); osc2.stop(now + durationSec + 0.05);
+    extraVoiceNodes.push(osc2, tineGain);
     primaryArpOsc = osc1;
   } else if (arpTimbre === "ANALOG_PULSE") {
     const osc1 = audioCtx.createOscillator(); const osc2 = audioCtx.createOscillator();
@@ -9050,6 +9080,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
     osc1.connect(arpVoiceFilter); osc2.connect(pulseGain); pulseGain.connect(arpVoiceFilter);
     osc1.start(now); osc2.start(now);
     osc1.stop(now + durationSec + 0.05); osc2.stop(now + durationSec + 0.05);
+    extraVoiceNodes.push(osc2, pulseGain);
     primaryArpOsc = osc1;
   } else if (arpTimbre === "SINE_CRYSTAL") {
     const osc = audioCtx.createOscillator(); osc.type = "sine";
@@ -9062,6 +9093,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
     osc.connect(arpVoiceFilter); shimmer.connect(shimmerGain); shimmerGain.connect(arpVoiceFilter);
     osc.start(now); shimmer.start(now);
     osc.stop(now + durationSec + 0.05); shimmer.stop(now + durationSec + 0.05);
+    extraVoiceNodes.push(shimmer, shimmerGain);
     primaryArpOsc = osc;
   } else if (arpTimbre === "MUSIC_BOX") {
     const osc1 = audioCtx.createOscillator(); const osc2 = audioCtx.createOscillator();
@@ -9075,6 +9107,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
     osc1.connect(arpVoiceFilter);
     osc1.start(now); osc2.start(now);
     osc1.stop(now + durationSec + 0.05); osc2.stop(now + durationSec + 0.05);
+    extraVoiceNodes.push(osc2, chimeGain);
     primaryArpOsc = osc1;
   } else if (arpTimbre === "CONCERT_HARP") {
     const osc = audioCtx.createOscillator(); const body = audioCtx.createOscillator();
@@ -9088,6 +9121,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
     osc.connect(arpVoiceFilter);
     osc.start(now); body.start(now);
     osc.stop(now + durationSec + 0.05); body.stop(now + durationSec + 0.05);
+    extraVoiceNodes.push(body, bodyGain);
     primaryArpOsc = osc;
   } else if (arpTimbre === "WATER_DROPLET") {
     const osc = audioCtx.createOscillator();
@@ -9109,6 +9143,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
     osc.connect(arpVoiceFilter);
     osc.start(now); pluck.start(now);
     osc.stop(now + durationSec + 0.05); pluck.stop(now + durationSec + 0.05);
+    extraVoiceNodes.push(pluck, pluckGain);
     primaryArpOsc = osc;
   } else {
     const osc = audioCtx.createOscillator(); osc.type = "sine";
@@ -9119,7 +9154,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
 
   if (pan) { gain.connect(pan); pan.connect(arpBusGain); }
   else { gain.connect(arpBusGain); }
-  disconnectOnEnded(primaryArpOsc, pan || gain);
+  disconnectOnEnded(primaryArpOsc, extraVoiceNodes);
 
   midiNoteTimed(MIDI_CH.ARP, midi, vel, durationSec);
 }
@@ -9258,7 +9293,7 @@ function playSnare(hard = false) {
   noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + (hard ? 0.22 : 0.16) * kit.decayMult);
 
   whiteNoise.connect(filter); filter.connect(noiseGain); noiseGain.connect(drumBusGain);
-  disconnectOnEnded(whiteNoise, noiseGain);
+  disconnectOnEnded(whiteNoise, filter, noiseGain);
   whiteNoise.start(now, Math.random() * 0.7); whiteNoise.stop(now + 0.25 * kit.decayMult);
 
   if (ringDynamics.drum) {
@@ -9302,7 +9337,7 @@ function playHiHat(accent = false) {
   gain.gain.exponentialRampToValueAtTime(0.0001, now + (accent ? 0.06 : 0.04) * kit.decayMult);
 
   source.connect(filter); filter.connect(gain); gain.connect(drumBusGain);
-  disconnectOnEnded(source, gain);
+  disconnectOnEnded(source, filter, gain);
   source.start(now, Math.random() * 0.7); source.stop(now + 0.07 * kit.decayMult);
 }
 
@@ -9353,7 +9388,7 @@ function playDayan(stroke = "TUN", hard = 1.0) {
     osc3.connect(g3); g3.connect(filter);
     filter.connect(gain); gain.connect(drumBusGain);
 
-    disconnectOnEnded(osc1, gain);
+    disconnectOnEnded(osc1, osc2, osc3, g3, filter, gain);
     osc1.start(now); osc2.start(now); osc3.start(now);
     osc1.stop(now + decay + 0.05); osc2.stop(now + decay + 0.05); osc3.stop(now + decay + 0.05);
   } else if (isNa) {
@@ -9378,7 +9413,7 @@ function playDayan(stroke = "TUN", hard = 1.0) {
 
     noise.connect(noiseFilter); noiseFilter.connect(noiseGain);
     noiseGain.connect(drumBusGain);
-    disconnectOnEnded(noise, noiseGain);
+    disconnectOnEnded(noise, noiseFilter, noiseGain);
     noise.start(now, Math.random() * 0.5); noise.stop(now + 0.06);
 
     const decay = 0.21 * kit.decayMult;
@@ -9390,7 +9425,7 @@ function playDayan(stroke = "TUN", hard = 1.0) {
     g2.gain.value = 0.35;
     osc1.connect(gain); osc2.connect(g2); g2.connect(gain);
     gain.connect(drumBusGain);
-    disconnectOnEnded(osc1, gain);
+    disconnectOnEnded(osc1, osc2, g2, gain);
     osc1.start(now); osc2.start(now);
     osc1.stop(now + decay + 0.04); osc2.stop(now + decay + 0.04);
   } else if (isTiRe) {
@@ -9414,7 +9449,7 @@ function playDayan(stroke = "TUN", hard = 1.0) {
     slapG.gain.setValueAtTime(0.24 * drumVol * hard, now);
     slapG.gain.exponentialRampToValueAtTime(0.0001, now + 0.022);
     slap.connect(slapF); slapF.connect(slapG); slapG.connect(drumBusGain);
-    disconnectOnEnded(slap, slapG);
+    disconnectOnEnded(slap, slapF, slapG);
     slap.start(now, Math.random() * 0.5); slap.stop(now + 0.03);
 
     osc1.connect(gain); gain.connect(drumBusGain);
@@ -9461,9 +9496,10 @@ function playBayan(stroke = "GHE", slide = true, hard = 1.0) {
   oscMain.frequency.setValueAtTime(baseFreq, now);
   oscSub.frequency.setValueAtTime(baseFreq * 0.5, now);
 
+  let oscMeendLFO = null, lfoGain = null;
   if (slide) {
-    const oscMeendLFO = audioCtx.createOscillator();
-    const lfoGain = audioCtx.createGain();
+    oscMeendLFO = audioCtx.createOscillator();
+    lfoGain = audioCtx.createGain();
     const peakFreq = (112 + randFloat() * 24) * kit.pitchMult; // gentler scoop (was 132-166 Hz)
     oscMain.frequency.exponentialRampToValueAtTime(baseFreq * 0.84, now + 0.018 * tempoScale);
     oscMain.frequency.exponentialRampToValueAtTime(peakFreq, now + 0.125 * tempoScale);
@@ -9504,7 +9540,7 @@ function playBayan(stroke = "GHE", slide = true, hard = 1.0) {
   resonantFilter.connect(gain);
   gain.connect(drumBusGain);
 
-  disconnectOnEnded(oscMain, gain);
+  disconnectOnEnded(oscMain, oscSub, resonantFilter, gain, oscMeendLFO, lfoGain);
   oscMain.start(now);
   oscSub.start(now);
   oscMain.stop(now + decay + 0.04);
@@ -15019,6 +15055,11 @@ function toggleRecord() {
       if (!isRecording) return;
       recordChunksL.push(new Float32Array(e.inputBuffer.getChannelData(0)));
       recordChunksR.push(new Float32Array(e.inputBuffer.getChannelData(1)));
+      // Safe memory cap: 45 minutes (~31,600 chunks at 48kHz stereo, ~1GB raw PCM)
+      if (recordChunksL.length >= 31600) {
+        setRecordStatus("45-min recording limit reached — saving take to protect memory…");
+        setTimeout(() => { if (isRecording) toggleRecord(); }, 10);
+      }
     };
     // A ScriptProcessor only runs while connected to the destination; route
     // it through a silent gain so it adds nothing to what you hear.
@@ -18225,12 +18266,30 @@ window.addEventListener("keydown", (e) => {
   function route(node, g, o) {
     const c = audioCtx;
     const pan = c.createStereoPanner(); pan.pan.value = o.pan || 0; node.connect(pan);
-    const send = (amt, dest) => { if (amt > 0) { const x = c.createGain(); x.gain.value = amt; pan.connect(x); x.connect(dest); } };
+    const sends = [];
+    const send = (amt, dest) => {
+      if (amt > 0) {
+        const x = c.createGain(); x.gain.value = amt;
+        pan.connect(x); x.connect(dest);
+        sends.push(x);
+      }
+    };
     send(o.dry, g.bus); send(o.wash, g.washIn); send(o.verb, g.verbIn);
-    return pan;
+    return { pan, sends };
   }
   function cleanupLater(src, nodes) {
-    src.onended = () => setTimeout(() => { try { src.disconnect(); } catch (e) {} nodes.forEach(n => { try { n.disconnect(); } catch (e) {} }); }, 300);
+    src.onended = () => setTimeout(() => {
+      try { src.disconnect(); } catch (e) {}
+      const list = [];
+      const collect = (item) => {
+        if (!item) return;
+        if (Array.isArray(item)) item.forEach(collect);
+        else if (item.pan && item.sends) { collect(item.pan); collect(item.sends); }
+        else if (typeof item.disconnect === "function" && !list.includes(item)) list.push(item);
+      };
+      collect(nodes);
+      list.forEach(n => { try { n.disconnect(); } catch (e) {} });
+    }, 300);
   }
   function sync() {
     const g = ensureGraph(); if (!g) return;
@@ -18254,8 +18313,8 @@ window.addEventListener("keydown", (e) => {
     vg.gain.setValueAtTime(peak, now + Math.max(0.15, dur - 0.3));
     vg.gain.linearRampToValueAtTime(0.0001, now + dur);
     src.connect(hp); hp.connect(lp); lp.connect(vg);
-    const pan = route(vg, g, { dry: 0.35, wash: 0.85, verb: 0.9, pan: (randFloat() - 0.5) * 0.8 });
-    cleanupLater(src, [hp, lp, vg, pan]);
+    const r = route(vg, g, { dry: 0.35, wash: 0.85, verb: 0.9, pan: (randFloat() - 0.5) * 0.8 });
+    cleanupLater(src, [hp, lp, vg, r]);
     S.ghostUntil = performance.now() + (dur + 4) * 1000;
     src.start(now);
   }
@@ -18285,8 +18344,8 @@ window.addEventListener("keydown", (e) => {
         vg.gain.setValueAtTime(peak, t0 + dur);
         vg.gain.linearRampToValueAtTime(0.0001, t0 + dur + rel);
         src.connect(hp); hp.connect(lp); lp.connect(vg);
-        const pan = route(vg, g, { dry: 0.55, wash: 0.5, verb: 0.8, pan: (i - 1) * 0.45 + (cents > 0 ? 0.15 : -0.15) });
-        cleanupLater(src, [hp, lp, vg, pan]);
+        const r = route(vg, g, { dry: 0.55, wash: 0.5, verb: 0.8, pan: (i - 1) * 0.45 + (cents > 0 ? 0.15 : -0.15) });
+        cleanupLater(src, [hp, lp, vg, r]);
         src.start(t0); src.stop(t0 + dur + rel + 0.1);
       });
     });
@@ -18301,8 +18360,8 @@ window.addEventListener("keydown", (e) => {
     const hp = c.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 350;
     const vg = c.createGain(); vg.gain.value = 0.22 + randFloat() * 0.14;
     src.connect(hp); hp.connect(vg);
-    const pan = route(vg, g, { dry: 1, wash: 0.25, verb: 0.2, pan: (randFloat() - 0.5) * 1.0 });
-    cleanupLater(src, [hp, vg, pan]);
+    const r = route(vg, g, { dry: 1, wash: 0.25, verb: 0.2, pan: (randFloat() - 0.5) * 1.0 });
+    cleanupLater(src, [hp, vg, r]);
     src.start(now);
   }
 

@@ -1036,3 +1036,18 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Added install prompt button (`#btnInstallApp`) in header utils and documentation in Keyboard Shortcuts dialog (`#shortcutsOverlay`).
 - **Cloudflare Edge Configuration**:
   - Added `_headers` specifying permissions policies (`microphone=(self), midi=(self)`), frame protection, and cache control.
+
+## Update — 2026-10-16 (Web Audio Graph Node Memory Leak Hardening & Teardown)
+
+- **Root Cause of High RAM (1.33 GB on Safari)**:
+  - Safari/WebKit manages `AudioNode`s strictly: any intermediate node (oscillators, filters, modulators, gain stages) connected into the audio graph is retained in C++ memory until explicitly disconnected via `.disconnect()`.
+  - At generative tempos, thousands of per-note nodes accumulated on `destination` and summing buses over extended sessions without being garbage-collected.
+- **Comprehensive Audio Node Teardown**:
+  - **Audio Clock Fallback**: Added explicit `src.disconnect()` in `scheduleAudioClockFallback.onended`, eliminating ~300 dead nodes per minute accumulating on `audioCtx.destination`.
+  - **Multi-Node `disconnectOnEnded` Upgrade**: Upgraded `disconnectOnEnded(source, ...nodes)` to recursively traverse, collect, and cleanly disconnect all primary oscillators, secondary oscillators, modulators, peaking/bandpass/lowpass filters, and voice gain stages when playback finishes.
+  - **Synth Chords & Voicing**: Wired all secondary oscillators (`osc2`), FM modulators (`fmGain`), tremolo depth/gain (`tremDepth`, `tremGain`, `tremOsc`), and Sitar physical model shapers/filters (`jawariShaper`, `formantBody`, `formantBuzz`) into `disconnectOnEnded`.
+  - **Shimmer Arp**: Wired all secondary timbral nodes (`oscOctave`, `vibrato`, `vibratoGain`, `breath`, `breathFilter`, `breathGain`, `octGain`, `mod`, `modGain`, `tineGain`, `pulseGain`, `shimmer`, `shimmerGain`, `chimeGain`, `bodyGain`, `pluckGain`) into `disconnectOnEnded(primaryArpOsc, extraVoiceNodes)`.
+  - **Drums & Tabla**: Wired all overtone filters, bandpass shapers, and slap noise nodes across `playKick`, `playSnare`, `playHiHat`, `playDayan`, and `playBayan` into `disconnectOnEnded`.
+  - **Module 5 Field Sampler Aux Sends**: Fixed `route()` to track auxiliary send gain nodes (`sends`) and updated `cleanupLater` to disconnect all 3 send gains alongside panners and filters.
+  - **Master Output Recording Cap**: Added a 45-minute (~1 GB raw PCM) safe buffer guard in `recordTap.onaudioprocess` to auto-stop and save long takes, preventing runaway memory exhaustion.
+
