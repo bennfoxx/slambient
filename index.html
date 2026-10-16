@@ -17770,7 +17770,7 @@ window.addEventListener("keydown", (e) => {
 
   function fieldAnalyze(mono, rate, name, maxSec) {
     const n = mono.length;
-    if (n < rate * 0.25) return { error: "TOO SHORT" };
+    if (n < rate * 0.20) return { error: "TOO SHORT" };
     const w = Math.max(8, Math.round(rate * 0.005));
     const nw = Math.floor(n / w);
     const env = new Float32Array(nw);
@@ -17781,14 +17781,14 @@ window.addEventListener("keydown", (e) => {
       env[i] = Math.sqrt(s / w);
       if (env[i] > peakE) peakE = env[i];
     }
-    if (peakE < 0.004) return { error: "TOO QUIET" };
-    // 1. trim lead-in / trailing silence
-    const thr = Math.max(0.004, peakE * 0.07);
+    if (peakE < 0.0008) return { error: "TOO QUIET" };
+    // 1. trim lead-in / trailing silence (if trimmed segment is short, gracefully use full take)
+    const thr = Math.max(0.0008, peakE * 0.06);
     let s0 = 0; while (s0 < nw && env[s0] < thr) s0++;
     let e0 = nw - 1; while (e0 > s0 && env[e0] < thr) e0--;
-    const a = Math.max(0, (s0 - 3) * w);
-    const b = Math.min(n, (e0 + 1 + 20) * w);
-    if (b - a < rate * 0.2) return { error: "TOO SHORT" };
+    let a = Math.max(0, (s0 - 3) * w);
+    let b = Math.min(n, (e0 + 1 + 20) * w);
+    if (b - a < rate * 0.20) { a = 0; b = Math.min(n, Math.floor(maxSec * rate)); }
     let seg = Float32Array.from(mono.subarray(a, Math.min(b, a + Math.floor(maxSec * rate))));
     // 2. remove DC / rumble (one-pole high-pass ~40 Hz)
     const hpA = Math.exp(-2 * Math.PI * 40 / rate);
@@ -17935,13 +17935,24 @@ window.addEventListener("keydown", (e) => {
   }
 
   /* ---------- Capture (press & hold / tap) ---------- */
+  let captureCtx = null;
+  function getCaptureContext() {
+    if (!captureCtx || captureCtx.state === "closed") {
+      captureCtx = new AC();
+    }
+    if (captureCtx.state === "suspended") {
+      captureCtx.resume().catch(() => {});
+    }
+    return captureCtx;
+  }
+
   function teardownRec(rec) {
     try { if (rec.proc) { rec.proc.onaudioprocess = null; rec.proc.disconnect(); } } catch (e) {}
     try { if (rec.src) rec.src.disconnect(); } catch (e) {}
     try { if (rec.mute) rec.mute.disconnect(); } catch (e) {}
     try { if (rec.analyser) rec.analyser.disconnect(); } catch (e) {}
     try { if (rec.stream) rec.stream.getTracks().forEach(t => t.stop()); } catch (e) {}
-    try { if (rec.ownCtx && rec.ctx) rec.ctx.close(); } catch (e) {}
+    try { if (navigator.audioSession && S.prevSession) navigator.audioSession.type = S.prevSession; } catch (e) {}
     clearTimeout(rec.tapTimer);
   }
   function setVU(v) { all(".field-badge, .field-panel, .mini-transport").forEach(el => el.style.setProperty("--field-vu", v.toFixed(3))); }
@@ -17973,26 +17984,49 @@ window.addEventListener("keydown", (e) => {
       S.rec = null; flashStatus("NO MIC (needs https)"); return;
     }
     try {
-      const haveCtx = (typeof audioCtx !== "undefined" && audioCtx && isPlaying);
-      const ctx = haveCtx ? audioCtx : new AC();
-      rec.ctx = ctx; rec.ownCtx = !haveCtx;
-      if (ctx.state === "suspended") ctx.resume().catch(() => {});
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: false, autoGainControl: false }
-      });
-      if (S.rec !== rec) { stream.getTracks().forEach(t => t.stop()); teardownRec(rec); return; }
+      try {
+        if (navigator.audioSession) {
+          S.prevSession = navigator.audioSession.type;
+          navigator.audioSession.type = "play-and-record";
+        }
+      } catch (e) {}
+
+      const ctx = getCaptureContext();
+      rec.ctx = ctx;
+      if (ctx.state === "suspended") {
+        await ctx.resume().catch(() => {});
+      }
+
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: false, autoGainControl: false }
+        });
+      } catch (e) {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      }
+
+      if (S.rec !== rec) {
+        stream.getTracks().forEach(t => t.stop());
+        teardownRec(rec);
+        return;
+      }
+
       rec.stream = stream;
       rec.rate = ctx.sampleRate;
       rec.src = ctx.createMediaStreamSource(stream);
-      rec.analyser = ctx.createAnalyser(); rec.analyser.fftSize = 1024;
+      rec.analyser = ctx.createAnalyser();
+      rec.analyser.fftSize = 1024;
       rec.proc = ctx.createScriptProcessor(4096, 1, 1);
       rec.mute = ctx.createGain();
-      rec.mute.gain.setValueAtTime(0, 0);
+      rec.mute.gain.setValueAtTime(0, ctx.currentTime);
       rec.mute.gain.value = 0; // keeps processor active without output
+
       rec.src.connect(rec.analyser);
       rec.src.connect(rec.proc);
       rec.proc.connect(rec.mute);
       rec.mute.connect(ctx.destination);
+
       rec.proc.onaudioprocess = (ev) => {
         // Zero out outputBuffer to guarantee absolute silence and prevent feedback
         const out = ev.outputBuffer.getChannelData(0);
@@ -18003,7 +18037,9 @@ window.addEventListener("keydown", (e) => {
         rec.len += d.length;
         if (rec.len >= MAX_REC_SEC * rec.rate) finishCapture();
       };
-      rec.active = true; rec.t0 = performance.now();
+
+      rec.active = true;
+      rec.t0 = performance.now();
       if (!S.holding || rec.tapRequested) enterTapMode(rec);
       updateUI();
       requestAnimationFrame(meterLoop);
@@ -18036,8 +18072,13 @@ window.addEventListener("keydown", (e) => {
   }
 
   function holdStart() {
+    if (S.rec && S.rec.active) {
+      finishCapture();
+      return;
+    }
     S.holding = true;
     if (S.rec) return;
+    getCaptureContext();
     beginCapture();
   }
   function holdEnd() {

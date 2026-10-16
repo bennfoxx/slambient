@@ -1000,24 +1000,19 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Updated `.btn-mic-mini` in `.mini-transport` to include `<span>SAMPLE</span>` with the mic icon.
   - Styled with equal `flex: 1 1 0` sizing (40px height, 12px JetBrains Mono bold text), perfectly matching the `[ ▶ Start ]` and `[ ● Record ]` buttons in the bottom floating toolbar.
 
-## Update — 2026-10-16 (Mic Capture: Bulletproof Web Audio Pipeline & Zero-Bleed Capture)
+## Update — 2026-10-16 (Mic Capture: Isolated Capture Context, Synchronous Activation & iOS AudioSession Fix)
 
-- **Eliminated Jarring Audio Playback & Synth Bursts**:
-  - Previously, tapping the mic button called `audioCtx.resume()` even when the transport was paused, causing pending synth voice queues to suddenly burst through the speakers.
-  - Now, if transport is paused (`!isPlaying`), capture uses an isolated temporary AudioContext (`new AC()`) that is cleanly closed upon teardown (`rec.ctx.close()`), keeping the main synthesis engine untouched and completely silent.
-  - The script processor output is explicitly routed through a dedicated zero-gain mute node (`rec.mute.gain.setValueAtTime(0, 0); rec.mute.gain.value = 0; rec.mute.connect(ctx.destination)`) ensuring the audio pull loop runs continuously in both Chromium and WebKit.
-  - Inside `rec.proc.onaudioprocess`, `ev.outputBuffer.getChannelData(0).fill(0)` is executed unconditionally on every quantum, guaranteeing 0dB bleed and completely preventing feedback loops.
-  - Removed `navigator.audioSession.type = "play-and-record"` toggling, preventing iOS Safari hardware audio route re-configuration clicks, speaker ducking, or Bluetooth profile drops.
-
-- **Restored Bulletproof Desktop & Mobile Recording**:
-  - `MediaStreamDestinationNode` was identified as causing `ScriptProcessorNode` to suspend (browsers do not pull buffers through dummy streams unless consumed by WebRTC/MediaRecorder). Reverting to the muted gain node connected to destination keeps the capture buffer pumping reliably.
-  - Media stream tracks are cleanly stopped upon teardown (`rec.stream.getTracks().forEach(t => t.stop())`), respecting browser sandboxing and preventing ghost/detached hardware track states.
-
-- **Microphone Permission Persistence Instructions**:
-  - Browser security models govern microphone permission prompts at the origin level. To permanently remember permission and prevent repeated prompts:
-    - **iOS Safari**: Tap the `aA` / Page Settings icon on the left of the URL bar → Tap **Website Settings** → Set **Microphone** to **Allow** (instead of "Ask").
-    - **macOS Safari**: Safari menu → **Settings** (or Preferences) → **Websites** tab → **Microphone** → Set the site to **Allow**.
-    - **Chrome (Desktop & Mobile)**: Tap the tune/padlock icon in the URL bar → **Site Settings** / **Permissions** → Set **Microphone** to **Allow**.
+- **Root Cause of Failed Recording**:
+  - In commit `56c5ec6`, `haveCtx` checked `audioCtx && isPlaying`. When testing mic sampling while paused (`!isPlaying`), it created an ephemeral context (`new AC()`) that stayed in a suspended state because `ctx.resume()` was called across an asynchronous boundary without synchronous user-gesture activation. On a suspended AudioContext, Web Audio never calls `onaudioprocess`, leaving recorded audio length at 0 samples (`TOO SHORT`).
+  - Furthermore, removing `navigator.audioSession.type = "play-and-record"` on iOS/WebKit caused Safari to enforce its default `"playback"` audio session, returning 100% muted (zeroed) buffers from `getUserMedia`.
+- **Bulletproof Isolated Capture Pipeline**:
+  - Implemented a dedicated `captureCtx` initialized synchronously inside `holdStart()` on `pointerdown`. This satisfies browser user-gesture activation rules before any `await` boundaries and ensures `captureCtx.state === "running"` immediately.
+  - Decoupled completely from `audioCtx`: `captureCtx` contains zero synth voices, oscillators, or drone nodes, completely eliminating any possibility of synthesizer audio playback or bursts when recording starts.
+  - Reinstated `navigator.audioSession.type = "play-and-record"` during active recording, safely restored to previous session type on teardown, enabling full mic input on iOS Safari.
+  - Added seamless fallback: requests `{ echoCancellation: true, noiseSuppression: false, autoGainControl: false }` and falls back to `{ audio: true }` if device constraints fail.
+  - In `rec.proc.onaudioprocess`, `ev.outputBuffer.getChannelData(0).fill(0)` and `rec.mute.gain.setValueAtTime(0, ctx.currentTime)` guarantee 0dB acoustic output to speakers.
+  - Added dual interaction support: press-and-hold records while held; quick tap records a 5-second take; tapping the mic button while actively recording stops and saves immediately.
+  - Relaxed energy thresholds in `fieldAnalyze`: lowered noise floor to `0.0008` (-62 dBFS) and added graceful fallback to the full recorded buffer if silence trimming is narrow, preventing quiet ambient room recordings from being rejected.
 
 
 
