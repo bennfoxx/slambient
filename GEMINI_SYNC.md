@@ -871,3 +871,58 @@ Still unverified on a real iPhone: phone portrait layout, orb sheet width, silen
        - Hides `.eno-standalone-pod` (`display: none !important`), freeing full horizontal width for presets and transport.
        - Compacts header padding (`8px 16px 6px 16px`), topBar padding (`8px 12px; gap: 6px`), transport row padding (`6px; gap: 8px`), and master volume pod (`width: 68px; padding: 6px 8px`).
      - Added early exit guard `(window.matchMedia("(max-height: 500px)").matches)` in `syncEnoPodSquare()`, clearing inline styles and delegating completely to CSS on phone landscape.
+
+## Multi-Phase Implementation Roadmap & Feature Plan
+
+The following phased roadmap organizes upcoming work into discrete, focused engineering packages aligned with the Master Blueprint:
+
+### Phase 8: Mobile UX, Touch Physics & Landscape Polish
+*Focus: Eliminate mobile friction, fix slider gesture hijacking, and perfect responsive layout.*
+1. **Mobile Slider Touch Isolation (`touch-action: none !important`)**:
+   - Apply `touch-action: none !important` and `user-select: none` across all `<input type="range">` elements (volume, tempo, pedals, and channel controls).
+   - Enforce an expanded mobile touch target height (34px–38px) on coarse pointer devices so finger drags never trigger page scrolls.
+   - Clean up remaining legacy `touch-action: pan-y` rules on orbital/side-panel sliders that permit Safari gesture theft.
+2. **iPhone Landscape Header Verification**:
+   - Verify zero-gap alignment and prevent feedback loops across all device aspect ratios.
+   - Guard against subpixel flex-stretch discrepancies between `.master-vol-pod` and `.top-bar`.
+
+### Phase 9: Maihar Gharana & "Lineage" Sonic Refinements
+*Focus: Authentic Indian classical acoustics, softer unifying drone beds, articulate tabla percussion, and breath-like raga phrasing.*
+1. **Tanpura Drone Redesign (Quiet, Meditative Bed)**:
+   - **Slow Plucking Cadence**: Decouple from the 1-beat metronome clock; space plucks across a slow 2-bar cycle (or every 8–16 ticks) so the 4 strings naturally overlap into an unbroken, gentle golden wash.
+   - **Soft Attack & Tamed Gain**: Soften the initial pick transient and lower the default level in Preset 7 (`knobTanpura: 18`) so it sits peacefully behind the sub-bass drone.
+2. **Tabla Engine Overhaul (Bayan Headroom & Dayan Paradiddles)**:
+   - **Tame Bayan Scoops**: Lower `Ghe` slide gain multiplier and filter resonance Q (preventing digital clipping into the limiter); reduce scoop frequency across intermediate beats.
+   - **Finger Articulations & Paradiddles**: Infuse authentic **Ti-Re-Ki-Ta**, **Dha-Ti-Te**, and **Ta-Ki-Ta** finger-roll subdivisions into Rupak Tala (7/4) and Teental (4/4), highlighting crisp wooden Dayan rim strikes and muted *Kat* strokes.
+3. **Maihar Sitar Character & Uniqueness**:
+   - Add a crisp brass *mizrab* (wire plectrum) attack click on note onset.
+   - Deepen expressive *meend* pitch glide (sliding up into notes over 80–180 ms) for solo phrases.
+   - Enhance resonant *taraf* (sympathetic string) bloom to leave a lingering harmonic halo.
+4. **Arpeggio Raga Taan Phrasing**:
+   - Break up repetitive every-beat ticks.
+   - Implement authentic *Taan* phrasing: 3-to-5 note fluid ascending/descending flourishes followed by 1–2 beats of breathing silence (*Ma*), locked to Rupak Tala's 3 + 2 + 2 structure.
+
+### Phase 10: "Pocket Field Recorder" — Live Mic & Found Sound Engine
+*Focus: Live voice/sound capture directly from phones and laptops, woven generatively into the ambient fabric.*
+1. **Header & Mobile Quick-Access Widgets**:
+   - **Desktop Header**: Cassette / Mic badge (`[ 🎙 REC / 📼 DROP ]`) with live recording VU pulse, waveform thumbnail, and eject button.
+   - **Mobile Floating Bar**: Dedicated thumb-friendly `[ 🎙 ]` button on the bottom floating transport bar.
+   - **Import Support**: Drag-and-drop or file upload for `.wav`, `.m4a`, `.mp3` (voice memos, poetry, quotes, field recordings).
+2. **Live Mic "Press & Hold" Sampling**:
+   - Tap/hold to record a 3–8 second snippet directly via browser `getUserMedia()`.
+   - On release: instant trim of lead-in silence, dynamic level-matching, and subtle analog bandpass/rumble filter.
+3. **Generative Splicing & Playback Modes (Module 5 / Atmosphere & Noise)**:
+   - **Ghost Phrases (Hauntology)**: Complete spoken phrases or laughs entering rarely on long bar turnarounds, washed in delay and cathedral reverb.
+   - **Granular Scale Choirs**: Vowel syllables pitch-shifted and sustained into ambient choir pads matching the active song key/raga.
+   - **Percussive Transients**: Consonants, clicks, and plosives mapped into subtle ghost hits inside the drum groove.
+
+### Phase 11: Blueprint Visualizers & Interaction Polish
+*Focus: Completing remaining roadmap items from Master Blueprint Sections 11 & 12.*
+1. **Audio-Gated 3D Roadside Shapes**:
+   - Gate floating geometry so idle spheres vanish when transport stops; scale density from 60% to 95%.
+2. **Audio-Reactive Space Invaders Mini-Game**:
+   - Playable Easter egg rendered inside the primary visualizer canvas.
+3. **Orb Click Debouncing & Global Spacebar/Enter Play-Pause**:
+   - 250ms click debounce on orbital nodes to prevent double-click flicker.
+   - Standard DAW global transport shortcuts (Spacebar / Enter to Play/Pause).
+
