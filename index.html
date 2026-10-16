@@ -3442,8 +3442,16 @@
       padding: 6px 8px;
     }
     .eno-standalone-pod {
-      display: none !important;
+      flex: 0 0 76px;
+      width: 76px !important;
+      height: 76px !important;
+      align-self: center;
+      aspect-ratio: auto;
+      padding: 4px;
+      gap: 0;
     }
+    .eno-standalone-pod .eno-bio-scan-label { display: none; }
+    .eno-standalone-pod .eno-crt-meta { display: none; }
   }
   /* viewport-fit=cover (for the phone layout) also applies in landscape, so
      keep the desktop layout clear of the notch there. html has zoom 0.75
