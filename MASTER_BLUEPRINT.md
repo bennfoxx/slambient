@@ -14,7 +14,8 @@ This master architecture document serves as the authoritative single-source-of-t
 
 * **Part I (Sections 1–5):** Embedded FM-1 Hardware & Firmware Architecture (4-layer coprime generative engine, 12-voice polyphony budget, DSP memory limits, 27-key live performance hand-off, 2-sector flash journaling, and 8-step hardware integration roadmap).
 * **Part II (Sections 6–12):** Canonical Web Workstation Architecture (`slambient_dev/index.html`): the 9-module audio engine (five instrument strips, a live-reorderable three-pedal insert chain, and the Master EQ & Out strip), the 4-layer CRT visualizer with fullscreen and roadside scenery, the drag-reorderable upper deck with playable MIDI keyboard and additive arpeggiator, the orbital constellation view, 15 presets with JSON patch save/load, implementation roadmap status, and architectural guardrails.
-* **Part III (Sections 13–14):** App Development, PWA Shell & Cross-Platform Packaging: standalone PWA wrapper (`manifest.json`, icon suite), offline-first service worker (`sw.js`), mobile viewport adaptation (safe-area insets, touch physics), Screen Wake Lock integration, WebKit/Safari Web Audio memory leak hardening, and native container deployment paths (Capacitor for iOS/Android, Tauri/Electron for Desktop).
+* **Part III (Sections 13–15):** App Development, PWA Shell & Cross-Platform Packaging: standalone PWA wrapper (`manifest.json`, icon suite), offline-first service worker (`sw.js`), mobile viewport adaptation (safe-area insets, touch physics), Screen Wake Lock integration, WebKit/Safari Web Audio memory leak hardening, stereo binaural spatial drift engine, and native container deployment paths (Capacitor for iOS/Android, Tauri/Electron for Desktop).
+* **Part IV (Sections 16–19):** FM-1 Hardware Conversion Planning & Physical Control Mapping Specification: complete physical surface translation (27 silicone keys, continuous rotary encoders, 24 FPS SPI display), dual-mode parameter dispatch (Macro vs. Module Page), AUTO-to-LIVE downbeat hand-off state machine, and comprehensive 8-phase embedded engineering roadmap.
 
 ---
 
@@ -299,3 +300,338 @@ This master architecture document serves as the authoritative single-source-of-t
     Cache-Control: public, max-age=0, must-revalidate
   ```
 * **Permissions Policy:** Specifically allows `microphone=(self)` for the pocket field recorder and `screen-wake-lock=(self)` for uninterrupted generative ambient performance while denying camera and geolocation.
+
+#### 15. Stereo Binaural Panning & Spatial Drift Engine
+
+##### 15.1 Psychoacoustic Philosophy & Dual-Axis Drift
+* **Aesthetic Goal:** Avoid static left/right channel pinning in ambient generative music. Sound sources behave as suspended acoustic objects orbiting organically around the listener's head.
+* **Low-Frequency Anchor:** Sub-drone fundamentals and kick percussion remain locked dead center (`pan = 0.0`) for mono punch and zero phase cancellation on small speakers.
+* **Coprime Slow Orbital Sweeps:** Mid and high frequencies orbit on non-repeating prime cycles:
+  * **Sub-Drone & Kick:** Anchored dead center (`pan = 0.0`).
+  * **Tanpura Acoustic Drone:** Subtle micro-spread (`±0.25` spread at 0.017 Hz / ~58s period).
+  * **Chords & Sitar:** Breathing figure-8 sweep (`±0.45` spread at 0.043 Hz / ~23s period).
+  * **Shimmer Arp & Bansuri:** Floating orbital swirl (`±0.75` spread at 0.071 Hz / ~14s period).
+  * **Atmosphere & Noise:** Wide atmospheric envelopment (`±0.85` spread at 0.031 Hz / ~32s period).
+
+##### 15.2 Psychoacoustic Model: ITD & Head-Shadow ILD
+* **Interaural Time Difference (ITD / Haas Phase Delay):**
+  * Human ears are ~17.5 cm apart, producing arrival time differences up to 0.65 ms (650 microseconds).
+  * As sounds move toward one ear, the opposite ear receives a variable micro-delay (`0.0 to 0.65ms`), generating an unmistakable sense of external three-dimensional acoustic space in headphones.
+* **Interaural Level Difference (ILD) & Head-Shadow Filtering:**
+  * Cranial shadow attenuates high frequencies on the opposite ear.
+  * A gentle 6dB/oct `highshelf` filter at 3500 Hz rolls off up to -4.5 dB on the far ear, simulating acoustic cranial absorption while leaving fundamental pitches completely untouched.
+* **Mono-Safe Correlation:**
+  * Positive-gain equal-power summing with sub-millisecond ITD micro-delays guarantees 100% phase coherence when summed to mono (phone speakers).
+
+##### 15.3 Macro-Weather Modulation & Hardware Parity
+* **Weather Macro Integration:** `knobWeather` dynamically scales drift velocity and stereo breadth (`0.5 + weatherVal`), allowing denser atmospheric settings to produce wider orbital motion.
+* **Continuous Foreground & Background Drift:** Driven by `requestAnimationFrame` at 60 FPS when active, and maintained via `clockTick()` when backgrounded or locked.
+* **Embedded Hardware Parity:** On the embedded FM-1 hardware, full audio-rate biquad filtering per channel is substituted with slow sinusoidal LFO modulators sending pan CC modulations using fixed-point math (`SINE_LUT`).
+
+---
+
+### Part IV: FM-1 Hardware Conversion Planning & Physical Control Mapping Specification
+
+#### 16. FM-1 Physical Architecture & Hardware Surface Topology
+
+##### 16.1 Target Embedded Platform (JieLi AC791N / Package ID FM-1_900)
+* **Processor Architecture:** Dual-Core 32-bit RISC DSP clocked at up to 320 MHz.
+  * **Core 0 (System, UI & Flash):** Handles physical button debouncing, rotary encoder interrupts, SPI display DMA strip rendering, flash journaling, and USB-MIDI/UART event queues.
+  * **Core 1 (Real-Time Audio ISR & Generative Brain):** Dedicated sample-accurate audio interrupt service routine, 12-voice polyphonic synthesis pipeline, 4-track coprime clock step sequencers, and master DSP insert chain.
+* **Memory Budget & Headroom Enforcement:**
+  * **Static RAM (`.data` + `.bss`):** Strict 98 KB ceiling with a verified 5.5 KB safety margin.
+  * **Audio Heap:** 344 KB total dynamic allocation pool.
+  * **Fixed-Allocation DSP Heap:** Strictly capped at **20.75 KB** (Tape wow/flutter delay line: 4.4 KB; lookahead peak limiter: 350 B; half-rate diffusion reverb: 16.0 KB). No dynamic `malloc()` or `free()` calls are permitted inside the audio ISR.
+* **Physical I/O & Peripheral Interfaces:**
+  * **USB-C Interface:** USB 2.0 Full-Speed bidirectional USB-MIDI class-compliant device and 5V DC power/charging.
+  * **3.5mm TRS MIDI IN:** Hardware MIDI input (Type A standard) running opto-isolated 31,250 baud serial communication.
+  * **3.5mm Stereo Audio Output:** Low-noise 24-bit stereo DAC line/headphone output with an integrated mechanical switch that automatically mutes the internal speaker upon jack insertion.
+  * **Internal Monitor Speaker:** Class-D amplified mono speaker for portable acoustic listening.
+  * **Onboard Microphone & 3.5mm Line In:** Audio sampling input for pocket field recordings.
+  * **Bluetooth BLE Disablement:** Bluetooth radio hardware is explicitly disabled in firmware at boot to eliminate RF noise coupling into the sensitive analog DAC stage and prevent high-priority BLE interrupts from stalling real-time audio buffers.
+
+##### 16.2 Surface Hardware Topology: Silicone Keys, Encoders & SPI Screen
+The physical surface of the Felucca FM-1 hardware features a unified tactile layout designed for rapid live improvisation and deep menu navigation without a mouse or computer:
+
+```
++-----------------------------------------------------------------------------------+
+|  [ HOME ]  [ SEQ ]  [ EDIT ]  [ FX ]  [ GLO ]      [ E1 ]   [ E2 ]   [ E3 ]   [ E4 ]  |
+|                                                    (Push)   (Push)   (Push)   (Push)  |
+|  +---------------------------+  [ OCT - ] [ OCT + ]                               |
+|  | SPI COLOR LCD / OLED      |                                                    |
+|  | 24 FPS DMA STRIP DISPLAY  |  [ REC ]   [ PLAY ]   [ SHIFT ]   [ TRACK ]        |
+|  +---------------------------+                                                    |
+|                                                                                   |
+|   [ 01 ] [ 02 ] [ 03 ] [ 04 ] [ 05 ] [ 06 ] [ 07 ] [ 08 ]                         |
+|   [ 09 ] [ 10 ] [ 11 ] [ 12 ] [ 13 ] [ 14 ] [ 15 ] [ 16 ]                         |
+|      <------------ 16 PERFORMANCE STEP / SILICONE KEYS ------------>               |
++-----------------------------------------------------------------------------------+
+```
+
+* **27 Silicone Keys Breakdown:**
+  * **16 Performance Step Keys (Bottom Matrix, Keys 01–16):** Backlit silicone keys functioning as 16 musical keyboard notes (quantized to active scale or chromatic with OCT-/OCT+ transposition), 16-step sequencer pattern triggers, or 16-slot preset recall buttons.
+  * **11 Navigation & Function Keys (Top & Center Matrix):**
+    1. `HOME`: Instant return to the high-level Master CRT Telemetry view.
+    2. `SEQ`: Toggle 16-step coprime loop view, mute mask, and step gate editor.
+    3. `EDIT`: Cycle active instrument module pages (Sub/Drone ➔ Drums ➔ Chords ➔ Arp ➔ Field).
+    4. `FX`: Cycle and inspect the 3-pedal DSP insert chain (Delay ➔ Reverb ➔ Chorus ➔ Master EQ).
+    5. `GLO`: Global system configuration (Root key, Scale mode, 32-bit World Seed, MIDI channels).
+    6. `OCT -`: Shift musical octave down one octave (range C1–C7).
+    7. `OCT +`: Shift musical octave up one octave (range C1–C7).
+    8. `REC`: Tap/hold to trigger sample recording, or `SHIFT + REC` to store patch to flash.
+    9. `PLAY / STOP`: Master transport start and stop with smooth bus gain ramping.
+    10. `SHIFT`: Latching/momentary secondary modifier button unlocking deeper hardware functions.
+    11. `TRACK`: Quick track select and mute matrix (Drone, Drums, Chords, Arp).
+* **Continuous Push-Rotary Encoders (E1–E4 Primary, E5–E6 Auxiliary if equipped):**
+  * High-resolution 24-detent continuous optical/magnetic rotary encoders with integrated momentary push switches.
+  * Because encoders are continuous, switching modes never creates parameter jumps (eliminating the need for catch-up or jump modes inherent in analog potentiometers).
+
+---
+
+#### 17. Physical UI State Machine, Encoder Modes & Button Relationships
+
+##### 17.1 Dual-Mode Rotary Encoder Dispatch
+The physical rotary encoders operate in two distinct software modes, determined by the active navigation context:
+
+###### Mode A: GLOBAL / MACRO MODE (Default Performance View)
+Engaged whenever the device is in `HOME` view. Encoders map directly to the primary master performance controls of the web application:
+* **Encoder 1 (Master Filter Cutoff):**
+  * *Rotate:* Adjusts master lowpass filter cutoff frequency (`knobMasterCutoff`, 60 Hz – 16 kHz with logarithmic response curve).
+  * *Push Switch:* Cycles master filter slope (12 dB/oct ➔ 24 dB/oct) or bypass.
+* **Encoder 2 (Master Resonance):**
+  * *Rotate:* Adjusts master filter resonance (`knobMasterRes`, Q = 0.5 – 8.0).
+  * *Push Switch:* Instantly resets resonance to neutral Butterworth Q (0.707).
+* **Encoder 3 (Space / Diffusion Weather):**
+  * *Rotate:* Controls master diffusion space and weather atmosphere (`knobWeather`, 0–100%). Dynamically scales reverb decay, chorus depth, and binaural drift spread.
+  * *Push Switch:* Toggles "Space Freeze" (infinite reverb sustain with input cut).
+* **Encoder 4 (Master Tempo / BPM):**
+  * *Rotate:* Sets master coprime tempo (`knobBpmHeader`, 45–115 BPM in 1 BPM increments).
+  * *Push Switch:* Tap tempo (calculates running average over 3 consecutive presses).
+* **Encoder 5 / 6 (When equipped or via SHIFT + E1 / E2):**
+  * *E5 Rotate (Drive & Flutter):* Master analog tape saturation (`knobMasterDrive`, 0–100%) and wow/flutter depth.
+  * *E6 Rotate (Master Volume):* Master DAC output gain (`knobMasterVolume`, 0–100%). Push switch toggles instant master mute.
+
+###### Mode B: CONTEXTUAL MODULE / EDIT PAGE MODE
+Engaged when pressing `EDIT` or selecting a specific module. The four encoders adapt to the active module displayed on the SPI screen:
+
+| Active Context | Encoder 1 (E1) | Encoder 2 (E2) | Encoder 3 (E3) | Encoder 4 (E4) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Module 1: Sub & Drone** | Drone Level (`knobDrone`) | Sub Cutoff (`knobDroneFilter`) | Wander Speed (`knobDroneWander`) | Tanpura Level / Buzz (`knobTanpura` / `knobJavari`) |
+| **Module 2: Drums** | Drum Level (`knobDrumVol`) | Punch / Attack (`knobDrumPunch`) | Density / Rest % (`knobDrumDensity`) | Groove Algorithm (`selDrumStyle`) |
+| **Module 3: Chords / Lead** | Chord Level (`knobChordVol`) | Sustain / Decay (`knobChordSustain`) | Dynamics / Velocity (`knobChordDynamics`) | Strum Spread (`knobStrum`, ms) |
+| **Module 4: Shimmer Arp** | Arp Level (`knobArpVol`) | Gate Length (`knobArpGate`, ms) | Rest Probability (`knobArpRest`, Ma %) | Pattern Selector (`selArpPattern`) |
+| **Module 5: Field Recorder** | Noise/Field Level (`knobNoiseVol`) | Filter Color (`knobNoiseColor`) | Spatial Drift (`knobNoiseDrift`) | Weave Mode (`ALL`/`GHOST`/`CHOIR`/`OFF`) |
+| **FX Page: Tape Delay** | Delay Time (`knobDelayTime`, ms/div) | Feedback (`knobDelayFeedback`, max 48%) | Tone / Dampening (`knobDelayTone`) | Wet / Dry Mix (`knobDelayMix`) |
+| **FX Page: Reverb** | Decay Time (`knobReverbDecay`, s) | Damping / Air (`knobReverbTone`) | Pre-Delay (`knobReverbPre`, ms) | Wet / Dry Mix (`knobReverbMix`) |
+| **FX Page: Master EQ** | Low Shelf Gain (100 Hz, ±12 dB) | Mid Bell Gain (1 kHz, ±12 dB) | High Shelf Gain (4.5 kHz, ±12 dB) | Master Saturation (`knobMasterDrive`) |
+
+##### 17.2 Complete Button Matrix & Dual-Function (SHIFT) Relationships
+
+| Button | Primary Direct Action (Tap) | Secondary Action (`SHIFT + Tap`) | Hold Action (> 600 ms) |
+| :--- | :--- | :--- | :--- |
+| **`HOME`** | Return to Master CRT Telemetry view | Toggle Screen Color Theme (Y / G / P / W) | Calibrate Encoders / Center Zero |
+| **`SEQ`** | Open Coprime Step Sequencer matrix | Randomize Loop Lengths (7, 11, 13, 17) | Clear Active Pattern Mute Mask |
+| **`EDIT`** | Cycle forward to next Instrument Module | Cycle backward to previous Instrument Module | Jump directly to Module 1 (Drone) |
+| **`FX`** | Cycle forward through DSP insert pedals | Reorder DSP pedals (DLY➔REV ➔ REV➔DLY) | Bypass entire DSP insert chain |
+| **`GLO`** | Open Global Settings (Scale, Root, Seed) | Generate New 32-Bit World Seed (⟲ RE-SEED) | Show Firmware Build & Battery Health |
+| **`OCT -`** | Transpose live silicone keys down 1 octave | Transpose Root Key down 1 semitone | Reset live octave to C3 |
+| **`OCT +`** | Transpose live silicone keys up 1 octave | Transpose Root Key up 1 semitone | Reset live octave to C3 |
+| **`REC`** | Tap: Arm/Disarm Field Mic Recorder | `SHIFT + REC`: Store Patch to Active Flash Slot | Instant Record & Loop (Hold to record) |
+| **`PLAY`** | Master Transport Play / Pause | `SHIFT + PLAY`: PANIC (All Notes & Tails Off) | Restart Clock to Step 1 Downbeat |
+| **`SHIFT`** | Momentary modifier for secondary functions | Double-tap locks SHIFT mode (LED solid) | Clear modifier latch |
+| **`TRACK`** | Open Track Mute / Solo HUD | `SHIFT + TRACK`: Open Track Pan & Drift Menu | Solo active track |
+| **`KEYS 01–16`** | Trigger musical note / Edit sequencer step | Instant recall Presets 01–15 / Slot 16 Init | Save current patch into Preset slot 01–16 |
+
+##### 17.3 Generative AUTO-to-LIVE Takeover & Downbeat Hand-off State Machine
+To deliver effortless live performance over generative ambient landscapes, the FM-1 firmware implements a seamless, click-free three-state transition engine:
+
+```
+                  +--------------------------------+
+                  |                                |
+                  |       STATE_AUTO_GEN           |
+                  |  (Generative Coprime Brain)    |
+                  |                                |
+                  +---------------+----------------+
+                                  |
+               Key Pressed (Any of Keys 01-16)
+               Instant Preemption (Voices 5-7 or Voice 3)
+               Latency = 0 ms
+                                  |
+                                  v
+                  +--------------------------------+
+                  |                                |
+                  |      STATE_LIVE_TAKEOVER       |
+                  |  (Real-Time Silicone Playing)  |
+                  |                                |
+                  +---------------+----------------+
+                                  |
+               All Silicone Keys Released
+               Anchor Root = Last Played Pitch
+               Set Latch Timer = Next Bar Downbeat
+                                  |
+                                  v
+                  +--------------------------------+
+                  |                                |
+                  |    STATE_DOWNBEAT_HANDOFF      |
+                  |   (50ms Cosine Fade Release)   |
+                  |                                |
+                  +---------------+----------------+
+                                  |
+               Clock Hits Next Downbeat Tick
+               Re-align Coprime Cycles to New Anchor
+                                  |
+                                  +--------> (Return to STATE_AUTO_GEN)
+```
+
+1. **`STATE_AUTO_GEN` (Autonomous Generative Generation):**
+   * The 4-layer coprime engine runs independently on Core 1, generating chord voicings, arpeggio cascades, tabla rhythms, and sub-drone evolutions.
+   * Visualizer indicates `AUTO` badge in green phosphor on the SPI display.
+2. **`STATE_LIVE_TAKEOVER` (Physical Performance Preemption):**
+   * The moment the user touches any of the 16 silicone keys, Core 1 instantly routes the note events to `PRIORITY_CRITICAL` voices (Voices 5–7 for chords/leads, or dynamically borrows Voice 3).
+   * Generative lead phrasing is immediately suppressed without cutting off active reverb or delay tails.
+   * Telemetry badge instantly flips to `LIVE` in amber phosphor.
+3. **`STATE_DOWNBEAT_HANDOFF` (Smooth Harmonic Re-engagement):**
+   * When the musician releases the last held silicone key, the engine does **not** instantly slam back into generative mode.
+   * The generative brain extracts the root pitch and scale degree of the player's final chord, sets it as the new harmonic tonal center, and schedules generative re-entry on the **next musical downbeat** (bar boundary).
+   * Active live voices execute a smooth 50–100 ms cosine decay, preventing audible pops or abrupt harmonic clashes.
+
+---
+
+#### 18. SPI Display Telemetry, CRT Miniatures & Visual Feedback Layouts
+
+##### 18.1 24 FPS DMA Strip-Buffered Display Architecture
+* **Display Specifications:** 160×80 (or 240×135) full-color SPI TFT/OLED driven over high-speed 4-wire SPI at 32 MHz.
+* **Zero Audio Jitter via Core Separation:**
+  * Core 0 renders graphical primitives and text into a 4 KB DMA strip buffer (e.g. 160×16 pixels per strip).
+  * Transmission is handled asynchronously by hardware SPI DMA interrupts, requiring less than 2% of Core 0 CPU time and leaving Core 1 100% uninterrupted for audio DSP.
+* **Palette Architecture:** Single-channel 8-bit CRT phosphor palette (Green `#42ff78`, Amber `#ffb830`, Cyan `#00e5ff`, White `#f0f4f8`), dynamically matching the web app's Eno phosphor themes.
+
+##### 18.2 Primary Display Page Layouts
+
+###### Page 1: `DISP_HOME_CRT` (Master Ambient Telemetry Screen)
+```
++-------------------------------------------------------------+
+| SLAMBIENT FM-1     [AUTO]  M:7/4  108 BPM   SEED:#534C-414D |
+| [~~~ W A V E F O R M ~~~]  ROOT: D  MODE: DORIAN            |
+|  /\_/\__/\___/\_/\_/\_/\_  CHORD: Dm9 [D F A C E]           |
+|                                                             |
+| T1:DRN [####....]  T3:ARP [######..]   REV: 42%   DLY: 38%  |
+| T2:CHD [######..]  T4:DRM [###.....]   CUT: 1.2k  RES: 2.4  |
++-------------------------------------------------------------+
+```
+* **Top Status Banner:** Station ID, Takeover Mode (`[AUTO]` / `[LIVE]`), Time Signature, Current BPM, and full 32-bit World Seed (`#534C-414D`).
+* **Miniature CRT Oscilloscope:** Real-time 64-pixel audio waveform window displaying output bus activity.
+* **Harmonic Telemetry:** Active Root, Scale Mode, Chord Name, and voiced pitch intervals.
+* **Track Activity Pips:** 4 four-segment activity meters for Drone, Chords, Arp, and Drums.
+* **Macro HUD:** Numerical feedback for Master Cutoff, Resonance, Reverb, and Delay.
+
+###### Page 2: `DISP_EDIT_MODULE` (Contextual Module Parameter Screen)
+```
++-------------------------------------------------------------+
+| EDIT: MODULE 3 (CHORDS / LEAD)            PG 1/2  [TRACK 2] |
+|                                                             |
+|   (E1) LEVEL        (E2) SUSTAIN      (E3) DYNAM    (E4) STRUM |
+|     84%               160%              75%           75 ms  |
+|    [=====---]        [========]        [====----]    [==------]|
+|                                                             |
+| VOICING: OPEN 9THS   TIMBRE: MAIHAR SITAR     VOICES: 3/8   |
++-------------------------------------------------------------+
+```
+* Clear visual representation of all 4 rotary encoders with graphical progress bars and precise numerical values.
+* Secondary parameters (Voicing, Timbre, Voice allocation status) displayed on lower line.
+
+###### Page 3: `DISP_FX_CHAIN` (DSP Pedal Insert Routing Screen)
+```
++-------------------------------------------------------------+
+| FX CHAIN ROUTING                           [ CHAIN ACTIVE ] |
+|                                                             |
+|   +---------+     +---------+     +---------+     +-----+   |
+|   | 1:DELAY | --> | 2:REVERB| --> | 3:CHORUS| --> |4:EQ |   |
+|   | 38% /44%|     | 42% /3.4|     | 25% ENS |     |WARM |   |
+|   +---------+     +---------+     +---------+     +-----+   |
+| (SHIFT+FX TO REORDER)                           CLIP: [ OK ]|
++-------------------------------------------------------------+
+```
+* Visual block diagram showing active pedal sequence.
+* Real-time soft-clip LED indicator (`CLIP: [ OK ]` turns into `[ SAT ]` when tape soft-saturation engages).
+
+---
+
+#### 19. Phased Hardware Conversion Roadmap (Phases HW-1 to HW-8)
+
+To systematically port the complete Slambient Web Workstation to the FM-1 embedded hardware with zero audio underruns and flawless stability, development is structured into 8 discrete hardware engineering phases:
+
+##### Phase HW-1: SLOOP Co-Processor Hooking & Voice Allocation Architecture
+* **Objective:** Establish the low-level co-processor interface between the Slambient generative brain and the stock SLOOP/Felucca firmware (`fw-AC79_AIoT_SDK`).
+* **Deliverables:**
+  * Fork and pin SLOOP v2.4/v2.5 codebase under `slambient-fm1/`.
+  * Establish Track 1–4 event dispatchers in `seq.c` and `audio.c`.
+  * Implement the strict 12-voice polyphonic budget (Voice 0: Drone, Voices 1–2: Pad, Voice 3: Shared Pad/Lead, Voice 4: Arp, Voices 5–7: Live Headroom, Track 4: 4 Drum voices).
+  * Implement dynamic Voice 3 borrowing state machine with 10 ms cosine anti-click ramp-down on preemption.
+* **Verification Gate:** Zero voice allocation collisions during simultaneous 4-track playback verified via UART log telemetry.
+
+##### Phase HW-2: Fixed-Point DSP & Deterministic Generative Math Port
+* **Objective:** Port all floating-point math, LFO modulators, and scale algorithms to 32-bit fixed-point (Q16.16) arithmetic for maximum execution speed.
+* **Deliverables:**
+  * Implement 1024-entry sine lookup table `SINE_LUT[1024]` with linear interpolation.
+  * Port 32-bit xorshift32 PRNG engine (`slambient_prng_next()`) guaranteeing 1:1 mathematical determinism with the web app for identical `#534C-414D` seeds.
+  * Implement scale quantization table covering all 14 Slambient scales, including Indian Classical Ragas (Bilawal, Bhairav) and Maihar 22-shruti microtonal offsets.
+  * Port 6-prime clock divider engine (periods 7, 11, 13, 17, 19, 23 ticks).
+* **Verification Gate:** 1,000,000-step PRNG regression test matching macOS CLI simulator against web app output buffer byte-for-byte.
+
+##### Phase HW-3: Physical UI State Machine, Encoder Matrix & Key Takeover Driver
+* **Objective:** Implement real-time interrupt drivers for the 27 silicone keys and continuous rotary encoders.
+* **Deliverables:**
+  * Non-blocking 5 ms debounce matrix scanner on Core 0 for 27 silicone keys.
+  * Quadrature decoding ISR for 4 (or 6) continuous optical rotary encoders with dynamic velocity acceleration (slow rotation = fine 1-unit adjustments; rapid flick = wide sweeps).
+  * Dual-mode encoder dispatcher (Global/Macro Mode vs. Contextual Module Mode).
+  * AUTO-to-LIVE takeover and downbeat hand-off state machine connecting physical silicone keys 01–16 to Voices 5–7.
+* **Verification Gate:** Sub-1ms key-to-audio trigger latency measured via oscilloscope on DAC output.
+
+##### Phase HW-4: Memory-Capped Audio DSP & FX Pipeline Port (20.75 KB Budget)
+* **Objective:** Port the 3-pedal DSP insert chain and Master EQ/Limiter within the strict 20.75 KB static audio heap allocation.
+* **Deliverables:**
+  * **Tape Wow/Flutter Delay (4.4 KB):** 16-bit mono circular delay line (max 1100 ms at downsampled 22.05 kHz) with 0.15 Hz sinusoidal tape wow modulation and 48% feedback ceiling.
+  * **Diffusion Reverb (16.0 KB):** Half-rate (24 kHz) Schroeder-Moorer 4-comb / 2-allpass diffusion matrix with high-frequency absorption damping.
+  * **Lookahead Peak Limiter (350 B):** 2 ms lookahead ring buffer (48 samples at 24 kHz) providing brickwall limiting at -0.5 dBFS with zero audible distortion.
+  * **Master Saturation & Warmth Filter:** Fixed-point polynomial approximation of `tanh(x)` soft saturation and 2-pole resonant lowpass filter.
+* **Verification Gate:** Total DSP memory footprint validated ≤ 21,248 bytes; zero buffer overruns under maximum polyphony.
+
+##### Phase HW-5: SPI DMA Strip UI, Telemetry & Compact CRT Visualizer
+* **Objective:** Build the 24 FPS hardware graphical user interface on the SPI LCD/OLED display.
+* **Deliverables:**
+  * Core 0 4 KB DMA strip-buffer rendering engine pushing updates asynchronously over 32 MHz SPI.
+  * Lock-free 32-entry drop-on-full ring buffer bridging Core 1 audio telemetry to Core 0 UI renderer.
+  * Render Page 1 (`DISP_HOME_CRT`) featuring mini-oscilloscope, 4-track activity meters, active chord name, and seed display.
+  * Render Page 2 (`DISP_EDIT_MODULE`) and Page 3 (`DISP_FX_CHAIN`).
+  * Phosphor palette switching (Yellow, Green, Pink, White) on `HOME` triple-tap.
+* **Verification Gate:** Stable 24 FPS display refresh rate measured with zero frame drops and zero CPU interference with Core 1 audio ISR.
+
+##### Phase HW-6: Flash Journaling, System Health & Low-Power Battery Management
+* **Objective:** Implement non-volatile state persistence across battery cycles and low-power hardware management.
+* **Deliverables:**
+  * Two-sector ping-pong flash journaling across Sector A and Sector B (4 KB each) using 24-byte atomic state records protected by CRC32 checksums.
+  * Background sector pre-erasing during transport STOP for zero-latency flash writes upon power-down.
+  * Auto-dimmer power management: screen brightness steps down to 30% PWM after 60 seconds of hardware inactivity.
+  * Low-battery interrupt handler: triggers atomic flash save and parks audio codecs before battery cutoff.
+* **Verification Gate:** 1,000 consecutive power-cycle recovery tests with 100% state restoration accuracy.
+
+##### Phase HW-7: Live Performance & Field Recording / Audio Ingestion Port
+* **Objective:** Port Module 5 live pocket field recorder and mic ingestion to physical hardware.
+* **Deliverables:**
+  * ADC input driver capturing built-in microphone and 3.5mm line-in audio at 22.05 kHz 12-bit mono.
+  * Direct flash streaming ring buffer capturing up to 45 seconds of live audio into dedicated sample flash sectors.
+  * Granular tape-playback engine with forward, reverse, and ghost-weave playback modes.
+  * Physical `REC` key integration: single-tap arms recorder; hold records; release loops.
+* **Verification Gate:** Clean audio capture with automatic gain normalization and click-free tape looping.
+
+##### Phase HW-8: 24-Hour Soak Testing, Thermal Verification & Production Firmware Signing
+* **Objective:** Rigorous stress-testing and production release packaging.
+* **Deliverables:**
+  * Continuous 24-hour hardware burn-in test running complex coprime patterns across all 4 tracks.
+  * Thermal profiling ensuring JieLi AC791N die temperature remains < 52°C under sustained load.
+  * Audio buffer underrun telemetry monitor confirming 0 buffer dropouts over 1,000,000 generated bars.
+  * Firmware binary packaging (`build/felucca.fwsc`) signed for WebMIDI browser flasher (`fm1.designburgapps.com`).
+* **Verification Gate:** Unconditional pass across all 24-hour soak tests; official release tagged `slambient-fm1-v1.0.0`.
+
+
