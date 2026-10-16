@@ -1518,10 +1518,31 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Added `<div class="preset-bank-header">` directly above `#presetBarFactory` and `#presetBarUser`.
   - Positioned `.preset-bank-tabs` (`PRESETS`, `USER [U1–U6]`) and `.patch-bank-actions` (`SAVE`, `LOAD`) side-by-side as flex items on the same horizontal line.
   - Styled both groups with matching pill container aesthetics (`background: #080a11; border: 1px solid var(--border-light); border-radius: 4px; padding: 2px`) and symmetrical button typography (`.btn-bank-tab` and `.btn-preset-io`).
-  - Responsive support:
-    - Desktop: flex row header spanning above preset chips with `justify-content: space-between`.
-    - Mobile portrait (`max-width: 640px`): header row sits cleanly across the top of `.preset-group` above the 2-row chip scroller.
+    - Desktop & mobile: aligned `.preset-bank-header` with `justify-content: flex-start; gap: 8px;` so SAVE/LOAD sits directly adjacent to PRESETS/USER tabs.
     - Phone landscape (`max-height: 550px`): `display: contents;` with flex order flows tabs, chips, and actions inline.
+
+## Update — 2026-10-16 (Centered Module Popup, Header Persistence, Rack FX Drag Reordering & Power/Randomize)
+
+- **Preset Bank Header Clustering**:
+  - Moved `[ SAVE | LOAD ]` immediately adjacent to `[ PRESETS | USER [U1–U6] ]` on the left using `justify-content: flex-start; gap: 8px;` across desktop and mobile, eliminating the wide gap across the header.
+- **Centered Module Pop-up Below Header (Replaced Full-Height Side Drawer)**:
+  - Replaced the edge-pinned left drawer (`top: 0; bottom: 0; left: 0;`) with a centered floating Eurorack module pop-up (`left: 50%; transform: translate(-50%, 0); width: 640px; max-width: calc(100vw - 32px)`).
+  - Constrained popup height and position to match the full rack view below the sticky header: `top: calc(var(--header-bottom, 106px) + 8px); height: calc(100vh - var(--header-bottom, 106px) - 20px)`.
+  - Elevated `.header-bar-wrapper` to `z-index: 10002` above the modal backdrop (`z-index: 9999`) and popup (`z-index: 10000`), so the top header remains completely visible, unshaded, and interactive while inspecting modules on desktop.
+  - Eliminated extraneous click-and-drag interactions in the inspector view: disabled mouse gestures in `initSheetSwipe`, and hid `.pedal-drag-handle` in `#orbitalModalActions` on desktop.
+- **Rack View Effects Click-and-Drag Reordering**:
+  - Added full drag-and-drop support to `.mini-pedal-card` in `#pedalBirdsEyeRack` (Filter, Delay, Space).
+  - Equipped each card with a tactile drag grip (`⋮⋮`, `cursor: grab;`), visual drag state (`.mini-pedal-dragging`), and drop target highlight (`.mini-pedal-drag-over`).
+  - Implemented dual-layer dragging (HTML5 drag-and-drop + pointer drag events with capture) so dragging any card over another immediately reorders the DSP insert chain via `reorderDspChainModules(srcKey, targetKey)`.
+  - Normal clicks on the card body outside buttons open the inspector via `openMiniPedalInspector()`.
+- **Rack View Effects Power & Randomize Buttons**:
+  - Upgraded effect bypass buttons to standard `PWR` buttons matching the instrument channel strips. Toggles between active state (glowing with the effect's neon accent) and bypassed state (dimmed/unlit), directly controlling audio DSP bypass.
+  - Added dedicated randomize buttons (`badge-tag btn-mini-randomize`) to all rack effects:
+    - Filter: `randomizeFilter()`
+    - Delay: `randomizeDelay()`
+    - Space (Reverb & Chorus): `randomizeReverbChorus()`
+    - Master Out: `randomizeSpace()` (Master EQ & saturation/drive)
+
 
 
 
