@@ -1391,3 +1391,35 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Renamed the view toggle button from `Console Rack` to `Pedal View` (`Pedalboard & Console Rack View`) so users can immediately switch into pedal/console view mode.
   - Updated `MASTER_BLUEPRINT.md` section 27 to document the completed desktop/mobile header symmetry polish and clarified that Phase 1 (Eurorack HP Sizing Grid & Macro Pedals Mode Layout) is the active roadmap item for the full hardware pedalboard container and dynamic SVG patch cables.
 
+## Update — 2026-10-16 (Modular DSP Engines: SlambientFilterEngine & SlambientMultiDelayEngine Landed in dsp-engines.js)
+
+- **Parallel Workstream Strategy (Zero Conflict with UI Design Fixes)**:
+  - While main thread finalized desktop/mobile header chassis symmetry and styling, this workstream authored the standalone DSP processors for **Phase 3 / Section 26** of `MASTER_BLUEPRINT.md` in `/Users/benfox/Documents/Development/slambient_dev/dsp-engines.js`.
+  - Zero DOM/CSS overlap: runs as an independent Web Audio API module with standard CommonJS/AMD/browser UMD exports.
+- **SlambientFilterEngine (Section 26.1)**:
+  - **4 Switchable Analog-Emulated Topologies**:
+    - `LADDER`: 4-pole cascaded transistor ladder with staggered resonance Qs, tanh waveshaping saturation, and automatic low-end bass compensation.
+    - `SEM`: 2-pole State-Variable multi-mode filter with singing resonance and lowpass/bandpass morphing.
+    - `FORMANT`: 3-cavity parallel bandpass acoustic resonators creating bansuri flute / vocal throat acoustic cavities.
+    - `COMB`: Resonant feedback delay line ($0.5\text{ ms} – 25\text{ ms}$) generating physical string overtones and harmonic halos.
+  - **Filter Intensity Scale & Bipolar Polarity**:
+    - Macro scaling slider ($0.0 – 2.0$) scaling cutoff sweep and envelope depths.
+    - Bipolar polarity toggle ($+1 / -1$) for positive or negative envelope dipping sweeps.
+  - **Dynamic Low-End Makeup Gain**:
+    - Dynamic lowshelf boost at 135 Hz proportional to resonance, preventing the volume loss inherent in 4-pole resonant ladders.
+  - **Modulation LFO**:
+    - Dedicated oscillator supporting Sine, Triangle, and Square/S&H modulation waveforms.
+- **SlambientMultiDelayEngine (Section 26.2)**:
+  - **4 Discrete Ambient Delay Algorithms**:
+    - `TAPE`: Capstan wow ($0.38\text{ Hz}$) and motor flutter ($3.6\text{ Hz}$) LFOs, asymmetric magnetic tape saturation curve, and high-frequency head damping.
+    - `BBD`: Analog Bucket Brigade compander saturation, warm clock noise floor, and steep clock-rate anti-aliasing filter that darkens repeats as delay time increases.
+    - `DIGITAL`: Pristine 32-bit floating point path, bitcrusher quantizer ($8\text{-bit} – 16\text{-bit}$), and clean repeats.
+    - `PINGPONG`: Cross-fed stereo delay lines with Haas binaural psychoacoustic spatial split ($12\text{ ms}$) and stereo width control ($0\% – 200\%$).
+  - **Dynamic Lead Voice Ducking**:
+    - Built-in sidechain ducking attenuator ($-3\text{ dB}$ to $-6\text{ dB}$) during active solos with smooth release ($320\text{ ms}$) into ambient breathing spaces.
+  - **Tempo Sync & Free Time**:
+    - Musical subdivision calculation ($1/16$, $1/8$, $1/8\text{D}$, $1/8\text{T}$, $1/4$, $1/2$, $1/1$) with live BPM tracking and click-free parameter smoothing.
+- **Service Worker & Testing**:
+  - Added `dsp-engines.js` to `PRECACHE_URLS` in `sw.js` and bumped cache version to `slambient-v4`.
+  - Comprehensive unit test suite verified in Node.js with 100% test passing across all curves, topologies, and delay modes.
+

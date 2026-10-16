@@ -1019,8 +1019,8 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
 * [x] Build the accordion drawer component for collapsible sub-parameters.
 
 ##### Phase 3: DSP & Parameter Integration (Filter & Multi-Delay)
-* [ ] Code the multi-topology filter DSP engine (Ladder, State-Variable, Formant, Comb) with pre-filter saturation and the Filter Intensity Scale.
-* [ ] Build the multi-delay engine switcher (Tape, BBD, Digital, Ping-Pong) with dynamic drawer parameter mapping.
+* [x] **Multi-Topology Filter DSP Engine (`SlambientFilterEngine` in `dsp-engines.js`):** 4 switchable topologies (Ladder 24dB with saturation, State-Variable 12dB SEM, Formant vowel cavity, Comb resonator), Filter Intensity Scale macro scaling, Bipolar Polarity (+1/-1), and dynamic low-end makeup gain.
+* [x] **Modular Multi-Delay DSP Engine (`SlambientMultiDelayEngine` in `dsp-engines.js`):** 4 discrete delay algorithms (Tape with capstan wow/flutter drift, BBD with clock noise grit, Digital 32-bit pristine with bitcrush, Ping-Pong stereo alternating spatial Haas bounce), dynamic lead voice ducking, and musical tempo sync.
 * [ ] Connect internal modulation sources (LFOs/Envelope Followers) to drive real-time parameter changes with pulsing visual feedback on patch lines.
 
 

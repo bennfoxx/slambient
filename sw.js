@@ -1,9 +1,10 @@
 // Slambient Service Worker - Offline Caching & App Shell
-const CACHE_NAME = 'slambient-v3';
+const CACHE_NAME = 'slambient-v4';
 const PRECACHE_URLS = [
   './',
   'index.html',
   'clock-processor.js',
+  'dsp-engines.js',
   'manifest.webmanifest',
   'manifest.json',
   'icon.svg',
