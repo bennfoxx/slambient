@@ -482,7 +482,7 @@
   .btn-randomize-all > span:last-child { margin-right: -0.07em; }
   @keyframes blinkRec { 50% { opacity: 0.3; } }
 
-  .root-scale-ctrl, .time-sig-ctrl, .tempo-ctrl {
+  .root-scale-ctrl, .time-sig-ctrl, .tempo-ctrl, .sample-ctrl {
     display: inline-flex;
     align-items: center;
     height: 32px;
@@ -495,7 +495,7 @@
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.6);
     transition: border-color 0.12s ease;
   }
-  .root-scale-ctrl:hover, .time-sig-ctrl:hover, .tempo-ctrl:hover {
+  .root-scale-ctrl:hover, .time-sig-ctrl:hover, .tempo-ctrl:hover, .sample-ctrl:hover {
     border-color: var(--border-bright);
   }
   .tempo-ctrl {
@@ -559,7 +559,7 @@
     letter-spacing: 0.5px;
     text-shadow: 0 0 6px rgba(var(--rgb-chord), 0.3);
   }
-  .root-scale-ctrl .tag, .time-sig-ctrl .tag, .tempo-ctrl .tag {
+  .root-scale-ctrl .tag, .time-sig-ctrl .tag, .tempo-ctrl .tag, .sample-ctrl .tag {
     font-size: 13px;
     font-weight: 800;
     color: var(--accent);
@@ -567,6 +567,9 @@
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     line-height: 1;
     white-space: nowrap;
+  }
+  .sample-ctrl .tag {
+    color: var(--color-noise);
   }
   .root-scale-ctrl select, .time-sig-ctrl select {
     -webkit-appearance: none;
@@ -3434,7 +3437,7 @@
   }
   @media (max-width: 900px) {
     .global-transport { gap: 6px; }
-    .root-scale-ctrl, .time-sig-ctrl, .tempo-ctrl { padding: 0 6px; }
+    .root-scale-ctrl, .time-sig-ctrl, .tempo-ctrl, .sample-ctrl { padding: 0 6px; }
     .tempo-ctrl input[type="range"] { width: 70px; }
   }
 
@@ -5177,13 +5180,6 @@
 
           <button class="btn-preset-chip btn-randomize-all" onclick="randomizeEverything()" title="Randomize every module"><svg class="rand-all-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20.5 3.5v5h-5"/></svg><span>ALL</span></button>
 
-          <div class="field-badge" id="fieldBadge" title="Pocket Field Recorder: hold REC to sample the mic (a quick tap records 5 s), or DROP / drag in a voice memo, poem or field recording. It is woven into the NOISE module.">
-            <button type="button" class="btn-field" data-field-hold aria-label="Hold to record from the microphone"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>REC</span></button>
-            <button type="button" class="btn-field" data-field-load aria-label="Load or drop an audio file"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><path d="M9 16h6"/></svg><span>DROP</span></button>
-            <canvas class="field-wave" data-field-wave width="112" height="40"></canvas>
-            <button type="button" class="btn-field-eject" data-field-eject title="Eject the sample" aria-label="Eject the sample">&times;</button>
-          </div>
-
           <div class="root-scale-ctrl">
             <span class="tag">KEY</span>
             <select id="topRootKey" onchange="syncRootKey(this.value)">
@@ -5239,6 +5235,20 @@
             <input type="range" id="knobBpmHeader" min="45" max="115" value="72" oninput="updateBpm(this)" title="Master Tempo (BPM)">
             <span class="tempo-val" id="lblBpmHeader">72 BPM</span>
             <button class="btn-tap-tempo" id="btnTapTempo" onclick="tapTempo()" title="Tap tempo: tap 3+ times in rhythm to set the BPM">TAP</button>
+          </div>
+
+          <div class="sample-ctrl field-badge" id="fieldBadge" title="Pocket Field Recorder: hold MIC to sample (tap records 5 s), or DROP audio file. Woven into Noise module.">
+            <span class="tag">SAMPLE</span>
+            <button type="button" class="btn-field btn-field-mic" data-field-hold aria-label="Hold to record from the microphone">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+              <span>MIC</span>
+            </button>
+            <button type="button" class="btn-field btn-field-drop" data-field-load aria-label="Load or drop an audio file">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><path d="M9 16h6"/></svg>
+              <span>DROP</span>
+            </button>
+            <canvas class="field-wave" data-field-wave width="84" height="20"></canvas>
+            <button type="button" class="btn-field-eject" data-field-eject title="Eject sample" aria-label="Eject sample">&times;</button>
           </div>
         </div>
 
@@ -17515,37 +17525,50 @@ window.addEventListener("keydown", (e) => {
     -webkit-touch-callout: none;
   }
   .field-badge, .field-panel { --field-vu: 0; }
-  .field-badge {
+  .sample-ctrl, .field-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     height: 32px;
     box-sizing: border-box;
-    padding: 0 5px;
+    padding: 0 8px;
     background: #080a11;
     border: 1px solid var(--border-light);
     border-radius: 4px;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6);
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
-  .field-badge.drop-active, .field-panel.drop-active {
+  .sample-ctrl:hover, .field-badge:hover {
+    border-color: var(--border-bright);
+  }
+  .sample-ctrl.drop-active, .field-badge.drop-active, .field-panel.drop-active {
     border-color: var(--color-noise);
     box-shadow: 0 0 12px rgba(var(--rgb-noise), 0.55);
+  }
+  .sample-ctrl .tag {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--color-noise);
+    letter-spacing: 0.8px;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    line-height: 1;
+    white-space: nowrap;
+    margin-right: 1px;
   }
   .btn-field {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
+    gap: 4px;
     height: 24px;
     box-sizing: border-box;
-    padding: 0 8px;
+    padding: 0 7px;
     background: #101420;
     color: var(--text-secondary);
     border: 1px solid var(--border-light);
     border-radius: 3px;
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: 12.5px;
+    font-size: 11.5px;
     font-weight: 800;
     letter-spacing: 0.6px;
     text-transform: uppercase;
@@ -17561,14 +17584,15 @@ window.addEventListener("keydown", (e) => {
     box-shadow: 0 0 calc(4px + var(--field-vu) * 16px) rgba(var(--rgb-drum), calc(0.35 + var(--field-vu) * 0.55));
   }
   .btn-field.recording svg { animation: blinkRec 0.8s infinite; }
-  .field-wave {
-    width: 56px;
+  .sample-ctrl .field-wave {
+    width: 60px;
     height: 20px;
     background: #04060a;
     border: 1px solid #141a26;
     border-radius: 2px;
     display: none;
   }
+  .sample-ctrl.has-sample .field-wave, .sample-ctrl.is-recording .field-wave,
   .field-badge.has-sample .field-wave, .field-badge.is-recording .field-wave { display: block; }
   .btn-field-eject {
     display: none;
@@ -17585,7 +17609,7 @@ window.addEventListener("keydown", (e) => {
     cursor: pointer;
   }
   .btn-field-eject:hover { color: var(--color-drum); border-color: var(--border-light); }
-  .field-badge.has-sample .btn-field-eject { display: inline-flex; align-items: center; justify-content: center; }
+  .sample-ctrl.has-sample .btn-field-eject, .field-badge.has-sample .btn-field-eject { display: inline-flex; align-items: center; justify-content: center; }
 
   /* Noise module panel */
   .field-panel {
@@ -17616,7 +17640,7 @@ window.addEventListener("keydown", (e) => {
 
   /* Phone: header badge would not fit -- use the floating bar + noise module */
   @media (max-width: 640px), (max-height: 500px) {
-    .field-badge { display: none; }
+    .sample-ctrl, .field-badge { display: none !important; }
   }
   @media (max-width: 640px) {
     .mini-transport .btn-mic-mini {

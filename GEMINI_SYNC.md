@@ -978,3 +978,15 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Updated the Keyboard Shortcuts modal (`shortcutsOverlay`) to display `Play / pause: [Space] [Enter]`.
 - **Orb Click Debouncing**:
   - Re-verified `ORB_CLICK_DEBOUNCE_MS = 250` and `DRAG_MOVE_THRESHOLD = 5` in canvas pointer interaction to eliminate accidental double-click modal flicker.
+
+## Update — 2026-10-16 (Header Sampler: Dedicated "SAMPLE" Pod & MIC Button Rebranding)
+
+- **Relocated from Transport to Parameters Pod Cluster**:
+  - Moved `#fieldBadge` from between `⟲ ALL` and `KEY/SCALE` to after `TEMPO` at the far end of `.global-transport`.
+  - Transport buttons (`[ Start ]`, `[ Record ]`, `[ ⟲ ALL ]`) are now strictly physically separated from sound sampling controls.
+- **Dedicated Capsule & Section Tag**:
+  - Styled as `.sample-ctrl.field-badge`, matching the boxed aesthetic of `.root-scale-ctrl`, `.time-sig-ctrl`, and `.tempo-ctrl` (32px height, `#080a11` dark inset, 1px subtle border).
+  - Added `<span class="tag">SAMPLE</span>` header tag colored with `var(--color-noise)` to visually unify with Module 5 (Noise).
+- **Renamed Button from "REC" to "MIC"**:
+  - Replaced the button text `REC` with `MIC` (with microphone icon) to eliminate user confusion with the master output recording `[ Record ]` button.
+  - Kept `[ 📼 DROP ]`, the waveform preview canvas, and eject (`×`) button fully functional within the pod.
