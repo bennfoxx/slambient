@@ -3357,6 +3357,7 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--rgb-noise), 0.16);
   }
   .strip-channel.field-ch  {
+    --dd-accent: var(--color-field);
     border-top: 3px solid var(--color-field);
     border-color: rgba(var(--rgb-field), 0.38);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--rgb-field), 0.16);
@@ -10603,7 +10604,7 @@ function renderBirdsEyePedalRack() {
 
   // Terminal Master EQ & Out Node (Node 10)
   html += `
-    <div class="mini-pedal-card mini-card-master active" data-pedal="MASTER" onclick="if (!event.target.closest('button')) openMiniPedalInspector('space', event)" title="Terminal Master Node • Click to inspect" style="cursor: pointer;">
+    <div class="mini-pedal-card mini-card-master active" data-pedal="MASTER" onclick="if (!event.target.closest('button')) openMiniPedalInspector('space', event)" title="Terminal Master Node • Click to inspect">
       <div class="mini-pedal-left">
         <span class="mini-pedal-badge">10</span>
         <div class="mini-pedal-info">
@@ -20164,6 +20165,7 @@ function getDropdownAccentColor(sel) {
   if (sel.closest(".chord-ch")) return "var(--color-chord)";
   if (sel.closest(".arp-ch")) return "var(--color-arp)";
   if (sel.closest(".noise-ch")) return "var(--color-noise)";
+  if (sel.closest(".field-ch") || sel.closest("#fieldModule")) return "var(--color-field)";
   if (sel.closest(".pedal-filter") || sel.closest(".filter-ch")) return "var(--color-filter)";
   if (sel.closest(".pedal-delay") || sel.closest(".delay-ch")) return "var(--color-delay)";
   if (sel.closest(".pedal-reverb") || sel.closest(".reverb-ch")) return "var(--color-reverb)";

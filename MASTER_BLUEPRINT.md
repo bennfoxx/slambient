@@ -2,6 +2,7 @@
 
 **Canonical Repository:** `/Users/benfox/Documents/Development/slambient_dev/index.html`  
 **Secondary Thread Worktree:** `/Users/benfox/Documents/Development/slambient_dev-thread2`  
+**Bonsai 27B Worktree:** `/Users/benfox/Documents/Development/slambient_dev-bonsai`  
 **Target Hardware Platform:** SLOOP / Felucca FM-1 (JieLi AC791N Dual-Core DSP, Package ID FM-1_900)  
 **Cloud & Edge Delivery:** Cloudflare Pages (with HTTP/3, custom edge headers, and standalone PWA caching)  
 **Live Production / Google Doc Mirror:** `https://docs.google.com/document/d/1YtjC-aq-wDhkcYdGXLQA8YYMRIkuQgU6j5Lx2NS1C1k`

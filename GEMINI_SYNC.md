@@ -1599,3 +1599,23 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - In `expandModuleOrb(orbId)`, added automatic expansion for all secondary parameter accordions (`.module-drawer-content.open`, `.module-drawer-toggle.expanded`, `aria-expanded="true"`) when viewing modules close up on desktop and mobile.
   - Set default HTML state for Filter (`FILTER ENVELOPE & MODULATION`), Delay (`MULTI-DELAY & TAPE WOW/FLUTTER`), and Space (`STEREO CHORUS & MODULATION`) drawers to `open` / `expanded`.
   - Styled `.orbital-side-panel .module-drawer-toggle.expanded` with the respective module's neon accent color and glow matching the modal theme.
+
+## Update — 2026-10-16 (Bonsai 27B Dedicated Git Worktree Initialized)
+
+- **Third Worktree Provisioning**:
+  - Provisioned a dedicated third git worktree at `/Users/benfox/Documents/Development/slambient_dev-bonsai` on a separate branch `bonsai-27b`.
+  - Configured specifically for pointing a locally running Bonsai 27B model at an isolated workspace without risking uncommitted change collisions with `main` (`/Users/benfox/Documents/Development/slambient_dev`) or `thread2` (`/Users/benfox/Documents/Development/slambient_dev-thread2`).
+- **Worktree Registry**:
+  1. Primary (`main`): `/Users/benfox/Documents/Development/slambient_dev`
+  2. Secondary (`feature-thread2`): `/Users/benfox/Documents/Development/slambient_dev-thread2`
+  3. Local LLM (`bonsai-27b`): `/Users/benfox/Documents/Development/slambient_dev-bonsai`
+
+## Update — 2026-10-16 (DSP FX Chain Grab Cursor & Field Module Dropdown Color-Matching)
+
+- **DSP FX Chain Custom Cyber Grab Cursor**:
+  - Replaced browser-native `cursor: grab;` / `pointer;` on `.mini-pedal-card`, `.mini-pedal-left`, `.mini-pedal-drag-handle`, and `.mini-pedal-card[draggable="true"]` with `cursor: var(--cursor-grab) !important;`.
+  - Configured active dragging state (`:active`, `.mini-pedal-dragging`) to display `cursor: var(--cursor-grabbing) !important;`.
+  - Maintained `cursor: var(--cursor-pointer) !important;` on action buttons and Master Out node.
+- **Field Module Dropdown Color-Matching (`#selFieldMode`)**:
+  - Added `if (sel.closest(".field-ch") || sel.closest("#fieldModule")) return "var(--color-field)";` to `getDropdownAccentColor(sel)` in JavaScript so the custom dropdown menu adopts `--color-field` (`#2bcbba`) rather than falling back to `--accent` (peach/orange).
+  - Added CSS rule `--dd-accent: var(--color-field);` to `.strip-channel.field-ch` container to ensure immediate scoped cascade for open trigger background, menu border, checkmarks, and hover highlights.
