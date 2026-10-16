@@ -1543,6 +1543,22 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
     - Space (Reverb & Chorus): `randomizeReverbChorus()`
     - Master Out: `randomizeSpace()` (Master EQ & saturation/drive)
 
+## Update — 2026-10-16 (Desktop Module Popup Container Confinement & Field Module Border Fix)
+
+- **Confined Desktop Module Popup Strictly Within Active UI Container**:
+  - Replaced floating fixed-coordinate viewport math (`top: calc(var(--header-bottom) + 8px)`) with strict relative container-confined popups:
+    - **Rack / Console View**: Pop-up (`#orbitalSidePanel`) and backdrop (`#orbitalModalBackdrop`) dynamically mount directly inside `.lower-deck` (`position: absolute; inset: 0; max-width: 760px; margin: 0 auto; z-index: 101;`).
+    - **Orbital View**: Dynamically mount directly inside `#orbitalArenaWrapper` (`position: absolute; inset: 0; max-width: 680px; margin: 0 auto; z-index: 101;`).
+    - **Mobile View (`<= 640px`)**: Preserved bottom-sheet overlay anchored to `document.body` for touch-friendly drawer behavior.
+  - Eliminated clipping and overlap issues where the top navigation bar (`< RACK`, module switcher, `PWR`, `✕`) previously tucked underneath the sticky header in Safari or varying browser viewport heights.
+  - Smooth backdrop and panel fade in/out transitions with zero layout shift to the underlying channel rack.
+
+- **Restored FIELD Module Full Border & Glow**:
+  - Identified root cause of missing border on `6. FIELD` channel strip: `--color-field` (`#2bcbba`) and `--rgb-field` (`43, 203, 186`) were missing from CSS `:root`, causing `var(--color-field)` and `rgba(var(--rgb-field), ...)` to silently fail.
+  - Defined `--color-field: #2bcbba;` and `--rgb-field: 43, 203, 186;` in `:root`.
+  - Removed legacy `.field-panel` class from `#fieldModule` and purged the reset rule (`.strip-channel.field-panel { border: none; box-shadow: none; background: transparent; }`) which previously stripped away channel strip styling.
+  - Restored full border, top neon accent strip, and ambient glow on `6. FIELD` matching all other channel strips in the console rack.
+
 ## Update — 2026-10-16 (Field Recorder Full Sample Playback with Effects)
 
 - **Full Sample Playback Engine (`playFullSample`)**:

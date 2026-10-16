@@ -46,6 +46,7 @@
     --color-chord: #fed330;
     --color-arp: #7d5fff;
     --color-noise: #1dd1a1;
+    --color-field: #2bcbba;
     --color-filter: #2ed573;
     --color-delay: #ff793f;
     --color-reverb: #ff5fc4;
@@ -55,6 +56,7 @@
     --rgb-chord: 254, 211, 48;
     --rgb-arp: 125, 95, 255;
     --rgb-noise: 29, 209, 161;
+    --rgb-field: 43, 203, 186;
     --rgb-filter: 46, 213, 115;
     --rgb-delay: 255, 121, 63;
     --rgb-reverb: 255, 95, 196;
@@ -2435,56 +2437,157 @@
   }
 
   .orbital-modal-backdrop {
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(4, 6, 12, 0.72);
+    background: rgba(4, 6, 12, 0.76);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     z-index: 9999;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.25s ease;
+    transition: opacity 0.22s ease;
   }
   .orbital-modal-backdrop.active {
+    display: block;
     opacity: 1;
     pointer-events: auto;
   }
 
   .orbital-side-panel {
+    display: none;
+    flex-direction: column;
     position: fixed;
-    top: calc(var(--header-bottom, 106px) + 8px);
-    height: calc(100vh - var(--header-bottom, 106px) - 20px);
-    height: calc(100dvh - var(--header-bottom, 106px) - 20px);
-    max-height: calc(100vh - var(--header-bottom, 106px) - 20px);
-    left: 50%;
-    transform: translate(-50%, -8px) scale(0.98);
-    opacity: 0;
-    width: 640px;
-    max-width: calc(100vw - 32px);
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 620px;
+    max-width: 88vw;
     background: linear-gradient(145deg, rgba(var(--modal-accent-rgb, 0, 229, 255), 0.08) 0%, rgba(9, 12, 20, 0.98) 42%, #070910 100%);
     border: 1px solid var(--modal-accent-color, var(--color-drone));
-    border-radius: 8px;
-    box-shadow: 0 14px 44px rgba(0, 0, 0, 0.85), 0 0 28px var(--modal-accent-glow, rgba(var(--rgb-drone), 0.35)), inset 0 0 20px rgba(0,0,0,0.8);
-    padding: 16px 18px;
-    overflow-y: auto;
+    border-radius: 6px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.85), 0 0 28px var(--modal-accent-glow, rgba(var(--rgb-drone), 0.35));
+    padding: 14px 16px;
+    overflow: hidden;
     z-index: 10000;
-    transition: transform 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.1), opacity 0.2s ease;
+    opacity: 0;
     pointer-events: none;
+    transition: opacity 0.22s ease;
     box-sizing: border-box;
   }
-  @media (max-width: 900px) {
-    .orbital-side-panel {
-      max-width: 94vw;
-    }
-  }
   .orbital-side-panel.active {
-    transform: translate(-50%, 0) scale(1);
+    display: flex;
     opacity: 1;
     pointer-events: auto;
   }
+
+  /* Rack View (Desktop): Confined strictly to the lower-deck UI bounds */
+  .lower-deck {
+    position: relative;
+  }
+  .lower-deck > .orbital-modal-backdrop {
+    display: none;
+    position: absolute;
+    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 6px;
+    background: rgba(4, 6, 12, 0.78);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 100;
+  }
+  .lower-deck > .orbital-modal-backdrop.active {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .lower-deck > .orbital-side-panel {
+    display: none;
+    position: absolute;
+    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    height: 100%;
+    max-height: 100%;
+    border: 1px solid var(--modal-accent-color, var(--color-drone));
+    border-radius: 6px;
+    background: linear-gradient(145deg, rgba(var(--modal-accent-rgb, 0, 229, 255), 0.10) 0%, rgba(9, 12, 20, 0.98) 38%, #070910 100%);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.9), 0 0 28px var(--modal-accent-glow, rgba(var(--rgb-drone), 0.35));
+    padding: 14px 18px;
+    z-index: 101;
+    transform: none;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  .lower-deck > .orbital-side-panel.active {
+    display: flex;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Orbital View (Desktop): Confined strictly to the arena wrapper card */
+  #orbitalArenaWrapper {
+    position: relative;
+  }
+  #orbitalArenaWrapper > .orbital-modal-backdrop {
+    display: none;
+    position: absolute;
+    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 8px;
+    background: rgba(4, 6, 12, 0.78);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 100;
+  }
+  #orbitalArenaWrapper > .orbital-modal-backdrop.active {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #orbitalArenaWrapper > .orbital-side-panel {
+    display: none;
+    position: absolute;
+    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+    height: 100%;
+    max-height: 100%;
+    border: 1px solid var(--modal-accent-color, var(--color-drone));
+    border-radius: 8px;
+    background: linear-gradient(145deg, rgba(var(--modal-accent-rgb, 0, 229, 255), 0.10) 0%, rgba(9, 12, 20, 0.98) 38%, #070910 100%);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.9), 0 0 28px var(--modal-accent-glow, rgba(var(--rgb-drone), 0.35));
+    padding: 14px 18px;
+    z-index: 101;
+    transform: none;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  #orbitalArenaWrapper > .orbital-side-panel.active {
+    display: flex;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   .orbital-side-panel .orbital-modal-actions-slot .pedal-drag-handle {
     display: none !important;
   }
@@ -3267,7 +3370,6 @@
   .strip-channel.reverb-ch .panel-header > span:first-child { color: var(--color-reverb); text-shadow: 0 0 8px rgba(var(--rgb-reverb), 0.35); }
   .strip-channel.space-ch  .panel-header > span:first-child { color: var(--color-space);  text-shadow: 0 0 8px rgba(var(--rgb-space), 0.35); }
 
-  .strip-channel.field-ch.field-panel,
   .strip-channel.field-ch {
     margin-top: 0;
     padding: 10px 10px;
@@ -8124,7 +8226,7 @@
     </div>
 
     <!-- 6. POCKET FIELD RECORDER (Dedicated Instrument Module) -->
-    <div class="strip-channel field-ch field-panel" id="fieldModule">
+    <div class="strip-channel field-ch" id="fieldModule">
       <div class="panel-header">
         <span onclick="openModuleInOrbital(this.closest('.strip-channel'))" style="cursor: pointer;" title="6. FIELD — Click to open in orbital view">6. FIELD</span>
         <div class="panel-header-actions">
@@ -20349,15 +20451,22 @@ function expandModuleOrb(orbId) {
     }
   }
 
-  const headerEl = document.querySelector(".header-bar-wrapper");
-  if (headerEl) {
-    const bottom = headerEl.getBoundingClientRect().bottom;
-    document.documentElement.style.setProperty("--header-bottom", `${Math.round(bottom)}px`);
+  const backdrop = document.getElementById("orbitalModalBackdrop");
+  const isMobile = window.matchMedia && window.matchMedia("(max-width: 640px)").matches;
+  if (!isMobile) {
+    const targetContainer = (activeModuleView === "console")
+      ? document.querySelector(".lower-deck")
+      : document.getElementById("orbitalArenaWrapper");
+    if (targetContainer) {
+      if (backdrop && backdrop.parentElement !== targetContainer) targetContainer.appendChild(backdrop);
+      if (panel && panel.parentElement !== targetContainer) targetContainer.appendChild(panel);
+    }
+  } else {
+    if (backdrop && backdrop.parentElement !== document.body) document.body.appendChild(backdrop);
+    if (panel && panel.parentElement !== document.body) document.body.appendChild(panel);
   }
 
   panel.classList.add("active");
-
-  const backdrop = document.getElementById("orbitalModalBackdrop");
   if (backdrop) backdrop.classList.add("active");
 
   const backLabel = document.getElementById("btnOrbitalBackLabel");
@@ -20379,25 +20488,11 @@ function closeOrbitalModal() {
   if (hint) hint.classList.remove("hidden-by-panel");
 
   if (orbitalRestoreTimer) clearTimeout(orbitalRestoreTimer);
-  orbitalRestoreTimer = setTimeout(() => { orbitalRestoreTimer = null; restoreStripsToRack(); }, 260);
+  orbitalRestoreTimer = setTimeout(() => { orbitalRestoreTimer = null; restoreStripsToRack(); }, 120);
 }
 
 function collapseOrbitalToPedals() {
-  const panel = document.getElementById("orbitalSidePanel");
-  if (panel && panel.classList.contains("active")) {
-    panel.style.transition = "transform 0.18s ease-in, opacity 0.16s ease-in";
-    const isMobile = window.matchMedia && window.matchMedia("(max-width: 640px)").matches;
-    panel.style.transform = isMobile ? "scale(0.92)" : "translate(-50%, -10px) scale(0.94)";
-    panel.style.opacity = "0";
-  }
-  setTimeout(() => {
-    closeOrbitalModal();
-    if (panel) {
-      panel.style.transition = "";
-      panel.style.transform = "";
-      panel.style.opacity = "";
-    }
-  }, 160);
+  closeOrbitalModal();
 }
 
 function getSignalChainOrbList() {
@@ -21737,7 +21832,6 @@ window.addEventListener("keydown", (e) => {
     border-radius: 4px;
     box-sizing: border-box;
   }
-  .strip-channel.field-panel,
   .strip-channel .field-panel {
     background: transparent;
     border: none;
