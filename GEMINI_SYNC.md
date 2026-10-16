@@ -1341,15 +1341,20 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
     - **Playable MIDI Keyboard**: Full 100% width, horizontal routing bar (`TARGET: CHD/ARP` and `LEDS`), and thumb-ergonomic keys (`clamp(80px, 25vh, 115px)`).
 - **Responsive JS Helpers**: Updated `mq` in `initPhoneHeader`, `orbitalPhone`, and dropdown `placeMenu` to match both portrait (`max-width: 640px`) and landscape mobile (`orientation: landscape and max-height: 550px`).
 
-## Update — 2026-10-16 (Orbital View Modal UI: Swiping Opacity Bleed & Centered Nav Controls: Priority 1)
+## Update — 2026-10-16 (Orbital View Modal UI & Pocket Field Recorder Resiliency Engine: Landed)
 
-- **Problem Diagnosis**:
-  - **Opacity Bleed on Swipe**: When cycling between module views in Orbital View via horizontal swiping (`cycleOrbitalModule`), `.swiping-left` and `.swiping-right` apply `opacity: 0.55` and a slight X-offset to `#orbitalSidePanel`. This causes the top modal header (`.orbital-modal-header`), back button (`[PEDALS]`), title, close button, borders, and dark chassis to turn semi-transparent, bleeding the canvas starfield through behind the text and controls.
-  - **Uncentered Title & Arrows**: The title and module cycle buttons (`#btnOrbitalPrev`, `#orbitalModalTitle`, `#btnOrbitalNext`) are not visually centered relative to the overall module faceplate.
-- **Architectural Resolution & Top Priority Plan**:
-  - **Scope Swipe Transition to Content Body**: Update swipe classes (`.swiping-left`, `.swiping-right`) to animate and fade only `#orbitalModalBody` (`opacity: 0.4`, `transform: translateX(...)`), leaving `.orbital-modal-header` and `#orbitalSidePanel` permanently opaque (`opacity: 1 !important`) with solid backdrop blur.
-  - **Center-Justified Module Title & Cycle Arrows**: Group `#btnOrbitalPrev`, `#orbitalModalTitle`, and `#btnOrbitalNext` into `.orbital-nav-group` with `margin: 0 auto; justify-self: center; text-align: center;`, flanked symmetrically by the `[PEDALS]` back button on the left and actions/close on the right.
-- **Roadmap Placement**: Codified at the top of Section 11 and Section 27 in `MASTER_BLUEPRINT.md`.
+- **UI Fix 1 (Orbital Modal Opacity Bleed Scoped to Modal Body)**:
+  - Scoped horizontal module cycling transitions (`.swiping-left`, `.swiping-right`) exclusively to `#orbitalModalBody` / `.orbital-modal-body` (`opacity: 0.4; transform: translateX(...)`).
+  - Enforced `opacity: 1 !important` on `.orbital-side-panel` and its top header, completely eliminating the visual bleed of background canvas stars through the dark chassis, borders, and header typography.
+- **UI Fix 2 (Center-Justified Title & Module Cycle Arrows)**:
+  - Converted `.orbital-modal-header` across desktop and mobile to a balanced 3-column CSS grid (`grid-template-columns: 1fr auto 1fr; align-items: center;`).
+  - Centered `.orbital-nav-group` (`#btnOrbitalPrev`, `#orbitalModalTitle`, `#btnOrbitalNext`) mathematically at the midpoint of the modal header, flanked symmetrically by `.btn-orbital-back` on the left (`justify-self: start`) and close/actions on the right (`justify-self: end`).
+- **Phase 0 / Pocket Field Recorder Resiliency Engine**:
+  - **Pointer Capture & Touch Physics**: Integrated `setPointerCapture(e.pointerId)` on `pointerdown` for all `[data-field-hold]` buttons, backed by dedicated `touchstart`/`touchend` listeners with `{ passive: false }` and `touch-action: none` to isolate sampling gestures from iOS Safari viewport scroll interruptions and `pointercancel` micro-jitters.
+  - **Synchronous AudioContext Pre-Warming**: Pre-warmed and synchronously resumed `captureCtx` inside the initial user touch dispatch before issuing asynchronous `getUserMedia()` queries, preserving the WebKit user activation token.
+  - **MediaRecorder Modernization**: Upgraded the capture pipeline to standard `MediaRecorder` (`audio/webm` / `audio/mp4` / AAC/Opus) decoded directly to Float32 mono PCM via `decodeAudioData`, completely bypassing iOS 17+ `createScriptProcessor` thread throttling while preserving the script processor as an automated fallback.
+  - **AudioSession Guarding**: Guarded `navigator.audioSession.type = "play-and-record"` with automated restore of previous session types, and verified `audioCtx.state` recovery to prevent background audio muting on WebKit.
+  - **Visual State Machine & Denied Feedback**: Implemented dynamic status states across all `[data-field-hold]` buttons (`HOLD TO REC`, `REC 0.0s`, `TAP TO STOP`, `MIC BLOCKED`) and integrated a floating glassmorphic `#fieldMicToast` notification with user-friendly recovery instructions when microphone access is blocked.
 
 
 
