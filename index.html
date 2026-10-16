@@ -14620,6 +14620,7 @@ function togglePlay() {
     stopAudioClockFallback();
     stopSessionTimer();
     midiAllNotesOff();
+    if (typeof roadsideObjects !== "undefined") roadsideObjects.length = 0;
 
     // Anti-click soft release envelope on Drone & Sub-Bass before full stop
     if (audioCtx) {
@@ -14719,18 +14720,22 @@ document.addEventListener("webkitfullscreenchange", syncAppFullscreenButton);
 })();
 
 
-// Enter is the universal play/pause key (Phase 7). Space is deliberately left
-// alone: Slambient Invaders uses it to fire, and a focused button would also
-// "click" on Space. Skipped while typing in a text field or while a custom
-// dropdown is open; preventDefault stops a focused button from also firing.
+// Space / Enter global transport keys (Phase 11). Space toggles play/pause when
+// Slambient Invaders is not active; Enter toggles play/pause universally.
+// Skipped while typing in a text field or while a custom dropdown is open.
 (function bindGlobalTransportKeys() {
   window.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter" || e.repeat || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+    const isEnter = (e.key === "Enter");
+    const isSpace = (e.code === "Space" && (typeof arcadeActive === "undefined" || !arcadeActive));
+    if ((!isEnter && !isSpace) || e.repeat || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
     const t = e.target;
     if (t && t.isContentEditable) return;
     if (t && t.tagName === "TEXTAREA") return;
     if (t && t.tagName === "INPUT" && !["range", "checkbox", "radio", "button"].includes(t.type)) return;
     if (document.querySelector(".custom-dropdown-menu.open")) return;
+    if (isSpace && t && t.tagName === "BUTTON") {
+      t.blur();
+    }
     e.preventDefault();
     togglePlay();
   });
@@ -15204,7 +15209,7 @@ function buildShortcutsPanel() {
     <div class="shortcuts-panel" role="dialog" aria-label="Keyboard shortcuts">
       <h3>Keyboard Shortcuts <button class="shortcuts-close" onclick="toggleShortcutsPanel(false)" title="Close (Esc)">✕</button></h3>
       <h4>Transport</h4>
-      ${row("Play / pause", ["Enter"])}
+      ${row("Play / pause", ["Space", "Enter"])}
       ${row("Undo last randomize / preset", ["Ctrl/⌘", "Z"])}
       ${row("Show this panel", ["?"])}
       ${row("Close panels / exit fullscreen", ["Esc"])}

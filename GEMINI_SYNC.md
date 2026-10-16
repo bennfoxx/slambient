@@ -966,3 +966,15 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
     - **Ghost Phrases (Hauntology)**: Spoken phrase entries on bar turnarounds through tempo-locked tape delay and 4.8s convolution reverb wash.
     - **Scale Choirs**: Granular loop retuned dynamically to the live chord notes (`recentChordNotes`) with stereo chorusing and slow attack/release swells.
     - **Percussive Ghost Hits**: Consonant slices triggered on off-beat groove subdivisions in sync with drum engine dynamics.
+
+## Update — 2026-10-16 (Phase 11: Blueprint Visualizers & Interaction Polish Verified & Hardened)
+
+- **Audio-Gated 3D Roadside Shapes**:
+  - Gated floating geometry cleanup on transport stop: `roadsideObjects.length = 0` runs immediately when `togglePlay()` transitions to paused, ensuring idle geometry vanishes instead of drifting in freeze.
+  - Dynamic scaling (`getRoadsideDensityScale()`): scales density ceiling from 1.60x to 1.95x (60% to 95% boost based on musical activity).
+- **Spacebar / Enter Global Transport Play-Pause**:
+  - Bound `Space` key alongside `Enter` in `bindGlobalTransportKeys()` as a standard DAW play/pause toggle.
+  - Gated so Space fires arcade lasers when Slambient Invaders (`arcadeActive`) is open, and blurs focused buttons to prevent browser button re-clicks.
+  - Updated the Keyboard Shortcuts modal (`shortcutsOverlay`) to display `Play / pause: [Space] [Enter]`.
+- **Orb Click Debouncing**:
+  - Re-verified `ORB_CLICK_DEBOUNCE_MS = 250` and `DRAG_MOVE_THRESHOLD = 5` in canvas pointer interaction to eliminate accidental double-click modal flicker.
