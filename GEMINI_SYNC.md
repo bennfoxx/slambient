@@ -1578,7 +1578,24 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
 
 - **Fixed Static Tempo Label in Top Header Bar**:
   - Identified bug in `updateBpm(sourceEl)`: `headerLbl` was fetched from the DOM (`document.getElementById("lblBpmHeader")`) but its `textContent` assignment was never executed, leaving the top header's tempo text permanently stuck on `72 BPM`.
-  - Added safe null-checking and bidirectional synchronization across both tempo sliders (`#knobBpmHeader` in the sticky top transport bar and `#knobBpm` in the Master Out channel strip) and both number labels (`#lblBpmHeader` and `#lblBpm`).
-  - Added synchronization in patch/preset deserialization so loading patches immediately reflects the saved tempo in `#lblBpmHeader`.
-  - Verified that mobile mini-transport `MutationObserver` on `#lblBpmHeader` also accurately receives live tempo updates on touch drag.
+## Update — 2026-10-16 (Rack PWR Buttons Fix, OUT Button Inspector Trigger & All Effect Parameters Open)
 
+- **Fixed PWR Buttons on Rack View Effects (Desktop & Mobile)**:
+  - Identified root causes of unresponsive `PWR` buttons in the DSP FX Chain rack cards:
+    - `togglePedalBypass(key, ev)` previously returned early when `!audioCtx`, preventing any UI update when users clicked PWR before starting audio.
+    - `togglePedalBypass` was only toggling classes on the hidden backing store cards (`#pedalCard_...`), not on the visible `.mini-pedal-card` or `.btn-mini-power` elements in `#pedalBirdsEyeRack`.
+    - Clicking the button also suffered potential event bubbling into card-level drag handlers.
+  - Refactored `togglePedalBypass` to immediately and directly toggle `.active` and `.bypassed` classes and accessible `title` attributes on the visible mini-cards and mini-buttons on screen, as well as the modal's `PWR` button if open.
+  - Added `draggable="false"` to all action buttons and stopped pointer/mouse/click event propagation at `.mini-pedal-actions`, shielding buttons completely from card drag interactions.
+  - Safely and smoothly applied Web Audio node ramps when `audioCtx` is active.
+
+- **Fixed OUT Rack View Button & Master Out Card Inspector Trigger**:
+  - Identified that the `[OUT]` element in the `birds-eye-flow-bar` (`BUS PRE ➔ LIVE INSERT MATRIX ➔ OUT`) was an inert `<span>` without a click handler. Replaced it with an interactive clickable button that opens the 10. OUT module inspector (`openMiniPedalInspector('space', event)`).
+  - Made the entire `10. MASTER OUT` card faceplate clickable (`style="cursor: pointer;"`), opening the 10. OUT module popup upon click.
+  - Added alias normalization in `openMiniPedalInspector` and `expandModuleOrb` so `'MASTER'`, `'master'`, `'out'`, and `'OUT'` all correctly map to `'space'`.
+  - Added `flex: 1 1 auto; min-height: 0; overflow-y: auto;` to `.orbital-modal-body` on desktop so all parameters scroll smoothly.
+
+- **Expanded All Parameter Drawers in Close Up Module Views for Effects**:
+  - In `expandModuleOrb(orbId)`, added automatic expansion for all secondary parameter accordions (`.module-drawer-content.open`, `.module-drawer-toggle.expanded`, `aria-expanded="true"`) when viewing modules close up on desktop and mobile.
+  - Set default HTML state for Filter (`FILTER ENVELOPE & MODULATION`), Delay (`MULTI-DELAY & TAPE WOW/FLUTTER`), and Space (`STEREO CHORUS & MODULATION`) drawers to `open` / `expanded`.
+  - Styled `.orbital-side-panel .module-drawer-toggle.expanded` with the respective module's neon accent color and glow matching the modal theme.

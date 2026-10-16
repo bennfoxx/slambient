@@ -2797,9 +2797,18 @@
   }
 
   .orbital-modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 12px;
+  }
+  .orbital-side-panel .module-drawer-toggle.expanded {
+    color: var(--modal-accent-color, var(--accent));
+    border-color: rgba(var(--modal-accent-rgb, 0, 229, 255), 0.45);
+    background: rgba(var(--modal-accent-rgb, 0, 229, 255), 0.10);
   }
 
   /* Scoped styling for strip channel (and, for the Filter/Delay/Reverb
@@ -3016,14 +3025,30 @@
   .birds-eye-flow-bar .flow-bus-node {
     color: #4b7bec;
     background: rgba(75, 123, 236, 0.15);
-    padding: 1px 5px;
-    border-radius: 2px;
+    padding: 1px 6px;
+    border-radius: 3px;
     border: 1px solid rgba(75, 123, 236, 0.35);
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    line-height: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
   .birds-eye-flow-bar .flow-bus-node.out-node {
     color: #a855f7;
     background: rgba(168, 85, 247, 0.15);
     border-color: rgba(168, 85, 247, 0.35);
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .birds-eye-flow-bar .flow-bus-node.out-node:hover {
+    color: #ffffff;
+    background: rgba(168, 85, 247, 0.32);
+    border-color: #c084fc;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.55);
   }
   .birds-eye-flow-bar .flow-bus-label {
     color: var(--text-secondary);
@@ -3057,7 +3082,7 @@
     transition: all 0.14s ease;
     flex: 1 1 auto;
     min-height: 54px;
-    cursor: pointer;
+    cursor: var(--cursor-grab);
   }
   .mini-pedal-card:hover {
     border-color: var(--card-accent, #00e5ff);
@@ -3072,12 +3097,16 @@
   .mini-pedal-card.mini-card-delay { --card-accent: var(--color-delay); --card-rgb: var(--rgb-delay); }
   .mini-pedal-card.mini-card-space { --card-accent: var(--color-reverb); --card-rgb: var(--rgb-reverb); }
   .mini-pedal-card.mini-card-master { --card-accent: #a855f7; --card-rgb: 168, 85, 247; }
+  .mini-pedal-card.mini-card-master,
+  .mini-pedal-card.mini-card-master .mini-pedal-left {
+    cursor: var(--cursor-pointer) !important;
+  }
 
   .mini-pedal-left {
     display: flex;
     align-items: center;
     gap: 8px;
-    cursor: pointer;
+    cursor: inherit;
     flex: 1 1 auto;
     min-width: 0;
   }
@@ -3132,7 +3161,7 @@
     width: 14px;
     height: 20px;
     color: var(--text-tertiary);
-    cursor: grab;
+    cursor: var(--cursor-grab) !important;
     opacity: 0.5;
     transition: opacity 0.12s ease, color 0.12s ease;
     flex-shrink: 0;
@@ -3142,13 +3171,22 @@
     opacity: 1;
     color: var(--card-accent, #00e5ff);
   }
-  .mini-pedal-card[draggable="true"] {
-    cursor: grab;
+  .mini-pedal-card[draggable="true"],
+  .mini-pedal-card[draggable="true"] .mini-pedal-left,
+  .mini-pedal-card[draggable="true"] .mini-pedal-drag-handle {
+    cursor: var(--cursor-grab) !important;
   }
-  .mini-pedal-card.mini-pedal-dragging {
+  .mini-pedal-card[draggable="true"]:active,
+  .mini-pedal-card[draggable="true"] .mini-pedal-left:active,
+  .mini-pedal-card[draggable="true"] .mini-pedal-drag-handle:active,
+  .mini-pedal-drag-handle:active {
+    cursor: var(--cursor-grabbing) !important;
+  }
+  .mini-pedal-card.mini-pedal-dragging,
+  .mini-pedal-card.mini-pedal-dragging * {
     opacity: 0.45;
     transform: scale(0.97);
-    cursor: grabbing !important;
+    cursor: var(--cursor-grabbing) !important;
     border-color: var(--card-accent, #00e5ff);
     box-shadow: 0 0 16px rgba(var(--card-rgb, 0, 229, 255), 0.45);
   }
@@ -3156,6 +3194,11 @@
     border-color: #00e5ff !important;
     transform: translateY(-2px);
     box-shadow: 0 0 14px rgba(0, 229, 255, 0.45), 0 4px 12px rgba(0, 0, 0, 0.7);
+  }
+
+  .mini-pedal-actions button,
+  .mini-pedal-actions [onclick] {
+    cursor: var(--cursor-pointer) !important;
   }
 
   .btn-mini-shift {
@@ -8294,7 +8337,7 @@
         <span class="flow-arrow">➔</span>
         <span class="flow-bus-label">LIVE INSERT MATRIX</span>
         <span class="flow-arrow">➔</span>
-        <span class="flow-bus-node out-node">OUT</span>
+        <button type="button" class="flow-bus-node out-node" onclick="openMiniPedalInspector('space', event)" title="Open Master EQ & Out (10. OUT)">OUT</button>
       </div>
 
       <!-- Birds-eye list of rectangular pedal cards -->
@@ -8361,11 +8404,11 @@
             <div class="control-label"><span>Resonance (Q)</span><span class="control-val filter-val" id="lblMasterRes">2.8</span></div>
             <input type="range" id="knobMasterRes" min="0.5" max="12.0" step="0.1" value="2.8" oninput="updateAudioParams()">
           </div>
-          <div class="module-drawer-toggle" onclick="toggleModuleDrawer(this)" aria-expanded="false" role="button" tabindex="0" title="Expand / collapse secondary filter envelope & modulation parameters">
+          <div class="module-drawer-toggle expanded" onclick="toggleModuleDrawer(this)" aria-expanded="true" role="button" tabindex="0" title="Expand / collapse secondary filter envelope & modulation parameters">
             <span class="drawer-arrow">▸</span>
             <span class="drawer-title">FILTER ENVELOPE & MODULATION</span>
           </div>
-          <div class="module-drawer-content">
+          <div class="module-drawer-content open">
             <div class="drawer-inner">
               <div class="control-row">
                 <div class="control-label"><span>Attack / Decay</span><span class="control-val filter-val" id="lblFilterEnvTimes">45 ms / 650 ms</span></div>
@@ -8444,11 +8487,11 @@
             <div class="control-label"><span>Feedback (Repeats / 48% Safe)</span><span class="control-val delay-val" id="lblDelayFeedback">35%</span></div>
             <input type="range" id="knobDelayFeedback" min="0" max="48" value="35" oninput="updateAudioParams()">
           </div>
-          <div class="module-drawer-toggle" onclick="toggleModuleDrawer(this)" aria-expanded="false" role="button" tabindex="0" title="Expand / collapse secondary multi-delay & tape wow/flutter parameters">
+          <div class="module-drawer-toggle expanded" onclick="toggleModuleDrawer(this)" aria-expanded="true" role="button" tabindex="0" title="Expand / collapse secondary multi-delay & tape wow/flutter parameters">
             <span class="drawer-arrow">▸</span>
             <span class="drawer-title">MULTI-DELAY & TAPE WOW/FLUTTER</span>
           </div>
-          <div class="module-drawer-content">
+          <div class="module-drawer-content open">
             <div class="drawer-inner">
               <div class="control-row">
                 <div class="control-label"><span>BBD Dark Damping (Tone)</span><span class="control-val delay-val" id="lblDelayTone">1900 Hz</span></div>
@@ -8507,11 +8550,11 @@
               </div>
             </div>
           </div>
-          <div class="module-drawer-toggle" onclick="toggleModuleDrawer(this)" aria-expanded="false" role="button" tabindex="0" title="Expand / collapse secondary stereo chorus & modulation engine parameters">
+          <div class="module-drawer-toggle expanded" onclick="toggleModuleDrawer(this)" aria-expanded="true" role="button" tabindex="0" title="Expand / collapse secondary stereo chorus & modulation engine parameters">
             <span class="drawer-arrow">▸</span>
             <span class="drawer-title">STEREO CHORUS & MODULATION</span>
           </div>
-          <div class="module-drawer-content">
+          <div class="module-drawer-content open">
             <div class="drawer-inner">
               <div class="control-row">
                 <div class="control-label">Stereo Chorus Mode</div>
@@ -10545,14 +10588,14 @@ function renderBirdsEyePedalRack() {
             <span class="mini-pedal-slot">${slotLabel}</span>
           </div>
         </div>
-        <div class="mini-pedal-actions" onclick="event.stopPropagation()">
-          <button type="button" class="btn-mini-power btn-power ${isBypassed ? '' : 'active'}" onclick="togglePedalBypass('${key}', event)" title="${isBypassed ? 'Turn ON ' + meta.name : 'Turn OFF ' + meta.name}">
+        <div class="mini-pedal-actions" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()" onmousedown="event.stopPropagation()">
+          <button type="button" draggable="false" class="btn-mini-power btn-power ${isBypassed ? '' : 'active'}" onclick="togglePedalBypass('${key}', event)" title="${isBypassed ? 'Turn ON ' + meta.name : 'Turn OFF ' + meta.name}">
             PWR
           </button>
-          <button type="button" class="badge-tag btn-mini-randomize" onclick="randomizePedalModule('${key}', event)" title="Randomize ${meta.name} parameters">
+          <button type="button" draggable="false" class="badge-tag btn-mini-randomize" onclick="randomizePedalModule('${key}', event)" title="Randomize ${meta.name} parameters">
             <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg>
           </button>
-          <button type="button" class="btn-mini-inspect" onclick="openMiniPedalInspector('${meta.orbId}', event)" title="Inspect full controls">EDIT ↗</button>
+          <button type="button" draggable="false" class="btn-mini-inspect" onclick="openMiniPedalInspector('${meta.orbId}', event)" title="Inspect full controls">EDIT ↗</button>
         </div>
       </div>
     `;
@@ -10560,7 +10603,7 @@ function renderBirdsEyePedalRack() {
 
   // Terminal Master EQ & Out Node (Node 10)
   html += `
-    <div class="mini-pedal-card mini-card-master active" data-pedal="MASTER" title="Terminal Master Node • Click EDIT to inspect">
+    <div class="mini-pedal-card mini-card-master active" data-pedal="MASTER" onclick="if (!event.target.closest('button')) openMiniPedalInspector('space', event)" title="Terminal Master Node • Click to inspect" style="cursor: pointer;">
       <div class="mini-pedal-left">
         <span class="mini-pedal-badge">10</span>
         <div class="mini-pedal-info">
@@ -10568,11 +10611,11 @@ function renderBirdsEyePedalRack() {
           <span class="mini-pedal-slot">BUS TERM</span>
         </div>
       </div>
-      <div class="mini-pedal-actions" onclick="event.stopPropagation()">
-        <button type="button" class="badge-tag btn-mini-randomize" onclick="randomizePedalModule('MASTER', event)" title="Randomize Master EQ & Out parameters">
+      <div class="mini-pedal-actions" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()" onmousedown="event.stopPropagation()">
+        <button type="button" draggable="false" class="badge-tag btn-mini-randomize" onclick="randomizePedalModule('MASTER', event)" title="Randomize Master EQ & Out parameters">
           <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg>
         </button>
-        <button type="button" class="btn-mini-inspect" onclick="openMiniPedalInspector('space', event)" title="Inspect Master EQ & Out">EDIT ↗</button>
+        <button type="button" draggable="false" class="btn-mini-inspect" onclick="openMiniPedalInspector('space', event)" title="Inspect Master EQ & Out">EDIT ↗</button>
       </div>
     </div>
   `;
@@ -10619,42 +10662,62 @@ function resetDspChain(ev) {
 }
 
 function togglePedalBypass(key, ev) {
-  if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
+  if (ev) {
+    if (typeof ev.stopPropagation === "function") ev.stopPropagation();
+    if (typeof ev.preventDefault === "function") ev.preventDefault();
+  }
   pedalBypassState[key] = !pedalBypassState[key];
-  const isBypassed = pedalBypassState[key];
+  const isBypassed = !!pedalBypassState[key];
+
+  // 1. Update backing store elements
   const card = document.getElementById("pedalCard_" + key);
   const btn = document.getElementById("stompBtn_" + key);
-
   if (card) card.classList.toggle("bypassed", isBypassed);
   if (btn) btn.classList.toggle("active", !isBypassed);
 
-  if (!audioCtx) return;
-  const now = audioCtx.currentTime;
-
-  if (key === 'FILTER') {
-    if (filterModuleInput && filterModuleOutput) {
-      if (masterFilter1 && masterFilter2) {
-        masterFilter1.frequency.setTargetAtTime(isBypassed ? 20000 : masterBaseCutoff, now, 0.05);
-        masterFilter2.frequency.setTargetAtTime(isBypassed ? 20000 : masterBaseCutoff, now, 0.05);
-        masterFilter1.Q.setTargetAtTime(isBypassed ? 0.5 : masterResonance, now, 0.05);
-        masterFilter2.Q.setTargetAtTime(isBypassed ? 0.5 : masterResonance, now, 0.05);
-      }
-    }
-  } else if (key === 'DELAY') {
-    if (delayWetGain && delayDryGain) {
-      delayWetGain.gain.setTargetAtTime(isBypassed ? 0.0001 : delayMixVal * 0.85, now, 0.05);
-      delayDryGain.gain.setTargetAtTime(isBypassed ? 1.0 : (1.0 - (delayMixVal * 0.45)), now, 0.05);
-    }
-  } else if (key === 'SPACE') {
-    if (spaceDryGain && reverbSend && chorusWetGain) {
-      reverbSend.gain.setTargetAtTime(isBypassed ? 0.0001 : (weatherVal * reverbMixVal), now, 0.05);
-      chorusWetGain.gain.setTargetAtTime(isBypassed ? 0.0001 : chorusMixVal, now, 0.05);
-      spaceDryGain.gain.setTargetAtTime(isBypassed ? 1.0 : 0.88, now, 0.05);
+  // 2. Directly update visible birds-eye rack cards & buttons immediately
+  const miniCard = document.querySelector(`.mini-pedal-card[data-pedal="${key}"]`);
+  if (miniCard) {
+    miniCard.classList.toggle("bypassed", isBypassed);
+    miniCard.classList.toggle("active", !isBypassed);
+    const pwrBtn = miniCard.querySelector(".btn-mini-power");
+    if (pwrBtn) {
+      pwrBtn.classList.toggle("active", !isBypassed);
+      pwrBtn.title = isBypassed ? ("Turn ON " + key) : ("Turn OFF " + key);
     }
   }
 
-  if (typeof renderBirdsEyePedalRack === "function") {
-    renderBirdsEyePedalRack();
+  // 3. Update modal header PWR button if modal is currently open for this pedal
+  const modalPwr = document.querySelector("#orbitalModalActions .btn-power");
+  const currentOrbId = (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && PEDAL_KEY_TO_ORBITAL_ID[key]) ? PEDAL_KEY_TO_ORBITAL_ID[key] : key.toLowerCase();
+  if (modalPwr && expandedOrbId === currentOrbId) {
+    modalPwr.classList.toggle("active", !isBypassed);
+  }
+
+  // 4. Update audio DSP if audioCtx exists
+  if (audioCtx) {
+    const now = audioCtx.currentTime;
+    if (key === 'FILTER') {
+      if (filterModuleInput && filterModuleOutput) {
+        if (masterFilter1 && masterFilter2) {
+          masterFilter1.frequency.setTargetAtTime(isBypassed ? 20000 : masterBaseCutoff, now, 0.05);
+          masterFilter2.frequency.setTargetAtTime(isBypassed ? 20000 : masterBaseCutoff, now, 0.05);
+          masterFilter1.Q.setTargetAtTime(isBypassed ? 0.5 : masterResonance, now, 0.05);
+          masterFilter2.Q.setTargetAtTime(isBypassed ? 0.5 : masterResonance, now, 0.05);
+        }
+      }
+    } else if (key === 'DELAY') {
+      if (delayWetGain && delayDryGain) {
+        delayWetGain.gain.setTargetAtTime(isBypassed ? 0.0001 : delayMixVal * 0.85, now, 0.05);
+        delayDryGain.gain.setTargetAtTime(isBypassed ? 1.0 : (1.0 - (delayMixVal * 0.45)), now, 0.05);
+      }
+    } else if (key === 'SPACE') {
+      if (spaceDryGain && reverbSend && chorusWetGain) {
+        reverbSend.gain.setTargetAtTime(isBypassed ? 0.0001 : (weatherVal * reverbMixVal), now, 0.05);
+        chorusWetGain.gain.setTargetAtTime(isBypassed ? 0.0001 : chorusMixVal, now, 0.05);
+        spaceDryGain.gain.setTargetAtTime(isBypassed ? 1.0 : 0.88, now, 0.05);
+      }
+    }
   }
 }
 
@@ -10958,8 +11021,9 @@ function openMiniPedalInspector(orbId, ev) {
     if (typeof ev.stopPropagation === "function") ev.stopPropagation();
     if (typeof ev.preventDefault === "function") ev.preventDefault();
   }
-  if (orbId && typeof expandModuleOrb === "function") {
-    expandModuleOrb(orbId);
+  const id = (orbId === 'MASTER' || orbId === 'master' || orbId === 'out' || orbId === 'OUT') ? 'space' : orbId;
+  if (id && typeof expandModuleOrb === "function") {
+    expandModuleOrb(id);
   }
 }
 
@@ -20427,13 +20491,14 @@ function setModuleView(mode) {
 }
 
 function expandModuleOrb(orbId) {
-  const orb = ORBITAL_MODULES.find(o => o.id === orbId);
+  const targetId = (orbId === 'MASTER' || orbId === 'master' || orbId === 'out' || orbId === 'OUT') ? 'space' : orbId;
+  const orb = ORBITAL_MODULES.find(o => o.id === targetId);
   if (!orb) return;
 
   if (orbitalRestoreTimer) { clearTimeout(orbitalRestoreTimer); orbitalRestoreTimer = null; }
   restoreStripsToRack();
 
-  expandedOrbId = orbId;
+  expandedOrbId = targetId;
   orbitalPanelActive = true;
   const panel = document.getElementById("orbitalSidePanel");
   const title = document.getElementById("orbitalModalTitle");
@@ -20451,6 +20516,16 @@ function expandModuleOrb(orbId) {
   if (sourceStrip) {
     body.appendChild(sourceStrip);
     sourceStrip.style.display = "flex";
+
+    // In all close up module views for effects on desktop and mobile have all parameters open
+    const drawers = sourceStrip.querySelectorAll(".module-drawer-content");
+    drawers.forEach(d => d.classList.add("open"));
+    const toggles = sourceStrip.querySelectorAll(".module-drawer-toggle");
+    toggles.forEach(t => {
+      t.classList.add("expanded");
+      t.setAttribute("aria-expanded", "true");
+    });
+
     // Borrow everything in the strip's own header except its title (that's
     // either a .panel-header-actions row of mute/solo/power/randomize
     // buttons, or -- for the master-chain modules, which have no per-channel
