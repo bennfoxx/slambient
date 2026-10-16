@@ -7263,12 +7263,133 @@ function enableMediaPlaybackSession() {
   }
 }
 
-// Web Audio hardware-thread clock fallback so generative sequencers keep steady
-// tempo when the phone screen is locked or the browser tab is backgrounded
-// (where setInterval is throttled to >= 1000ms).
+// ==========================================================================
+// MASTER CLOCK: SAMPLE-ACCURATE AUDIOWORKLET ENGINE + FALLBACK
+// ==========================================================================
+let workletClockNode = null;
+let workletClockReady = false;
+let workletClockInitializing = false;
 let audioClockNode = null;
 let audioClockSilentBuf = null;
 let nextAudioClockTime = 0;
+
+async function initWorkletClock() {
+  if (!audioCtx || !audioCtx.audioWorklet || workletClockReady || workletClockInitializing) return workletClockReady;
+  workletClockInitializing = true;
+  try {
+    try {
+      await audioCtx.audioWorklet.addModule("./clock-processor.js");
+      workletClockReady = true;
+    } catch (e1) {
+      // Fallback: Inline Blob URL if local file fetch fails or offline
+      const blobCode = `
+class ClockProcessor extends AudioWorkletProcessor {
+  constructor() {
+    super();
+    this.bpm = 60;
+    this.ticksPerBeat = 4;
+    this.sampleCount = 0;
+    this.running = false;
+    this.port.onmessage = (e) => {
+      const d = e.data;
+      if (!d) return;
+      if (d.action === "start") {
+        this.running = true;
+        this.sampleCount = 0;
+        if (typeof d.bpm === "number") this.bpm = d.bpm;
+        if (typeof d.ticksPerBeat === "number") this.ticksPerBeat = d.ticksPerBeat;
+      } else if (d.action === "stop") {
+        this.running = false;
+        this.sampleCount = 0;
+      } else if (d.action === "setBpm") {
+        if (typeof d.bpm === "number") this.bpm = d.bpm;
+      } else if (d.action === "setTimeSig") {
+        if (typeof d.ticksPerBeat === "number") this.ticksPerBeat = d.ticksPerBeat;
+      }
+    };
+  }
+  process(inputs, outputs, parameters) {
+    if (!this.running) return true;
+    const effectiveBpm = Math.max(30, Math.min(300, this.bpm));
+    const samplesPerTick = (sampleRate * 60) / (effectiveBpm * this.ticksPerBeat);
+    this.sampleCount += 128;
+    while (this.sampleCount >= samplesPerTick) {
+      this.sampleCount -= samplesPerTick;
+      this.port.postMessage({ type: "tick", time: currentTime });
+    }
+    return true;
+  }
+}
+registerProcessor("slambient-clock-processor", ClockProcessor);
+`;
+      const blob = new Blob([blobCode], { type: "application/javascript" });
+      const blobUrl = URL.createObjectURL(blob);
+      await audioCtx.audioWorklet.addModule(blobUrl);
+      URL.revokeObjectURL(blobUrl);
+      workletClockReady = true;
+    }
+    console.log("[Slambient Clock] AudioWorklet hardware clock initialized successfully.");
+    return true;
+  } catch (err) {
+    console.warn("[Slambient Clock] AudioWorklet clock unavailable; falling back to Web Audio timer scheduler:", err);
+    workletClockReady = false;
+    return false;
+  } finally {
+    workletClockInitializing = false;
+  }
+}
+
+function startWorkletClock() {
+  if (!workletClockReady || !audioCtx) return false;
+  try {
+    if (!workletClockNode) {
+      workletClockNode = new AudioWorkletNode(audioCtx, "slambient-clock-processor");
+      workletClockNode.port.onmessage = (e) => {
+        if (e.data && e.data.type === "tick") {
+          if (isPlaying) clockTick();
+        }
+      };
+      // AudioWorkletNode needs a destination sink to guarantee processing
+      const sink = audioCtx.createGain();
+      sink.gain.value = 0;
+      workletClockNode.connect(sink);
+      sink.connect(audioCtx.destination);
+    }
+    const ts = (typeof TIME_SIGNATURES !== "undefined" && TIME_SIGNATURES[currentTimeSig]) ? TIME_SIGNATURES[currentTimeSig] : null;
+    const tpb = (ts && ts.ticksPerBeat) ? ts.ticksPerBeat : 4;
+    workletClockNode.port.postMessage({ action: "start", bpm: bpm, ticksPerBeat: tpb });
+    return true;
+  } catch (e) {
+    console.warn("[Slambient Clock] Error starting worklet clock:", e);
+    return false;
+  }
+}
+
+function stopWorkletClock() {
+  if (workletClockNode) {
+    try {
+      workletClockNode.port.postMessage({ action: "stop" });
+    } catch (e) {}
+  }
+}
+
+function updateWorkletClockBpm() {
+  if (workletClockNode) {
+    try {
+      workletClockNode.port.postMessage({ action: "setBpm", bpm: bpm });
+    } catch (e) {}
+  }
+}
+
+function updateWorkletClockTimeSig() {
+  if (workletClockNode) {
+    try {
+      const ts = (typeof TIME_SIGNATURES !== "undefined" && TIME_SIGNATURES[currentTimeSig]) ? TIME_SIGNATURES[currentTimeSig] : null;
+      const tpb = (ts && ts.ticksPerBeat) ? ts.ticksPerBeat : 4;
+      workletClockNode.port.postMessage({ action: "setTimeSig", ticksPerBeat: tpb });
+    } catch (e) {}
+  }
+}
 
 function stopAudioClockFallback() {
   if (audioClockNode) {
@@ -7368,6 +7489,14 @@ document.addEventListener("visibilitychange", () => {
 function initAudio() {
   enableMediaPlaybackSession();
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  initWorkletClock().then((ready) => {
+    if (ready && isPlaying && clockInterval) {
+      clearInterval(clockInterval);
+      clockInterval = null;
+      stopAudioClockFallback();
+      startWorkletClock();
+    }
+  });
 
   drumAnalyser = audioCtx.createAnalyser(); drumAnalyser.fftSize = 512;
   chordAnalyser = audioCtx.createAnalyser(); chordAnalyser.fftSize = 512;
@@ -10146,6 +10275,7 @@ function updateTimeSignature() {
   taanNotesLeft = 0; taanRestTicks = 0;
   const ts = TIME_SIGNATURES[currentTimeSig] || TIME_SIGNATURES["7/4"];
   document.getElementById("hudMeter").textContent = `${currentTimeSig} [1/${ts.beats}]`;
+  if (typeof updateWorkletClockTimeSig === "function") updateWorkletClockTimeSig();
   if (typeof updateMediaSessionMetadata === "function") updateMediaSessionMetadata();
 }
 
@@ -12728,12 +12858,14 @@ function updateBpm(sourceEl) {
   const headerKnob = document.getElementById("knobBpmHeader");
   const headerLbl = document.getElementById("lblBpmHeader");
   if (headerKnob) headerKnob.value = bpm;
-  if (headerLbl) headerLbl.textContent = bpm + " BPM";
+  updateWorkletClockBpm();
   if (isPlaying) {
-    clearInterval(clockInterval);
-    const ms = (60000 / bpm) / 4;
-    clockInterval = setInterval(clockTick, ms);
-    scheduleAudioClockFallback();
+    if (!workletClockReady) {
+      clearInterval(clockInterval);
+      const ms = (60000 / bpm) / 4;
+      clockInterval = setInterval(clockTick, ms);
+      scheduleAudioClockFallback();
+    }
     document.getElementById("footerStatus").textContent = "Engine: Running (" + bpm + " BPM)";
   } else if (liveArpTimer) {
     clearInterval(liveArpTimer);
@@ -14707,8 +14839,15 @@ function togglePlay() {
     btn.classList.add("active"); label.textContent = "Pause";
     status.textContent = "Engine: Running (" + bpm + " BPM)";
     stopLiveArp();
-    const ms = (60000 / bpm) / 4; clockInterval = setInterval(clockTick, ms);
-    scheduleAudioClockFallback();
+    let usedWorklet = false;
+    if (workletClockReady) {
+      usedWorklet = startWorkletClock();
+    }
+    if (!usedWorklet) {
+      const ms = (60000 / bpm) / 4;
+      clockInterval = setInterval(clockTick, ms);
+      scheduleAudioClockFallback();
+    }
     triggerCurrentChord();
     startSessionTimer();
     midiSubSync();
@@ -14731,7 +14870,9 @@ function togglePlay() {
     }
   } else {
     btn.classList.remove("active"); label.textContent = "Start";
-    status.textContent = "Engine: Paused"; clearInterval(clockInterval);
+    status.textContent = "Engine: Paused";
+    stopWorkletClock();
+    if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
     stopAudioClockFallback();
     stopSessionTimer();
     midiAllNotesOff();
