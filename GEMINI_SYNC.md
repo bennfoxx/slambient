@@ -1619,3 +1619,17 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
 - **Field Module Dropdown Color-Matching (`#selFieldMode`)**:
   - Added `if (sel.closest(".field-ch") || sel.closest("#fieldModule")) return "var(--color-field)";` to `getDropdownAccentColor(sel)` in JavaScript so the custom dropdown menu adopts `--color-field` (`#2bcbba`) rather than falling back to `--accent` (peach/orange).
   - Added CSS rule `--dd-accent: var(--color-field);` to `.strip-channel.field-ch` container to ensure immediate scoped cascade for open trigger background, menu border, checkmarks, and hover highlights.
+## Update — 2026-10-16 (Chassis Backing Store Numbering Audit & Brand Guidelines 10-Module Spec)
+
+- **Pedal Chassis Backing Store Numbering Synchronized**:
+  - Audited `#masterDeckUnified` in `index.html` and updated legacy module numbers:
+    - `pedalTitle_FILTER`: Updated from `6. FILTER` to `7. FILTER`.
+    - `pedalTitle_DELAY`: Updated from `7. DELAY` to `8. DELAY`.
+    - `pedalTitle_SPACE`: Updated from `8. SPACE` to `9. SPACE`.
+  - Reflects the canonical 10-module order introduced with Module 6 (Field Recorder):
+    - 1. Drone, 2. Drums, 3. Chords, 4. Arp, 5. Noise, 6. Field Recorder, 7. Filter, 8. Delay, 9. Space, 10. Master Out.
+- **Brand Guidelines Color Spectrum Table Updated**:
+  - Updated Section 3.3 ("Functional Module Color Spectrum") in `BRAND_GUIDELINES.md`:
+    - Updated total module count from 9 to 10.
+    - Added **Mod 6**: **Field Recorder** (`#2bcbba` Turquoise / `43, 203, 186`).
+    - Shifted Master Filter to Mod 7, Analog Delay to Mod 8, Reverb & Chorus to Mod 9, and Master Space & Out to Mod 10.

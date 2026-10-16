@@ -65,7 +65,7 @@
 | **Text Tertiary** | `--text-tertiary` | `#525c74` | Hardware hints, inactive telemetry, micro-stamps |
 
 ### 3.3 Functional Module Color Spectrum
-Each of the 9 generative modules and signal stages is bound to an immutable semantic neon accent:
+Each of the 10 generative modules and signal stages is bound to an immutable semantic neon accent:
 
 | Module # | Name | Semantic Role | Hex Accent | RGB Values |
 | :--- | :--- | :--- | :--- | :--- |
@@ -73,11 +73,12 @@ Each of the 9 generative modules and signal stages is bound to an immutable sema
 | **Mod 2** | **Organic Drums** | Tabla, heartbeat, rhythm | `#ff3838` (Crimson) | `255, 56, 56` |
 | **Mod 3** | **Chords & Voicing**| Harmonic pad, sitar, keys | `#fed330` (Yellow) | `254, 211, 48` |
 | **Mod 4** | **Shimmer Arp** | High-register cascade, Bansuri | `#7d5fff` (Indigo) | `125, 95, 255` |
-| **Mod 5** | **Noise / Atmosphere**| Field mic, tape hiss, vinyl | `#1dd1a1` (Mint) | `29, 209, 161` |
-| **Mod 6** | **Master Filter** | 24dB ladder, formant shaping | `#2ed573` (Emerald) | `46, 213, 115` |
-| **Mod 7** | **Analog Delay** | Tape, BBD, tempo-sync repeats | `#ff793f` (Tangerine) | `255, 121, 63` |
-| **Mod 8** | **Reverb & Chorus** | Cathedral wash, 3-phase chorus | `#ff5fc4` (Hot Pink) | `255, 95, 196` |
-| **Mod 9** | **Master Space & Out**| Bus limiter, tape drive, output | `#4b7bec` (Blue) | `75, 123, 236` |
+| **Mod 5** | **Noise / Atmosphere**| Tape hiss, vinyl, environmental | `#1dd1a1` (Mint) | `29, 209, 161` |
+| **Mod 6** | **Field Recorder** | Live mic capture, sample playback | `#2bcbba` (Turquoise) | `43, 203, 186` |
+| **Mod 7** | **Master Filter** | 24dB ladder, formant shaping | `#2ed573` (Emerald) | `46, 213, 115` |
+| **Mod 8** | **Analog Delay** | Tape, BBD, tempo-sync repeats | `#ff793f` (Tangerine) | `255, 121, 63` |
+| **Mod 9** | **Reverb & Chorus** | Cathedral wash, 3-phase chorus | `#ff5fc4` (Hot Pink) | `255, 95, 196` |
+| **Mod 10** | **Master Space & Out**| Bus limiter, tape drive, output | `#4b7bec` (Blue) | `75, 123, 236` |
 
 * **Global UI Accent (`--accent`):** Defaults to `--color-chord` (`#fed330`) with `--accent-dim` (`rgba(254, 211, 48, 0.14)`).
 
