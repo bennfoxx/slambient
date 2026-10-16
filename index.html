@@ -6415,6 +6415,8 @@ let isPlaying = false;
 let tickCount = 0;
 
 let stepEuclid = 0;
+// Raga Taan arp phrasing state: 3-5 note flourishes, then 1-2 beats of silence
+let taanNotesLeft = 0, taanRestTicks = 0, taanDir = 1, taanNoteIdx = 0;
 let stepShim = 0;
 let stepLead = 0;
 let stepDrone = 0;
@@ -8085,11 +8087,11 @@ function playTanpuraPluck(stringIdx) {
   // Pluck Voice Gain Envelope: rich golden acoustic resonance
   const voiceGain = audioCtx.createGain();
   const stringWeight = stringIdx === 3 ? 1.45 : (stringIdx === 0 ? 1.15 : 1.0);
-  const peakGain = 0.68 * stringWeight * (0.6 + tanpuraVol * 0.8);
+  const peakGain = 0.50 * stringWeight * (0.6 + tanpuraVol * 0.8); // tamed: sits behind the sub drone
 
   voiceGain.gain.setValueAtTime(0.0001, now);
-  voiceGain.gain.linearRampToValueAtTime(peakGain, now + 0.025); // Fleshy fingertip sweep
-  voiceGain.gain.exponentialRampToValueAtTime(peakGain * 0.72, now + 0.85); // Sustained golden resonance
+  voiceGain.gain.linearRampToValueAtTime(peakGain, now + 0.09); // Soft thumb-pad pick, no hard transient
+  voiceGain.gain.exponentialRampToValueAtTime(peakGain * 0.72, now + 1.1); // Sustained golden resonance
   voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + ringDuration); // Evolving acoustic decay
 
   // 1. Warm Wooden Gourd Fundamental (Triangle/Sine acoustic blend)
@@ -8153,7 +8155,8 @@ function playTanpuraPluck(stringIdx) {
   // Rounds off the top so the strings sit behind the other voices.
   const voiceLP = audioCtx.createBiquadFilter();
   voiceLP.type = "lowpass";
-  voiceLP.frequency.setValueAtTime(2600, now);
+  voiceLP.frequency.setValueAtTime(1500, now); // softer pick: opens up as the string blooms
+  voiceLP.frequency.linearRampToValueAtTime(2300, now + 0.6);
   voiceLP.Q.setValueAtTime(0.5, now);
   voiceGain.connect(voiceLP);
   voiceLP.connect(tanpuraBusGain);
@@ -8475,14 +8478,16 @@ function triggerSympatheticStrings(pluckedMidi, startTime, vel, targetBus) {
   if (!audioCtx || !targetBus) return;
   const scale = SCALES[activeScaleKey] || SCALES.BILAWAL || SCALES.DORIAN;
   const rootBase = 60 + (rootNote % 12); // C4-B4 taraf resonance register
-  const degOffsets = [0, Math.min(4, scale.length - 1), randRange(1, scale.length - 1)];
+  // Four taraf strings (tonic, fifth, a random scale tone, high tonic) bloom into a
+  // lingering harmonic halo behind each plucked note.
+  const degOffsets = [0, Math.min(4, scale.length - 1), randRange(1, scale.length - 1), 0];
   degOffsets.forEach((deg, idx) => {
-    const semi = scale[deg % scale.length] + (idx === 2 ? 12 : 0);
+    const semi = scale[deg % scale.length] + (idx >= 2 ? 12 : 0);
     const sympMidi = rootBase + semi;
     const sympFreq = midiToFreq(sympMidi);
-    const delaySec = 0.035 + idx * 0.045 + randFloat() * 0.02;
+    const delaySec = 0.035 + idx * 0.055 + randFloat() * 0.02;
     const t0 = startTime + delaySec;
-    const ringDur = 1.9 + randFloat() * 0.8;
+    const ringDur = 3.4 + randFloat() * 1.4;
 
     const osc = audioCtx.createOscillator();
     const filter = audioCtx.createBiquadFilter();
@@ -8496,9 +8501,9 @@ function triggerSympatheticStrings(pluckedMidi, startTime, vel, targetBus) {
     filter.frequency.setValueAtTime(sympFreq * 2.0, t0);
     filter.Q.setValueAtTime(6.5, t0);
 
-    const peak = (vel / 127) * 0.028 * (1 - idx * 0.16);
+    const peak = (vel / 127) * 0.040 * (1 - idx * 0.14);
     g.gain.setValueAtTime(0.0001, t0);
-    g.gain.linearRampToValueAtTime(peak, t0 + 0.18);
+    g.gain.linearRampToValueAtTime(peak, t0 + 0.30);
     g.gain.exponentialRampToValueAtTime(0.0001, t0 + ringDur);
 
     osc.connect(filter);
@@ -8639,12 +8644,16 @@ function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0,
     baseVolume *= 0.94;
   } else if (chordTimbre === "SITAR_STRINGS") {
     osc1.type = "sawtooth"; osc2.type = "triangle";
-    const bendDepth = isLead ? (0.90 + randFloat() * 0.05) : (0.95 + randFloat() * 0.03);
-    const bendTime = isLead ? (0.14 + randFloat() * 0.10) : 0.07;
+    // Deep expressive meend: the string is pulled flat and slides up into the note
+    // over 80-180 ms on solo phrases (shallower and quicker on accompaniment notes).
+    const bendDepth = isLead ? (0.865 + randFloat() * 0.05) : (0.95 + randFloat() * 0.03);
+    const bendTime = isLead ? (0.08 + randFloat() * 0.10) : 0.07;
     osc1.frequency.setValueAtTime(freq * bendDepth, now);
     osc1.frequency.exponentialRampToValueAtTime(freq, now + bendTime);
 
-    osc2.frequency.setValueAtTime(freq * 2.0, now);
+    // The octave partial slides with the fundamental so the glide stays one string.
+    osc2.frequency.setValueAtTime(freq * 2.0 * (isLead ? bendDepth : 1), now);
+    if (isLead) osc2.frequency.exponentialRampToValueAtTime(freq * 2.0, now + bendTime);
     osc2.detune.setValueAtTime(isLead ? 12 : 9, now);
     voiceFilter.frequency.setValueAtTime(Math.min(3100, freq * 5.6), now);
     voiceFilter.Q.setValueAtTime(2.1, now);
@@ -8686,6 +8695,21 @@ function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0,
     formantBody.connect(formantBuzz);
     formantBuzz.connect(voiceFilter);
     voiceFilter.connect(gain);
+
+    // Brass mizrab (wire plectrum) attack: a tiny bright click on note onset
+    const clickSrc = audioCtx.createBufferSource();
+    clickSrc.buffer = getNoiseBuffer();
+    const clickBP = audioCtx.createBiquadFilter();
+    clickBP.type = "bandpass";
+    clickBP.frequency.setValueAtTime(Math.min(6500, 3600 + freq * 2.2), now);
+    clickBP.Q.setValueAtTime(1.6, now);
+    const clickGain = audioCtx.createGain();
+    const clickPeak = (vel / 127) * (isLead ? 0.15 : 0.10);
+    clickGain.gain.setValueAtTime(clickPeak, now);
+    clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.022);
+    clickSrc.connect(clickBP); clickBP.connect(clickGain); clickGain.connect(busTarget);
+    disconnectOnEnded(clickSrc, clickGain);
+    clickSrc.start(now, Math.random() * 0.5); clickSrc.stop(now + 0.03);
 
     if (isLead || randFloat() < 0.55) {
       triggerSympatheticStrings(midi, now, vel, busTarget);
@@ -9300,7 +9324,7 @@ function playBayan(stroke = "GHE", slide = true, hard = 1.0) {
   if (slide) {
     const oscMeendLFO = audioCtx.createOscillator();
     const lfoGain = audioCtx.createGain();
-    const peakFreq = (132 + randFloat() * 34) * kit.pitchMult;
+    const peakFreq = (112 + randFloat() * 24) * kit.pitchMult; // gentler scoop (was 132-166 Hz)
     oscMain.frequency.exponentialRampToValueAtTime(baseFreq * 0.84, now + 0.018 * tempoScale);
     oscMain.frequency.exponentialRampToValueAtTime(peakFreq, now + 0.125 * tempoScale);
     oscMain.frequency.exponentialRampToValueAtTime(baseFreq * 1.38, now + 0.32 * tempoScale);
@@ -9312,7 +9336,7 @@ function playBayan(stroke = "GHE", slide = true, hard = 1.0) {
 
     oscMeendLFO.frequency.setValueAtTime(5.8, now);
     lfoGain.gain.setValueAtTime(0.001, now);
-    lfoGain.gain.linearRampToValueAtTime(16.0, now + 0.18 * tempoScale);
+    lfoGain.gain.linearRampToValueAtTime(9.0, now + 0.18 * tempoScale);
     lfoGain.gain.exponentialRampToValueAtTime(0.001, now + 0.65 * tempoScale);
     oscMeendLFO.connect(lfoGain);
     lfoGain.connect(oscMain.frequency);
@@ -9321,14 +9345,14 @@ function playBayan(stroke = "GHE", slide = true, hard = 1.0) {
   }
 
   resonantFilter.type = "lowpass";
-  resonantFilter.Q.setValueAtTime(5.6, now);
+  resonantFilter.Q.setValueAtTime(2.6, now); // was 5.6: resonant peak was clipping into the limiter
   const filterStart = 115;
-  const filterPeak = slide ? (310 + randFloat() * 65) : 145;
+  const filterPeak = slide ? (235 + randFloat() * 45) : 145;
   resonantFilter.frequency.setValueAtTime(filterStart, now);
   resonantFilter.frequency.exponentialRampToValueAtTime(filterPeak, now + 0.125 * tempoScale);
   resonantFilter.frequency.exponentialRampToValueAtTime(95, now + 0.62 * tempoScale);
 
-  const vol = (1.02 + drumPunch * 0.68) * drumVol * hard * kit.drive;
+  const vol = (0.84 + drumPunch * 0.52) * drumVol * hard * kit.drive * (slide ? 0.88 : 1.0);
   const decay = 0.68 * tempoScale * kit.decayMult;
   gain.gain.setValueAtTime(0.0001, now);
   gain.gain.linearRampToValueAtTime(vol, now + 0.012);
@@ -9360,17 +9384,55 @@ function playBayan(stroke = "GHE", slide = true, hard = 1.0) {
 
 // Combined "Dha" / "Dhin" stroke: simultaneous Bayan Ge + Dayan Na/Tin with slight micro-humanization
 function playTablaDha(open = true, slide = true, hard = 1.0) {
-  playBayan("GHE", slide, hard);
+  // Scoops (palm-heel meend) only on strong accents or the odd intermediate beat
+  const doSlide = slide && (hard >= 1.15 || randFloat() < 0.35);
+  playBayan("GHE", doSlide, hard);
   const microOffsetMs = 3 + Math.random() * 6;
   setTimeout(() => {
     playDayan(open ? "NA" : "TUN", hard * 0.96);
   }, microOffsetMs);
 }
 
+// Finger-roll subdivisions layered on a beat's main stroke (which plays on tick 0).
+// Each entry is [offset in ticks from the beat start, stroke, hardness]; "NA" is the
+// crisp wooden dayan rim strike and "KAT" the muted flat-palm bayan slap.
+const TABLA_PHRASES = {
+  TI_RE_KI_TA: [[2, "TI", 0.60], [2.5, "RE", 0.50], [3, "KI", 0.56], [3.5, "NA", 0.85]],
+  DHA_TI_TE:   [[1, "KAT", 0.55], [2, "TI", 0.62], [3, "RE", 0.56]],
+  TA_KI_TA:    [[1, "NA", 0.80], [2, "KI", 0.55], [3, "NA", 0.78]]
+};
+// Which beat of the tala gets which phrase (Rupak 3+2+2 cadences, Teental bars)
+const TABLA_PHRASE_BEATS = {
+  "7/4": { 2: "TA_KI_TA", 4: "DHA_TI_TE", 6: "TI_RE_KI_TA" },
+  "4/4": { 1: "DHA_TI_TE", 2: "TA_KI_TA", 3: "TI_RE_KI_TA" }
+};
+let tablaPhraseActive = false;
+
+function playTablaPhrase(name, tpb) {
+  const phrase = TABLA_PHRASES[name];
+  if (!phrase) return;
+  const tickMs = 60000 / Math.max(40, bpm) / tpb;
+  phrase.forEach(([off, stroke, hard]) => {
+    setTimeout(() => {
+      if (!isPlaying) return;
+      if (stroke === "KAT") playBayan("KAT", false, hard);
+      else playDayan(stroke, hard);
+    }, off * tickMs);
+  });
+}
+
 function playTablaGroove(measureTick, isDownbeat, ts) {
   const tpb = ts.ticksPerBeat || 4;
   const currentBeat = Math.floor(measureTick / tpb);
   const subTick = measureTick % tpb;
+
+  // Decide once per beat (on its first tick) whether a finger-roll phrase replaces
+  // the random off-beat fillers for that beat.
+  if (subTick === 0) {
+    const phraseName = tpb === 4 && TABLA_PHRASE_BEATS[currentTimeSig] ? TABLA_PHRASE_BEATS[currentTimeSig][currentBeat] : null;
+    tablaPhraseActive = !!phraseName && randFloat() < (0.30 + drumDensity * 0.50);
+    if (tablaPhraseActive) playTablaPhrase(phraseName, tpb);
+  }
 
   if (currentTimeSig === "7/4") {
     // Rupak Tala cycle: 7 beats (3 + 2 + 2)
@@ -9393,11 +9455,11 @@ function playTablaGroove(measureTick, isDownbeat, ts) {
       } else if (currentBeat === 6) {
         playTablaDha(true, true, 1.2);
       }
-    } else if (subTick === 2 && randFloat() < (0.45 + drumDensity * 0.45)) {
+    } else if (subTick === 2 && !tablaPhraseActive && randFloat() < (0.45 + drumDensity * 0.45)) {
       if (currentBeat === 6) {
         playTablaDha(true, true, 0.82);
       } else if (currentBeat === 3 || currentBeat === 5) {
-        playBayan("GHE", true, 0.75);
+        playBayan("GHE", false, 0.75);
         playDayan("TUN", 0.70);
       } else if (currentBeat === 2 || currentBeat === 4) {
         playDayan("TI", 0.65);
@@ -9426,9 +9488,9 @@ function playTablaGroove(measureTick, isDownbeat, ts) {
           playTablaDha(true, true, 1.12);
         }
       }
-    } else if (subTick === 2 && randFloat() < (0.45 + drumDensity * 0.45)) {
+    } else if (subTick === 2 && !tablaPhraseActive && randFloat() < (0.45 + drumDensity * 0.45)) {
       if (currentBeat === 0 || currentBeat === 2) {
-        playBayan("GHE", true, 0.80);
+        playBayan("GHE", false, 0.80);
         playDayan("TUN", 0.75);
       } else {
         playDayan("TI", 0.65);
@@ -9444,13 +9506,13 @@ function playTablaGroove(measureTick, isDownbeat, ts) {
       } else {
         playDayan("TUN", 0.9);
       }
-    } else if (subTick === 2 && randFloat() < drumDensity) {
+    } else if (subTick === 2 && !tablaPhraseActive && randFloat() < drumDensity) {
       playDayan("TI", 0.6);
     }
   }
 
   // Rapid Ti-Re-Ki-Ta polyrhythmic embellishments & cross-rhythm bols
-  if (!isDownbeat && subTick !== 0) {
+  if (!isDownbeat && subTick !== 0 && !tablaPhraseActive) {
     const polyPhase = (stepEuclid * 3) % 7;
     if (polyPhase < 2 && randFloat() < (0.20 + drumDensity * 0.36)) {
       const fillStrokes = ["TUN", "NA", "TI", "RE", "KI"];
@@ -9940,6 +10002,7 @@ let clockInterval = null;
 function updateTimeSignature() {
   currentTimeSig = document.getElementById("selTimeSig").value;
   measureTick = 0; barCount = 0;
+  taanNotesLeft = 0; taanRestTicks = 0;
   const ts = TIME_SIGNATURES[currentTimeSig] || TIME_SIGNATURES["7/4"];
   document.getElementById("hudMeter").textContent = `${currentTimeSig} [1/${ts.beats}]`;
   if (typeof updateMediaSessionMetadata === "function") updateMediaSessionMetadata();
@@ -10132,6 +10195,7 @@ function clockTick() {
     if (pool.length > 0) {
       let shouldTrigger = false;
       let targetMidi = pool[0];
+      let taanVel = 0;
 
       if (arpPattern === "SHIMMER") {
         if (randFloat() < (0.42 + weatherVal * 0.45)) {
@@ -10149,15 +10213,37 @@ function clockTick() {
         else if (arpStepCounter <= 0) { arpDirection = 1; arpStepCounter = 0; }
         targetMidi = pool[arpStepCounter];
       } else if (arpPattern === "RAGA_TAAN") {
+        // Authentic taan phrasing: a fluid 3-5 note run (one note per tick) that
+        // starts on a tala division, followed by 1-2 beats of breathing silence (Ma).
+        // Rupak (7/4) phrases start on its 3 + 2 + 2 vibhag boundaries.
         const tpb = ts.ticksPerBeat || 4;
         const subTick = measureTick % tpb;
-        if (subTick === 0 || (subTick === 2 && randFloat() < 0.35)) {
+        const beatIdx = Math.floor(measureTick / tpb);
+        const starts = (currentTimeSig === "7/4") ? [0, 3, 5] : [0, Math.floor(ts.beats / 2)];
+        let emit = false;
+        if (taanRestTicks > 0) {
+          taanRestTicks--;
+        } else if (taanNotesLeft > 0) {
+          emit = true;
+        } else if (subTick === 0 && starts.indexOf(beatIdx) !== -1 && randFloat() < 0.62) {
+          taanNotesLeft = randRange(3, 5);
+          taanNoteIdx = 0;
+          taanDir = (randFloat() < 0.5) ? 1 : -1;
+          emit = true;
+        }
+        if (emit) {
           shouldTrigger = true;
-          const stepAmt = (randFloat() < 0.7) ? 1 : 2;
-          arpStepCounter += arpDirection * stepAmt;
-          if (arpStepCounter >= pool.length - 1) { arpDirection = -1; arpStepCounter = pool.length - 1; }
-          else if (arpStepCounter <= 0) { arpDirection = 1; arpStepCounter = 0; }
+          arpStepCounter = Math.min(Math.max(0, arpStepCounter), pool.length - 1);
+          const stepAmt = (randFloat() < 0.8) ? 1 : 2;
+          let nxt = arpStepCounter + taanDir * stepAmt;
+          if (nxt >= pool.length) { taanDir = -1; nxt = Math.max(0, pool.length - 2); }
+          else if (nxt < 0) { taanDir = 1; nxt = Math.min(pool.length - 1, 1); }
+          arpStepCounter = nxt;
           targetMidi = pool[arpStepCounter];
+          taanVel = 72 + taanNoteIdx * 6 + randRange(0, 8);
+          taanNoteIdx++;
+          taanNotesLeft--;
+          if (taanNotesLeft === 0) taanRestTicks = tpb * randRange(1, 2);
         }
       } else if (arpPattern === "CHORD_BURST") {
         if (stepShim === 0) {
@@ -10171,8 +10257,9 @@ function clockTick() {
         }
       }
 
-      if (shouldTrigger && arpPattern !== "CHORD_BURST" && randFloat() >= arpRestProb) {
-        playArpNote(targetMidi, 85 + randRange(0, 20));
+      // Taan phrases keep their notes fluid: the random rest dice only apply to other patterns.
+      if (shouldTrigger && arpPattern !== "CHORD_BURST" && (arpPattern === "RAGA_TAAN" || randFloat() >= arpRestProb)) {
+        playArpNote(targetMidi, arpPattern === "RAGA_TAAN" ? taanVel : 85 + randRange(0, 20));
       }
     }
   }
@@ -10182,10 +10269,11 @@ function clockTick() {
     updateDronePitches(true);
   }
 
-  // Authentic cyclical Tanpura plucking: 1 string per beat in classical sequence
-  // (Pa - Sa - Sa - Sa). With the 9.5s resonant ring decay, all 4 strings continuously
-  // overlap into an unbroken, shimmering golden acoustic bed of sound.
-  const tanpuraInterval = ts.ticksPerBeat || 4;
+  // Authentic cyclical Tanpura plucking in classical sequence (Pa - Sa - Sa - Sa),
+  // but on a slow cadence decoupled from the 1-beat metronome: one string every
+  // 2 beats (8 ticks in x/4), so a full 4-string cycle spans ~8 beats. With the
+  // 9.5s ring decay the strings still overlap into an unbroken, gentle golden wash.
+  const tanpuraInterval = (ts.ticksPerBeat || 4) * 2;
   if (tanpuraEnabled && tickCount % tanpuraInterval === 0 && tanpuraVol > 0.01 && droneEnabled && !channelMute.drone) {
     playTanpuraPluck(tanpuraStep % 4);
     tanpuraStep++;
@@ -13671,7 +13759,7 @@ function applyPreset(idx) {
     document.getElementById("selDroneOctave").value = "D2";
     if (chkTanpura) chkTanpura.checked = true;
     if (document.getElementById("selTanpuraTuning")) document.getElementById("selTanpuraTuning").value = "PA";
-    if (document.getElementById("knobTanpura")) document.getElementById("knobTanpura").value = 38;
+    if (document.getElementById("knobTanpura")) document.getElementById("knobTanpura").value = 18;
     if (document.getElementById("knobJavari")) document.getElementById("knobJavari").value = 55;
     document.getElementById("knobDrone").value = 75;
     document.getElementById("knobDroneFilter").value = 220;
