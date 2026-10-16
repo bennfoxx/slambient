@@ -1573,3 +1573,12 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Added probabilistic trigger on downbeat phrase turnarounds (`barCount % 4 === 0`) during `ALL` and `GHOST` modes when no conflicting voice is active (`nowMs > S.fullUntil && nowMs > S.ghostUntil`).
   - Coexists harmoniously with the existing cut-up voices (rhythmic transient drum hits and tuned chord choir loops).
   - Wired into `window.fieldPreview()` so manual preview plays the entire sample in full fidelity with effects.
+
+## Update — 2026-10-16 (Master Tempo Slider Number Display Synchronization)
+
+- **Fixed Static Tempo Label in Top Header Bar**:
+  - Identified bug in `updateBpm(sourceEl)`: `headerLbl` was fetched from the DOM (`document.getElementById("lblBpmHeader")`) but its `textContent` assignment was never executed, leaving the top header's tempo text permanently stuck on `72 BPM`.
+  - Added safe null-checking and bidirectional synchronization across both tempo sliders (`#knobBpmHeader` in the sticky top transport bar and `#knobBpm` in the Master Out channel strip) and both number labels (`#lblBpmHeader` and `#lblBpm`).
+  - Added synchronization in patch/preset deserialization so loading patches immediately reflects the saved tempo in `#lblBpmHeader`.
+  - Verified that mobile mini-transport `MutationObserver` on `#lblBpmHeader` also accurately receives live tempo updates on touch drag.
+
