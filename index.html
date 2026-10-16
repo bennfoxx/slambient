@@ -7480,6 +7480,7 @@ let workletClockInitializing = false;
 let audioClockNode = null;
 let audioClockSilentBuf = null;
 let nextAudioClockTime = 0;
+let lastClockTickTime = 0;
 
 async function initWorkletClock() {
   if (!audioCtx || !audioCtx.audioWorklet || workletClockReady || workletClockInitializing) return workletClockReady;
@@ -7521,6 +7522,9 @@ class ClockProcessor extends AudioWorkletProcessor {
     const effectiveBpm = Math.max(30, Math.min(300, this.bpm));
     const samplesPerTick = (sampleRate * 60) / (effectiveBpm * this.ticksPerBeat);
     this.sampleCount += 128;
+    if (this.sampleCount > samplesPerTick * 1.5) {
+      this.sampleCount = samplesPerTick;
+    }
     while (this.sampleCount >= samplesPerTick) {
       this.sampleCount -= samplesPerTick;
       this.port.postMessage({ type: "tick", time: currentTime });
@@ -7550,6 +7554,11 @@ registerProcessor("slambient-clock-processor", ClockProcessor);
 function startWorkletClock() {
   if (!workletClockReady || !audioCtx) return false;
   try {
+    if (clockInterval) {
+      clearInterval(clockInterval);
+      clockInterval = null;
+    }
+    stopAudioClockFallback();
     if (!workletClockNode) {
       workletClockNode = new AudioWorkletNode(audioCtx, "slambient-clock-processor");
       workletClockNode.port.onmessage = (e) => {
@@ -7609,11 +7618,15 @@ function stopAudioClockFallback() {
 function scheduleAudioClockFallback() {
   stopAudioClockFallback();
   if (!isPlaying || !audioCtx) return;
+  // If sample-accurate AudioWorklet clock is actively driving playback, do NOT schedule fallback
+  if (workletClockReady && workletClockNode) return;
   try {
     if (!audioClockSilentBuf || audioClockSilentBuf.sampleRate !== audioCtx.sampleRate) {
       audioClockSilentBuf = audioCtx.createBuffer(1, 1, audioCtx.sampleRate);
     }
-    const tickSec = (60 / Math.max(40, bpm)) / 4;
+    const ts = (typeof TIME_SIGNATURES !== "undefined" && TIME_SIGNATURES[currentTimeSig]) ? TIME_SIGNATURES[currentTimeSig] : null;
+    const tpb = (ts && ts.ticksPerBeat) ? ts.ticksPerBeat : 4;
+    const tickSec = (60 / Math.max(40, bpm)) / tpb;
     const now = audioCtx.currentTime;
     if (nextAudioClockTime <= now + 0.005 || nextAudioClockTime > now + tickSec * 2.5) {
       nextAudioClockTime = now + tickSec;
@@ -7627,13 +7640,14 @@ function scheduleAudioClockFallback() {
       if (audioClockNode !== src) return;
       audioClockNode = null;
       if (!isPlaying || !audioCtx) return;
-      const tickMs = (60000 / Math.max(40, bpm)) / 4;
+      if (workletClockReady && workletClockNode) return;
+      const tickMs = (60000 / Math.max(40, bpm)) / tpb;
       const elapsedMs = performance.now() - (typeof lastClockTickTime === "number" ? lastClockTickTime : 0);
-      // Fire clockTick from the Web Audio thread when backgrounded/locked or when setInterval lags
-      if (document.hidden || elapsedMs >= tickMs * 1.45) {
+      // ONLY fire if primary clock has actually stalled/lagged (never double tick unconditionally)
+      if (elapsedMs >= tickMs * 0.85) {
         clockTick();
       }
-      nextAudioClockTime += (60 / Math.max(40, bpm)) / 4;
+      nextAudioClockTime += tickSec;
       scheduleAudioClockFallback();
     };
     src.start(nextAudioClockTime);
@@ -7687,8 +7701,15 @@ function ensureAudioReady() {
   }, { capture: true, passive: true }));
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState !== "visible") {
-    if (isPlaying && audioCtx) scheduleAudioClockFallback();
+    // Only schedule Web Audio buffer fallback if sample-accurate AudioWorklet clock is NOT available
+    if (isPlaying && audioCtx && !workletClockReady) {
+      scheduleAudioClockFallback();
+    }
     return;
+  }
+  // When returning to visible foreground:
+  if (workletClockReady) {
+    stopAudioClockFallback();
   }
   enableMediaPlaybackSession();
   if (isPlaying && audioCtx && audioCtx.state !== "running") audioCtx.resume().catch(() => {});
@@ -10034,7 +10055,6 @@ let isDrumFillActive = false;
 let lastFillArchetype = -1;
 let activeFillQueue = [];
 let pendingDrumStyleAfterFill = null;
-let lastClockTickTime = 0;
 let previewFillTimers = [];
 
 function clearPreviewFillTimers() {
@@ -10518,10 +10538,16 @@ function cycleTimeSignature() {
 }
 
 function clockTick() {
-  lastClockTickTime = performance.now();
-  tickCount++;
+  const now = performance.now();
   const ts = TIME_SIGNATURES[currentTimeSig] || TIME_SIGNATURES["7/4"];
   const tpb = ts.ticksPerBeat || 4;
+  const tickPeriodMs = (60000 / Math.max(30, bpm)) / tpb;
+  // Refractory debounce guard: drops duplicate/overlapping ticks if called faster than 55% of the tempo period
+  if (lastClockTickTime && (now - lastClockTickTime) < tickPeriodMs * 0.55) {
+    return;
+  }
+  lastClockTickTime = now;
+  tickCount++;
   const totalMeasureTicks = ts.beats * tpb;
   measureTick = (measureTick + 1) % totalMeasureTicks;
   if (measureTick === 0) barCount++;

@@ -1147,3 +1147,19 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
     - **💾 Patches & MIDI**: User Bank U1–U6 guide (click to load, shift-click to overwrite, right-click context menu), MIDI CC map, and multi-format audio/stems export.
     - **✨ Secrets**: Hidden features documented (MU-TH-UR 6000 Eno CRT phosphor cycler, Void Raiders arcade minigame, planetary orb momentum flinging, 60 FPS fullscreen CRT mode, instant Ctrl/⌘+Z patch undo).
   - Unlocked `#btnShortcuts` on touch/mobile devices so phone and tablet users can access the Field Manual anytime.
+
+## Update — 2026-10-16 (Fix Background Tab Double Tempo & Audio Clock Coordination)
+
+- **Root Cause**:
+  - `visibilitychange` listener called `scheduleAudioClockFallback()` whenever the browser tab was hidden.
+  - In `scheduleAudioClockFallback()`, `src.onended` executed `if (document.hidden || elapsedMs >= tickMs * 1.45) clockTick();`.
+  - Because `document.hidden` was true, the Web Audio buffer clock ticked concurrently with `workletClockNode` (which already runs jitter-free on the audio render thread and is never throttled by desktop browsers), doubling the tempo from 72 BPM to 144 BPM and scrambling drum fills and chord voices.
+  - Furthermore, returning to the visible tab never stopped the recurring fallback scheduler.
+- **Resolution**:
+  - **Clock Engine Coordination**: In `scheduleAudioClockFallback()`, immediately return if `workletClockReady && workletClockNode`.
+  - **Stall-Only Fallback**: Removed unconditional `document.hidden` execution in `src.onended`; fallback only fires if `elapsedMs >= tickMs * 0.85` (meaning primary timer actually stalled).
+  - **Visibility Handler Clean-up**: On tab blur, only schedule fallback if `!workletClockReady`. On tab focus, stop fallback immediately if `workletClockReady`.
+  - **Hardware Debounce Guard in `clockTick()`**: Added a mathematical refractory guard `if (lastClockTickTime && (now - lastClockTickTime) < tickPeriodMs * 0.55) return;`, dropping duplicate ticks or timer collisions.
+  - **Sample Burst Protection**: Clamped `this.sampleCount` to `samplesPerTick * 1.5` in `clock-processor.js` and inline fallback to prevent tick bursts upon audio thread resume.
+  - **Service Worker Version Bump**: Bumped `CACHE_NAME` in `sw.js` to `slambient-v3` for immediate cache invalidation.
+

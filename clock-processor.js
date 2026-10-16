@@ -37,6 +37,9 @@ class ClockProcessor extends AudioWorkletProcessor {
 
     // AudioWorklet quantum is fixed at 128 samples per block
     this.sampleCount += 128;
+    if (this.sampleCount > samplesPerTick * 1.5) {
+      this.sampleCount = samplesPerTick;
+    }
     while (this.sampleCount >= samplesPerTick) {
       this.sampleCount -= samplesPerTick;
       this.port.postMessage({ type: "tick", time: currentTime });
