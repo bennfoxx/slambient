@@ -997,6 +997,9 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
 ##### UI Fixes & Visual Polish (COMPLETED)
 * [x] **Orbital Modal Opacity Bleed Fix:** Prevent top UI header, borders, and backdrop from going transparent when swiping or switching between modules in Orbital Mode by scoping opacity transitions (`.swiping-left`, `.swiping-right`) to `#orbitalModalBody` rather than `#orbitalSidePanel`.
 * [x] **Center-Justify Orbital Module Title & Nav Arrows:** Center-justify `#orbitalModalTitle` and navigation cycle arrows (`#btnOrbitalPrev`, `#btnOrbitalNext`) across desktop and mobile, ensuring balanced layout between `[PEDALS]` back button and `[ACTIONS] [✕]` controls.
+* [x] **Desktop Header Bar Eurorack Symmetry & Card Framing:** Restructure the desktop top bar into a balanced 2-row Eurorack chassis layout. Row 1 houses Transport & Audio on the left and Harmony & Master Clock on the right; Row 2 houses the Telemetry HUD on the left and Workspace Utilities & Generative Engine on the right. Frame the Patch Bank I/O as a dedicated bordered card, completely eliminating text collisions between `BANK` and preset names (`AIRPORTS`).
+* [x] **Mobile Transport 2-Row Layout & Auto-Fill Elements:** Symmetrically align mobile Section 1 into two 12-column rows: Row 1 splits START (cols 1–6) and RECORD + Format (cols 7–12); Row 2 splits SAMPLE (cols 1–9) and MIDI (cols 10–12). Apply `flex: 1 1 0` to `MIC` and `DROP` buttons to auto-fill the sample block with zero dead space, auto-contracting when a sample is loaded to give prominence to the waveform display.
+* [x] **View Switcher 'Pedal View' Re-labeling:** Rename the view mode toggle button from `Console Rack` to `Pedal View` (`Pedalboard & Console Rack View`) so users can immediately identify and toggle the pedalboard console mode.
 
 ##### Phase 0: Mobile Microphone & Pocket Field Recorder Resiliency (COMPLETED)
 * [x] **Pointer Capture & Touch Physics:** Implement `setPointerCapture(e.pointerId)` on `pointerdown` for all `[data-field-hold]` elements, combined with dedicated `touchstart`/`touchend` hooks to prevent iOS Safari `pointercancel` micro-jitter aborts.
@@ -1007,7 +1010,7 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
 
 ##### Phase 1: Grid Foundation & Pedals Mode Layout (Front-End)
 * [ ] Implement the Eurorack HP sizing grid and CSS/layout token framework across mobile (32 HP) and desktop (64 HP) viewports.
-* [ ] Build the macro Pedals Mode container to replace the legacy mobile console view.
+* [ ] Build the macro Pedals Mode container to replace the legacy mobile console view (active view toggle renamed to `Pedal View`).
 * [ ] Code the metallic jack anchor points and dynamic bezier-curve SVG "patch cables" for audio and CV routing.
 
 ##### Phase 2: Orbital View & Gesture Navigation (COMPLETED)

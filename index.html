@@ -223,16 +223,25 @@
     padding-top: 10px;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    gap: 8px;
+    justify-content: space-between;
+    gap: 12px;
     width: 100%;
-    flex-wrap: wrap;
   }
   .readout-row {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 8px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     width: 100%;
-    padding-top: 2px;
+  }
+  .header-util-gen-cluster {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    flex-shrink: 0;
   }
 
   .brand-group {
@@ -313,17 +322,30 @@
   .patch-bank-section {
     margin-left: auto;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 10px;
-    padding-left: 16px;
-    border-left: 1px solid var(--border);
+    justify-content: center;
+    gap: 5px;
+    padding: 5px 10px;
+    background: #080a11;
+    border: 1px solid var(--border-light);
+    border-radius: 5px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.55);
     flex-shrink: 0;
-    align-self: stretch;
+    align-self: center;
+  }
+  .patch-bank-section > .preset-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    color: var(--accent);
+    line-height: 1;
+    margin: 0;
   }
   .preset-io-stack {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex-direction: row;
+    align-items: center;
     gap: 6px;
     flex-shrink: 0;
   }
@@ -521,6 +543,7 @@
     border: none;
   }
   .header-sec-harmony {
+    margin-left: auto;
     gap: 8px;
     padding: 2px 8px;
   }
@@ -539,7 +562,6 @@
     border-right: 1px solid rgba(255, 255, 255, 0.08);
   }
   .header-sec-utils {
-    margin-left: auto;
     gap: 6px;
   }
   .header-sec-gen {
@@ -4236,7 +4258,7 @@
       border-top: 1px solid var(--border);
       padding-top: 5px;
       display: grid;
-      grid-template-columns: 1.15fr 1.35fr 1fr;
+      grid-template-columns: 1fr 1.15fr;
       gap: 6px;
       width: 100%;
       align-items: stretch;
@@ -4254,11 +4276,11 @@
     /* SECTION 1: Transport & Audio */
     .header-sec-transport {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) 48px;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
       gap: 4px;
     }
     .header-sec-transport > .btn-main-play {
-      grid-column: 1;
+      grid-column: 1 / 7;
       grid-row: 1;
       width: 100%;
       height: 30px;
@@ -4271,7 +4293,7 @@
       min-width: 0;
     }
     .header-sec-transport > .rec-ctrl-wrap {
-      grid-column: 2;
+      grid-column: 7 / 13;
       grid-row: 1;
       display: flex;
       align-items: center;
@@ -4302,26 +4324,10 @@
       font-size: 10px;
       border-radius: 3px;
     }
-    .header-sec-transport > .btn-header-midi {
-      grid-column: 3;
-      grid-row: 1;
-      width: 48px;
-      min-width: 48px;
-      height: 30px;
-      padding: 0 4px;
-      font-size: 10px;
-      font-weight: 700;
-      border-radius: 3px;
-      box-sizing: border-box;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-    }
 
-    /* Row 2: SAMPLE full width in landscape */
+    /* Row 2: SAMPLE (cols 1-9) + MIDI (cols 10-12) */
     .header-sec-transport > .sample-ctrl {
-      grid-column: 1 / -1;
+      grid-column: 1 / 10;
       grid-row: 2;
       width: 100%;
       box-sizing: border-box;
@@ -4341,9 +4347,17 @@
       height: 22px;
       padding: 0 5px;
       font-size: 9px;
-      flex: 0 0 auto;
+      flex: 1 1 0;
+      min-width: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 2px;
       white-space: nowrap;
+    }
+    .header-sec-transport > .sample-ctrl.has-sample .btn-field {
+      flex: 0 0 auto;
+      padding: 0 4px;
     }
     .header-sec-transport > .sample-ctrl .field-wave {
       flex: 1 1 auto;
@@ -4358,6 +4372,21 @@
       font-size: 13px;
       flex: 0 0 18px;
       margin-left: 2px;
+    }
+    .header-sec-transport > .btn-header-midi {
+      grid-column: 10 / 13;
+      grid-row: 2;
+      width: 100%;
+      height: 28px;
+      padding: 0 4px;
+      font-size: 9.5px;
+      font-weight: 700;
+      border-radius: 3px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
     }
 
     /* SECTION 2: Harmony & Master Clock */
@@ -4483,16 +4512,27 @@
     }
     .header-sec-utils #btnAppFullscreen span { display: none; }
 
-    /* Telemetry row */
+    /* Telemetry row & Utilities cluster */
     .readout-row {
       width: 100%;
       padding-top: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
     }
-    .sys-readout {
+    .readout-row .header-util-gen-cluster {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .readout-row .sys-readout {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 4px;
-      width: 100%;
+      flex: 1 1 auto;
+      min-width: 0;
     }
     .telemetry-pill {
       padding: 2px 5px;
@@ -4954,12 +4994,12 @@
     .header-sec-transport {
       grid-column: 1 / -1;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) 56px;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
       gap: 6px;
       padding: 6px;
     }
     .header-sec-transport > .btn-main-play {
-      grid-column: 1;
+      grid-column: 1 / 7;
       grid-row: 1;
       width: 100%;
       height: 40px;
@@ -4972,7 +5012,7 @@
       min-width: 0;
     }
     .header-sec-transport > .rec-ctrl-wrap {
-      grid-column: 2;
+      grid-column: 7 / 13;
       grid-row: 1;
       display: flex;
       align-items: center;
@@ -5019,27 +5059,10 @@
       font-size: 11.5px;
       border-radius: 4px;
     }
-    .header-sec-transport > .btn-header-midi {
-      grid-column: 3;
-      grid-row: 1;
-      width: 56px;
-      min-width: 56px;
-      height: 40px;
-      padding: 0 4px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      border-radius: 4px;
-      box-sizing: border-box;
-    }
 
-    /* Row 2: SAMPLE spans full width so waveform can extend cleanly without displacing MIDI */
+    /* Row 2: SAMPLE (cols 1-9) + MIDI (cols 10-12) */
     .header-sec-transport > .sample-ctrl {
-      grid-column: 1 / -1;
+      grid-column: 1 / 10;
       grid-row: 2;
       width: 100%;
       box-sizing: border-box;
@@ -5062,9 +5085,17 @@
       height: 30px;
       padding: 0 8px;
       font-size: 10.5px;
-      flex: 0 0 auto;
+      flex: 1 1 0;
+      min-width: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 3px;
       white-space: nowrap;
+    }
+    .header-sec-transport > .sample-ctrl.has-sample .btn-field {
+      flex: 0 0 auto;
+      padding: 0 6px;
     }
     .header-sec-transport > .sample-ctrl .btn-field svg {
       width: 13px;
@@ -5084,6 +5115,22 @@
       font-size: 16px;
       flex: 0 0 24px;
       margin-left: 2px;
+    }
+    .header-sec-transport > .btn-header-midi {
+      grid-column: 10 / 13;
+      grid-row: 2;
+      width: 100%;
+      height: 40px;
+      padding: 0 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border-radius: 4px;
+      box-sizing: border-box;
     }
 
     /* SECTION 2: Harmony & Master Clock (Full Width, 3 Symmetrical Rows) */
@@ -5276,8 +5323,24 @@
     .header-sec-utils .pal-btn-dots i { width: 6px; height: 6px; }
     /* iPhone Safari has no Fullscreen API for pages (class set from JS) */
     html.no-fullscreen-api #btnAppFullscreen { display: none; }
-    .readout-row { width: 100%; }
-
+    .readout-row {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .header-util-gen-cluster {
+      order: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 100%;
+    }
+    .header-util-gen-cluster > .header-sec-gen { order: 1; }
+    .header-util-gen-cluster > .header-sec-utils { order: 2; }
+    .readout-row > .sys-readout {
+      order: 2;
+    }
     /* Telemetry: compact 2x2 grid of label-over-value tiles */
     .sys-readout {
       display: grid;
@@ -6785,36 +6848,6 @@
             <button class="btn-tap-tempo" id="btnTapTempo" onclick="tapTempo()" title="Tap tempo: tap 3+ times in rhythm to set the BPM">TAP</button>
           </div>
         </div>
-
-        <!-- SECTION 3: Workspace & System Utilities (full screen, palette, ?) -->
-        <div class="header-section header-sec-utils">
-          <button class="btn-header-util" id="btnAppFullscreen" onclick="toggleAppFullscreen()" title="Full screen">
-            <svg class="icon-enter-fs" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <svg class="icon-exit-fs" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span>Full Screen</span>
-          </button>
-          <div class="palette-wrap">
-            <button class="btn-header-util" id="btnPalette" onclick="togglePaletteMenu()" title="Color palette">
-              <span class="pal-btn-dots"><i></i><i></i><i></i><i></i></span>
-              <span>Palette</span>
-            </button>
-            <div class="palette-menu" id="paletteMenu" role="menu"></div>
-          </div>
-          <button class="btn-header-util btn-header-help" id="btnShortcuts" onclick="toggleShortcutsPanel()" title="Keyboard shortcuts (?)">?</button>
-          <button class="btn-header-util btn-install-app" id="btnInstallApp" onclick="installAppPrompt()" title="Install Slambient as App" style="display: none;">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2V10M8 10L5 7M8 10L11 7M2 13H14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span>Install</span>
-          </button>
-        </div>
-
-        <!-- SECTION 4: Generative Engine & History (Randomize All, Undo) -->
-        <div class="header-section header-sec-gen">
-          <button class="btn-preset-chip btn-randomize-all" id="btnRandomizeAll" onclick="randomizeEverything()" title="Randomize every module"><svg class="rand-all-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20.5 3.5v5h-5"/></svg><span>Randomize All</span></button>
-          <button class="btn-header-util" id="btnUndoPatch" onclick="undoPatchChange()" title="Undo the last randomize / preset / new seed (Ctrl/⌘+Z)" disabled>
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.5 3.5L2 7L5.5 10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 7H10a4 4 0 0 1 0 8H7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            <span>Undo</span>
-          </button>
-        </div>
       </div>
 
       <div class="top-bar-row readout-row">
@@ -6823,6 +6856,38 @@
           <div class="telemetry-pill"><span class="pill-k">METER</span><span class="val" id="hudMeter">7/4 [1/7]</span></div>
           <div class="telemetry-pill"><span class="pill-k">ROOT / SCALE</span><span class="val" id="hudScale">D DORIAN</span></div>
           <div class="telemetry-pill"><span class="pill-k">SEED</span><span class="val" id="hudSeed">#534C-414D</span></div>
+        </div>
+
+        <div class="header-util-gen-cluster">
+          <!-- SECTION 3: Workspace & System Utilities (full screen, palette, ?) -->
+          <div class="header-section header-sec-utils">
+            <button class="btn-header-util" id="btnAppFullscreen" onclick="toggleAppFullscreen()" title="Full screen">
+              <svg class="icon-enter-fs" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <svg class="icon-exit-fs" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Full Screen</span>
+            </button>
+            <div class="palette-wrap">
+              <button class="btn-header-util" id="btnPalette" onclick="togglePaletteMenu()" title="Color palette">
+                <span class="pal-btn-dots"><i></i><i></i><i></i><i></i></span>
+                <span>Palette</span>
+              </button>
+              <div class="palette-menu" id="paletteMenu" role="menu"></div>
+            </div>
+            <button class="btn-header-util btn-header-help" id="btnShortcuts" onclick="toggleShortcutsPanel()" title="Keyboard shortcuts (?)">?</button>
+            <button class="btn-header-util btn-install-app" id="btnInstallApp" onclick="installAppPrompt()" title="Install Slambient as App" style="display: none;">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2V10M8 10L5 7M8 10L11 7M2 13H14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Install</span>
+            </button>
+          </div>
+
+          <!-- SECTION 4: Generative Engine & History (Randomize All, Undo) -->
+          <div class="header-section header-sec-gen">
+            <button class="btn-preset-chip btn-randomize-all" id="btnRandomizeAll" onclick="randomizeEverything()" title="Randomize every module"><svg class="rand-all-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20.5 3.5v5h-5"/></svg><span>Randomize All</span></button>
+            <button class="btn-header-util" id="btnUndoPatch" onclick="undoPatchChange()" title="Undo the last randomize / preset / new seed (Ctrl/⌘+Z)" disabled>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.5 3.5L2 7L5.5 10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 7H10a4 4 0 0 1 0 8H7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <span>Undo</span>
+            </button>
+          </div>
         </div>
       </div>
     </header>
@@ -7063,7 +7128,7 @@
   <div class="orbital-deck-header">
     <div class="view-switcher-group">
       <button class="btn-view-mode active" id="btnViewOrbital" onclick="setModuleView('orbital')" title="Floating Planetary Orb Constellation">Orbital View</button>
-      <button class="btn-view-mode" id="btnViewConsole" onclick="setModuleView('console')" title="Console Rack & Pedalboard">Console Rack</button>
+      <button class="btn-view-mode" id="btnViewConsole" onclick="setModuleView('console')" title="Pedalboard &amp; Console Rack View">Pedal View</button>
     </div>
 
     <div class="orbital-bar-center">

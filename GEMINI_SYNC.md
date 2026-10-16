@@ -1376,3 +1376,18 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - **Typography Rules**: `JetBrains Mono` for all controls, badges, readouts, and titles; `Inter` for descriptive copy; explicit font loading to prevent system font metric discrepancies on non-Mac devices.
   - **Quality Checklist**: 7-point pre-flight checklist for all future PRs and code modifications.
 
+## Update — 2026-10-16 (Desktop Header Eurorack Symmetry, Mobile 2-Row MIDI Layout & Pedal View Mode)
+
+- **Desktop Header Formatting & Eurorack Chassis Symmetry**:
+  - Moved Section 3 (Workspace Utilities: Fullscreen, Palette, ?) and Section 4 (Generative Engine: Randomize All, Undo) out of `.transport-row` into `.readout-row` inside `.header-util-gen-cluster`.
+  - Created a balanced 2-row chassis layout: Row 1 houses Transport & Audio on the left and Harmony & Master Clock on the right (`justify-content: space-between`); Row 2 houses Telemetry HUD on the left and Utilities & Generative Engine on the right (`justify-content: space-between`).
+  - Redesigned `.patch-bank-section` as a dedicated bordered card with `BANK` title centered above side-by-side `SAVE` and `LOAD` buttons, eliminating all text overlap and collision with preset names (`AIRPORTS`).
+- **Mobile Transport 2-Row Symmetry & Auto-Fill Elements**:
+  - Re-architected `.header-sec-transport` across portrait (`@media (max-width: 640px)`) and landscape (`@media (orientation: landscape) and (max-height: 550px)`) into two 12-column rows:
+    - **Row 1**: `START` button (cols 1–6, 50%) + `RECORD` button with format dropdown (cols 7–12, 50%).
+    - **Row 2**: `SAMPLE` pocket recorder (cols 1–9, 75%) + `MIDI` hardware button (cols 10–12, 25%).
+  - Inside `.sample-ctrl`: set `.btn-field` (`MIC` and `DROP`) to `flex: 1 1 0; min-width: 0; justify-content: center;` so they expand symmetrically to fill the entire remaining container with zero dead space. When a sample is loaded, they auto-contract (`flex: 0 0 auto; padding: 0 6px`) to give full width to the waveform canvas and eject button.
+- **Pedal View Switcher Mode & Roadmap Clarification**:
+  - Renamed the view toggle button from `Console Rack` to `Pedal View` (`Pedalboard & Console Rack View`) so users can immediately switch into pedal/console view mode.
+  - Updated `MASTER_BLUEPRINT.md` section 27 to document the completed desktop/mobile header symmetry polish and clarified that Phase 1 (Eurorack HP Sizing Grid & Macro Pedals Mode Layout) is the active roadmap item for the full hardware pedalboard container and dynamic SVG patch cables.
+
