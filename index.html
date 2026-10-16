@@ -3444,6 +3444,12 @@
       padding-top: 6px;
       gap: 8px;
     }
+    /* Header card is as tall as Eno + master stacked: let both rows grow and
+       center their content so there is no dead space at the bottom. */
+    header.top-bar > .brand-row,
+    header.top-bar > .transport-row {
+      flex: 1 1 auto;
+    }
     /* Eno head on top, same size as before; master volume tucked below it */
     .eno-standalone-pod {
       grid-column: 2;
