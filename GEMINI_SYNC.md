@@ -1016,17 +1016,23 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
 
 
 
-## Multi-Phase Roadmap Expansion: Phase 12 (Production Hosting, PWA, Audio Stability & Privacy)
+## Update — 2026-10-16 (Phase 12: PWA Standalone, Offline Service Worker, Screen Wake Lock & Safe Areas)
 
-### Phase 12: Production Hosting, PWA, Audio Stability & Privacy
-*Focus: Seamless installation on mobile, edge-accelerated delivery, rock-solid audio execution, and zero-leak privacy.*
-1. **PWA Standalone & Offline Caching**:
-   - Web App Manifest (`manifest.json`): Configure `display: standalone`, `orientation: any`, high-res icons, theme color (`#07080c`), and launch title so "Add to Home Screen" runs without browser address bars or navigation chrome.
-   - Offline Service Worker (`sw.js`): Cache `index.html` and static font assets for instant boot on airplanes or without network access.
-2. **Audio Stability & WakeLock**:
-   - Screen WakeLock API (`navigator.wakeLock.request('screen')`): Keep the display and audio rendering awake during extended generative sessions without forced phone sleep.
-   - Long-term AudioWorklet Clock migration: Evaluate decoupling master sequencing pulses from UI thread ticks to eliminate background jitter.
-3. **Privacy & Anti-Scraping Protection**:
-   - Add `<meta name="robots" content="noindex, nofollow">` to `<head>` to prevent public search indexing and AI scrapers while testing.
-4. **Cloudflare Pages / High-Performance Edge Hosting**:
-   - Deploy via Cloudflare Pages or Vercel with HTTP/3, Brotli compression, and custom security/COOP/COEP headers (`Cross-Origin-Opener-Policy`, `Cross-Origin-Embedder-Policy`) unlocking high-resolution timers.
+- **PWA Manifest & App Identity**:
+  - Implemented `manifest.webmanifest` and `manifest.json` with `display: standalone`, `background_color: #07080c`, `theme_color: #07080c`, `orientation: any`, and metadata tags.
+  - Generated full suite of high-resolution icons (`icon.svg`, `icon-512.png`, `icon-192.png`, and `apple-touch-icon.png`) showcasing Slambient's signature cosmic constellation orbital motif.
+- **Offline Service Worker (`sw.js`)**:
+  - Installed and registered Service Worker with pre-caching for app shell and core assets.
+  - Implemented Network-First strategy with instant cache fallback for navigation/html, and Cache-First strategy for Google Fonts (`JetBrains Mono`, `Inter`).
+- **Screen Wake Lock API (`navigator.wakeLock`)**:
+  - Bound `requestWakeLock()` to transport play (`togglePlay()`) and `releaseWakeLock()` to pause.
+  - Re-acquires wake lock seamlessly on `visibilitychange` when user returns to active session.
+  - Prevents screens from sleeping or throttling background timers during unattended generative performances.
+- **App Shell UX & Touch Polish**:
+  - Added `<meta name="robots" content="noindex, nofollow">` to protect development deployment.
+  - Added iOS mobile web app tags (`apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style: black-translucent`, `apple-mobile-web-app-title`).
+  - Added `overscroll-behavior-y: none` and `-webkit-tap-highlight-color: transparent` to eliminate pull-to-refresh page bounces and gray tap flashes.
+  - Integrated top safe-area-inset padding (`env(safe-area-inset-top)`) across desktop, landscape, and mobile views to keep the top bar clear of phone notches and dynamic islands.
+  - Added install prompt button (`#btnInstallApp`) in header utils and documentation in Keyboard Shortcuts dialog (`#shortcutsOverlay`).
+- **Cloudflare Edge Configuration**:
+  - Added `_headers` specifying permissions policies (`microphone=(self), midi=(self)`), frame protection, and cache control.
