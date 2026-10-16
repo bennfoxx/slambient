@@ -1020,3 +1020,18 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
     - **Chrome (Desktop & Mobile)**: Tap the tune/padlock icon in the URL bar → **Site Settings** / **Permissions** → Set **Microphone** to **Allow**.
 
 
+
+## Multi-Phase Roadmap Expansion: Phase 12 (Production Hosting, PWA, Audio Stability & Privacy)
+
+### Phase 12: Production Hosting, PWA, Audio Stability & Privacy
+*Focus: Seamless installation on mobile, edge-accelerated delivery, rock-solid audio execution, and zero-leak privacy.*
+1. **PWA Standalone & Offline Caching**:
+   - Web App Manifest (`manifest.json`): Configure `display: standalone`, `orientation: any`, high-res icons, theme color (`#07080c`), and launch title so "Add to Home Screen" runs without browser address bars or navigation chrome.
+   - Offline Service Worker (`sw.js`): Cache `index.html` and static font assets for instant boot on airplanes or without network access.
+2. **Audio Stability & WakeLock**:
+   - Screen WakeLock API (`navigator.wakeLock.request('screen')`): Keep the display and audio rendering awake during extended generative sessions without forced phone sleep.
+   - Long-term AudioWorklet Clock migration: Evaluate decoupling master sequencing pulses from UI thread ticks to eliminate background jitter.
+3. **Privacy & Anti-Scraping Protection**:
+   - Add `<meta name="robots" content="noindex, nofollow">` to `<head>` to prevent public search indexing and AI scrapers while testing.
+4. **Cloudflare Pages / High-Performance Edge Hosting**:
+   - Deploy via Cloudflare Pages or Vercel with HTTP/3, Brotli compression, and custom security/COOP/COEP headers (`Cross-Origin-Opener-Policy`, `Cross-Origin-Embedder-Policy`) unlocking high-resolution timers.
