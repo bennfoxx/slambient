@@ -15861,12 +15861,22 @@ window.addEventListener('keyup', (e) => {
 let lastAppliedMasterDriveVal = null;
 
 function updateBpm(sourceEl) {
-  bpm = parseInt((sourceEl || document.getElementById("knobBpm")).value);
-  document.getElementById("knobBpm").value = bpm;
-  document.getElementById("lblBpm").textContent = bpm + " BPM";
+  const el = sourceEl || document.getElementById("knobBpmHeader") || document.getElementById("knobBpm");
+  if (!el) return;
+  const val = parseInt(el.value, 10);
+  if (isNaN(val)) return;
+  bpm = val;
+
+  const knob = document.getElementById("knobBpm");
+  const lbl = document.getElementById("lblBpm");
   const headerKnob = document.getElementById("knobBpmHeader");
   const headerLbl = document.getElementById("lblBpmHeader");
-  if (headerKnob) headerKnob.value = bpm;
+
+  if (knob && knob !== el) knob.value = bpm;
+  if (headerKnob && headerKnob !== el) headerKnob.value = bpm;
+  if (lbl) lbl.textContent = bpm + " BPM";
+  if (headerLbl) headerLbl.textContent = bpm + " BPM";
+
   updateWorkletClockBpm();
   if (isPlaying) {
     if (!workletClockReady) {
@@ -17749,6 +17759,12 @@ function applyPatchData(data, skipIds) {
     bpm = data.bpm;
     const kb = document.getElementById("knobBpm");
     if (kb) kb.value = bpm;
+    const kbh = document.getElementById("knobBpmHeader");
+    if (kbh) kbh.value = bpm;
+    const lb = document.getElementById("lblBpm");
+    if (lb) lb.textContent = bpm + " BPM";
+    const lbh = document.getElementById("lblBpmHeader");
+    if (lbh) lbh.textContent = bpm + " BPM";
   }
   if (typeof data.currentChordVoicing === "number") currentChordVoicing = data.currentChordVoicing;
   if (typeof data.currentChordStepIdx === "number") currentChordStepIdx = data.currentChordStepIdx;
