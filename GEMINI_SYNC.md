@@ -1490,3 +1490,15 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Included `field` in `ORBITAL_LOWER_DECK_IDS` and `getSignalChainOrbList()` for seamless swipe cycling.
   - Added `field` to `THEME_KEYS` and updated all 5 color theme presets in `COLOR_THEMES`.
 
+## Update — 2026-10-16 (FX Chain Button Inspector Navigation & Header Button Standardization)
+
+- **Pedal Birds-Eye Direct Inspector Navigation**:
+  - Resolved event interception bug where clicking any pedal or button in `#pedalChainModule` opened Filter (`expandModuleOrb("filter")`) due to pointerdown / pointerup bubbling on `.strip-channel`.
+  - Updated `isInteractive(target)` in `initPedalDragAndDrop()` to classify `.mini-pedal-card, .mini-pedal-left, .pedal-birds-eye-rack, .btn-pedal-action, .birds-eye-flow-bar` as interactive so background card drag handlers don't hijack clicks.
+  - Bound `onclick="openMiniPedalInspector('${meta.orbId}', event)"` across `.mini-pedal-card` with `cursor: pointer`. Clicking `DELAY` opens Delay (`orbId: "delay"`), `SPACE` opens Space / Reverb (`orbId: "reverb"`), `FILTER` opens Filter (`orbId: "filter"`), and `MASTER OUT` opens Master EQ & Out (`orbId: "space"`).
+  - Attached `event.stopPropagation()` to `.mini-pedal-actions` and helper buttons (`▲`, `▼`, `BYP/ON`) so reordering and bypassing operate cleanly without triggering modal popups.
+- **Shuffle & Reset Button Formatting Consistency**:
+  - Upgraded `SHUFFLE` button across `#pedalChainModule` and `#pedalsContainer` from raw unicode `⟲` to an inline SVG cycle/refresh icon.
+  - Standardized `.btn-pedal-action` to exact `height: 24px`, matching `PWR`, `M`, `S`, and `badge-tag` header actions with `JetBrains Mono` 9.5px / 800 weight typography and neon cyan hover glow.
+
+
