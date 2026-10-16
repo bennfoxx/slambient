@@ -909,6 +909,34 @@
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     color: var(--text-secondary);
   }
+  .manual-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .manual-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--color-drone);
+  }
+  .manual-title .pill {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: rgba(var(--rgb-drone), 0.18);
+    border: 1px solid var(--color-drone);
+    color: var(--color-drone);
+    letter-spacing: 0.5px;
+  }
   .shortcuts-panel h3 {
     margin: 0 0 10px;
     display: flex;
@@ -1149,7 +1177,9 @@
     cursor: var(--cursor-grabbing) !important;
   }
   .scope-panel {
-    flex: 1.15 1 0;
+    flex: 0 0 clamp(360px, 28vw, 410px);
+    width: clamp(360px, 28vw, 410px);
+    max-width: 430px;
     min-width: 320px;
     background: var(--panel);
     border: 1px solid var(--eno-glow-border, var(--border));
@@ -1169,6 +1199,7 @@
     bottom: 0;
     width: auto;
     height: auto;
+    max-width: none;
     z-index: 9999;
     border-radius: 0;
     padding: 16px 22px;
@@ -1179,6 +1210,8 @@
     flex: 1;
     height: auto;
     min-height: 0;
+    max-height: none;
+    aspect-ratio: auto;
   }
   body.scope-fullscreen-open {
     overflow: hidden;
@@ -1199,8 +1232,8 @@
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
   .keyboard-panel {
-    flex: 1.15 1 0;
-    min-width: 360px;
+    flex: 2 1 0;
+    min-width: 380px;
     background: var(--panel);
     border: 1px solid var(--eno-glow-border, var(--border));
     border-radius: 6px;
@@ -1215,8 +1248,12 @@
     .upper-deck {
       flex-wrap: wrap;
     }
-    .scope-panel, .keyboard-panel {
-      flex: 1 1 45%;
+    .scope-panel {
+      flex: 1 1 360px;
+      max-width: 440px;
+    }
+    .keyboard-panel {
+      flex: 1 1 480px;
     }
     .chord-info-panel {
       flex: 0 0 270px;
@@ -1478,20 +1515,29 @@
     box-shadow: 0 0 6px rgba(var(--rgb-chord), 0.4);
   }
 
+  .scope-panel:not(.is-fullscreen) > .panel-header {
+    height: auto;
+    min-height: 28px;
+    flex-wrap: wrap;
+    row-gap: 6px;
+    column-gap: 6px;
+    padding-bottom: 6px;
+  }
   .scope-legend {
     display: flex;
     align-items: center;
-    gap: 8px;
-    flex-wrap: nowrap;
+    gap: 6px;
+    flex-wrap: wrap;
     min-width: 0;
+    margin-left: auto;
   }
   .legend-item {
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 12.5px;
+    font-size: 11.5px;
     font-weight: 800;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
     color: var(--text-secondary);
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     white-space: nowrap;
@@ -1505,8 +1551,10 @@
   }
 
   .scope-left-viz {
-    height: 290px;
-    min-height: 290px;
+    aspect-ratio: 4 / 3;
+    height: auto;
+    min-height: 250px;
+    max-height: 300px;
     position: relative;
     width: 100%;
     background: #050608;
@@ -3938,6 +3986,16 @@
       max-width: 100%;
       min-width: 0;
     }
+    .preset-bank-tabs {
+      align-self: flex-start;
+      margin-bottom: 2px;
+      padding: 2px;
+    }
+    .btn-bank-tab {
+      height: 28px;
+      padding: 0 10px;
+      font-size: 10.5px;
+    }
     .preset-group > .preset-label {
       display: flex;
       justify-content: space-between;
@@ -4033,6 +4091,7 @@
       width: 100%;
     }
     .global-transport > .btn-main-play,
+    .global-transport > .rec-ctrl-wrap,
     .global-transport > .btn-record,
     .global-transport > .btn-randomize-all {
       width: 100%;
@@ -4044,8 +4103,34 @@
       white-space: nowrap;
       overflow: hidden;
     }
+    .global-transport > .rec-ctrl-wrap {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      padding: 0;
+    }
+    .global-transport > .rec-ctrl-wrap > .btn-record {
+      flex: 1 1 0;
+      min-width: 0;
+      height: 40px;
+      padding: 0 3px;
+      font-size: 11px;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .global-transport > .rec-ctrl-wrap > .record-format-select {
+      flex: 0 0 auto;
+      width: 44px;
+      height: 40px;
+      padding: 0 2px;
+      font-size: 10px;
+      text-align: center;
+    }
     .global-transport, .mini-transport { --tr-icon: 18px; }
     /* "Stop & Save" is the longest label; tighten it so the dot never clips */
+    .global-transport > .rec-ctrl-wrap > .btn-record.recording,
+    .global-transport > .rec-ctrl-wrap > .btn-record:disabled,
     .global-transport > .btn-record.recording,
     .global-transport > .btn-record:disabled {
       gap: 4px;
@@ -5151,6 +5236,23 @@
       padding: 0 14px 14px;
       overscroll-behavior: contain;
     }
+    .manual-header {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--panel);
+      padding: 10px 0 6px;
+      margin: 0 0 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .manual-title {
+      font-size: 11.5px;
+    }
+    .manual-nav-btn {
+      padding: 6px 10px;
+      font-size: 11px;
+      min-height: 32px;
+    }
     .shortcuts-panel h3 {
       position: sticky;
       top: 0;
@@ -5301,13 +5403,21 @@
     /* ---- Keyboard ---- */
     /* Header row: title, AUTO/LIVE badge, OCT -/+. The "Keys A-K" hint and the
        octave range are desktop helpers (the keys are labelled themselves). */
-    .keyboard-panel > .keyboard-meta { height: auto; min-height: 34px; gap: 8px; padding-bottom: 8px; }
+    .keyboard-panel > .keyboard-meta {
+      height: auto;
+      min-height: 34px;
+      gap: 8px;
+      padding-bottom: 8px;
+      flex-wrap: wrap;
+    }
     .keyboard-hint { display: none; }
     .keyboard-panel-header { height: auto; min-width: 0; overflow: hidden; }
-    .keyboard-meta-controls { gap: 6px; }
+    .keyboard-meta-controls { gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .keyboard-view-toggle { height: 28px; padding: 2px; }
+    .btn-kb-view { height: 24px; padding: 0 6px; font-size: 9.5px; }
     .keyboard-panel .takeover-badge { font-size: 10px; height: 28px; padding: 0 8px; display: inline-flex; align-items: center; }
     .oct-controls { gap: 6px; }
-    .btn-oct { height: 32px; padding: 0 9px; font-size: 11px; border-radius: 4px; }
+    .btn-oct { height: 28px; padding: 0 8px; font-size: 10.5px; border-radius: 4px; }
     /* The full "Playable MIDI Keyboard" title only fits beside the controls on
        the widest phones; narrower ones show "MIDI Keyboard". */
     @media (max-width: 419px) {
@@ -5337,6 +5447,19 @@
       touch-action: none;
       -webkit-touch-callout: none;
       -webkit-user-select: none;
+    }
+    .piano-keys-wrapper.mode-radar {
+      height: clamp(90px, 26vw, 130px);
+      padding: 3px 2px;
+    }
+    .piano-keys-wrapper.mode-radar .white-key {
+      padding-bottom: 2px;
+      border-width: 0.5px;
+    }
+    .piano-keys-wrapper.mode-radar .key-label.octave-marker {
+      font-size: 7.5px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
     }
     .white-key { padding-bottom: 7px; min-width: 0; }
     .black-key { width: 5.6%; padding-bottom: 5px; }
@@ -13227,17 +13350,20 @@ function setKeyboardDisplayMode(mode) {
   const btnPlay = document.getElementById("btnKbPlay");
   const btnRadar = document.getElementById("btnKbRadar");
   const hintText = document.getElementById("keyboardHintText");
+  const octControls = document.querySelector(".keyboard-panel .oct-controls");
 
   if (mode === "88") {
     if (container) container.classList.add("mode-radar");
     if (btnPlay) btnPlay.classList.remove("active");
     if (btnRadar) btnRadar.classList.add("active");
     if (hintText) hintText.innerHTML = `Full-Range Radar (A0 - C8) · Multi-Voice Harmonic Radar`;
+    if (octControls) octControls.style.display = "none";
   } else {
     if (container) container.classList.remove("mode-radar");
     if (btnPlay) btnPlay.classList.add("active");
     if (btnRadar) btnRadar.classList.remove("active");
     if (hintText) hintText.innerHTML = `Keys A-K · <span id="valOctave">C${baseKeyboardOctave} - C${baseKeyboardOctave + 2}</span>`;
+    if (octControls) octControls.style.display = "";
   }
   buildKeyboard();
 }
@@ -15443,6 +15569,37 @@ function switchPresetBank(bank) {
   if (isUser) renderUserPatchSlots();
 }
 
+let userSlotLongPressTimer = null;
+let userSlotLongPressTriggered = false;
+
+function bindUserSlotLongPress() {
+  for (let i = 1; i <= 6; i++) {
+    const btn = document.getElementById(`btnUserSlot${i}`);
+    if (!btn || btn.dataset.longPressBound) continue;
+    btn.dataset.longPressBound = "1";
+
+    btn.addEventListener("touchstart", (e) => {
+      userSlotLongPressTriggered = false;
+      userSlotLongPressTimer = setTimeout(() => {
+        userSlotLongPressTriggered = true;
+        handleUserSlotContextMenu(e, i);
+      }, 550);
+    }, { passive: false });
+
+    btn.addEventListener("touchend", (e) => {
+      if (userSlotLongPressTimer) clearTimeout(userSlotLongPressTimer);
+      if (userSlotLongPressTriggered) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+
+    btn.addEventListener("touchcancel", () => {
+      if (userSlotLongPressTimer) clearTimeout(userSlotLongPressTimer);
+    });
+  }
+}
+
 function renderUserPatchSlots() {
   const patches = getUserPatches();
   for (let i = 1; i <= 6; i++) {
@@ -15457,9 +15614,14 @@ function renderUserPatchSlots() {
       btn.title = `Slot U${i} (Empty) — Click to store current soundscape`;
     }
   }
+  bindUserSlotLongPress();
 }
 
 function handleUserSlotClick(slotNum, event) {
+  if (userSlotLongPressTriggered) {
+    userSlotLongPressTriggered = false;
+    return;
+  }
   const patches = getUserPatches();
   const entry = patches[slotNum];
   const isShift = event && event.shiftKey;
