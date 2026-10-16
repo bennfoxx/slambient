@@ -1279,3 +1279,10 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
 
 
 
+
+## Update — 2026-10-16 (Mobile Portrait Header Refinements)
+
+- **Generative row**: `RANDOMIZE ALL` and `UNDO` now sit on the same level as two equal-width, 40px buttons in their own full-width row (Undo shows its label again).
+- **Utilities row**: Palette and `?` are split onto their own full-width row as two equal 40px buttons (Palette label restored; Install/Fullscreen share the row when available).
+- **Meter**: METER now has a full-width row (dropdown min 96px, 14px type, 32px cycle button) so the time signature is clearly legible; TEMPO takes its own full-width row below it.
+- **Record format dropdown**: MP3/WAV/STEMS is a custom dropdown (the native select is hidden), so the old selector never applied; the wrapper/trigger is now 40px tall to match START and RECORD.

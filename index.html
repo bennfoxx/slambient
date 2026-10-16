@@ -4396,13 +4396,28 @@
       border-radius: 4px;
     }
     .header-sec-transport > .rec-ctrl-wrap > .record-format-select {
-      flex: 0 0 46px;
-      width: 46px;
+      flex: 0 0 62px;
+      width: 62px;
       height: 40px;
       padding: 0 2px;
-      font-size: 10.5px;
+      font-size: 11px;
       font-weight: 700;
       text-align: center;
+      border-radius: 4px;
+    }
+    /* Custom dropdown that replaces the native format <select>: same height as
+       the Start / Record buttons */
+    .header-sec-transport > .rec-ctrl-wrap > .custom-dropdown-wrap {
+      flex: 0 0 64px;
+      width: 64px;
+      height: 40px;
+      align-self: stretch;
+    }
+    .header-sec-transport > .rec-ctrl-wrap > .custom-dropdown-wrap .custom-dropdown-trigger {
+      height: 40px;
+      padding: 0 8px;
+      gap: 4px;
+      font-size: 12px;
       border-radius: 4px;
     }
     /* Row 2: SAMPLE and MIDI share the second row */
@@ -4457,11 +4472,11 @@
       border-radius: 4px;
     }
 
-    /* SECTION 2: Harmony & Master Clock (Full Width, 2 Symmetrical Rows) */
+    /* SECTION 2: Harmony & Master Clock (Full Width, 3 Symmetrical Rows) */
     .header-sec-harmony {
       grid-column: 1 / -1;
       display: grid;
-      grid-template-columns: minmax(0, 115px) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr);
       gap: 6px;
       padding: 6px 8px;
     }
@@ -4472,7 +4487,7 @@
       align-items: center;
       gap: 6px;
       width: 100%;
-      height: 36px;
+      height: 40px;
       padding: 0 6px;
       box-sizing: border-box;
     }
@@ -4484,39 +4499,44 @@
     #wrap_topRootKey { flex: 0 0 62px; }
     #wrap_topScaleMode { flex: 1 1 auto; min-width: 0; }
 
-    /* Row 2: METER (left) and TEMPO (right) */
+    /* Row 2: METER -- full width so the time signature is large and readable */
     .header-sec-harmony > .time-sig-ctrl {
-      grid-column: 1;
+      grid-column: 1 / -1;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
       width: 100%;
-      height: 36px;
-      padding: 0 4px;
+      height: 40px;
+      padding: 0 6px;
       box-sizing: border-box;
       min-width: 0;
     }
     .time-sig-ctrl .tag {
       font-size: 10px;
-      letter-spacing: 0.5px;
+      letter-spacing: 1px;
       flex: 0 0 auto;
     }
-    #wrap_selTimeSig { flex: 1 1 auto; min-width: 0; }
+    #wrap_selTimeSig { flex: 1 1 auto; min-width: 96px; }
+    #wrap_selTimeSig .custom-dropdown-trigger {
+      font-size: 14px;
+      letter-spacing: 0.5px;
+    }
     .time-sig-ctrl .btn-meter-cycle {
-      flex: 0 0 28px;
-      width: 28px;
-      height: 28px;
+      flex: 0 0 32px;
+      width: 32px;
+      height: 32px;
       padding: 0;
     }
-    .time-sig-ctrl .btn-meter-cycle svg { width: 14px; height: 14px; }
+    .time-sig-ctrl .btn-meter-cycle svg { width: 16px; height: 16px; }
 
+    /* Row 3: TEMPO -- full width slider */
     .header-sec-harmony > .tempo-ctrl {
-      grid-column: 2;
+      grid-column: 1 / -1;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       width: 100%;
-      height: 36px;
+      height: 40px;
       padding: 0 6px;
       box-sizing: border-box;
       min-width: 0;
@@ -4546,90 +4566,98 @@
       border-radius: 3px;
     }
 
-    /* SECTION 4: Generative Engine (Left half of Row 3) */
+    /* SECTION 4: Generative Engine -- its own full-width row, RANDOMIZE ALL + UNDO
+       side by side at the same height / level */
     .header-sec-gen {
-      grid-column: 1;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 6px;
+      grid-column: 1 / -1;
+      height: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: stretch;
+      gap: 6px;
+      padding: 6px;
       box-sizing: border-box;
     }
-    .header-sec-gen > .btn-randomize-all {
-      flex: 1 1 auto;
+    .header-sec-gen > .btn-randomize-all,
+    .header-sec-gen > .btn-header-util {
+      width: 100%;
       min-width: 0;
-      height: 32px;
+      height: 40px;
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.4px;
-      padding: 0 6px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
       white-space: nowrap;
       overflow: hidden;
       border-radius: 4px;
+      box-sizing: border-box;
     }
-    .header-sec-gen > .btn-randomize-all svg { width: 14px; height: 14px; flex-shrink: 0; }
-    .header-sec-gen > .btn-header-util {
-      flex: 0 0 32px;
-      width: 32px;
-      height: 32px;
-      padding: 0;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-    }
-    .header-sec-gen > .btn-header-util span { display: none; }
-    .header-sec-gen > .btn-header-util svg { width: 14px; height: 14px; }
+    .header-sec-gen > .btn-randomize-all svg,
+    .header-sec-gen > .btn-header-util svg { width: 14px; height: 14px; flex-shrink: 0; }
+    /* the <=1200px rule hides button labels -- bring the Undo label back */
+    .header-sec-gen > #btnUndoPatch > span { display: inline !important; }
 
-    /* SECTION 3: Workspace & System Utilities (Right half of Row 3) */
+    /* SECTION 3: Workspace & System Utilities -- its own full-width row,
+       PALETTE + ? as two equal buttons */
     .header-sec-utils {
-      grid-column: 2;
-      height: 40px;
+      grid-column: 1 / -1;
+      height: auto;
       display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 4px;
-      padding: 4px 6px;
+      align-items: stretch;
+      justify-content: stretch;
+      gap: 6px;
+      padding: 6px;
       box-sizing: border-box;
       margin-left: 0;
       width: 100%;
     }
     .header-sec-utils > .palette-wrap {
-      flex: 1 1 auto;
+      flex: 1 1 0;
       min-width: 0;
-      height: 32px;
+      height: 40px;
     }
     .header-sec-utils > .palette-wrap > .btn-header-util {
       width: 100%;
-      height: 32px;
-      padding: 0 6px;
+      height: 40px;
+      padding: 0 8px;
       border-radius: 4px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
     }
+    .header-sec-utils > .palette-wrap > .btn-header-util > span:not(.pal-btn-dots) { display: inline !important; }
     .header-sec-utils .btn-header-help {
-      flex: 0 0 32px;
-      width: 32px;
-      height: 32px;
-      font-size: 14px;
+      flex: 1 1 0;
+      width: auto;
+      min-width: 0;
+      height: 40px;
+      font-size: 16px;
       font-weight: 700;
       padding: 0;
       border-radius: 4px;
     }
     .header-sec-utils #btnAppFullscreen {
-      flex: 0 0 32px;
-      width: 32px;
-      height: 32px;
+      flex: 0 0 40px;
+      width: 40px;
+      height: 40px;
       padding: 0;
       border-radius: 4px;
     }
     .header-sec-utils #btnAppFullscreen span { display: none; }
+    .header-sec-utils .btn-install-app {
+      flex: 1 1 0;
+      min-width: 0;
+      height: 40px;
+      border-radius: 4px;
+    }
     .header-sec-utils .pal-btn-dots { grid-template-columns: repeat(2, 6px); }
     .header-sec-utils .pal-btn-dots i { width: 6px; height: 6px; }
     /* iPhone Safari has no Fullscreen API for pages (class set from JS) */
