@@ -859,10 +859,13 @@ Still unverified on a real iPhone: phone portrait layout, orb sheet width, silen
      - Connected `readFractalBandEnergy` to `sampleAnalyserForFrame(analyser)` to reuse cached FFT data without extra Web Audio API calls.
      - Dynamic frame governor (`FRACTAL_FRAME_BUDGET_MS = 10`, buffer width `180` to `400`) automatically maintains 60fps across mobile and desktop.
 
-4. **Header Bar & Eno Pod Landscape Alignment Fix**:
-   - **Root Cause**: On mobile landscape (844px–932px viewport width), the desktop layout applies `zoom: 0.75` on `html`. `.header-bar-wrapper` uses `display: flex; align-items: stretch;`, naturally stretching `header.top-bar` and `.master-vol-pod` across the cross axis. However, `syncEnoPodSquare()` previously read `topBar.offsetHeight` (which truncates fractional pixels under CSS `zoom`) and stamped `pod.style.height = h + "px"`, conflicting with flexbox cross-axis stretching and causing vertical misalignment of Eno pod's top and bottom borders relative to the master volume pod and header card.
-   - **Fix**:
-     - Updated `.eno-standalone-pod` CSS with `align-self: stretch; height: auto; aspect-ratio: 1 / 1; width: auto;`. Modern WebKit naturally derives the width from the stretched flex height with exact subpixel precision without requiring JS inline style intervention.
-     - Updated `syncEnoPodSquare()` to defer to native `aspect-ratio` support (`window.CSS && CSS.supports("aspect-ratio", "1 / 1")`), and fallback to `getBoundingClientRect().height` for subpixel accuracy on legacy browsers.
+4. **Scope Render Loop Restoration & Eno Pod Landscape Alignment**:
+   - **Scope Render Loop (`drawScope`)**:
+     - Restored `const { w, h, cx, cy } = updateCanvasDimensions();` in `drawScope()` which was inadvertently omitted in a previous edit, resolving an uncaught `ReferenceError: w is not defined` that had temporarily halted the canvas requestAnimationFrame loop (black visualizer and inactive chord wheel).
+   - **Eno Pod Landscape Sizing & Alignment**:
+     - In `syncEnoPodSquare()`, measured `getTargetH()` as `Math.max(topBar.getBoundingClientRect().height, masterVol.getBoundingClientRect().height)` so the Eno pod matches the true stretched height of `.header-bar-wrapper` (which expands to fit the taller of the two header elements).
+     - Applied explicit `flex: 0 0 ${h}px`, `width: ${h}px`, and `height: ${h}px` with a 2-pass layout check to detect and adapt if assigning the width triggers transport row wrapping in `header.top-bar`.
+     - Attached `ResizeObserver` to both `header.top-bar` and `.master-vol-pod` to guarantee instantaneous, subpixel-accurate re-synchronization across orientations and resizes without squishing.
+
 
 

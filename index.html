@@ -3186,10 +3186,6 @@
     border: 1px solid var(--eno-glow-border, var(--border-light));
     border-radius: 6px;
     padding: 8px 10px;
-    align-self: stretch;
-    height: auto;
-    aspect-ratio: 1 / 1;
-    width: auto;
     box-sizing: border-box;
     flex-shrink: 0;
     min-height: 0;
@@ -12140,6 +12136,7 @@ function drawScope(ts) {
 
   if (scopeCanvasVisible || scopeFullscreen) {
     updateWaterfallSpectrogram();
+    const { w, h, cx, cy } = updateCanvasDimensions();
     if (arcadeActive) {
       scopeCtx.fillStyle = "#0c0d11"; scopeCtx.fillRect(0, 0, w, h);
       drawArcadeGame(w, h, ts || now);
@@ -16552,38 +16549,56 @@ if (document.readyState === "loading") {
 // width to match exactly. Re-synced on load/resize since the header's
 // natural height (and therefore the pod's stretched height) can change
 // when the transport row wraps at narrower widths.
+let isSyncingEno = false;
 function syncEnoPodSquare() {
+  if (isSyncingEno) return;
   const pod = document.querySelector(".eno-standalone-pod");
   if (!pod) return;
-  // Modern browsers natively resolve aspect-ratio with flex stretch at subpixel precision
-  if (window.CSS && CSS.supports && CSS.supports("aspect-ratio", "1 / 1")) {
-    pod.style.width = "";
-    pod.style.height = "";
-    return;
-  }
   if (window.matchMedia && window.matchMedia("(max-width: 640px)").matches) {
     pod.style.width = "";
     pod.style.height = "";
+    pod.style.flex = "";
     return;
   }
   const topBar = document.querySelector("header.top-bar");
-  if (topBar) {
-    const h = topBar.getBoundingClientRect().height;
+  if (!topBar) return;
+
+  isSyncingEno = true;
+  try {
+    const masterVol = document.querySelector(".master-vol-pod");
+    const getTargetH = () => {
+      const h1 = topBar ? topBar.getBoundingClientRect().height : 0;
+      const h2 = masterVol ? masterVol.getBoundingClientRect().height : 0;
+      return Math.round(Math.max(h1, h2));
+    };
+
+    let h = getTargetH();
     if (h > 0) {
-      pod.style.height = h + "px";
       pod.style.width = h + "px";
-    } else {
-      pod.style.height = "";
-      pod.style.width = "";
+      pod.style.height = h + "px";
+      pod.style.flex = "0 0 " + h + "px";
+
+      // Re-verify after width assignment in case topBar's transport row wrapped/unwrapped
+      const hNext = getTargetH();
+      if (hNext > 0 && Math.abs(hNext - h) > 1) {
+        pod.style.width = hNext + "px";
+        pod.style.height = hNext + "px";
+        pod.style.flex = "0 0 " + hNext + "px";
+      }
     }
-  } else {
-    pod.style.width = "auto";
-    const h = pod.getBoundingClientRect().height;
-    if (h > 0) pod.style.width = h + "px";
+  } finally {
+    isSyncingEno = false;
   }
 }
 window.addEventListener("load", syncEnoPodSquare);
 window.addEventListener("resize", syncEnoPodSquare);
+if (typeof ResizeObserver !== "undefined") {
+  const topBarEl = document.querySelector("header.top-bar");
+  const masterVolEl = document.querySelector(".master-vol-pod");
+  const ro = new ResizeObserver(() => syncEnoPodSquare());
+  if (topBarEl) ro.observe(topBarEl);
+  if (masterVolEl) ro.observe(masterVolEl);
+}
 if (document.readyState === "loading") {
   window.addEventListener("DOMContentLoaded", syncEnoPodSquare);
 } else {
