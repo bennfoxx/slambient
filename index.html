@@ -4,6 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
 <title>Slambient — Generative Ambient Instrument</title>
+<meta name="description" content="Generative ambient music synthesizer, tape drone, and polyrhythmic instrument">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#07080c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Slambient">
+<meta name="application-name" content="Slambient">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <!-- The UI leans on Mac-only system fonts (ui-monospace/SFMono-Regular/Menlo) for
      almost every label. They look right on the machine this was built on, but a
      friend on Windows/Linux/Android has none of them installed and falls back to
@@ -67,6 +81,8 @@
     zoom: 0.75;
     background-color: var(--bg);
     cursor: var(--cursor-default);
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
@@ -86,6 +102,8 @@
     gap: 14px;
     -webkit-font-smoothing: antialiased;
     cursor: var(--cursor-default);
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   button, a, select, input, label,
@@ -3518,6 +3536,7 @@
      above 640px, hence the division. env() is 0 on desktops. */
   @media (min-width: 641px) {
     body {
+      padding-top: max(16px, calc(env(safe-area-inset-top) / 0.75));
       padding-left: max(22px, calc(env(safe-area-inset-left) / 0.75));
       padding-right: max(22px, calc(env(safe-area-inset-right) / 0.75));
       padding-bottom: max(16px, calc(env(safe-area-inset-bottom) / 0.75));
@@ -3550,8 +3569,8 @@
     body {
       min-height: 100vh;
       min-height: 100dvh;
-      /* bottom padding leaves room for the floating mini transport bar */
-      padding: 10px max(10px, env(safe-area-inset-right)) calc(16px + 64px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+      /* bottom padding leaves room for the floating mini transport bar, top padding respects notch */
+      padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) calc(16px + 64px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
       gap: 12px;
       overflow-x: hidden;
       overflow-x: clip;
@@ -5307,6 +5326,10 @@
             <span>Undo</span>
           </button>
           <button class="btn-header-util btn-header-help" id="btnShortcuts" onclick="toggleShortcutsPanel()" title="Keyboard shortcuts (?)">?</button>
+          <button class="btn-header-util btn-install-app" id="btnInstallApp" onclick="installAppPrompt()" title="Install Slambient as App" style="display: none;">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2V10M8 10L5 7M8 10L11 7M2 13H14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Install</span>
+          </button>
           <button class="btn-header-util" id="btnAppFullscreen" onclick="toggleAppFullscreen()" title="Full screen">
             <svg class="icon-enter-fs" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <svg class="icon-exit-fs" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -7288,6 +7311,32 @@ function scheduleAudioClockFallback() {
   } catch (e) {}
 }
 
+// Screen Wake Lock (Keeps display awake during active generative sessions)
+let wakeLockSentinel = null;
+
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try {
+    if (!wakeLockSentinel) {
+      wakeLockSentinel = await navigator.wakeLock.request('screen');
+      wakeLockSentinel.addEventListener('release', () => {
+        wakeLockSentinel = null;
+      });
+    }
+  } catch (err) {
+    wakeLockSentinel = null;
+  }
+}
+
+async function releaseWakeLock() {
+  if (wakeLockSentinel) {
+    try {
+      await wakeLockSentinel.release();
+    } catch (err) {}
+    wakeLockSentinel = null;
+  }
+}
+
 // Create the audio engine if needed and make sure it is running. Call it from a
 // tap/click/key handler: phone browsers only let a page start or resume audio
 // from inside a gesture (the Invaders game uses it, so its sounds work even
@@ -7313,6 +7362,7 @@ document.addEventListener("visibilitychange", () => {
   }
   enableMediaPlaybackSession();
   if (isPlaying && audioCtx && audioCtx.state !== "running") audioCtx.resume().catch(() => {});
+  if (isPlaying) requestWakeLock();
 });
 
 function initAudio() {
@@ -14662,6 +14712,7 @@ function togglePlay() {
     triggerCurrentChord();
     startSessionTimer();
     midiSubSync();
+    requestWakeLock();
 
     // Anti-click soft attack envelope on Drone & Sub-Bass
     if (audioCtx) {
@@ -14684,6 +14735,7 @@ function togglePlay() {
     stopAudioClockFallback();
     stopSessionTimer();
     midiAllNotesOff();
+    releaseWakeLock();
     if (typeof roadsideObjects !== "undefined") roadsideObjects.length = 0;
 
     // Anti-click soft release envelope on Drone & Sub-Bass before full stop
@@ -15286,6 +15338,9 @@ function buildShortcutsPanel() {
       ${row("Move", ["←", "→"])}
       ${row("Fire / start", ["Space"])}
       ${row("Quit game", ["Esc"])}
+      <h4>App & Mobile</h4>
+      ${row("Install to device", ["Share ➔ Add to Home Screen / Install"])}
+      ${row("Screen Wake Lock", ["Automatic during playback"])}
     </div>`;
   ov.addEventListener("pointerdown", (e) => { if (e.target === ov) toggleShortcutsPanel(false); });
   document.body.appendChild(ov);
@@ -18341,6 +18396,66 @@ window.addEventListener("keydown", (e) => {
   const fv = $("knobFieldVol"); if (fv) S.level = parseInt(fv.value, 10) / 100;
   updateUI();
 })();
+
+// =====================================================================
+// PWA & SERVICE WORKER INSTALLATION PIPELINE
+// =====================================================================
+let deferredInstallPrompt = null;
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then((reg) => {
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        if (newWorker) {
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('[Slambient PWA] New version ready for offline caching.');
+            }
+          });
+        }
+      });
+    }).catch((err) => {
+      console.warn('[Slambient PWA] Service Worker registration failed:', err);
+    });
+  });
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const btn = document.getElementById('btnInstallApp');
+  if (btn) btn.style.display = 'inline-flex';
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  const btn = document.getElementById('btnInstallApp');
+  if (btn) btn.style.display = 'none';
+  if (typeof flashStatus === 'function') flashStatus('APP INSTALLED');
+});
+
+function installAppPrompt() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then((choice) => {
+      if (choice && choice.outcome === 'accepted') {
+        deferredInstallPrompt = null;
+        const btn = document.getElementById('btnInstallApp');
+        if (btn) btn.style.display = 'none';
+      }
+    });
+  } else {
+    // For iOS or browsers without beforeinstallprompt support
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    if (isIOS) {
+      alert("To install Slambient on your iOS device: tap the Share button in Safari, then select 'Add to Home Screen'.");
+    } else {
+      alert("To install Slambient: use your browser's menu (three dots / address bar icon) and select 'Install Slambient' or 'Add to Home screen'.");
+    }
+  }
+}
+window.installAppPrompt = installAppPrompt;
 </script>
 </body>
 </html>
