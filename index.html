@@ -5166,21 +5166,21 @@
         <div class="preset-group">
           <span class="preset-label">PRESETS</span>
           <div class="preset-bar">
-            <button class="btn-preset-chip" onclick="applyPreset(0)" title="Nostalgic Drift">Nostalgia</button>
-            <button class="btn-preset-chip" onclick="applyPreset(1)">Organic</button>
-            <button class="btn-preset-chip" onclick="applyPreset(2)">Shimmer</button>
-            <button class="btn-preset-chip" onclick="applyPreset(3)">Hauntology</button>
-            <button class="btn-preset-chip" onclick="applyPreset(4)" title="Velvet Horizon">Velvet</button>
-            <button class="btn-preset-chip" onclick="applyPreset(5)">Pale Bloom</button>
-            <button class="btn-preset-chip" onclick="applyPreset(6)">Green</button>
-            <button class="btn-preset-chip" onclick="applyPreset(7)" title="Khan Lineage — Indian Classical Raga">Lineage</button>
-            <button class="btn-preset-chip" onclick="applyPreset(8)">After Hours</button>
-            <button class="btn-preset-chip" onclick="applyPreset(9)">Airports</button>
-            <button class="btn-preset-chip" onclick="applyPreset(10)">Twin Peaks</button>
-            <button class="btn-preset-chip" onclick="applyPreset(11)" title="Aphex Twin — IDM breakbeats, eerie glass pads, Delay ➔ Filter ➔ Space at 48% feedback">Twinning</button>
-            <button class="btn-preset-chip" onclick="applyPreset(12)" title="Berlin School sequences, pulsing arpeggiators, Filter ➔ Delay ➔ Space cathedral sweeps">Tangerine</button>
-            <button class="btn-preset-chip" onclick="applyPreset(13)" title="Disintegrating tape loops, pitch drift, Space ➔ Delay ➔ Filter dark low-pass repeats">Disintegration</button>
-            <button class="btn-preset-chip" onclick="applyPreset(14)" title="Boom-bap swing, dusty Rhodes chords, rain/vinyl texture, Filter ➔ Delay ➔ Space warmth">Chillhop</button>
+            <button class="btn-preset-chip" onclick="applyPreset(0)" title="Nostalgic Drift — 7/4 warm tape pads, music box arp, drifting sub">Nostalgia</button>
+            <button class="btn-preset-chip" onclick="applyPreset(1)" title="Organic Glitch — 5/8 intricate woodblocks, lofi keys, kalimba pendulum">Organic</button>
+            <button class="btn-preset-chip" onclick="applyPreset(2)" title="Shimmer Cascade — 7/8 Lydian string swells, glass FM chimes, cathedral wash">Shimmer</button>
+            <button class="btn-preset-chip" onclick="applyPreset(3)" title="Hauntological Tape — 5/4 Aeolian dub echo, tape flutter, chamber woods">Hauntology</button>
+            <button class="btn-preset-chip" onclick="applyPreset(4)" title="Velvet Horizon — 4/4 Major 9 celestial organ, water droplet arp, deep sub">Velvet</button>
+            <button class="btn-preset-chip" onclick="applyPreset(5)" title="Pale Bloom — 3/4 Major Pentatonic minimal clicks, celesta, pizzicato strings">Pale Bloom</button>
+            <button class="btn-preset-chip" onclick="applyPreset(6)" title="Kankyō Green — 4/4 Hirajoshi pure glass tones, crystal chimes, subtle pulse">Green</button>
+            <button class="btn-preset-chip" onclick="applyPreset(7)" title="Khan Lineage — 7/4 Rupak Tala classical tabla, sitar meend, tanpura drone">Lineage</button>
+            <button class="btn-preset-chip" onclick="applyPreset(8)" title="After Hours — 4/4 Dorian deep groove, electric tine keys, dotted-eighth dub delay">After Hours</button>
+            <button class="btn-preset-chip" onclick="applyPreset(9)" title="Airports — 4/4 Lydian tape loops, pure mineral glass, cathedral diffusion">Airports</button>
+            <button class="btn-preset-chip" onclick="applyPreset(10)" title="Douglas Firs — 4/4 Aeolian noir vibraphone chime, slow sub hum, cathedral reverb">Douglas Firs</button>
+            <button class="btn-preset-chip" onclick="applyPreset(11)" title="Twinning — 7/8 Hirajoshi breakbeats, glass FM cascades, Delay ➔ Filter ➔ Space">Twinning</button>
+            <button class="btn-preset-chip" onclick="applyPreset(12)" title="Tangerine — 4/4 Berlin School sequences, analog pulse arp, Filter ➔ Delay ➔ Space">Tangerine</button>
+            <button class="btn-preset-chip" onclick="applyPreset(13)" title="Disintegration — 3/4 tape loops, pitch drift, Space ➔ Delay ➔ Filter dark repeats">Disintegration</button>
+            <button class="btn-preset-chip" onclick="applyPreset(14)" title="Chillhop — 4/4 boom-bap pocket, dusty tine keys, rain crackle, tape warmth">Chillhop</button>
           </div>
         </div>
 
@@ -5332,13 +5332,13 @@
       <button class="master-vol-mute" id="btnMasterMute" onclick="toggleMasterMute()" title="Mute Master Output">M</button>
     </div>
 
-    <div class="eno-standalone-pod" onclick="toggleEnoPhosphor()" title="MU-TH-UR 6000 // ENO, B. (Click to cycle primary color)">
+    <div class="eno-standalone-pod" onclick="toggleEnoPhosphor()" title="S.L.A.M. 6000 // CORE MESH (Click to cycle primary phosphor)">
       <div class="eno-crt-screen">
         <span class="eno-bio-scan-label">Bio-Scan</span>
         <canvas id="enoWidgetCanvas" width="96" height="96"></canvas>
       </div>
       <div class="eno-crt-meta">
-        <span class="eno-sub" id="lblEnoPhos">ENO · Y</span>
+        <span class="eno-sub" id="lblEnoPhos">SLAM · Y</span>
       </div>
     </div>
   </div>
@@ -5412,7 +5412,7 @@
               </svg>
             </button>
 
-            <button class="btn-layer-toggle layer-arcade" id="btnToggleArcade" onclick="toggleArcadeGame()" title="Arcade: Space Invaders (← → move, Space fire, Esc quit)">
+            <button class="btn-layer-toggle layer-arcade" id="btnToggleArcade" onclick="toggleArcadeGame()" title="Arcade: Void Raiders (← → move, Space fire, Esc quit)">
               <svg width="18" height="15" viewBox="0 0 18 15" fill="none">
                 <rect x="0.5" y="0.5" width="17" height="14" rx="2" stroke="rgba(46,213,115,0.5)" stroke-width="1"/>
                 <path d="M6 3h1v1h-1zM11 3h1v1h-1zM7 4h4v1h-4zM6 5h6v1h-6zM5 6h2v1h-2zM8 6h2v1h-2zM11 6h2v1h-2zM4 7h10v1h-10zM4 8h1v1h-1zM6 8h6v1h-6zM13 8h1v1h-1zM4 9h1v1h-1zM6 9h1v1h-1zM11 9h1v1h-1zM13 9h1v1h-1zM7 10h1v1h-1zM10 10h1v1h-1z" fill="#2ed573"/>
@@ -5777,11 +5777,11 @@
           <option value="CHAMBER_WOODS">Chamber Woods &amp; Flute (Pastoral Mellotron)</option>
           <option value="CELESTIAL_ORGAN">Celestial Flute Organ (Cathedral / Frahm)</option>
           <option value="VIBES_CELESTE">Vibraphone &amp; Celesta (Acoustic Chime)</option>
-          <option value="RHODES">Rhodes Electric Piano (Tine Bark + Tremolo)</option>
-          <option value="GLASS_EP">DX7 Electric Piano (Glass Tines)</option>
+          <option value="RHODES">Vintage Tine EP (Bark + Tremolo)</option>
+          <option value="GLASS_EP">FM Bell Tines (Digital Glass)</option>
           <option value="LOFI_KEYS">Lofi Wobbly Tape Keys (Vintage)</option>
-          <option value="DIGITAL_STRINGS">Solina Digital Strings (Shimmer)</option>
-          <option value="SAW_SYNTH">Juno Saw Synth (Biting 80s)</option>
+          <option value="DIGITAL_STRINGS">Analog String Ensemble (Shimmer)</option>
+          <option value="SAW_SYNTH">Alpha Saw Synth (Biting 80s)</option>
         </select>
       </div>
       <div class="control-row">
@@ -15787,10 +15787,10 @@ window.addEventListener("keydown", (e) => {
 })(typeof window !== 'undefined' ? window : globalThis);
 
 const ENO_PHOSPHORS = [
-  { name: "ENO · Y",   color: "#fed330" },
-  { name: "ENO · G",   color: "#2ed573" },
-  { name: "ENO · P",   color: "#a855f7" },
-  { name: "ENO · W",   color: "#ffffff" },
+  { name: "SLAM · Y",  color: "#fed330" },
+  { name: "SLAM · G",  color: "#2ed573" },
+  { name: "SLAM · P",  color: "#a855f7" },
+  { name: "SLAM · W",  color: "#ffffff" },
 ];
 let enoPhosIndex = 0;
 let enoHeadController = null;
