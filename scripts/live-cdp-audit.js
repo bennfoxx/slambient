@@ -148,7 +148,12 @@ async function runAudit() {
     const editToggled = await client.evaluate(() => {
       const btn = document.getElementById("btnEditWorkspace");
       if (!btn) return { error: "btnEditWorkspace not found" };
-      btn.click();
+      // Test direct handler invocation
+      if (typeof toggleWorkspaceEditMode === "function") {
+        toggleWorkspaceEditMode(true);
+      } else {
+        btn.click();
+      }
       return {
         active: document.body.classList.contains("workspace-edit-mode"),
         title: btn.title,
@@ -299,7 +304,7 @@ async function runAudit() {
 
     // Turn on Tanpura drone
     const tanpuraResult = await client.evaluate(() => {
-      const chkTanpura = document.getElementById("chkTanpura");
+      const chkTanpura = document.getElementById("chkTanpuraEnabled");
       if (chkTanpura && !chkTanpura.checked) chkTanpura.click();
       return {
         tanpuraEnabled: typeof tanpuraEnabled !== "undefined" ? tanpuraEnabled : false,

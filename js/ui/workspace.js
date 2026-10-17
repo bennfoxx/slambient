@@ -524,6 +524,10 @@
 
     // 10. Edit Mode Toggle
     toggleEditMode(force) {
+      const now = performance.now();
+      if (this._lastToggleTs && now - this._lastToggleTs < 150) return;
+      this._lastToggleTs = now;
+
       const active = typeof force === "boolean" ? force : !this.state.editMode;
       this.state.editMode = active;
       document.body.classList.toggle("workspace-edit-mode", active);
