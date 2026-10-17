@@ -1901,6 +1901,16 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Added both modules to `PRECACHE_URLS` in `sw.js` and bumped offline cache to `slambient-v12`.
   - `index.html` reduced by another 553 lines down to **7,663 lines**.
 
+## Update — 2026-10-16 (Decoupling 3D Eno Head Visualizer into js/ui/visualizers.js)
+
+- **Extracted Module**:
+  - `js/ui/visualizers.js` (594 lines): 3D wireframe Eno Head visualizer engine, audio-reactive amplitude modulation, rotating projection matrix, phosphor color switching (`ENO_PHOSPHORS`, `setEnoPhosphor`, `toggleEnoPhosphor`), CRT glow updating (`updateHeaderEnoGlow`), and pod layout square sizing (`syncEnoPodSquare`).
+- **index.html & PWA Sync**:
+  - Linked `<script src="js/ui/visualizers.js"></script>`.
+  - Added to `PRECACHE_URLS` in `sw.js` and bumped offline cache to `slambient-v13`.
+  - `index.html` reduced by another 592 lines down to **7,071 lines** (71% code reduction from the original 24,200+ line document).
+
+
 
 
 
