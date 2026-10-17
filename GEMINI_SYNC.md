@@ -1660,3 +1660,31 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
     - **Phase 5 (Agent 2: Mobile UX Architecture Overhaul)**: Macro Overview (2-column ~110px compact summary tiles with Name, Power, 15-char preset, LED/meter) vs. Micro Inspect Sheet (`max-height: 85dvh` bottom drawer with "Back to Rack" button), plus Master Out modular signal-chain reordering pass.
     - **Phase 6 (Experimental Staging Branches)**: `experiment/scale-tied-voicings` (scale-coupled chord voicing profiles), `experiment/midi-file-recorder` (multi-track Standard MIDI File Type 1 in-browser exporter), and `experiment/accompaniment-mode` (interactive live harmonic follower accompaniment).
   - All mobile adjustments enforced strictly under `@media (max-width: 768px)` with zero regression to desktop layout.
+
+## Update — 2026-10-16 (Phase 4 / Track 1 Mobile UI Bugs & QoL Fixes Completed)
+
+- **Viewport & Touch Zoom Lockdown**:
+  - Configured `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">`.
+  - Applied `touch-action: manipulation; overscroll-behavior: none;` on `html, body`.
+  - Scoped scrolling on `.lower-deck` with `overscroll-behavior: contain`.
+  - Set `touch-action: pan-y;` on scrollable card containers and `touch-action: none;` strictly on interactive knobs, sliders, pads, and drag handles.
+- **Mobile Header Centering & Brand Balancing**:
+  - Centered `.brand-group`, `.app-title`, and `.app-sub` under `@media (max-width: 640px)` for true symmetrical alignment.
+- **Shortcuts Modal (`?`) Anchor Offset**:
+  - Anchored `.shortcuts-overlay` top edge to static coordinate `align-items: flex-start; padding-top: max(20px, env(safe-area-inset-top)); backdrop-filter: blur(5px);`.
+  - Capped `.shortcuts-panel { max-height: min(88vh, calc(100dvh - 48px)); }`, preventing vertical jumping across tabs.
+- **Playable MIDI Keyboard Header Consistency**:
+  - Locked `.keyboard-panel > .keyboard-meta` to `min-height: 44px; font-variant-numeric: tabular-nums;` on mobile.
+  - Replaced `display: none / ""` with `visibility: hidden / visible` and `pointer-events: none / auto` on `octControls` so switching between 25-Key Play and 88-Key Radar mode does not cause header height twitching or layout shift.
+- **User Preset Name Ellipsis & 15-Character Cap**:
+  - Enforced 15-character hard limit via `.slice(0, 15)` in both `handleUserSlotClick` (initial save prompt) and `handleUserSlotContextMenu` (rename prompt).
+  - Added CSS truncation (`max-width: 130px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;`) on `.btn-preset-chip.user-slot-chip`.
+- **Modular View Header Actions No-Wrap**:
+  - Set `flex-wrap: nowrap !important; flex-shrink: 0 !important;` on `.panel-header-actions` to prevent randomize/mute buttons from breaking onto separate lines on compact cards.
+- **Unresponsive Touch Module Switching Buttons**:
+  - Added `initTouchViewSwitchers()` binding `pointerup` handlers with touch event consumption on `btnViewOrbital`, `btnViewConsole`, `btnOrbitalBack`, `btnOrbitalPrev`, and `btnOrbitalNext` to eliminate 300ms mobile tap delays and unresponsive clicks.
+- **Analyzer Frozen on Auto-Play Switch**:
+  - Cleared `lastChordWheelSignature = ""` inside `isDownbeat` when `isManualChordActive` clears to `AUTO`, forcing immediate redraw of the chord wheel and harmonic readouts upon timeout.
+- **Fullscreen Visualizer Delayed Bounds Recalculation**:
+  - Added 150ms delayed bounds recalculation (`setTimeout(() => { cachedScopeW = 0; cachedScopeH = 0; if (typeof updateCanvasDimensions === "function") updateCanvasDimensions(); }, 150);`) in `toggleScopeFullscreen` to allow CSS transitions to finish before recalculating canvas dimensions.
+

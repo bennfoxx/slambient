@@ -7228,11 +7228,11 @@
     /* Header row: title, AUTO/LIVE badge, OCT -/+. The "Keys A-K" hint and the
        octave range are desktop helpers (the keys are labelled themselves). */
     .keyboard-panel > .keyboard-meta {
-      height: auto;
-      min-height: 34px;
+      min-height: 44px;
       gap: 8px;
       padding-bottom: 8px;
       flex-wrap: wrap;
+      font-variant-numeric: tabular-nums;
     }
     .keyboard-hint { display: none; }
     .keyboard-panel-header { height: auto; min-width: 0; overflow: hidden; }
@@ -13396,6 +13396,7 @@ function clockTick() {
         isManualChordActive = false;
         liveActiveChord = null;
         customArpPool = null;
+        lastChordWheelSignature = "";
         const badge = document.getElementById("hudTakeover");
         if (badge) {
           badge.textContent = "AUTO";
@@ -14761,6 +14762,11 @@ function toggleScopeFullscreen(forceState) {
   }
   cachedScopeW = 0;
   cachedScopeH = 0;
+  setTimeout(() => {
+    cachedScopeW = 0;
+    cachedScopeH = 0;
+    if (typeof updateCanvasDimensions === "function") updateCanvasDimensions();
+  }, 150);
 }
 
 window.addEventListener('keydown', (e) => {
@@ -15695,13 +15701,19 @@ function setKeyboardDisplayMode(mode) {
     if (btnPlay) btnPlay.classList.remove("active");
     if (btnRadar) btnRadar.classList.add("active");
     if (hintText) hintText.innerHTML = `Full-Range Radar (A0 - C8) · Multi-Voice Harmonic Radar`;
-    if (octControls) octControls.style.display = "none";
+    if (octControls) {
+      octControls.style.visibility = "hidden";
+      octControls.style.pointerEvents = "none";
+    }
   } else {
     if (container) container.classList.remove("mode-radar");
     if (btnPlay) btnPlay.classList.add("active");
     if (btnRadar) btnRadar.classList.remove("active");
     if (hintText) hintText.innerHTML = `Keys A-K · <span id="valOctave">C${baseKeyboardOctave} - C${baseKeyboardOctave + 2}</span>`;
-    if (octControls) octControls.style.display = "";
+    if (octControls) {
+      octControls.style.visibility = "";
+      octControls.style.pointerEvents = "";
+    }
   }
   buildKeyboard();
 }
@@ -18005,7 +18017,7 @@ function handleUserSlotClick(slotNum, event) {
     const defName = (document.getElementById("hudScale") ? document.getElementById("hudScale").textContent : `Patch ${slotNum}`).trim();
     const name = window.prompt(`Save current soundscape to User Slot U${slotNum}:`, (entry && entry.name) || defName);
     if (name === null) return;
-    const finalName = name.trim() || `Patch ${slotNum}`;
+    const finalName = (name.trim() || `Patch ${slotNum}`).slice(0, 15);
     patches[slotNum] = {
       name: finalName,
       data: serializeCurrentPatch(),
@@ -18034,9 +18046,9 @@ function handleUserSlotContextMenu(event, slotNum) {
   }
   const action = window.prompt(`Slot U${slotNum}: "${entry.name}"\nType 1 to Rename, 2 to Overwrite with current sound, 3 to Clear slot:`, "1");
   if (action === "1") {
-    const newName = window.prompt("New patch name:", entry.name);
+    const newName = window.prompt("New patch name (max 15 chars):", entry.name);
     if (newName && newName.trim()) {
-      entry.name = newName.trim();
+      entry.name = newName.trim().slice(0, 15);
       saveUserPatches(patches);
       renderUserPatchSlots();
     }
@@ -20662,6 +20674,33 @@ function cycleOrbitalModule(dir) {
     expandModuleOrb(nextOrbId);
   }
 }
+
+function initTouchViewSwitchers() {
+  const switchers = [
+    { id: "btnViewOrbital", action: () => setModuleView("orbital") },
+    { id: "btnViewConsole", action: () => setModuleView("console") },
+    { id: "btnOrbitalBack", action: () => collapseOrbitalToPedals() },
+    { id: "btnOrbitalPrev", action: () => cycleOrbitalModule(-1) },
+    { id: "btnOrbitalNext", action: () => cycleOrbitalModule(1) }
+  ];
+  switchers.forEach(({ id, action }) => {
+    const el = document.getElementById(id);
+    if (!el || el.dataset.touchFastBound) return;
+    el.dataset.touchFastBound = "1";
+    el.addEventListener("pointerup", (e) => {
+      if (e.pointerType === "touch") {
+        e.preventDefault();
+        action();
+      }
+    }, { passive: false });
+  });
+}
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", initTouchViewSwitchers);
+} else {
+  initTouchViewSwitchers();
+}
+window.addEventListener("load", initTouchViewSwitchers);
 
 function toggleModuleDrawer(toggleEl) {
   if (!toggleEl) return;

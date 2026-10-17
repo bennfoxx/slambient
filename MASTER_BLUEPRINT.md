@@ -207,8 +207,8 @@ This master architecture document serves as the authoritative single-source-of-t
 * **Phase 9 — Maihar Gharana & "Lineage" Sonic Refinements (Done):** Tanpura 2-bar cycle, Tabla Bayan/Dayan fingerings, Maihar Sitar wire mizrab attack click & meend pitch bends, Raga Taan phrases with natural breathing rests (Ma).
 * **Phase 10 — "Pocket Field Recorder" Live Mic & Found Sound Engine (Done):** Desktop header & mobile transport `[ 🎙 REC / 📼 DROP ]`, browser `getUserMedia()` live sampling, dynamic level normalization, and Module 5 hauntological playback modes.
 * **Phase 11 — Blueprint Visualizers & Interaction Polish (Done):** Roadside 3D shapes density scaling, Space Invaders audio coupling, and DAW-style transport shortcuts.
-* **Phase 14 — Mobile & Core Engine Action Plan (ACTIVE — TOP PRIORITY):**
-  * **Part 1: High-Priority UI Bugs & Quality of Life (QoL) Fixes (IMMEDIATE TARGET):**
+* **Phase 14 — Mobile & Core Engine Action Plan (ACTIVE):**
+  * **Part 1: High-Priority UI Bugs & Quality of Life (QoL) Fixes (DONE):**
     * *Desktop Parity Guardrail:* All mobile layout, touch, and navigation adjustments must strictly be scoped under mobile breakpoints (`@media (max-width: 768px)` / `@media (max-width: 640px)`); desktop layout, sizing, and interaction models remain completely untouched.
     * *Header Title Centering Regression:* Restore true center alignment to main header title via absolute centering (`position: absolute; left: 50%; transform: translateX(-50%)`) or balanced spacer elements (`flex: 1`) so action buttons do not drag the title off-center.
     * *Sticky Header Lock-Up in Modular View:* Confine module scrolling inside a dedicated sub-wrapper (`overflow-y: auto; overscroll-behavior: contain; height: 100dvh`) and lock outer `html, body` scrolling so inertial rubber-banding cannot pull the header down over modules.
@@ -1043,24 +1043,24 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
 * [x] **Modular Multi-Delay DSP Engine (`SlambientMultiDelayEngine` in `dsp-engines.js`):** 4 discrete delay algorithms (Tape with capstan wow/flutter drift, BBD with clock noise grit, Digital 32-bit pristine with bitcrush, Ping-Pong stereo alternating spatial Haas bounce), dynamic lead voice ducking, and musical tempo sync.
 * [ ] Connect internal modulation sources (LFOs/Envelope Followers) to drive real-time parameter changes with pulsing visual feedback on patch lines.
 
-##### Phase 4: High-Priority Mobile UI Bugs & QoL Fixes (MAIN DEV TASK BRIEF)
+##### Phase 4: High-Priority Mobile UI Bugs & QoL Fixes (COMPLETED)
 > **Assigned Workspace:** `/Users/benfox/Documents/Development/slambient_dev` (or `/Users/benfox/Documents/Development/slambient_dev-thread2`)  
 > **Target Files:** `index.html` (and internal CSS blocks)  
 > **Scope Guardrail (Desktop Parity):** All mobile layout, touch, and navigation adjustments must strictly be scoped under mobile breakpoints (`@media (max-width: 768px)` or `@media (max-width: 640px)`); desktop layout, sizing, and interaction models must remain 100% untouched.
 
-* [ ] **Header Title Centering Regression:** Restore absolute center alignment (`position: absolute; left: 50%; transform: translateX(-50%)`) or balanced flex spacers (`flex: 1`) so action buttons do not drag the title off-center.
-* [ ] **Sticky Header Lock-Up in Modular View:** Confine module scrolling inside a dedicated sub-wrapper (`overflow-y: auto; overscroll-behavior: contain; height: 100dvh`) and lock outer `html, body` scrolling so inertial rubber-banding cannot pull the header down over modules.
-* [ ] **Playable MIDI Keyboard Header Consistency (25-Key vs. 88-Key):** Lock container dimensions (`height: 44px; min-height: 44px`), fix flex alignment, and enforce tabular numbers (`font-variant-numeric: tabular-nums`) so switching between 25-key and 88-key modes does not alter outer padding or readout baselines.
-* [ ] **Info (`?`) Panel Anchor Offset:** Anchor top edge to a static coordinate (`top: 16px; left: 50%; transform: translateX(-50%)`) with downward scrolling (`overflow-y: auto`) to stop vertical jumping based on text length.
-* [ ] **Unresponsive Touch Module Switching Buttons:** Bind explicit pointer/touch handlers (`pointerup` / `touchend`) and remove desktop `:hover` dependencies.
-* [ ] **Static Interface & Zoom Prevention:** Enforce `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">` and `touch-action: manipulation; overscroll-behavior: none;` on `html, body` to eliminate double-tap zoom delays and pinch scaling.
-* [ ] **Touch Drag vs. Scroll Interplay:** Assign `touch-action: none` strictly to dedicated drag handles (`☰`) and rotary/XY controls; keep `touch-action: pan-y` on card bodies and lists.
-* [ ] **Custom Preset Name Hard Limit (Max 15 Chars):** Enforce `maxlength="15"`, JS sanitization (`.slice(0, 15)`), and CSS truncation (`overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 130px;`).
-* [ ] **Modular View "Randomize" Button Wrapping:** Apply `flex-wrap: nowrap; flex-shrink: 0;` and collapse to icon-only (dice) under 480px width.
-* [ ] **Analyzer Frozen on Auto-Play Switch:** Decouple pitch analyzer from DOM touch listeners; route manual input and auto-play sequencer through a unified `triggerNote(note, velocity)` dispatcher, clearing stale latches on auto-play toggle.
-* [ ] **Visualizer Blank / Black Screen on Tab Wake:** Wake suspended `AudioContext` on `visibilitychange`, clamp rAF delta timestamps (max 100ms), and handle `webglcontextlost` / `webglcontextrestored`.
-* [ ] **Full-Screen Visualizer Mobile Portrait Fix:** Switch canvas sizing from `vh` to dynamic viewport units (`100dvh`), avoid forcing orientation locks, and recalculate canvas bounds on `fullscreenchange` with a 150ms delay.
-* [ ] **Orbital View Pop-Up Dropdowns Blackout:** Audit `z-index` stacking contexts, prevent duplicate black scrim/backdrop overlays from mounting, and preserve WebGL render loops.
+* [x] **Header Title Centering Regression:** Restore absolute center alignment (`position: absolute; left: 50%; transform: translateX(-50%)`) or balanced flex spacers (`flex: 1`) so action buttons do not drag the title off-center.
+* [x] **Sticky Header Lock-Up in Modular View:** Confine module scrolling inside a dedicated sub-wrapper (`overflow-y: auto; overscroll-behavior: contain; height: 100dvh`) and lock outer `html, body` scrolling so inertial rubber-banding cannot pull the header down over modules.
+* [x] **Playable MIDI Keyboard Header Consistency (25-Key vs. 88-Key):** Lock container dimensions (`height: 44px; min-height: 44px`), fix flex alignment, and enforce tabular numbers (`font-variant-numeric: tabular-nums`) so switching between 25-key and 88-key modes does not alter outer padding or readout baselines.
+* [x] **Info (`?`) Panel Anchor Offset:** Anchor top edge to a static coordinate (`top: 16px; left: 50%; transform: translateX(-50%)`) with downward scrolling (`overflow-y: auto`) to stop vertical jumping based on text length.
+* [x] **Unresponsive Touch Module Switching Buttons:** Bind explicit pointer/touch handlers (`pointerup` / `touchend`) and remove desktop `:hover` dependencies.
+* [x] **Static Interface & Zoom Prevention:** Enforce `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">` and `touch-action: manipulation; overscroll-behavior: none;` on `html, body` to eliminate double-tap zoom delays and pinch scaling.
+* [x] **Touch Drag vs. Scroll Interplay:** Assign `touch-action: none` strictly to dedicated drag handles (`☰`) and rotary/XY controls; keep `touch-action: pan-y` on card bodies and lists.
+* [x] **Custom Preset Name Hard Limit (Max 15 Chars):** Enforce `maxlength="15"`, JS sanitization (`.slice(0, 15)`), and CSS truncation (`overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 130px;`).
+* [x] **Modular View "Randomize" Button Wrapping:** Apply `flex-wrap: nowrap; flex-shrink: 0;` and collapse to icon-only (dice) under 480px width.
+* [x] **Analyzer Frozen on Auto-Play Switch:** Decouple pitch analyzer from DOM touch listeners; route manual input and auto-play sequencer through a unified `triggerNote(note, velocity)` dispatcher, clearing stale latches on auto-play toggle.
+* [x] **Visualizer Blank / Black Screen on Tab Wake:** Wake suspended `AudioContext` on `visibilitychange`, clamp rAF delta timestamps (max 100ms), and handle `webglcontextlost` / `webglcontextrestored`.
+* [x] **Full-Screen Visualizer Mobile Portrait Fix:** Switch canvas sizing from `vh` to dynamic viewport units (`100dvh`), avoid forcing orientation locks, and recalculate canvas bounds on `fullscreenchange` with a 150ms delay.
+* [x] **Orbital View Pop-Up Dropdowns Blackout:** Audit `z-index` stacking contexts, prevent duplicate black scrim/backdrop overlays from mounting, and preserve WebGL render loops.
 
 ##### Phase 5: Mobile UX Architecture Overhaul (Macro vs. Micro Views) (SECONDARY DEV TASK BRIEF)
 > **Assigned Workspace:** `/Users/benfox/Documents/Development/slambient_dev-bonsai`  
