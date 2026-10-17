@@ -2440,27 +2440,6 @@
     opacity: 0;
   }
 
-  .orbital-modal-backdrop {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(4, 6, 12, 0.76);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    z-index: 9999;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.22s ease;
-  }
-  .orbital-modal-backdrop.active {
-    display: block;
-    opacity: 1;
-    pointer-events: auto;
-  }
-
   /* ==========================================================================
      CLOSE-UP MODULE INSPECTOR (Desktop Viewport-Centered Cyber-Chassis)
      ========================================================================== */
@@ -4269,12 +4248,21 @@
   }
   .strip-channel:has(.custom-dropdown-menu.open),
   .pedal-chassis:has(.custom-dropdown-menu.open),
-  .orbital-side-panel:has(.custom-dropdown-menu.open),
   .root-scale-ctrl:has(.custom-dropdown-menu.open),
   .time-sig-ctrl:has(.custom-dropdown-menu.open),
   header.top-bar:has(.custom-dropdown-menu.open) {
     z-index: 9000 !important;
     overflow: visible !important;
+  }
+  .orbital-side-panel:has(.custom-dropdown-menu.open) {
+    z-index: 100005 !important;
+    overflow: visible !important;
+  }
+  .orbital-side-panel .custom-dropdown-wrap.is-open {
+    z-index: 100010 !important;
+  }
+  .orbital-side-panel .custom-dropdown-menu {
+    z-index: 100020 !important;
   }
   .custom-dropdown-menu {
     position: absolute;
@@ -6352,6 +6340,15 @@
       pointer-events: auto !important;
       transition: opacity 0.2s ease, visibility 0s;
     }
+    body:has(.orbital-side-panel.active) .mini-transport,
+    body.orbital-panel-open .mini-transport,
+    body:has(.orbital-side-panel.active) .mini-transport.is-visible,
+    body.orbital-panel-open .mini-transport.is-visible {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
     .mini-transport .btn-main-play,
     .mini-transport .btn-record,
     .mini-transport .btn-mic-mini {
@@ -6565,7 +6562,7 @@
       box-sizing: border-box;
       padding: 0;
       overflow: hidden;
-      z-index: 10000;
+      z-index: 100001 !important;
       border: 1.5px solid var(--modal-accent-color, var(--color-drone));
       border-bottom: 0;
       border-radius: 12px 12px 0 0;
@@ -6584,6 +6581,7 @@
       transform: none;
       visibility: visible;
       pointer-events: auto;
+      z-index: 100001 !important;
       transition: transform 0.26s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s;
     }
     /* While the finger drags the sheet down (orbital.js), follow it 1:1. */
