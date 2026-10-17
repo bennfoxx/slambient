@@ -710,7 +710,7 @@
 
     // 12. Trigger Canvas and Layout Resizes
     triggerCanvasResizes() {
-      requestAnimationFrame(() => {
+      const doResize = () => {
         if (typeof scopeNeedsResize !== "undefined") scopeNeedsResize = true;
         if (typeof orbitalNeedsResize !== "undefined") orbitalNeedsResize = true;
         if (typeof lastChordWheelSignature !== "undefined") lastChordWheelSignature = "";
@@ -721,7 +721,11 @@
         if (typeof buildKeyboard === "function") buildKeyboard();
 
         window.dispatchEvent(new Event("resize"));
-      });
+      };
+
+      requestAnimationFrame(doResize);
+      setTimeout(doResize, 60);
+      setTimeout(doResize, 220);
     }
 
     bindGlobalKeys() {

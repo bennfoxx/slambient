@@ -8475,22 +8475,22 @@
   /* 3. Fullscreen Focus Studio Modal (.module-fullscreen-active) */
   .module-fullscreen-active {
     position: fixed !important;
-    inset: 12px !important;
-    top: 12px !important;
-    left: 12px !important;
-    right: 12px !important;
-    bottom: 12px !important;
-    width: calc(100vw - 24px) !important;
-    height: calc(100vh - 24px) !important;
-    height: calc(100dvh - 24px) !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(calc(100vw - 32px), 1400px) !important;
+    width: min(calc(100dvw - 32px), 1400px) !important;
+    height: min(calc(100vh - 32px), 880px) !important;
+    height: min(calc(100dvh - 32px), 880px) !important;
     max-width: none !important;
     max-height: none !important;
+    margin: 0 !important;
     z-index: 250000 !important;
     background: rgba(8, 10, 16, 0.98) !important;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--accent) !important;
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.95), 0 0 30px rgba(var(--rgb-chord), 0.35) !important;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.95), 0 0 35px rgba(var(--rgb-chord), 0.35) !important;
     border-radius: 8px !important;
     overflow-y: auto !important;
     padding: 18px 24px !important;
@@ -8502,12 +8502,54 @@
   @keyframes studioFocusIn {
     from {
       opacity: 0;
-      transform: scale(0.96);
+      transform: translate(-50%, -50%) scale(0.96);
     }
     to {
       opacity: 1;
-      transform: scale(1);
+      transform: translate(-50%, -50%) scale(1);
     }
+  }
+
+  /* Desktop zoom 0.75 compensation: ensure the modal expands to fill screen space */
+  @media (min-width: 1025px) and (min-height: 551px) {
+    .module-fullscreen-active {
+      width: min(calc((100vw - 48px) / 0.75), 1800px) !important;
+      height: min(calc((100vh - 48px) / 0.75), 1100px) !important;
+    }
+  }
+
+  /* Visualizer Scope specifically inside fullscreen focus modal: expand to fill vertical space */
+  .module-fullscreen-active.scope-panel,
+  #scopePanel.module-fullscreen-active {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .module-fullscreen-active.scope-panel .scope-left-viz,
+  #scopePanel.module-fullscreen-active .scope-left-viz {
+    flex: 1 1 0 !important;
+    height: 100% !important;
+    min-height: 380px !important;
+    max-height: none !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .module-fullscreen-active.scope-panel .scope-left-viz canvas,
+  #scopePanel.module-fullscreen-active #scopeCanvas {
+    flex: 1 1 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 340px !important;
+  }
+
+  .module-fullscreen-active.scope-panel .scope-layer-toggles,
+  #scopePanel.module-fullscreen-active .scope-layer-toggles {
+    flex-shrink: 0 !important;
+    margin: 14px auto 4px auto !important;
+    width: 100% !important;
+    max-width: 680px !important;
   }
 
   .module-fullscreen-active .btn-win-focus {
