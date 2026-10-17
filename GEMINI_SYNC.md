@@ -1738,5 +1738,15 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
     - Traps and prevents WebKit gesture events (`gesturestart`, `gesturechange`, `gestureend`) to block iOS Safari pinch-to-zoom.
     - Traps and prevents multi-touch scaling on `touchmove` (`e.scale !== 1 || e.touches.length > 1`).
     - Intercepts rapid `touchend` events (within 320ms) on non-interactive containers to block iOS Safari double-tap zoom while keeping button, pad, and piano key multi-taps 100% responsive.
+
+## Update — 2026-10-16 (Mobile Popup Darkening / Stacking Context Fix)
+
+- **Eliminated Screen Darkening Over Module Popups**:
+  - **Root Cause**: On mobile under `@media (max-width: 640px)`, `.orbital-side-panel` was styled with `z-index: 10000;`, while `.orbital-modal-backdrop` had `z-index: 100000;`. As a result, the dark 82% opacity blurred backdrop was placed *in front of* the module inspection sheet on mobile devices.
+  - **Fix**:
+    1. Elevated `.orbital-side-panel` on mobile to `z-index: 100001 !important;` (both normal and `.active`), ensuring it renders strictly above `.orbital-modal-backdrop` (`z-index: 100000;`).
+    2. Separated `.orbital-side-panel:has(.custom-dropdown-menu.open)` from the `z-index: 9000` rule and gave it dedicated `z-index: 100005 !important;` (with dropdown wraps at 100010 and menus at 100020), preventing dropdown openings from sending the panel behind the backdrop.
+    3. Added phone media-query suppression rules ensuring `.mini-transport` (`is-visible`) is completely hidden whenever the inspection sheet is open.
+    4. Removed stale duplicate `.orbital-modal-backdrop` declaration at `z-index: 9999`.
     - Prevents default on `dblclick` (preserving `.scope-left-viz` fullscreen toggle).
     - Prevents trackpad/mouse `wheel` pinch zoom when `e.ctrlKey` is true.
