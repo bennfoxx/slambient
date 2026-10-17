@@ -634,16 +634,93 @@ const ARCADE_SPRITES = [
 const ARCADE_UFO_SPRITE = ["0000111110000", "0011111111100", "0111111111110", "1101101101101", "1111111111111", "0011100011100", "0001000001000"];
 const ARCADE_PLAYER_SPRITE = ["00000100000", "00001110000", "00001110000", "01111111110", "11111111111", "11111111111", "11111111111"];
 
+var arcadeCanvas = document.getElementById("arcadeCanvas");
+var arcadeCtx = arcadeCanvas ? arcadeCanvas.getContext("2d") : null;
+let arcadeRafId = null;
+
+function updateArcadeCanvasDimensions() {
+  if (!arcadeCanvas) {
+    arcadeCanvas = document.getElementById("arcadeCanvas");
+    if (arcadeCanvas) arcadeCtx = arcadeCanvas.getContext("2d");
+  }
+  if (!arcadeCanvas || !arcadeCtx) return { w: 460, h: 290 };
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const rect = arcadeCanvas.getBoundingClientRect();
+  const w = Math.max(260, Math.floor(rect.width || 420));
+  const h = Math.max(160, Math.floor(rect.height || (w * 0.62)));
+  const targetW = Math.floor(w * dpr);
+  const targetH = Math.floor(h * dpr);
+  if (arcadeCanvas.width !== targetW || arcadeCanvas.height !== targetH) {
+    arcadeCanvas.width = targetW;
+    arcadeCanvas.height = targetH;
+  }
+  arcadeCtx.resetTransform();
+  arcadeCtx.scale(dpr, dpr);
+  return { w, h };
+}
+
+function updateArcadeHeaderHUD() {
+  if (!arcade) return;
+  const scoreEl = document.getElementById("arcadeHeaderScore");
+  if (scoreEl) {
+    scoreEl.textContent = `SCORE ${String(arcade.score).padStart(5, "0")} · W${arcade.wave} · ${"▲".repeat(Math.max(0, arcade.lives))}`;
+  }
+}
+
+function runArcadeLoop(ts) {
+  if (!arcadeActive) {
+    arcadeRafId = null;
+    return;
+  }
+  const { w, h } = updateArcadeCanvasDimensions();
+  if (arcadeCtx) {
+    drawArcadeGame(w, h, ts || performance.now(), arcadeCtx);
+    syncArcadePad();
+    updateArcadeHeaderHUD();
+  }
+  arcadeRafId = requestAnimationFrame(runArcadeLoop);
+}
+
 function toggleArcadeGame(forceState) {
   arcadeActive = (typeof forceState === "boolean") ? forceState : !arcadeActive;
   if (arcadeActive) ensureAudioReady();
   const btn = document.getElementById("btnToggleArcade");
   if (btn) {
     btn.classList.toggle("active", arcadeActive);
-    // Otherwise the focused button would "click" again on the first Space.
     btn.blur();
   }
-  arcade = arcadeActive ? newArcadeState() : null;
+  const panel = document.getElementById("arcadePanel");
+  if (panel) {
+    panel.classList.toggle("hidden-module", !arcadeActive);
+    panel.classList.toggle("module-hidden-in-dock", !arcadeActive);
+    panel.style.display = arcadeActive ? "" : "none";
+  }
+  arcade = arcadeActive ? (arcade || newArcadeState()) : null;
+  if (arcadeActive) {
+    if (!arcadeRafId) arcadeRafId = requestAnimationFrame(runArcadeLoop);
+  } else {
+    if (arcadeRafId) { cancelAnimationFrame(arcadeRafId); arcadeRafId = null; }
+  }
+}
+
+function toggleArcadePanel(show) {
+  toggleArcadeGame(show);
+}
+
+function resetArcadeGame() {
+  ensureAudioReady();
+  const hi = arcade ? Math.max(arcade.hiScore, arcade.score) : 0;
+  arcade = Object.assign(newArcadeState(), { hiScore: hi, phase: "playing" });
+  arcadeSpawnWave(arcade, performance.now());
+  if (!arcadeActive) toggleArcadeGame(true);
+}
+
+function toggleArcadeFullscreen() {
+  const panel = document.getElementById("arcadePanel");
+  if (!panel) return;
+  const isFs = panel.classList.toggle("module-fullscreen-active");
+  document.body.classList.toggle("module-focus-open", isFs);
+  if (typeof triggerCanvasResizes === "function") triggerCanvasResizes();
 }
 
 function newArcadeState() {
@@ -740,12 +817,14 @@ function arcadeLayout(w, h, cols) {
   return { px, cellW, cellH, gridW, left, top, rowDrop: cellH * 0.5, playerY: h - 14 * px, stepPx: px * 2 };
 }
 
-function arcadeDrawSprite(rows, x, y, px, rgb, alpha) {
-  scopeCtx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha.toFixed(3)})`;
+function arcadeDrawSprite(rows, x, y, px, rgb, alpha, targetCtx) {
+  const ctx = targetCtx || arcadeCtx || scopeCtx;
+  if (!ctx) return;
+  ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha.toFixed(3)})`;
   for (let j = 0; j < rows.length; j++) {
     const line = rows[j];
     for (let i = 0; i < line.length; i++) {
-      if (line.charCodeAt(i) === 49) scopeCtx.fillRect(x + i * px, y + j * px, px, px);
+      if (line.charCodeAt(i) === 49) ctx.fillRect(x + i * px, y + j * px, px, px);
     }
   }
 }
@@ -801,23 +880,32 @@ window.addEventListener("keyup", (e) => {
 }, { capture: true });
 
 (function bindArcadePointer() {
-  const toX = (e) => {
-    const rect = scopeCanvas.getBoundingClientRect();
+  const toX = (e, canvas) => {
+    const rect = canvas.getBoundingClientRect();
     return Math.max(0, Math.min(1, (e.clientX - rect.left) / Math.max(1, rect.width)));
   };
-  scopeCanvas.addEventListener("pointerdown", (e) => {
-    if (!arcadeActive || !arcade) return;
-    arcade.pointerX = toX(e);
-    try { scopeCanvas.setPointerCapture(e.pointerId); } catch (err) {}
-    arcadeHandleFire(arcade);
-    e.preventDefault();
+  function attachCanvas(cvs) {
+    if (!cvs) return;
+    cvs.addEventListener("pointerdown", (e) => {
+      if (!arcadeActive || !arcade) return;
+      arcade.pointerX = toX(e, cvs);
+      try { cvs.setPointerCapture(e.pointerId); } catch (err) {}
+      arcadeHandleFire(arcade);
+      e.preventDefault();
+    });
+    cvs.addEventListener("pointermove", (e) => {
+      if (arcadeActive && arcade && arcade.pointerX !== null) arcade.pointerX = toX(e, cvs);
+    });
+    const release = () => { if (arcade) arcade.pointerX = null; };
+    cvs.addEventListener("pointerup", release);
+    cvs.addEventListener("pointercancel", release);
+  }
+  if (scopeCanvas) attachCanvas(scopeCanvas);
+  const aCanvas = document.getElementById("arcadeCanvas");
+  if (aCanvas) attachCanvas(aCanvas);
+  else document.addEventListener("DOMContentLoaded", () => {
+    attachCanvas(document.getElementById("arcadeCanvas"));
   });
-  scopeCanvas.addEventListener("pointermove", (e) => {
-    if (arcadeActive && arcade && arcade.pointerX !== null) arcade.pointerX = toX(e);
-  });
-  const release = () => { if (arcade) arcade.pointerX = null; };
-  scopeCanvas.addEventListener("pointerup", release);
-  scopeCanvas.addEventListener("pointercancel", release);
 })();
 
 // Touch pad under the playfield (phones / touch devices): drag the slider to
@@ -1124,7 +1212,9 @@ function arcadeLoseLife(g, L, w, ts) {
   if (g.lives <= 0) g.hiScore = Math.max(g.hiScore, g.score);
 }
 
-function drawArcadeGame(w, h, ts) {
+function drawArcadeGame(w, h, ts, targetCtx) {
+  const ctx = targetCtx || arcadeCtx || scopeCtx;
+  if (!ctx) return;
   const g = arcade;
   if (!g) return;
   if (g.lastTs === null) g.lastTs = ts;
@@ -1134,12 +1224,16 @@ function drawArcadeGame(w, h, ts) {
   const L = arcadeLayout(w, h, g.cols);
   arcadeUpdate(g, w, h, L, ts, dtSec);
 
-  scopeCtx.save();
-  scopeCtx.shadowBlur = 0;
+  ctx.save();
+  ctx.shadowBlur = 0;
+
+  // Clear background
+  ctx.fillStyle = "#0c0d11";
+  ctx.fillRect(0, 0, w, h);
 
   // Faint CRT scanlines.
-  scopeCtx.fillStyle = "rgba(255, 255, 255, 0.025)";
-  for (let y = 0; y < h; y += 3) scopeCtx.fillRect(0, y, w, 1);
+  ctx.fillStyle = "rgba(255, 255, 255, 0.025)";
+  for (let y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1);
 
   // Invaders, glowing with their instrument's live energy.
   if (g.phase !== "title") {
@@ -1151,92 +1245,92 @@ function drawArcadeGame(w, h, ts) {
       // Armored drones that have taken a hit render dimmer/cracked.
       const damaged = v.type === "drone" && v.hp < t.hp;
       const rgb = v.hitFlash > 0 ? [255, 255, 255] : t.rgb;
-      scopeCtx.shadowColor = `rgb(${t.rgb.join(",")})`;
-      scopeCtx.shadowBlur = 2 + en * 14 + (v.dive ? 6 : 0);
+      ctx.shadowColor = `rgb(${t.rgb.join(",")})`;
+      ctx.shadowBlur = 2 + en * 14 + (v.dive ? 6 : 0);
       const frame = v.type === "arp" ? (Math.floor(ts / 160 + v.phase) % 2) : g.frame;
-      arcadeDrawSprite(ARCADE_SPRITES[t.sprite][frame], p.x, p.y, L.px, rgb, (damaged ? 0.45 : 0.6) + en * 0.4);
+      arcadeDrawSprite(ARCADE_SPRITES[t.sprite][frame], p.x, p.y, L.px, rgb, (damaged ? 0.45 : 0.6) + en * 0.4, ctx);
     });
-    scopeCtx.shadowBlur = 0;
+    ctx.shadowBlur = 0;
   }
 
   if (g.ufo) {
-    scopeCtx.shadowColor = `rgb(${ARCADE_UFO_RGB.join(",")})`;
-    scopeCtx.shadowBlur = 10;
+    ctx.shadowColor = `rgb(${ARCADE_UFO_RGB.join(",")})`;
+    ctx.shadowBlur = 10;
     const blink = Math.floor(ts / 140) % 2;
-    arcadeDrawSprite(ARCADE_UFO_SPRITE, g.ufo.x, g.ufo.y, L.px, blink ? ARCADE_UFO_RGB : [255, 160, 220], 0.95);
-    scopeCtx.shadowBlur = 0;
+    arcadeDrawSprite(ARCADE_UFO_SPRITE, g.ufo.x, g.ufo.y, L.px, blink ? ARCADE_UFO_RGB : [255, 160, 220], 0.95, ctx);
+    ctx.shadowBlur = 0;
   }
 
   // Player (blinks while invulnerable, hidden while exploding).
   const blink = ts < g.invulnUntil && Math.floor(ts / 120) % 2 === 0;
   if ((g.phase === "playing" || g.phase === "cleared") && !blink) {
-    arcadeDrawSprite(ARCADE_PLAYER_SPRITE, g.playerX * w - 5.5 * L.px, L.playerY, L.px, themeRgbArr("filter"), 0.95);
+    arcadeDrawSprite(ARCADE_PLAYER_SPRITE, g.playerX * w - 5.5 * L.px, L.playerY, L.px, themeRgbArr("filter"), 0.95, ctx);
   }
 
   if (g.shot && g.shot.y !== null) {
-    scopeCtx.fillStyle = themeHex("chord");
-    scopeCtx.fillRect(g.shot.x * w - L.px / 2, g.shot.y, L.px, 4 * L.px);
+    ctx.fillStyle = themeHex("chord");
+    ctx.fillRect(g.shot.x * w - L.px / 2, g.shot.y, L.px, 4 * L.px);
   }
   g.enemyShots.forEach(s => {
-    scopeCtx.fillStyle = `rgb(${s.rgb.join(",")})`;
+    ctx.fillStyle = `rgb(${s.rgb.join(",")})`;
     if (s.kind === "heavy") {
-      scopeCtx.fillRect(s.x - L.px, s.y, 2 * L.px, 4 * L.px);
+      ctx.fillRect(s.x - L.px, s.y, 2 * L.px, 4 * L.px);
     } else if (s.kind === "aimed") {
-      scopeCtx.fillRect(s.x - L.px / 2, s.y, L.px, 2 * L.px);
-      scopeCtx.fillRect(s.x - L.px / 2 - s.vx * 4 * L.px, s.y - 2 * L.px, L.px, L.px);
+      ctx.fillRect(s.x - L.px / 2, s.y, L.px, 2 * L.px);
+      ctx.fillRect(s.x - L.px / 2 - s.vx * 4 * L.px, s.y - 2 * L.px, L.px, L.px);
     } else if (s.kind === "spread") {
-      scopeCtx.fillRect(s.x - L.px / 2, s.y, L.px, L.px * 2);
+      ctx.fillRect(s.x - L.px / 2, s.y, L.px, L.px * 2);
     } else {
       const zig = (Math.floor(s.y / (2 * L.px)) % 2) * L.px;
-      scopeCtx.fillRect(s.x - L.px + zig, s.y, L.px, 3 * L.px);
+      ctx.fillRect(s.x - L.px + zig, s.y, L.px, 3 * L.px);
     }
   });
   g.sparks.forEach(s => {
     const a = Math.max(0, Math.min(1, s.life)).toFixed(3);
     if (s.text) {
-      scopeCtx.font = `700 ${Math.max(10, L.px * 4)}px "JetBrains Mono", ui-monospace, monospace`;
-      scopeCtx.textAlign = "left";
-      scopeCtx.textBaseline = "top";
-      scopeCtx.fillStyle = `rgba(${s.rgb.join(",")}, ${a})`;
-      scopeCtx.fillText(s.text, s.x, s.y);
+      ctx.font = `700 ${Math.max(10, L.px * 4)}px "JetBrains Mono", ui-monospace, monospace`;
+      ctx.textAlign = "left";
+      ctx.textBaseline = "top";
+      ctx.fillStyle = `rgba(${s.rgb.join(",")}, ${a})`;
+      ctx.fillText(s.text, s.x, s.y);
     } else {
-      scopeCtx.fillStyle = `rgba(${s.rgb.join(",")}, ${a})`;
-      scopeCtx.fillRect(s.x, s.y, L.px, L.px);
+      ctx.fillStyle = `rgba(${s.rgb.join(",")}, ${a})`;
+      ctx.fillRect(s.x, s.y, L.px, L.px);
     }
   });
 
   // Ground line.
-  scopeCtx.fillStyle = `rgba(${themeRgb("filter")}, 0.45)`;
-  scopeCtx.fillRect(8, L.playerY + 9 * L.px, w - 16, 1);
+  ctx.fillStyle = `rgba(${themeRgb("filter")}, 0.45)`;
+  ctx.fillRect(8, L.playerY + 9 * L.px, w - 16, 1);
 
   // HUD.
   const fs = Math.max(10, Math.round(L.px * 4.5));
-  scopeCtx.font = `600 ${fs}px "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace`;
-  scopeCtx.textBaseline = "top";
-  scopeCtx.fillStyle = "rgba(230, 236, 255, 0.85)";
-  scopeCtx.textAlign = "left";
-  scopeCtx.fillText(`SCORE ${String(g.score).padStart(5, "0")}`, 10, 8);
-  scopeCtx.textAlign = "center";
-  scopeCtx.fillText(`HI ${String(Math.max(g.hiScore, g.score)).padStart(5, "0")}  ·  WAVE ${g.wave}`, w / 2, 8);
-  scopeCtx.textAlign = "right";
-  scopeCtx.fillText(`${"▲".repeat(Math.max(0, g.lives))}`, w - 10, 8);
+  ctx.font = `600 ${fs}px "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace`;
+  ctx.textBaseline = "top";
+  ctx.fillStyle = "rgba(230, 236, 255, 0.85)";
+  ctx.textAlign = "left";
+  ctx.fillText(`SCORE ${String(g.score).padStart(5, "0")}`, 10, 8);
+  ctx.textAlign = "center";
+  ctx.fillText(`HI ${String(Math.max(g.hiScore, g.score)).padStart(5, "0")}  ·  WAVE ${g.wave}`, w / 2, 8);
+  ctx.textAlign = "right";
+  ctx.fillText(`${"▲".repeat(Math.max(0, g.lives))}`, w - 10, 8);
 
   const centerMsg = (lines) => {
-    scopeCtx.textAlign = "center";
-    scopeCtx.textBaseline = "middle";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
     lines.forEach((ln, i) => {
-      scopeCtx.font = `${i === 0 ? 800 : 500} ${i === 0 ? fs * 1.6 : fs}px "JetBrains Mono", ui-monospace, monospace`;
-      scopeCtx.fillStyle = i === 0 ? themeHex("filter") : "rgba(230, 236, 255, 0.8)";
-      scopeCtx.fillText(ln, w / 2, h / 2 + (i - (lines.length - 1) / 2) * fs * 2);
+      ctx.font = `${i === 0 ? 800 : 500} ${i === 0 ? fs * 1.6 : fs}px "JetBrains Mono", ui-monospace, monospace`;
+      ctx.fillStyle = i === 0 ? themeHex("filter") : "rgba(230, 236, 255, 0.8)";
+      ctx.fillText(ln, w / 2, h / 2 + (i - (lines.length - 1) / 2) * fs * 2);
     });
   };
   const touchUi = PHONE_LAYOUT_MQ.matches || TOUCH_POINTER_MQ.matches;
-  if (g.phase === "title") centerMsg(touchUi ? ["VOID RAIDERS", "TAP TO START", "SLIDE TO MOVE · FIRE TO SHOOT", "TAP THE ARCADE BUTTON TO QUIT"] : ["VOID RAIDERS", "SPACE / TAP TO START", "← → MOVE · SPACE FIRE · ESC QUIT"]);
+  if (g.phase === "title") centerMsg(touchUi ? ["VOID RAIDERS", "TAP TO START", "SLIDE TO MOVE · FIRE TO SHOOT", "TAP ✕ TO CLOSE"] : ["VOID RAIDERS", "SPACE / TAP TO START", "← → MOVE · SPACE FIRE · ESC QUIT"]);
   else if (g.phase === "gameover") centerMsg(["GAME OVER", `SCORE ${g.score}`, touchUi ? "TAP TO PLAY AGAIN" : "SPACE / TAP TO PLAY AGAIN"]);
   else if (g.phase === "cleared") centerMsg([`WAVE ${g.wave} CLEAR`]);
   else if (g.phase === "playing" && ts < g.bannerUntil) centerMsg([`WAVE ${g.wave}`, g.formation]);
 
-  scopeCtx.restore();
+  ctx.restore();
 }
 
 function toggleScopeFullscreen(forceState) {
@@ -1952,22 +2046,16 @@ function drawScope(ts) {
   if (scopeCanvasVisible || isFsActive) {
     updateWaterfallSpectrogram();
     const { w, h, cx, cy } = updateCanvasDimensions();
-    if (arcadeActive) {
-      scopeCtx.fillStyle = "#0c0d11"; scopeCtx.fillRect(0, 0, w, h);
-      drawArcadeGame(w, h, ts || now);
-      syncArcadePad();
+    if (fractalModeEnabled) {
+      drawFractalVisualizer(w, h, ts || now);
     } else {
-      if (fractalModeEnabled) {
-        drawFractalVisualizer(w, h, ts || now);
-      } else {
-        scopeCtx.fillStyle = "#0c0d11"; scopeCtx.fillRect(0, 0, w, h);
-      }
-      drawWaterfallSpectrogram(w, h);
-      drawFlightTerrainGrid(w, h);
-      drawRoadsideObjects(w, h);
-      if (window.videoSynthesisCompositor) {
-        window.videoSynthesisCompositor.applyPostProcessing(scopeCtx, w, h);
-      }
+      scopeCtx.fillStyle = "#0c0d11"; scopeCtx.fillRect(0, 0, w, h);
+    }
+    drawWaterfallSpectrogram(w, h);
+    drawFlightTerrainGrid(w, h);
+    drawRoadsideObjects(w, h);
+    if (window.videoSynthesisCompositor) {
+      window.videoSynthesisCompositor.applyPostProcessing(scopeCtx, w, h);
     }
 
     // Tempo-synced rotation speed: a full revolution takes a fixed number of
@@ -1981,7 +2069,7 @@ function drawScope(ts) {
     const revolutionBeats = 480; // one full 360 deg turn every 480 beats -- slow, "slight" rotation
     scopeRotationAngle += dtSec * beatsPerSec * (Math.PI * 2 / revolutionBeats) * (isPlaying ? 1 : 0.15);
 
-    if (oscilloscopeRingsEnabled && !arcadeActive) {
+    if (oscilloscopeRingsEnabled) {
       const fit = scopeFullscreen ? Math.min(2.3, Math.min(w, h) / 330) : Math.min(1, Math.min(w, h) / 360);
       scopeCtx.save();
       scopeCtx.translate(cx, cy); scopeCtx.scale(fit, fit); scopeCtx.rotate(scopeRotationAngle); scopeCtx.translate(-cx, -cy);

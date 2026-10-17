@@ -20,9 +20,9 @@
     editMode: false,
     activeTemplate: "FULL_STUDIO",
     headerOrder: ["brand", "presets", "transport", "harmony", "readout", "masterVol", "utilities", "generative", "eno"],
-    upperDeckOrder: ["chordWheel", "scope", "keyboard"],
+    upperDeckOrder: ["chordWheel", "scope", "arcade", "keyboard"],
     rackOrder: ["drone", "chords", "noise", "drums", "arp", "field", "fxChain"],
-    hiddenModules: [],
+    hiddenModules: ["arcade"],
     fullscreenModule: null
   };
 
@@ -31,6 +31,7 @@
     scope: "#scopePanel",
     chordWheel: "#chordInfoPanel",
     chord: "#chordInfoPanel",
+    arcade: "#arcadePanel",
     keyboard: "#keyboardPanel",
     keys: "#keyboardPanel"
   };
@@ -50,6 +51,7 @@
   const MODULE_REGISTRY = [
     { id: "scope", selector: "#scopePanel", label: "VISUALIZER", type: "upper" },
     { id: "chordWheel", selector: "#chordInfoPanel", label: "CHORD WHEEL", type: "upper" },
+    { id: "arcade", selector: "#arcadePanel", label: "ARCADE CRT", type: "upper" },
     { id: "keyboard", selector: "#keyboardPanel", label: "KEYBOARD", type: "upper" },
     { id: "drone", selector: ".strip-channel.drone-ch", label: "SUB", type: "rack" },
     { id: "drums", selector: ".strip-channel.drum-ch", label: "DRUMS", type: "rack" },
@@ -193,13 +195,14 @@
       const upperCards = [
         { id: "scope", selector: "#scopePanel" },
         { id: "chordWheel", selector: "#chordInfoPanel" },
+        { id: "arcade", selector: "#arcadePanel" },
         { id: "keyboard", selector: "#keyboardPanel" }
       ];
       upperCards.forEach(({ id, selector }) => {
         const el = document.querySelector(selector);
         if (el) {
           el.setAttribute("data-module-id", id);
-          el.setAttribute("data-upper-widget", id === "chordWheel" ? "chord" : (id === "keyboard" ? "keys" : "scope"));
+          el.setAttribute("data-upper-widget", id === "chordWheel" ? "chord" : (id === "keyboard" ? "keys" : (id === "arcade" ? "arcade" : "scope")));
         }
       });
 
@@ -516,9 +519,15 @@
         if (this.state.fullscreenModule === moduleId) {
           this.toggleModuleFullscreen(moduleId);
         }
+        if (moduleId === "arcade" && typeof toggleArcadeGame === "function") {
+          toggleArcadeGame(false);
+        }
       } else {
         // Restore it
         this.state.hiddenModules.splice(idx, 1);
+        if (moduleId === "arcade" && typeof toggleArcadeGame === "function") {
+          toggleArcadeGame(true);
+        }
       }
       this.saveState();
       this.applyVisibility();

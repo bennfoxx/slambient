@@ -1848,6 +1848,105 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), var(--eno-glow-shadow, 0 0 16px rgba(var(--rgb-chord), 0.18));
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
+  .arcade-panel {
+    flex: 1 1 380px;
+    min-width: 320px;
+    max-width: 480px;
+    background: var(--panel);
+    border: 1px solid var(--eno-glow-border, var(--border));
+    border-radius: 6px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), var(--eno-glow-shadow, 0 0 16px rgba(var(--rgb-chord), 0.18));
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    box-sizing: border-box;
+    position: relative;
+  }
+  .arcade-panel.hidden-module,
+  .arcade-panel.module-hidden-in-dock {
+    display: none !important;
+  }
+  .arcade-panel.module-fullscreen-active {
+    position: fixed !important;
+    inset: 32px !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: 1100px !important;
+    max-height: 840px !important;
+    margin: auto !important;
+    z-index: 200000 !important;
+    border-radius: 8px !important;
+    background: var(--bg-darker) !important;
+    border: 1px solid var(--accent) !important;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.95), 0 0 20px rgba(46, 213, 115, 0.35) !important;
+  }
+  .arcade-panel.module-fullscreen-active .arcade-stage-wrap {
+    flex: 1;
+    height: auto;
+    min-height: 400px;
+  }
+  .arcade-header-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .arcade-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: rgba(46, 213, 115, 0.15);
+    color: #2ed573;
+    border: 1px solid rgba(46, 213, 115, 0.35);
+    font-family: "JetBrains Mono", monospace;
+  }
+  .arcade-header-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-arcade-hud {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-dim);
+    font-size: 10.5px;
+    font-weight: 700;
+    font-family: "JetBrains Mono", monospace;
+    padding: 2px 7px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-arcade-hud:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--text-bright);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  .btn-arcade-hud.btn-arcade-close:hover {
+    color: #ff4757;
+    border-color: rgba(255, 71, 87, 0.4);
+    background: rgba(255, 71, 87, 0.15);
+  }
+  .arcade-stage-wrap {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #0c0d11;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.85);
+    cursor: crosshair;
+  }
+  #arcadeCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  }
   .keyboard-panel {
     flex: 2 1 0;
     min-width: 380px;
@@ -1869,6 +1968,10 @@
       flex: 1 1 360px;
       max-width: 440px;
     }
+    .arcade-panel {
+      flex: 1 1 340px;
+      max-width: 440px;
+    }
     .keyboard-panel {
       flex: 1 1 480px;
     }
@@ -1880,7 +1983,7 @@
     .upper-deck {
       flex-direction: column;
     }
-    .scope-panel, .chord-info-panel, .keyboard-panel {
+    .scope-panel, .chord-info-panel, .keyboard-panel, .arcade-panel {
       width: 100% !important;
       max-width: 100% !important;
       flex: 1 1 auto !important;
@@ -9901,7 +10004,8 @@
   /* ==== Slambient Invaders touch pad (phones and touch devices) ==== */
   .arcade-pad { display: none; }
   @media (max-width: 640px), (hover: none) and (pointer: coarse) {
-    #scopePanel:has(#btnToggleArcade.active) .arcade-pad {
+    #scopePanel:has(#btnToggleArcade.active) .arcade-pad,
+    .arcade-panel .arcade-pad {
       display: flex;
       align-items: stretch;
       gap: 8px;
@@ -9975,7 +10079,8 @@
       background: repeating-linear-gradient(90deg, var(--color-filter) 0 2px, transparent 2px 5px);
       opacity: 0.8;
     }
-    .scope-panel.is-fullscreen .arcade-pad { margin-bottom: 2px; }
+    .scope-panel.is-fullscreen .arcade-pad,
+    .arcade-panel.module-fullscreen-active .arcade-pad { margin-bottom: 2px; }
   }
 
   /* =====================================================================
@@ -9988,7 +10093,8 @@
   .upper-deck-card,
   .scope-panel,
   .chord-info-panel,
-  .keyboard-panel {
+  .keyboard-panel,
+  .arcade-panel {
     container-type: inline-size;
     container-name: moduleCard;
   }
