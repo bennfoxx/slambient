@@ -1075,7 +1075,7 @@
           <div class="split-fx-title">
             <span class="split-fx-icon">🎛️</span>
             <span class="split-fx-label">STUDIO EFFECTS RACK // SPLIT MONITOR</span>
-            <span class="split-fx-tag">5 CONSOLIDATED UNITS</span>
+            <span class="split-fx-tag" id="deckStreamActiveCount">10 FX MODULES + MASTER OUT</span>
           </div>
           <button type="button" class="btn-rail-expand" onclick="setLowerDeckMode('fx')" title="Expand to Full Eurorack Studio FX Rack">
             <span>FULL RACK</span>
@@ -1884,13 +1884,13 @@
       </div>
         </div>
 
-        <!-- 3. SPLIT VIEW MINI-CARDS VERTICAL RAIL (5 Consolidated Units, 52-60px compact) -->
+        <!-- 3. SPLIT VIEW MINI-CARDS VERTICAL RAIL (All 10 Studio FX Modules + Master Out) -->
         <div class="split-fx-rail" id="splitFxRail">
           <div class="split-rail-header">
             <div class="split-rail-title">
               <span class="rail-icon">🎛️</span>
               <span class="rail-label">STUDIO EFFECTS RACK // SPLIT MONITOR</span>
-              <span class="rail-tag">5 CONSOLIDATED UNITS</span>
+              <span class="rail-tag">10 FX MODULES + MASTER OUT</span>
             </div>
             <button type="button" class="btn-rail-expand" onclick="setLowerDeckMode('fx')" title="Expand to Full Eurorack Studio FX Rack">
               <span>FULL RACK</span>
@@ -1899,128 +1899,298 @@
           </div>
 
           <div class="split-rail-cards" id="splitRailCards">
-            <!-- UNIT 1: DRIVE & FILTER -->
-            <div class="mini-fx-card mini-fx-unit-1" id="miniCard_unit1" data-unit="unit1" style="--unit-accent: #ff5252;">
+            <!-- 1. TUBE DRIVE (OVERDRIVE) -->
+            <div class="mini-fx-card" id="miniCard_OVERDRIVE" data-pedal="OVERDRIVE" data-unit="OVERDRIVE" style="--unit-accent: #ff5252;">
               <div class="mini-fx-pip" aria-hidden="true"></div>
               <div class="mini-fx-badge-group">
-                <span class="mini-fx-slot">#01</span>
-                <span class="mini-fx-name" title="Unit 1: Drive & Filter">DRV/FLT</span>
+                <span class="mini-fx-slot" id="mini_slot_OVERDRIVE">#01</span>
+                <span class="mini-fx-name" title="1. Tube Drive (Asymmetric Analog Saturation)">DRIVE</span>
               </div>
               <div class="mini-fx-sliders">
                 <div class="mini-fx-slider-row" title="Drive Gain">
                   <span class="mini-fx-lbl">DRV</span>
-                  <input type="range" class="mini-fx-range" id="mini_slider_drive" min="0.2" max="8.0" step="0.1" value="2.0" oninput="syncMiniParam('OVERDRIVE', 'drive', this.value, 'lbl_mini_drive', 'x')">
-                  <span class="mini-fx-val" id="lbl_mini_drive">2.0x</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_OVERDRIVE_drive" min="0.2" max="8.0" step="0.1" value="2.0" oninput="syncMiniParam('OVERDRIVE', 'drive', this.value, 'lbl_mini_OVERDRIVE_drive', 'x')">
+                  <span class="mini-fx-val" id="lbl_mini_OVERDRIVE_drive">2.0x</span>
                 </div>
-                <div class="mini-fx-slider-row" title="Filter Cutoff">
-                  <span class="mini-fx-lbl">CUT</span>
-                  <input type="range" class="mini-fx-range" id="mini_slider_cutoff" min="60" max="12000" step="20" value="2400" oninput="syncMiniParam('FILTER', 'cutoff', this.value, 'lbl_mini_cutoff', 'Hz')">
-                  <span class="mini-fx-val" id="lbl_mini_cutoff">2.4k</span>
+                <div class="mini-fx-slider-row" title="Drive Wet/Dry Mix">
+                  <span class="mini-fx-lbl">MIX</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_OVERDRIVE_mix" min="0" max="100" step="1" value="50" oninput="syncMiniParam('OVERDRIVE', 'mix', this.value, 'lbl_mini_OVERDRIVE_mix', '%')">
+                  <span class="mini-fx-val" id="lbl_mini_OVERDRIVE_mix">50%</span>
                 </div>
               </div>
               <div class="mini-fx-actions">
-                <button type="button" class="btn-mini-fx-pwr active" id="mini_pwr_unit1" onclick="toggleUnitBypass('unit1', event)" title="Toggle Drive & Filter Bypass">PWR</button>
-                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('unit1', event)" title="Inspect full Drive & Filter controls">EDIT ↗</button>
+                <button type="button" class="btn-mini-fx-shift" id="mini_up_OVERDRIVE" onclick="shiftMasterDspChain('OVERDRIVE', -1, event)" title="Move Up in Signal Chain">↑</button>
+                <button type="button" class="btn-mini-fx-shift" id="mini_dn_OVERDRIVE" onclick="shiftMasterDspChain('OVERDRIVE', 1, event)" title="Move Down in Signal Chain">↓</button>
+                <button type="button" class="btn-mini-fx-pwr" id="mini_pwr_OVERDRIVE" onclick="togglePedalBypass('OVERDRIVE', event)" title="Toggle Tube Drive Bypass">PWR</button>
+                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('OVERDRIVE', event)" title="Inspect Tube Drive full controls">EDIT ↗</button>
               </div>
             </div>
 
-            <!-- UNIT 2: MOD CLUSTER -->
-            <div class="mini-fx-card mini-fx-unit-2" id="miniCard_unit2" data-unit="unit2" style="--unit-accent: #a55eea;">
+            <!-- 2. SVF FILTER (FILTER) -->
+            <div class="mini-fx-card" id="miniCard_FILTER" data-pedal="FILTER" data-unit="FILTER" style="--unit-accent: #2ed573;">
               <div class="mini-fx-pip" aria-hidden="true"></div>
               <div class="mini-fx-badge-group">
-                <span class="mini-fx-slot">#02</span>
-                <span class="mini-fx-name" title="Unit 2: Modulation Cluster">MOD</span>
+                <span class="mini-fx-slot" id="mini_slot_FILTER">#02</span>
+                <span class="mini-fx-name" title="2. SVF Filter & Envelope">FILTER</span>
               </div>
               <div class="mini-fx-sliders">
-                <div class="mini-fx-slider-row" title="Modulation Rate">
-                  <span class="mini-fx-lbl">RATE</span>
-                  <input type="range" class="mini-fx-range" id="mini_slider_mod_rate" min="0.1" max="10.0" step="0.1" value="0.35" oninput="syncMiniModParam('rate', this.value, 'lbl_mini_mod_rate', 'Hz')">
-                  <span class="mini-fx-val" id="lbl_mini_mod_rate">0.35Hz</span>
+                <div class="mini-fx-slider-row" title="Filter Cutoff Frequency">
+                  <span class="mini-fx-lbl">CUT</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_FILTER_cutoff" min="60" max="12000" step="20" value="2200" oninput="syncMiniParam('FILTER', 'cutoff', this.value, 'lbl_mini_FILTER_cutoff', 'Hz')">
+                  <span class="mini-fx-val" id="lbl_mini_FILTER_cutoff">2.2k</span>
                 </div>
-                <div class="mini-fx-slider-row" title="Modulation Depth">
-                  <span class="mini-fx-lbl">DPTH</span>
-                  <input type="range" class="mini-fx-range" id="mini_slider_mod_depth" min="0" max="100" step="1" value="65" oninput="syncMiniModParam('depth', this.value, 'lbl_mini_mod_depth', '%')">
-                  <span class="mini-fx-val" id="lbl_mini_mod_depth">65%</span>
+                <div class="mini-fx-slider-row" title="Filter Resonance (Q)">
+                  <span class="mini-fx-lbl">RES</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_FILTER_res" min="0.1" max="12.0" step="0.1" value="2.4" oninput="syncMiniParam('FILTER', 'res', this.value, 'lbl_mini_FILTER_res', 'Q')">
+                  <span class="mini-fx-val" id="lbl_mini_FILTER_res">2.4</span>
                 </div>
               </div>
               <div class="mini-fx-actions">
-                <button type="button" class="btn-mini-fx-pwr active" id="mini_pwr_unit2" onclick="toggleUnitBypass('unit2', event)" title="Toggle Mod Cluster Bypass">PWR</button>
-                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('unit2', event)" title="Inspect full Modulation Cluster">EDIT ↗</button>
+                <button type="button" class="btn-mini-fx-shift" id="mini_up_FILTER" onclick="shiftMasterDspChain('FILTER', -1, event)" title="Move Up in Signal Chain">↑</button>
+                <button type="button" class="btn-mini-fx-shift" id="mini_dn_FILTER" onclick="shiftMasterDspChain('FILTER', 1, event)" title="Move Down in Signal Chain">↓</button>
+                <button type="button" class="btn-mini-fx-pwr active" id="mini_pwr_FILTER" onclick="togglePedalBypass('FILTER', event)" title="Toggle Filter Bypass">PWR</button>
+                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('FILTER', event)" title="Inspect SVF Filter full controls">EDIT ↗</button>
               </div>
             </div>
 
-            <!-- UNIT 3: ANALOG TAPE DELAY -->
-            <div class="mini-fx-card mini-fx-unit-3" id="miniCard_unit3" data-unit="unit3" style="--unit-accent: #feca57;">
+            <!-- 3. OPTO TREMOLO (TREMOLO) -->
+            <div class="mini-fx-card" id="miniCard_TREMOLO" data-pedal="TREMOLO" data-unit="TREMOLO" style="--unit-accent: #00d2d3;">
               <div class="mini-fx-pip" aria-hidden="true"></div>
               <div class="mini-fx-badge-group">
-                <span class="mini-fx-slot">#03</span>
-                <span class="mini-fx-name" title="Unit 3: Analog Tape Delay">TAPE</span>
+                <span class="mini-fx-slot" id="mini_slot_TREMOLO">#03</span>
+                <span class="mini-fx-name" title="3. Optical Tremolo & Stereo Pan">TREMOLO</span>
+              </div>
+              <div class="mini-fx-sliders">
+                <div class="mini-fx-slider-row" title="Tremolo Rate">
+                  <span class="mini-fx-lbl">RATE</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_TREMOLO_rate" min="0.2" max="12.0" step="0.1" value="3.5" oninput="syncMiniParam('TREMOLO', 'rate', this.value, 'lbl_mini_TREMOLO_rate', 'Hz')">
+                  <span class="mini-fx-val" id="lbl_mini_TREMOLO_rate">3.5Hz</span>
+                </div>
+                <div class="mini-fx-slider-row" title="Tremolo Depth">
+                  <span class="mini-fx-lbl">DPTH</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_TREMOLO_depth" min="0" max="100" step="1" value="60" oninput="syncMiniParam('TREMOLO', 'depth', this.value, 'lbl_mini_TREMOLO_depth', '%')">
+                  <span class="mini-fx-val" id="lbl_mini_TREMOLO_depth">60%</span>
+                </div>
+              </div>
+              <div class="mini-fx-actions">
+                <button type="button" class="btn-mini-fx-shift" id="mini_up_TREMOLO" onclick="shiftMasterDspChain('TREMOLO', -1, event)" title="Move Up in Signal Chain">↑</button>
+                <button type="button" class="btn-mini-fx-shift" id="mini_dn_TREMOLO" onclick="shiftMasterDspChain('TREMOLO', 1, event)" title="Move Down in Signal Chain">↓</button>
+                <button type="button" class="btn-mini-fx-pwr" id="mini_pwr_TREMOLO" onclick="togglePedalBypass('TREMOLO', event)" title="Toggle Opto Tremolo Bypass">PWR</button>
+                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('TREMOLO', event)" title="Inspect Opto Tremolo full controls">EDIT ↗</button>
+              </div>
+            </div>
+
+            <!-- 4. 12-POLE PHASER (PHASER) -->
+            <div class="mini-fx-card" id="miniCard_PHASER" data-pedal="PHASER" data-unit="PHASER" style="--unit-accent: #e056fd;">
+              <div class="mini-fx-pip" aria-hidden="true"></div>
+              <div class="mini-fx-badge-group">
+                <span class="mini-fx-slot" id="mini_slot_PHASER">#04</span>
+                <span class="mini-fx-name" title="4. 12-Pole All-Pass Phaser">PHASER</span>
+              </div>
+              <div class="mini-fx-sliders">
+                <div class="mini-fx-slider-row" title="Phaser Sweep Rate">
+                  <span class="mini-fx-lbl">RATE</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_PHASER_rate" min="0.05" max="6.0" step="0.05" value="0.35" oninput="syncMiniParam('PHASER', 'rate', this.value, 'lbl_mini_PHASER_rate', 'Hz')">
+                  <span class="mini-fx-val" id="lbl_mini_PHASER_rate">0.35Hz</span>
+                </div>
+                <div class="mini-fx-slider-row" title="Phaser Sweep Depth">
+                  <span class="mini-fx-lbl">DPTH</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_PHASER_depth" min="0" max="100" step="1" value="65" oninput="syncMiniParam('PHASER', 'depth', this.value, 'lbl_mini_PHASER_depth', '%')">
+                  <span class="mini-fx-val" id="lbl_mini_PHASER_depth">65%</span>
+                </div>
+              </div>
+              <div class="mini-fx-actions">
+                <button type="button" class="btn-mini-fx-shift" id="mini_up_PHASER" onclick="shiftMasterDspChain('PHASER', -1, event)" title="Move Up in Signal Chain">↑</button>
+                <button type="button" class="btn-mini-fx-shift" id="mini_dn_PHASER" onclick="shiftMasterDspChain('PHASER', 1, event)" title="Move Down in Signal Chain">↓</button>
+                <button type="button" class="btn-mini-fx-pwr" id="mini_pwr_PHASER" onclick="togglePedalBypass('PHASER', event)" title="Toggle 12-Pole Phaser Bypass">PWR</button>
+                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('PHASER', event)" title="Inspect 12-Pole Phaser full controls">EDIT ↗</button>
+              </div>
+            </div>
+
+            <!-- 5. ANALOG FLANGER (FLANGER) -->
+            <div class="mini-fx-card" id="miniCard_FLANGER" data-pedal="FLANGER" data-unit="FLANGER" style="--unit-accent: #54a0ff;">
+              <div class="mini-fx-pip" aria-hidden="true"></div>
+              <div class="mini-fx-badge-group">
+                <span class="mini-fx-slot" id="mini_slot_FLANGER">#05</span>
+                <span class="mini-fx-name" title="5. Analog Comb-Filter Flanger">FLANGER</span>
+              </div>
+              <div class="mini-fx-sliders">
+                <div class="mini-fx-slider-row" title="Flanger LFO Rate">
+                  <span class="mini-fx-lbl">RATE</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_FLANGER_rate" min="0.05" max="5.0" step="0.05" value="0.25" oninput="syncMiniParam('FLANGER', 'rate', this.value, 'lbl_mini_FLANGER_rate', 'Hz')">
+                  <span class="mini-fx-val" id="lbl_mini_FLANGER_rate">0.25Hz</span>
+                </div>
+                <div class="mini-fx-slider-row" title="Flanger Comb Depth">
+                  <span class="mini-fx-lbl">DPTH</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_FLANGER_depth" min="0" max="100" step="1" value="70" oninput="syncMiniParam('FLANGER', 'depth', this.value, 'lbl_mini_FLANGER_depth', '%')">
+                  <span class="mini-fx-val" id="lbl_mini_FLANGER_depth">70%</span>
+                </div>
+              </div>
+              <div class="mini-fx-actions">
+                <button type="button" class="btn-mini-fx-shift" id="mini_up_FLANGER" onclick="shiftMasterDspChain('FLANGER', -1, event)" title="Move Up in Signal Chain">↑</button>
+                <button type="button" class="btn-mini-fx-shift" id="mini_dn_FLANGER" onclick="shiftMasterDspChain('FLANGER', 1, event)" title="Move Down in Signal Chain">↓</button>
+                <button type="button" class="btn-mini-fx-pwr" id="mini_pwr_FLANGER" onclick="togglePedalBypass('FLANGER', event)" title="Toggle Analog Flanger Bypass">PWR</button>
+                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('FLANGER', event)" title="Inspect Analog Flanger full controls">EDIT ↗</button>
+              </div>
+            </div>
+
+            <!-- 6. TAPE DELAY (DELAY) -->
+            <div class="mini-fx-card" id="miniCard_DELAY" data-pedal="DELAY" data-unit="DELAY" style="--unit-accent: #ff793f;">
+              <div class="mini-fx-pip" aria-hidden="true"></div>
+              <div class="mini-fx-badge-group">
+                <span class="mini-fx-slot" id="mini_slot_DELAY">#06</span>
+                <span class="mini-fx-name" title="6. Analog Tape Delay">T-DELAY</span>
               </div>
               <div class="mini-fx-sliders">
                 <div class="mini-fx-slider-row" title="Tape Delay Time">
                   <span class="mini-fx-lbl">TIME</span>
-                  <input type="range" class="mini-fx-range" id="mini_slider_tape_time" min="0.05" max="2.5" step="0.01" value="0.38" oninput="syncMiniParam('DELAY', 'time', this.value, 'lbl_mini_tape_time', 's')">
-                  <span class="mini-fx-val" id="lbl_mini_tape_time">380ms</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_DELAY_time" min="0.05" max="1.5" step="0.025" value="0.38" oninput="syncMiniParam('DELAY', 'time', this.value, 'lbl_mini_DELAY_time', 's')">
+                  <span class="mini-fx-val" id="lbl_mini_DELAY_time">380ms</span>
                 </div>
-                <div class="mini-fx-slider-row" title="Motor Wow & Flutter">
-                  <span class="mini-fx-lbl">FLUT</span>
-                  <input type="range" class="mini-fx-range" id="mini_slider_tape_flutter" min="0" max="100" step="1" value="35" oninput="syncMiniParam('TAPE_ECHO', 'flutter', this.value, 'lbl_mini_tape_flutter', '%')">
-                  <span class="mini-fx-val" id="lbl_mini_tape_flutter">35%</span>
+                <div class="mini-fx-slider-row" title="Tape Delay Wet/Dry Mix">
+                  <span class="mini-fx-lbl">MIX</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_DELAY_mix" min="0" max="100" step="1" value="42" oninput="syncMiniParam('DELAY', 'mix', this.value, 'lbl_mini_DELAY_mix', '%')">
+                  <span class="mini-fx-val" id="lbl_mini_DELAY_mix">42%</span>
                 </div>
               </div>
               <div class="mini-fx-actions">
-                <button type="button" class="btn-mini-fx-pwr active" id="mini_pwr_unit3" onclick="toggleUnitBypass('unit3', event)" title="Toggle Tape Delay Bypass">PWR</button>
-                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('unit3', event)" title="Inspect full Tape Delay controls">EDIT ↗</button>
+                <button type="button" class="btn-mini-fx-shift" id="mini_up_DELAY" onclick="shiftMasterDspChain('DELAY', -1, event)" title="Move Up in Signal Chain">↑</button>
+                <button type="button" class="btn-mini-fx-shift" id="mini_dn_DELAY" onclick="shiftMasterDspChain('DELAY', 1, event)" title="Move Down in Signal Chain">↓</button>
+                <button type="button" class="btn-mini-fx-pwr active" id="mini_pwr_DELAY" onclick="togglePedalBypass('DELAY', event)" title="Toggle Tape Delay Bypass">PWR</button>
+                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('DELAY', event)" title="Inspect Tape Delay full controls">EDIT ↗</button>
               </div>
             </div>
 
-            <!-- UNIT 4: DIGITAL DELAY -->
-            <div class="mini-fx-card mini-fx-unit-4" id="miniCard_unit4" data-unit="unit4" style="--unit-accent: #48dbfb;">
+            <!-- 7. TAPE ECHO (TAPE_ECHO) -->
+            <div class="mini-fx-card" id="miniCard_TAPE_ECHO" data-pedal="TAPE_ECHO" data-unit="TAPE_ECHO" style="--unit-accent: #feca57;">
               <div class="mini-fx-pip" aria-hidden="true"></div>
               <div class="mini-fx-badge-group">
-                <span class="mini-fx-slot">#04</span>
-                <span class="mini-fx-name" title="Unit 4: Digital Delay">D-DLY</span>
+                <span class="mini-fx-slot" id="mini_slot_TAPE_ECHO">#07</span>
+                <span class="mini-fx-name" title="7. 3-Head Multi-Tap Tape Echo">T-ECHO</span>
               </div>
               <div class="mini-fx-sliders">
-                <div class="mini-fx-slider-row" title="Delay Division Time">
-                  <span class="mini-fx-lbl">TIME</span>
-                  <input type="range" class="mini-fx-range" id="mini_slider_dig_time" min="0.02" max="2.0" step="0.01" value="0.375" oninput="syncMiniParam('DIGITAL_DELAY', 'time', this.value, 'lbl_mini_dig_time', 's')">
-                  <span class="mini-fx-val" id="lbl_mini_dig_time">375ms</span>
+                <div class="mini-fx-slider-row" title="Tape Capstan Motor Speed">
+                  <span class="mini-fx-lbl">SPD</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_TAPE_ECHO_speed" min="0.2" max="2.5" step="0.05" value="1.0" oninput="syncMiniParam('TAPE_ECHO', 'speed', this.value, 'lbl_mini_TAPE_ECHO_speed', 'x')">
+                  <span class="mini-fx-val" id="lbl_mini_TAPE_ECHO_speed">1.0x</span>
                 </div>
-                <div class="mini-fx-slider-row" title="Delay Feedback">
-                  <span class="mini-fx-lbl">FDBK</span>
-                  <input type="range" class="mini-fx-range" id="mini_slider_dig_fdbk" min="0" max="95" step="1" value="45" oninput="syncMiniParam('DIGITAL_DELAY', 'feedback', this.value, 'lbl_mini_dig_fdbk', '%')">
-                  <span class="mini-fx-val" id="lbl_mini_dig_fdbk">45%</span>
+                <div class="mini-fx-slider-row" title="Tape Echo Wet/Dry Mix">
+                  <span class="mini-fx-lbl">MIX</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_TAPE_ECHO_mix" min="0" max="100" step="1" value="45" oninput="syncMiniParam('TAPE_ECHO', 'mix', this.value, 'lbl_mini_TAPE_ECHO_mix', '%')">
+                  <span class="mini-fx-val" id="lbl_mini_TAPE_ECHO_mix">45%</span>
                 </div>
               </div>
               <div class="mini-fx-actions">
-                <button type="button" class="btn-mini-fx-pwr active" id="mini_pwr_unit4" onclick="toggleUnitBypass('unit4', event)" title="Toggle Digital Delay Bypass">PWR</button>
-                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('unit4', event)" title="Inspect full Digital Delay controls">EDIT ↗</button>
+                <button type="button" class="btn-mini-fx-shift" id="mini_up_TAPE_ECHO" onclick="shiftMasterDspChain('TAPE_ECHO', -1, event)" title="Move Up in Signal Chain">↑</button>
+                <button type="button" class="btn-mini-fx-shift" id="mini_dn_TAPE_ECHO" onclick="shiftMasterDspChain('TAPE_ECHO', 1, event)" title="Move Down in Signal Chain">↓</button>
+                <button type="button" class="btn-mini-fx-pwr" id="mini_pwr_TAPE_ECHO" onclick="togglePedalBypass('TAPE_ECHO', event)" title="Toggle Tape Echo Bypass">PWR</button>
+                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('TAPE_ECHO', event)" title="Inspect Tape Echo full controls">EDIT ↗</button>
               </div>
             </div>
 
-            <!-- UNIT 5: REVERB & SPACE -->
-            <div class="mini-fx-card mini-fx-unit-5" id="miniCard_unit5" data-unit="unit5" style="--unit-accent: #ff5fc4;">
+            <!-- 8. DIGITAL DELAY (DIGITAL_DELAY) -->
+            <div class="mini-fx-card" id="miniCard_DIGITAL_DELAY" data-pedal="DIGITAL_DELAY" data-unit="DIGITAL_DELAY" style="--unit-accent: #48dbfb;">
               <div class="mini-fx-pip" aria-hidden="true"></div>
               <div class="mini-fx-badge-group">
-                <span class="mini-fx-slot">#05</span>
-                <span class="mini-fx-name" title="Unit 5: Reverb & Space">SPACE</span>
+                <span class="mini-fx-slot" id="mini_slot_DIGITAL_DELAY">#08</span>
+                <span class="mini-fx-name" title="8. Stereo Ping-Pong Digital Delay">D-DELAY</span>
+              </div>
+              <div class="mini-fx-sliders">
+                <div class="mini-fx-slider-row" title="Digital Delay Time">
+                  <span class="mini-fx-lbl">TIME</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_DIGITAL_DELAY_time" min="0.02" max="2.0" step="0.01" value="0.375" oninput="syncMiniParam('DIGITAL_DELAY', 'time', this.value, 'lbl_mini_DIGITAL_DELAY_time', 's')">
+                  <span class="mini-fx-val" id="lbl_mini_DIGITAL_DELAY_time">375ms</span>
+                </div>
+                <div class="mini-fx-slider-row" title="Digital Delay Feedback">
+                  <span class="mini-fx-lbl">FDBK</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_DIGITAL_DELAY_feedback" min="0" max="85" step="1" value="45" oninput="syncMiniParam('DIGITAL_DELAY', 'feedback', this.value, 'lbl_mini_DIGITAL_DELAY_feedback', '%')">
+                  <span class="mini-fx-val" id="lbl_mini_DIGITAL_DELAY_feedback">45%</span>
+                </div>
+              </div>
+              <div class="mini-fx-actions">
+                <button type="button" class="btn-mini-fx-shift" id="mini_up_DIGITAL_DELAY" onclick="shiftMasterDspChain('DIGITAL_DELAY', -1, event)" title="Move Up in Signal Chain">↑</button>
+                <button type="button" class="btn-mini-fx-shift" id="mini_dn_DIGITAL_DELAY" onclick="shiftMasterDspChain('DIGITAL_DELAY', 1, event)" title="Move Down in Signal Chain">↓</button>
+                <button type="button" class="btn-mini-fx-pwr" id="mini_pwr_DIGITAL_DELAY" onclick="togglePedalBypass('DIGITAL_DELAY', event)" title="Toggle Digital Delay Bypass">PWR</button>
+                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('DIGITAL_DELAY', event)" title="Inspect Digital Delay full controls">EDIT ↗</button>
+              </div>
+            </div>
+
+            <!-- 9. SPACE DELAY (SPACE_DELAY) -->
+            <div class="mini-fx-card" id="miniCard_SPACE_DELAY" data-pedal="SPACE_DELAY" data-unit="SPACE_DELAY" style="--unit-accent: #ff9f43;">
+              <div class="mini-fx-pip" aria-hidden="true"></div>
+              <div class="mini-fx-badge-group">
+                <span class="mini-fx-slot" id="mini_slot_SPACE_DELAY">#09</span>
+                <span class="mini-fx-name" title="9. Space Delay Diffusion & Flutter">S-DELAY</span>
+              </div>
+              <div class="mini-fx-sliders">
+                <div class="mini-fx-slider-row" title="Space Delay Time">
+                  <span class="mini-fx-lbl">TIME</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_SPACE_DELAY_time" min="0.1" max="2.5" step="0.025" value="0.52" oninput="syncMiniParam('SPACE_DELAY', 'time', this.value, 'lbl_mini_SPACE_DELAY_time', 's')">
+                  <span class="mini-fx-val" id="lbl_mini_SPACE_DELAY_time">520ms</span>
+                </div>
+                <div class="mini-fx-slider-row" title="Space Delay Flutter">
+                  <span class="mini-fx-lbl">FLUT</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_SPACE_DELAY_flutter" min="0" max="100" step="1" value="40" oninput="syncMiniParam('SPACE_DELAY', 'flutter', this.value, 'lbl_mini_SPACE_DELAY_flutter', '%')">
+                  <span class="mini-fx-val" id="lbl_mini_SPACE_DELAY_flutter">40%</span>
+                </div>
+              </div>
+              <div class="mini-fx-actions">
+                <button type="button" class="btn-mini-fx-shift" id="mini_up_SPACE_DELAY" onclick="shiftMasterDspChain('SPACE_DELAY', -1, event)" title="Move Up in Signal Chain">↑</button>
+                <button type="button" class="btn-mini-fx-shift" id="mini_dn_SPACE_DELAY" onclick="shiftMasterDspChain('SPACE_DELAY', 1, event)" title="Move Down in Signal Chain">↓</button>
+                <button type="button" class="btn-mini-fx-pwr" id="mini_pwr_SPACE_DELAY" onclick="togglePedalBypass('SPACE_DELAY', event)" title="Toggle Space Delay Bypass">PWR</button>
+                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('SPACE_DELAY', event)" title="Inspect Space Delay full controls">EDIT ↗</button>
+              </div>
+            </div>
+
+            <!-- 10. SPACE REVERB & CHORUS (SPACE) -->
+            <div class="mini-fx-card" id="miniCard_SPACE" data-pedal="SPACE" data-unit="SPACE" style="--unit-accent: #ff5fc4;">
+              <div class="mini-fx-pip" aria-hidden="true"></div>
+              <div class="mini-fx-badge-group">
+                <span class="mini-fx-slot" id="mini_slot_SPACE">#10</span>
+                <span class="mini-fx-name" title="10. Space Reverb & Stereo Chorus">REVERB</span>
               </div>
               <div class="mini-fx-sliders">
                 <div class="mini-fx-slider-row" title="Reverb Size / Decay">
                   <span class="mini-fx-lbl">SIZE</span>
-                  <input type="range" class="mini-fx-range" id="mini_slider_spc_size" min="10" max="95" step="1" value="65" oninput="syncMiniParam('SPACE', 'weather', this.value, 'lbl_mini_spc_size', '%')">
-                  <span class="mini-fx-val" id="lbl_mini_spc_size">65%</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_SPACE_decay" min="10" max="95" step="1" value="65" oninput="syncMiniParam('SPACE', 'decay', this.value, 'lbl_mini_SPACE_decay', '%')">
+                  <span class="mini-fx-val" id="lbl_mini_SPACE_decay">65%</span>
                 </div>
                 <div class="mini-fx-slider-row" title="Reverb Wet/Dry Mix">
                   <span class="mini-fx-lbl">MIX</span>
-                  <input type="range" class="mini-fx-range" id="mini_slider_spc_mix" min="0" max="100" step="1" value="48" oninput="syncMiniParam('SPACE', 'mix', this.value, 'lbl_mini_spc_mix', '%')">
-                  <span class="mini-fx-val" id="lbl_mini_spc_mix">48%</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_SPACE_mix" min="0" max="100" step="1" value="48" oninput="syncMiniParam('SPACE', 'mix', this.value, 'lbl_mini_SPACE_mix', '%')">
+                  <span class="mini-fx-val" id="lbl_mini_SPACE_mix">48%</span>
                 </div>
               </div>
               <div class="mini-fx-actions">
-                <button type="button" class="btn-mini-fx-pwr active" id="mini_pwr_unit5" onclick="toggleUnitBypass('unit5', event)" title="Toggle Reverb & Space Bypass">PWR</button>
-                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('unit5', event)" title="Inspect full Reverb & Space controls">EDIT ↗</button>
+                <button type="button" class="btn-mini-fx-shift" id="mini_up_SPACE" onclick="shiftMasterDspChain('SPACE', -1, event)" title="Move Up in Signal Chain">↑</button>
+                <button type="button" class="btn-mini-fx-shift" id="mini_dn_SPACE" onclick="shiftMasterDspChain('SPACE', 1, event)" title="Move Down in Signal Chain">↓</button>
+                <button type="button" class="btn-mini-fx-pwr active" id="mini_pwr_SPACE" onclick="togglePedalBypass('SPACE', event)" title="Toggle Space Reverb Bypass">PWR</button>
+                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('SPACE', event)" title="Inspect Space Reverb full controls">EDIT ↗</button>
+              </div>
+            </div>
+
+            <!-- 11. TERMINAL MASTER OUT & 3-BAND EQ (MASTER) -->
+            <div class="mini-fx-card mini-fx-master" id="miniCard_MASTER" data-pedal="MASTER" data-unit="MASTER" style="--unit-accent: #4b7bec;">
+              <div class="mini-fx-pip" aria-hidden="true"></div>
+              <div class="mini-fx-badge-group">
+                <span class="mini-fx-slot" id="mini_slot_MASTER">OUT</span>
+                <span class="mini-fx-name" title="Master 3-Band EQ, Tape Saturation & Diffusion Out">MASTER</span>
+              </div>
+              <div class="mini-fx-sliders">
+                <div class="mini-fx-slider-row" title="Diffusion Master Space">
+                  <span class="mini-fx-lbl">SPCE</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_MASTER_weather" min="0" max="100" step="1" value="45" oninput="syncMiniMasterParam('weather', this.value, 'lbl_mini_MASTER_weather')">
+                  <span class="mini-fx-val" id="lbl_mini_MASTER_weather">45%</span>
+                </div>
+                <div class="mini-fx-slider-row" title="Master Tape Saturation / Drive">
+                  <span class="mini-fx-lbl">DRV</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_MASTER_drive" min="0" max="100" step="1" value="10" oninput="syncMiniMasterParam('drive', this.value, 'lbl_mini_MASTER_drive')">
+                  <span class="mini-fx-val" id="lbl_mini_MASTER_drive">10%</span>
+                </div>
+              </div>
+              <div class="mini-fx-actions">
+                <button type="button" class="btn-mini-fx-shift" onclick="randomizeSpace()" title="Randomize Master EQ & Out">⚄</button>
+                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('MASTER', event)" title="Inspect Master EQ & Out controls">EDIT ↗</button>
               </div>
             </div>
           </div>
@@ -3872,17 +4042,25 @@ function rewireDspChain(newOrder, immediate = false) {
         ANALOG_DELAY: { in: delayModuleInput,  out: delayModuleOutput },
         DIGITAL_DELAY:{ in: delayModuleInput,  out: delayModuleOutput },
         SPACE_REVERB: { in: spaceModuleInput,  out: spaceModuleOutput },
-        FILTER: { in: filterModuleInput, out: filterModuleOutput },
-        DELAY:  { in: delayModuleInput,  out: delayModuleOutput },
-        SPACE:  { in: spaceModuleInput,  out: spaceModuleOutput },
-        REVERB: { in: spaceModuleInput,  out: spaceModuleOutput }
+        OVERDRIVE:    { in: filterModuleInput, out: filterModuleOutput },
+        FILTER:       { in: filterModuleInput, out: filterModuleOutput },
+        TREMOLO:      { in: filterModuleInput, out: filterModuleOutput },
+        PHASER:       { in: filterModuleInput, out: filterModuleOutput },
+        FLANGER:      { in: filterModuleInput, out: filterModuleOutput },
+        DELAY:        { in: delayModuleInput,  out: delayModuleOutput },
+        TAPE_ECHO:    { in: delayModuleInput,  out: delayModuleOutput },
+        SPACE_DELAY:  { in: delayModuleInput,  out: delayModuleOutput },
+        SPACE:        { in: spaceModuleInput,  out: spaceModuleOutput },
+        REVERB:       { in: spaceModuleInput,  out: spaceModuleOutput }
       };
 
       let prevNode = masterBusPre;
+      const connectedInNodes = new Set();
       for (let i = 0; i < dspChainOrder.length; i++) {
         const key = dspChainOrder[i];
         const m = modules[key];
-        if (m && m.in && m.out) {
+        if (m && m.in && m.out && !connectedInNodes.has(m.in)) {
+          connectedInNodes.add(m.in);
           prevNode.connect(m.in);
           prevNode = m.out;
         }
@@ -4336,48 +4514,74 @@ function swapPedalOrbPositions(keyA, keyB) {
   orbB.bump = Math.min(0.8, (orbB.bump || 0) + 0.25);
 }
 
+const DEFAULT_10_PEDAL_ORDER = [
+  "OVERDRIVE", "FILTER", "TREMOLO", "PHASER", "FLANGER",
+  "DELAY", "TAPE_ECHO", "DIGITAL_DELAY", "SPACE_DELAY", "SPACE"
+];
+
+function getExpandedPedalOrder(rawOrder) {
+  const source = Array.isArray(rawOrder) && rawOrder.length ? rawOrder : DEFAULT_10_PEDAL_ORDER;
+  const expanded = [];
+  const seen = new Set();
+
+  source.forEach(key => {
+    const meta = PEDAL_REGISTRY[key];
+    const subKeys = (meta && Array.isArray(meta.subPedals) && meta.subPedals.length) ? meta.subPedals : [key];
+    subKeys.forEach(sk => {
+      if (DEFAULT_10_PEDAL_ORDER.includes(sk) && !seen.has(sk)) {
+        seen.add(sk);
+        expanded.push(sk);
+      }
+    });
+  });
+
+  DEFAULT_10_PEDAL_ORDER.forEach(sk => {
+    if (!seen.has(sk)) {
+      seen.add(sk);
+      expanded.push(sk);
+    }
+  });
+
+  return expanded;
+}
+
 function updatePedalsOrderUI() {
   const container = document.getElementById("studioFxGrid") || document.getElementById("masterDeckUnified");
+  const expandedOrder = getExpandedPedalOrder(dspChainOrder);
 
-  // Synchronize pedal cards and slot badges in the pedalboard grid
+  // Synchronize all 10 pedal cards and slot badges in the pedalboard grid
   if (container) {
-    let globalSlot = 1;
+    expandedOrder.forEach((subKey, idx) => {
+      const el = document.getElementById("pedalCard_" + subKey);
+      if (el && !el.closest("#orbitalModalBody")) {
+        container.appendChild(el);
+      }
+
+      const chainNum = idx + 1;
+      const formattedSlot = "#" + (chainNum < 10 ? "0" + chainNum : chainNum);
+      const slotIndexEl = document.getElementById("slotIndex_" + subKey);
+      if (slotIndexEl) slotIndexEl.textContent = formattedSlot;
+
+      const titleEl = document.getElementById("pedalTitle_" + subKey) || (el ? el.querySelector(".panel-header .pedal-card-title, .panel-header > span:first-child") : null);
+      if (titleEl) {
+        const subMeta = PEDAL_REGISTRY[subKey];
+        titleEl.textContent = `${chainNum}. ${subMeta ? subMeta.name : (PEDAL_BASE_NAMES[subKey] || subKey)}`;
+      }
+
+      const slotBadge = document.getElementById("slotBadge_" + subKey);
+      if (slotBadge) {
+        if (idx === 0) slotBadge.textContent = "IN";
+        else if (idx === expandedOrder.length - 1) slotBadge.textContent = "OUT";
+        else slotBadge.textContent = "INSERT";
+      }
+
+      const shiftL = document.getElementById("shiftLeft_" + subKey);
+      const shiftR = document.getElementById("shiftRight_" + subKey);
+      if (shiftL) shiftL.disabled = (idx === 0);
+      if (shiftR) shiftR.disabled = (idx === expandedOrder.length - 1);
+    });
+
     dspChainOrder.forEach((key, idx) => {
-      const meta = PEDAL_REGISTRY[key];
-      const subKeys = (meta && meta.subPedals) ? meta.subPedals : [key];
-
-      subKeys.forEach(subKey => {
-        const el = document.getElementById("pedalCard_" + subKey);
-        if (el && !el.closest("#orbitalModalBody")) {
-          container.appendChild(el);
-        }
-
-        const chainNum = globalSlot;
-        const formattedSlot = "#" + (chainNum < 10 ? "0" + chainNum : chainNum);
-        const slotIndexEl = document.getElementById("slotIndex_" + subKey);
-        if (slotIndexEl) slotIndexEl.textContent = formattedSlot;
-
-        const titleEl = document.getElementById("pedalTitle_" + subKey) || (el ? el.querySelector(".panel-header .pedal-card-title, .panel-header > span:first-child") : null);
-        if (titleEl) {
-          const subMeta = PEDAL_REGISTRY[subKey];
-          titleEl.textContent = `${chainNum}. ${subMeta ? subMeta.name : (PEDAL_BASE_NAMES[subKey] || subKey)}`;
-        }
-
-        const slotBadge = document.getElementById("slotBadge_" + subKey);
-        if (slotBadge) {
-          if (idx === 0 && subKey === subKeys[0]) slotBadge.textContent = "IN";
-          else if (idx === dspChainOrder.length - 1 && subKey === subKeys[subKeys.length - 1]) slotBadge.textContent = "OUT";
-          else slotBadge.textContent = "INSERT";
-        }
-
-        const shiftL = document.getElementById("shiftLeft_" + subKey);
-        const shiftR = document.getElementById("shiftRight_" + subKey);
-        if (shiftL) shiftL.disabled = (idx === 0 && subKey === subKeys[0]);
-        if (shiftR) shiftR.disabled = (idx === dspChainOrder.length - 1 && subKey === subKeys[subKeys.length - 1]);
-
-        globalSlot++;
-      });
-
       if (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && typeof ORBITAL_MODULES !== "undefined") {
         const orbId = PEDAL_KEY_TO_ORBITAL_ID[key];
         const orb = orbId ? ORBITAL_MODULES.find(o => o.id === orbId) : null;
@@ -4405,7 +4609,7 @@ function updatePedalsOrderUI() {
   if (eqStrip) {
     const outHeader = eqStrip.querySelector(".panel-header > span:first-child");
     if (outHeader) {
-      outHeader.textContent = (typeof globalSlot !== "undefined" && globalSlot) ? `${globalSlot}. OUT` : "OUT";
+      outHeader.textContent = `${expandedOrder.length + 1}. OUT`;
     }
   }
 
@@ -4432,7 +4636,7 @@ function renderPedalboardRoutingRibbon() {
   const container = document.getElementById("pedalboardRoutingStream");
   if (!container) return;
 
-  const order = Array.isArray(dspChainOrder) ? dspChainOrder : Object.keys(PEDAL_REGISTRY);
+  const order = getExpandedPedalOrder(dspChainOrder);
   let html = "";
 
   order.forEach((key, idx) => {
@@ -4455,12 +4659,21 @@ function renderPedalboardRoutingRibbon() {
   const countEl = document.getElementById("deckStreamActiveCount");
   if (countEl) {
     const activeCount = order.filter(k => !(typeof pedalBypassState !== "undefined" && pedalBypassState[k])).length;
-    countEl.textContent = `${activeCount} / ${order.length} ACTIVE INSERTS`;
+    countEl.textContent = `${activeCount} / ${order.length} ACTIVE FX + OUT`;
   }
 }
 
 function focusOrInspectPedal(key, ev) {
   if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
+  if (currentLowerDeckMode === "split") {
+    const miniEl = document.getElementById("miniCard_" + key);
+    if (miniEl) {
+      miniEl.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+      miniEl.classList.add("pedal-highlight-flash");
+      setTimeout(() => miniEl.classList.remove("pedal-highlight-flash"), 1200);
+      return;
+    }
+  }
   const el = document.getElementById("pedalCard_" + key);
   if (el) {
     el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
@@ -4567,8 +4780,25 @@ function initLowerDeckView() {
 }
 
 // =========================================================================
-// 5 CONSOLIDATED FX UNITS & SPLIT-VIEW MINI-CARDS ENGINE
+// ALL 10 STUDIO FX MODULES + MASTER OUT SPLIT-VIEW ENGINE
 // =========================================================================
+
+function formatMiniReadout(numVal, unit) {
+  if (unit === "Hz") {
+    if (numVal >= 1000) return (numVal / 1000).toFixed(1) + "k";
+    return (numVal < 10 ? numVal.toFixed(2) : Math.round(numVal)) + "Hz";
+  }
+  if (unit === "s") {
+    return Math.round(numVal * 1000) + "ms";
+  }
+  if (unit === "x") {
+    return numVal.toFixed(1) + "x";
+  }
+  if (unit === "Q") {
+    return numVal.toFixed(1);
+  }
+  return Math.round(numVal) + (unit || "");
+}
 
 function syncMiniParam(pedalKey, paramId, value, lblId, unit) {
   const numVal = parseFloat(value);
@@ -4577,22 +4807,39 @@ function syncMiniParam(pedalKey, paramId, value, lblId, unit) {
   }
   const lbl = document.getElementById(lblId);
   if (lbl) {
-    if (unit === "Hz") {
-      lbl.textContent = numVal >= 1000 ? (numVal / 1000).toFixed(1) + "k" : Math.round(numVal) + "Hz";
-    } else if (unit === "s") {
-      lbl.textContent = Math.round(numVal * 1000) + "ms";
-    } else if (unit === "x") {
-      lbl.textContent = numVal.toFixed(1) + "x";
-    } else {
-      lbl.textContent = Math.round(numVal) + (unit || "");
-    }
+    lbl.textContent = formatMiniReadout(numVal, unit);
   }
 
   const fullSlider = document.getElementById(`slider_${pedalKey}_${paramId}`) ||
-                     (paramId === "cutoff" ? document.getElementById("knobMasterCutoff") : null) ||
-                     (paramId === "weather" ? document.getElementById("knobWeather") : null);
+                     (pedalKey === "FILTER" && paramId === "cutoff" ? document.getElementById("knobMasterCutoff") : null) ||
+                     (pedalKey === "FILTER" && paramId === "res" ? document.getElementById("knobMasterRes") : null) ||
+                     (pedalKey === "DELAY" && paramId === "time" ? document.getElementById("knobDelayTime") : null) ||
+                     (pedalKey === "DELAY" && paramId === "mix" ? document.getElementById("knobDelayMix") : null) ||
+                     (pedalKey === "SPACE" && (paramId === "weather" || paramId === "decay") ? document.getElementById("knobWeather") : null) ||
+                     (pedalKey === "SPACE" && paramId === "mix" ? document.getElementById("knobReverbMix") : null);
   if (fullSlider) {
     fullSlider.value = numVal;
+  }
+}
+
+function syncMiniMasterParam(paramId, value, lblId) {
+  const numVal = parseFloat(value);
+  const lbl = document.getElementById(lblId);
+  if (lbl) {
+    lbl.textContent = Math.round(numVal) + "%";
+  }
+  if (paramId === "weather") {
+    const kWeather = document.getElementById("knobWeather");
+    if (kWeather) kWeather.value = numVal;
+    const lWeather = document.getElementById("lblWeather");
+    if (lWeather) lWeather.textContent = Math.round(numVal) + "%";
+    if (typeof updateAudioParams === "function") updateAudioParams();
+  } else if (paramId === "drive") {
+    const kDrive = document.getElementById("knobMasterDrive");
+    if (kDrive) kDrive.value = numVal;
+    const lDrive = document.getElementById("lblMasterDrive");
+    if (lDrive) lDrive.textContent = Math.round(numVal) + "%";
+    if (typeof updateAudioParams === "function") updateAudioParams();
   }
 }
 
@@ -4633,56 +4880,36 @@ function toggleSubPedalBypass(spKey, event) {
   const btn = document.getElementById("sub_pwr_" + spKey);
   const isEngaged = !(typeof pedalBypassState !== "undefined" && pedalBypassState[spKey]);
   if (btn) btn.classList.toggle("active", isEngaged);
-
-  const unitMap = {
-    OVERDRIVE: "unit1", FILTER: "unit1",
-    TREMOLO: "unit2", PHASER: "unit2", FLANGER: "unit2",
-    DELAY: "unit3", TAPE_ECHO: "unit3",
-    DIGITAL_DELAY: "unit4", SPACE_DELAY: "unit4",
-    SPACE: "unit5"
-  };
-  const uKey = unitMap[spKey];
-  if (uKey) updateUnitBypassUI(uKey);
 }
 
 function renderSplitFxSidebar() {
   const sidebar = document.getElementById("splitRailCards") || document.getElementById("splitFxSidebar");
   if (!sidebar) return;
 
-  const keyToUnit = {
-    DRIVE_FILTER: "unit1",
-    MOD_CLUSTER: "unit2",
-    ANALOG_DELAY: "unit3",
-    DIGITAL_DELAY: "unit4",
-    SPACE_REVERB: "unit5",
-    OVERDRIVE: "unit1",
-    FILTER: "unit1",
-    TREMOLO: "unit2",
-    PHASER: "unit2",
-    FLANGER: "unit2",
-    DELAY: "unit3",
-    TAPE_ECHO: "unit3",
-    SPACE_DELAY: "unit4",
-    SPACE: "unit5"
-  };
+  const order = getExpandedPedalOrder(dspChainOrder);
 
-  const order = Array.isArray(dspChainOrder) ? dspChainOrder : ["DRIVE_FILTER", "MOD_CLUSTER", "ANALOG_DELAY", "DIGITAL_DELAY", "SPACE_REVERB"];
-  const seenUnits = new Set();
-
-  order.forEach(key => {
-    const unitKey = keyToUnit[key];
-    if (unitKey && !seenUnits.has(unitKey)) {
-      seenUnits.add(unitKey);
-      const card = document.getElementById("miniCard_" + unitKey);
-      if (card) {
-        sidebar.appendChild(card);
-        const idxEl = card.querySelector(".mini-fx-slot, .mini-fx-idx");
-        if (idxEl) {
-          idxEl.textContent = `#0${seenUnits.size}`;
-        }
+  order.forEach((key, idx) => {
+    const card = document.getElementById("miniCard_" + key);
+    if (card) {
+      sidebar.appendChild(card);
+      const num = idx + 1;
+      const idxEl = document.getElementById("mini_slot_" + key) || card.querySelector(".mini-fx-slot, .mini-fx-idx");
+      if (idxEl) {
+        idxEl.textContent = "#" + (num < 10 ? "0" + num : num);
       }
+      const upBtn = document.getElementById("mini_up_" + key);
+      const dnBtn = document.getElementById("mini_dn_" + key);
+      if (upBtn) upBtn.disabled = (idx === 0);
+      if (dnBtn) dnBtn.disabled = (idx === order.length - 1);
     }
   });
+
+  const masterCard = document.getElementById("miniCard_MASTER");
+  if (masterCard) {
+    sidebar.appendChild(masterCard);
+    const mSlot = document.getElementById("mini_slot_MASTER");
+    if (mSlot) mSlot.textContent = "OUT";
+  }
 
   if (typeof syncAllMiniFxCards === "function") {
     syncAllMiniFxCards();
@@ -4691,6 +4918,10 @@ function renderSplitFxSidebar() {
 
 function toggleUnitBypass(unitKey, event) {
   if (event) event.stopPropagation();
+  if (PEDAL_REGISTRY[unitKey] && !PEDAL_REGISTRY[unitKey].subPedals) {
+    togglePedalBypass(unitKey, event);
+    return;
+  }
   const unitMap = {
     unit1: ["OVERDRIVE", "FILTER"],
     unit2: ["TREMOLO", "PHASER", "FLANGER"],
@@ -4719,10 +4950,22 @@ function toggleUnitBypass(unitKey, event) {
   });
 
   updateUnitBypassUI(unitKey);
+  if (typeof syncAllMiniFxCards === "function") syncAllMiniFxCards();
   if (typeof renderPedalboardRoutingRibbon === "function") renderPedalboardRoutingRibbon();
 }
 
 function updateUnitBypassUI(unitKey) {
+  if (DEFAULT_10_PEDAL_ORDER.includes(unitKey)) {
+    const isBypassed = !!(typeof pedalBypassState !== "undefined" && pedalBypassState[unitKey]);
+    const miniCard = document.getElementById("miniCard_" + unitKey);
+    const pwrBtn = document.getElementById("mini_pwr_" + unitKey);
+    if (miniCard) miniCard.classList.toggle("bypassed", isBypassed);
+    if (pwrBtn) {
+      pwrBtn.classList.toggle("active", !isBypassed);
+      pwrBtn.title = isBypassed ? `Turn ON ${unitKey}` : `Turn OFF ${unitKey}`;
+    }
+    return;
+  }
   const unitMap = {
     unit1: ["OVERDRIVE", "FILTER"],
     unit2: ["TREMOLO", "PHASER", "FLANGER"],
@@ -4750,7 +4993,9 @@ function inspectConsolidatedUnit(unitKey, event) {
   if (event) event.stopPropagation();
   setLowerDeckMode("fx");
   let targetEl = null;
-  if (unitKey === "unit1") {
+  if (unitKey === "MASTER") {
+    targetEl = document.getElementById("masterEqOutStrip") || document.getElementById("pedalboardMasterSection");
+  } else if (unitKey === "unit1") {
     targetEl = document.getElementById("pedalCard_FILTER") || document.getElementById("pedalCard_OVERDRIVE");
   } else if (unitKey === "unit2") {
     targetEl = document.getElementById("pedalCard_TREMOLO");
@@ -4761,7 +5006,7 @@ function inspectConsolidatedUnit(unitKey, event) {
   } else if (unitKey === "unit5") {
     targetEl = document.getElementById("pedalCard_SPACE");
   } else {
-    targetEl = document.getElementById(unitKey) || document.getElementById("pedalCard_" + unitKey);
+    targetEl = document.getElementById("pedalCard_" + unitKey) || document.getElementById(unitKey);
   }
   if (targetEl) {
     targetEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -4794,9 +5039,9 @@ function setDelayDivision(divStr, event) {
   if (slider) slider.value = delaySec;
   const readout = document.getElementById("digitalDelayMsReadout");
   if (readout) readout.textContent = `${delayMs}.0 ms [${divStr}]`;
-  const miniSlider = document.getElementById("mini_slider_dig_time");
+  const miniSlider = document.getElementById("mini_slider_DIGITAL_DELAY_time") || document.getElementById("mini_slider_dig_time");
   if (miniSlider) miniSlider.value = delaySec;
-  const miniLbl = document.getElementById("lbl_mini_dig_time");
+  const miniLbl = document.getElementById("lbl_mini_DIGITAL_DELAY_time") || document.getElementById("lbl_mini_dig_time");
   if (miniLbl) miniLbl.textContent = `${delayMs}ms`;
 }
 
@@ -4819,15 +5064,16 @@ function setReverbCathedralMode(modeStr, event) {
 
   if (typeof updateFxParam === "function") {
     updateFxParam("SPACE", "weather", weatherTarget);
+    updateFxParam("SPACE", "decay", weatherTarget);
   }
   const kWeather = document.getElementById("knobWeather");
   if (kWeather) kWeather.value = weatherTarget;
   const lWeather = document.getElementById("lblWeather");
   if (lWeather) lWeather.textContent = weatherTarget + "%";
 
-  const miniS = document.getElementById("mini_slider_spc_size");
+  const miniS = document.getElementById("mini_slider_SPACE_decay") || document.getElementById("mini_slider_spc_size");
   if (miniS) miniS.value = weatherTarget;
-  const miniL = document.getElementById("lbl_mini_spc_size");
+  const miniL = document.getElementById("lbl_mini_SPACE_decay") || document.getElementById("lbl_mini_spc_size");
   if (miniL) miniL.textContent = weatherTarget + "%";
 }
 
@@ -4845,78 +5091,57 @@ function selectModSubStage(stageKey, event) {
 }
 
 function syncAllMiniFxCards() {
-  const drvVal = (typeof fxParamsState !== "undefined" && fxParamsState["OVERDRIVE"] && fxParamsState["OVERDRIVE"]["drive"]) || 2.0;
-  const cutVal = (typeof fxParamsState !== "undefined" && fxParamsState["FILTER"] && fxParamsState["FILTER"]["cutoff"]) || 2400;
-  const sDrv = document.getElementById("mini_slider_drive");
-  const sCut = document.getElementById("mini_slider_cutoff");
-  if (sDrv) sDrv.value = drvVal;
-  if (sCut) sCut.value = cutVal;
-  const lDrv = document.getElementById("lbl_mini_drive");
-  const lCut = document.getElementById("lbl_mini_cutoff");
-  if (lDrv) lDrv.textContent = parseFloat(drvVal).toFixed(1) + "x";
-  if (lCut) lCut.textContent = (cutVal >= 1000 ? (cutVal / 1000).toFixed(1) + "k" : cutVal) + "Hz";
+  const miniSpecs = [
+    { key: "OVERDRIVE", p1: { id: "drive", def: 2.0, unit: "x" }, p2: { id: "mix", def: 50, unit: "%" } },
+    { key: "FILTER", p1: { id: "cutoff", def: 2200, unit: "Hz" }, p2: { id: "res", def: 2.4, unit: "Q" } },
+    { key: "TREMOLO", p1: { id: "rate", def: 3.5, unit: "Hz" }, p2: { id: "depth", def: 60, unit: "%" } },
+    { key: "PHASER", p1: { id: "rate", def: 0.35, unit: "Hz" }, p2: { id: "depth", def: 65, unit: "%" } },
+    { key: "FLANGER", p1: { id: "rate", def: 0.25, unit: "Hz" }, p2: { id: "depth", def: 70, unit: "%" } },
+    { key: "DELAY", p1: { id: "time", def: 0.38, unit: "s" }, p2: { id: "mix", def: 42, unit: "%" } },
+    { key: "TAPE_ECHO", p1: { id: "speed", def: 1.0, unit: "x" }, p2: { id: "mix", def: 45, unit: "%" } },
+    { key: "DIGITAL_DELAY", p1: { id: "time", def: 0.375, unit: "s" }, p2: { id: "feedback", def: 45, unit: "%" } },
+    { key: "SPACE_DELAY", p1: { id: "time", def: 0.52, unit: "s" }, p2: { id: "flutter", def: 40, unit: "%" } },
+    { key: "SPACE", p1: { id: "decay", def: 65, unit: "%" }, p2: { id: "mix", def: 48, unit: "%" } }
+  ];
 
-  const modR = (typeof fxParamsState !== "undefined" && fxParamsState["PHASER"] && fxParamsState["PHASER"]["rate"]) || 0.35;
-  const modD = (typeof fxParamsState !== "undefined" && fxParamsState["PHASER"] && fxParamsState["PHASER"]["depth"]) || 65;
-  const sMR = document.getElementById("mini_slider_mod_rate");
-  const sMD = document.getElementById("mini_slider_mod_depth");
-  if (sMR) sMR.value = modR;
-  if (sMD) sMD.value = modD;
-  const lMR = document.getElementById("lbl_mini_mod_rate");
-  const lMD = document.getElementById("lbl_mini_mod_depth");
-  if (lMR) lMR.textContent = parseFloat(modR).toFixed(2) + "Hz";
-  if (lMD) lMD.textContent = Math.round(modD) + "%";
+  miniSpecs.forEach(spec => {
+    const k = spec.key;
+    [spec.p1, spec.p2].forEach(p => {
+      let val = (typeof fxParamsState !== "undefined" && fxParamsState[k] && fxParamsState[k][p.id] !== undefined)
+        ? fxParamsState[k][p.id]
+        : p.def;
+      if (k === "SPACE" && p.id === "decay" && fxParamsState[k] && fxParamsState[k].weather !== undefined) {
+        val = fxParamsState[k].weather;
+      }
+      const sEl = document.getElementById(`mini_slider_${k}_${p.id}`);
+      const lEl = document.getElementById(`lbl_mini_${k}_${p.id}`);
+      if (sEl) sEl.value = val;
+      if (lEl) lEl.textContent = formatMiniReadout(parseFloat(val), p.unit);
+    });
 
-  const tapeT = (typeof fxParamsState !== "undefined" && fxParamsState["DELAY"] && fxParamsState["DELAY"]["time"]) || 0.38;
-  const tapeF = (typeof fxParamsState !== "undefined" && fxParamsState["TAPE_ECHO"] && fxParamsState["TAPE_ECHO"]["flutter"]) || 35;
-  const sTT = document.getElementById("mini_slider_tape_time");
-  const sTF = document.getElementById("mini_slider_tape_flutter");
-  if (sTT) sTT.value = tapeT;
-  if (sTF) sTF.value = tapeF;
-  const lTT = document.getElementById("lbl_mini_tape_time");
-  const lTF = document.getElementById("lbl_mini_tape_flutter");
-  if (lTT) lTT.textContent = Math.round(tapeT * 1000) + "ms";
-  if (lTF) lTF.textContent = Math.round(tapeF) + "%";
-
-  const digT = (typeof fxParamsState !== "undefined" && fxParamsState["DIGITAL_DELAY"] && fxParamsState["DIGITAL_DELAY"]["time"]) || 0.375;
-  const digF = (typeof fxParamsState !== "undefined" && fxParamsState["DIGITAL_DELAY"] && fxParamsState["DIGITAL_DELAY"]["feedback"]) || 45;
-  const sDT = document.getElementById("mini_slider_dig_time");
-  const sDF = document.getElementById("mini_slider_dig_fdbk");
-  if (sDT) sDT.value = digT;
-  if (sDF) sDF.value = digF;
-  const lDT = document.getElementById("lbl_mini_dig_time");
-  const lDF = document.getElementById("lbl_mini_dig_fdbk");
-  if (lDT) lDT.textContent = Math.round(digT * 1000) + "ms";
-  if (lDF) lDF.textContent = Math.round(digF) + "%";
-
-  const spcS = (typeof fxParamsState !== "undefined" && fxParamsState["SPACE"] && fxParamsState["SPACE"]["weather"]) || 65;
-  const spcM = (typeof fxParamsState !== "undefined" && fxParamsState["SPACE"] && fxParamsState["SPACE"]["mix"]) || 48;
-  const sSS = document.getElementById("mini_slider_spc_size");
-  const sSM = document.getElementById("mini_slider_spc_mix");
-  if (sSS) sSS.value = spcS;
-  if (sSM) sSM.value = spcM;
-  const lSS = document.getElementById("lbl_mini_spc_size");
-  const lSM = document.getElementById("lbl_mini_spc_mix");
-  if (lSS) lSS.textContent = Math.round(spcS) + "%";
-  if (lSM) lSM.textContent = Math.round(spcM) + "%";
-
-  const subPedals = ["OVERDRIVE", "FILTER", "TREMOLO", "PHASER", "FLANGER", "DELAY", "TAPE_ECHO", "DIGITAL_DELAY", "SPACE_DELAY", "SPACE"];
-  subPedals.forEach(sp => {
-    const btn = document.getElementById("sub_pwr_" + sp);
-    if (btn) {
-      const isEngaged = !(typeof pedalBypassState !== "undefined" && pedalBypassState[sp]);
-      btn.classList.toggle("active", isEngaged);
-    }
+    updateUnitBypassUI(k);
   });
 
-  ["unit1", "unit2", "unit3", "unit4", "unit5"].forEach(updateUnitBypassUI);
+  // Sync Master Out card
+  const kWeather = document.getElementById("knobWeather");
+  const kDrive = document.getElementById("knobMasterDrive");
+  const wVal = kWeather ? parseFloat(kWeather.value) : (typeof weatherVal === "number" ? Math.round(weatherVal * 100) : 45);
+  const dVal = kDrive ? parseFloat(kDrive.value) : 10;
+  const sMW = document.getElementById("mini_slider_MASTER_weather");
+  const lMW = document.getElementById("lbl_mini_MASTER_weather");
+  if (sMW) sMW.value = wVal;
+  if (lMW) lMW.textContent = Math.round(wVal) + "%";
+  const sMD = document.getElementById("mini_slider_MASTER_drive");
+  const lMD = document.getElementById("lbl_mini_MASTER_drive");
+  if (sMD) sMD.value = dVal;
+  if (lMD) lMD.textContent = Math.round(dVal) + "%";
 }
 
 function renderBirdsEyePedalRack() {
   const rack = document.getElementById("pedalBirdsEyeRack");
   if (!rack) return;
 
-  const order = Array.isArray(dspChainOrder) ? dspChainOrder : Object.keys(PEDAL_REGISTRY);
+  const order = getExpandedPedalOrder(dspChainOrder);
   let html = "";
 
   order.forEach((key, idx) => {
@@ -5021,17 +5246,15 @@ function randomizeDspChain(ev) {
   if (window.fxRackManager) {
     dspChainOrder = window.fxRackManager.randomizeChain("SAFE");
   } else {
-    dspChainOrder = [...dspChainOrder].sort(() => Math.random() - 0.5);
+    const expanded = getExpandedPedalOrder(dspChainOrder);
+    dspChainOrder = [...expanded].sort(() => Math.random() - 0.5);
   }
   rewireDspChain(dspChainOrder, false);
 }
 
 function resetDspChain(ev) {
   if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
-  const defaultOrder = (window.fxRackManager && !window.fxRackManager.consolidated)
-    ? ['OVERDRIVE', 'FILTER', 'TREMOLO', 'PHASER', 'FLANGER', 'DELAY', 'DIGITAL_DELAY', 'SPACE_DELAY', 'TAPE_ECHO', 'SPACE']
-    : ['DRIVE_FILTER', 'MOD_CLUSTER', 'ANALOG_DELAY', 'DIGITAL_DELAY', 'SPACE_REVERB'];
-  dspChainOrder = [...defaultOrder];
+  dspChainOrder = [...DEFAULT_10_PEDAL_ORDER];
   if (window.fxRackManager) {
     window.fxRackManager.setChainOrder(dspChainOrder, false);
   }
@@ -5042,14 +5265,14 @@ function renderMasterDspChainList() {
   const container = document.getElementById("masterDspChainList");
   if (!container) return;
 
-  const order = Array.isArray(dspChainOrder) ? dspChainOrder : Object.keys(PEDAL_REGISTRY);
+  const order = getExpandedPedalOrder(dspChainOrder);
   let html = "";
 
   order.forEach((key, idx) => {
     const meta = PEDAL_REGISTRY[key];
     if (!meta) return;
     const isBypassed = !!(typeof pedalBypassState !== "undefined" && pedalBypassState[key]);
-    const num = 7 + idx;
+    const num = idx + 1;
     const isFirst = idx === 0;
     const isLast = idx === order.length - 1;
 
@@ -5080,7 +5303,10 @@ function renderMasterDspChainList() {
 
 function shiftMasterDspChain(key, direction, ev) {
   if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
-  if (window.fxRackManager) {
+  if (DEFAULT_10_PEDAL_ORDER.includes(key) && !dspChainOrder.includes(key)) {
+    dspChainOrder = getExpandedPedalOrder(dspChainOrder);
+  }
+  if (window.fxRackManager && dspChainOrder.includes(key) && window.fxRackManager.chain.includes(key)) {
     dspChainOrder = window.fxRackManager.shiftModule(key, direction);
   } else {
     const idx = dspChainOrder.indexOf(key);
@@ -5113,7 +5339,10 @@ function togglePedalBypass(key, ev) {
   if (card) card.classList.toggle("bypassed", isBypassed);
   if (btn) btn.classList.toggle("active", !isBypassed);
 
-  // 2. Directly update visible birds-eye rack cards & buttons immediately
+  // 2. Update Split View mini-fx-card immediately
+  updateUnitBypassUI(key);
+
+  // 3. Directly update visible birds-eye rack cards & buttons immediately
   const miniCard = document.querySelector(`.mini-pedal-card[data-pedal="${key}"]`);
   if (miniCard) {
     miniCard.classList.toggle("bypassed", isBypassed);
@@ -5125,7 +5354,7 @@ function togglePedalBypass(key, ev) {
     }
   }
 
-  // 3. Update master DSP chain item in Master panel
+  // 4. Update master DSP chain item in Master panel
   const chainItem = document.querySelector(`.master-dsp-chain-item[data-chain-pedal="${key}"]`);
   if (chainItem) {
     chainItem.classList.toggle("bypassed", isBypassed);
@@ -5136,13 +5365,16 @@ function togglePedalBypass(key, ev) {
     }
   }
 
-  // 4. Update modal header PWR button if modal is currently open for this pedal
+  // 5. Update modal header PWR button if modal is currently open for this pedal
   const modalPwr = document.querySelector("#orbitalModalActions .btn-power");
   const currentOrbId = (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && PEDAL_KEY_TO_ORBITAL_ID[key]) ? PEDAL_KEY_TO_ORBITAL_ID[key] : key.toLowerCase();
   if (modalPwr && expandedOrbId === currentOrbId) {
     modalPwr.classList.toggle("active", !isBypassed);
   }
 
+  if (typeof renderPedalboardRoutingRibbon === "function") {
+    renderPedalboardRoutingRibbon();
+  }
   if (typeof renderMasterDspChainList === "function") {
     renderMasterDspChainList();
   }
@@ -5150,7 +5382,7 @@ function togglePedalBypass(key, ev) {
     renderMobileMacroGrid();
   }
 
-  // 5. Update audio DSP if audioCtx exists
+  // 6. Update audio DSP if audioCtx exists
   if (audioCtx) {
     const now = audioCtx.currentTime;
     if (key === 'FILTER') {
@@ -5467,7 +5699,11 @@ function bindPointerReorder({ cards, handles, cardSelector, keyAttr, bodyClass, 
 
 function reorderDspChainModules(sourceKey, targetKey) {
   if (!sourceKey || !targetKey || sourceKey === targetKey) return;
-  if (window.fxRackManager) {
+  if ((DEFAULT_10_PEDAL_ORDER.includes(sourceKey) || DEFAULT_10_PEDAL_ORDER.includes(targetKey)) &&
+      (!dspChainOrder.includes(sourceKey) || !dspChainOrder.includes(targetKey))) {
+    dspChainOrder = getExpandedPedalOrder(dspChainOrder);
+  }
+  if (window.fxRackManager && window.fxRackManager.chain.includes(sourceKey) && window.fxRackManager.chain.includes(targetKey)) {
     dspChainOrder = window.fxRackManager.reorderChain(sourceKey, targetKey);
   } else {
     const fromIdx = dspChainOrder.indexOf(sourceKey);

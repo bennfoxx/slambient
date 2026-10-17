@@ -4334,26 +4334,31 @@
     gap: 5px;
   }
 
-  /* Mini-FX Card: Compact 54px (52px-60px spec floor) */
+  /* Mini-FX Card: Compact 48px so all 10 FX modules + Master Out fit cleanly */
   .mini-fx-card {
-    height: 54px;
+    height: 48px;
     box-sizing: border-box;
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(14, 18, 26, 0.88);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    gap: 7px;
+    background: rgba(14, 18, 26, 0.90);
+    border: 1px solid rgba(255, 255, 255, 0.09);
     border-radius: 5px;
-    padding: 4px 8px 4px 0;
+    padding: 3px 8px 3px 0;
     position: relative;
     overflow: hidden;
     transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
   }
 
   .mini-fx-card:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-    background: rgba(18, 23, 33, 0.94);
+    border-color: rgba(255, 255, 255, 0.22);
+    background: rgba(18, 23, 33, 0.96);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  }
+
+  .mini-fx-card.pedal-highlight-flash {
+    border-color: var(--unit-accent, #00e5ff) !important;
+    box-shadow: 0 0 14px var(--unit-accent, #00e5ff) !important;
   }
 
   .mini-fx-card.bypassed {
@@ -4375,7 +4380,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    width: 50px;
+    width: 58px;
     flex-shrink: 0;
     gap: 1px;
     padding-left: 2px;
@@ -4390,10 +4395,10 @@
   }
 
   .mini-fx-name {
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 800;
     color: #f1f2f6;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
     text-transform: uppercase;
     white-space: nowrap;
   }
@@ -4411,7 +4416,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    height: 19px;
+    height: 17px;
   }
 
   .mini-fx-lbl {
@@ -4448,8 +4453,39 @@
   .mini-fx-actions {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
     flex-shrink: 0;
+  }
+
+  .btn-mini-fx-shift {
+    height: 18px;
+    line-height: 16px;
+    width: 19px;
+    box-sizing: border-box;
+    padding: 0;
+    font-family: var(--font-mono, monospace);
+    font-size: 9.5px;
+    font-weight: 800;
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.04);
+    color: #9fb3c8;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.14s ease;
+  }
+
+  .btn-mini-fx-shift:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+  }
+
+  .btn-mini-fx-shift:disabled {
+    opacity: 0.3;
+    cursor: default;
   }
 
   .btn-mini-fx-pwr {
