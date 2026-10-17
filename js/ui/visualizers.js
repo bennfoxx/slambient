@@ -549,34 +549,10 @@ function syncEnoPodSquare() {
   const pod = document.querySelector(".eno-standalone-pod");
   if (!pod) return;
 
-  // Phone portrait (<= 640px) or phone landscape (<= 500px tall):
-  // Let CSS rules handle the layout directly, do not apply square desktop dimensions.
-  if (window.matchMedia && (window.matchMedia("(max-width: 640px)").matches || window.matchMedia("(max-height: 500px)").matches)) {
-    pod.style.width = "";
-    pod.style.height = "";
-    pod.style.flex = "";
-    return;
-  }
-
-  const topBar = document.querySelector("header.top-bar");
-  const masterVol = document.querySelector(".master-vol-pod");
-  if (!topBar) return;
-
-  isSyncingEno = true;
-  try {
-    // Measure unzoomed CSS layout height via offsetHeight (NEVER getBoundingClientRect which is scaled by CSS zoom: 0.75)
-    const h1 = topBar.offsetHeight || 0;
-    const h2 = masterVol ? masterVol.offsetHeight : 0;
-    const h = Math.max(h1, h2);
-
-    if (h > 0) {
-      pod.style.width = h + "px";
-      pod.style.height = h + "px";
-      pod.style.flex = "0 0 " + h + "px";
-    }
-  } finally {
-    isSyncingEno = false;
-  }
+  // Let CSS rules handle standardized modular pod dimensions across desktop & mobile
+  pod.style.width = "";
+  pod.style.height = "";
+  pod.style.flex = "";
 }
 window.addEventListener("load", syncEnoPodSquare);
 window.addEventListener("resize", syncEnoPodSquare);

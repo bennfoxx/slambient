@@ -21,19 +21,33 @@ if (typeof IntersectionObserver !== "undefined" && scopeCanvas) {
     }, { threshold: 0.01 }).observe(scopeCanvas);
   } catch (err) {}
 }
-window.addEventListener("resize", () => { scopeNeedsResize = true; });
-window.addEventListener("orientationchange", () => { scopeNeedsResize = true; });
+window.addEventListener("resize", () => {
+  scopeNeedsResize = true;
+  updateCanvasDimensions();
+});
+window.addEventListener("orientationchange", () => {
+  scopeNeedsResize = true;
+  updateCanvasDimensions();
+});
 
 function updateCanvasDimensions() {
+  if (!scopeCanvas && typeof document !== "undefined") {
+    scopeCanvas = document.getElementById("scopeCanvas");
+    if (scopeCanvas) scopeCtx = scopeCanvas.getContext("2d");
+  }
+  if (!scopeCanvas || !scopeCtx) return { w: 460, h: 290, cx: 230, cy: 145 };
+
   // Cap DPR to 1.5 in fullscreen and on mobile phones so high-DPI mobile GPUs
   // aren't forced to fill 3x/9x pixel buffers with shadowBlur every frame.
   const rawDpr = window.devicePixelRatio || 1;
   const isPhone = typeof PHONE_LAYOUT_MQ !== "undefined" && PHONE_LAYOUT_MQ.matches;
-  const dpr = (scopeFullscreen || isPhone) ? Math.min(1.5, rawDpr) : Math.min(2, rawDpr);
+  const isFullscreen = (typeof scopeFullscreen !== "undefined" && scopeFullscreen) ||
+    (typeof document !== "undefined" && !!document.getElementById("scopePanel") && document.getElementById("scopePanel").classList.contains("module-fullscreen-active"));
+  const dpr = (isFullscreen || isPhone) ? Math.min(1.5, rawDpr) : Math.min(2, rawDpr);
   const parent = scopeCanvas.parentElement;
   if (scopeNeedsResize || !cachedScopeW || !cachedScopeH) {
-    const w = Math.round(parent.clientWidth || 460);
-    const h = Math.round(parent.clientHeight || 290);
+    const w = Math.round((parent && parent.clientWidth) || 460);
+    const h = Math.round((parent && parent.clientHeight) || 290);
     if (Math.abs(w - cachedScopeW) > 1 || Math.abs(h - cachedScopeH) > 1 || scopeCanvas.width !== Math.round(w * dpr)) {
       cachedScopeW = w;
       cachedScopeH = h;
@@ -45,6 +59,15 @@ function updateCanvasDimensions() {
   scopeCtx.resetTransform();
   scopeCtx.scale(dpr, dpr);
   return { w: cachedScopeW, h: cachedScopeH, cx: cachedScopeW / 2, cy: cachedScopeH / 2 };
+}
+
+function resizeScopeCanvas() {
+  scopeNeedsResize = true;
+  return updateCanvasDimensions();
+}
+if (typeof window !== "undefined") {
+  window.resizeScopeCanvas = resizeScopeCanvas;
+  window.updateCanvasDimensions = updateCanvasDimensions;
 }
 
 const RING_CONFIGS = [
@@ -1923,7 +1946,9 @@ function drawScope(ts) {
     return;
   }
 
-  if (scopeCanvasVisible || scopeFullscreen) {
+  const isFsActive = (typeof scopeFullscreen !== "undefined" && scopeFullscreen) ||
+    (typeof document !== "undefined" && !!document.getElementById("scopePanel") && document.getElementById("scopePanel").classList.contains("module-fullscreen-active"));
+  if (scopeCanvasVisible || isFsActive) {
     updateWaterfallSpectrogram();
     const { w, h, cx, cy } = updateCanvasDimensions();
     if (arcadeActive) {

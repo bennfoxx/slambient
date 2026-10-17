@@ -31,25 +31,42 @@ function drawChordWheelCard() {
   updateInstrumentMeters();
 
   const isPhone = typeof PHONE_LAYOUT_MQ !== "undefined" && PHONE_LAYOUT_MQ.matches;
+  const chordPanelEl = typeof document !== "undefined" ? document.getElementById("chordInfoPanel") : null;
+  const isFullscreen = !!(chordPanelEl && chordPanelEl.classList.contains("module-fullscreen-active"));
   const manualSig = (isManualChordActive && liveActiveChord)
     ? `${liveActiveChord.rootMidi}:${liveActiveChord.chordQuality}:${liveActiveChord.sortedNotes.join(",")}`
     : "auto";
   const themeSig = (typeof activeTheme !== "undefined" && activeTheme) ? `${activeTheme.id}:${themeHex("chord")}:${themeHex("arp")}:${themeHex("drone")}:${themeHex("field")}` : "";
   const tanpuraSig = (typeof tanpuraEnabled !== "undefined" && tanpuraEnabled && typeof isPlaying !== "undefined" && isPlaying) ? `tanpura:${typeof tanpuraTuning !== "undefined" ? tanpuraTuning : "PA"}:${typeof tanpuraStep !== "undefined" ? (tanpuraStep % 4) : 0}` : "no-tanpura";
-  const sig = `${rootNote}|${activeScaleKey}|${currentChordVoicing}|${currentChordRootStep}|${currentChordDeg}|${manualSig}|${themeSig}|${tanpuraSig}|${isPhone ? 1 : 0}`;
+
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  let cssSize, wheelK;
+  if (isFullscreen) {
+    // In fullscreen focus modal, dynamically expand wheel canvas up to ~400px
+    const availableSpace = typeof window !== "undefined" ? Math.min(window.innerWidth - 64, window.innerHeight - 300) : 400;
+    cssSize = Math.min(400, Math.max(300, Math.round(availableSpace)));
+    wheelK = cssSize / 144;
+  } else {
+    // Phones draw the wheel 1.44x (207px) so its note names and geometry are large and crisp.
+    wheelK = isPhone ? 1.44 : 1;
+    cssSize = Math.round(144 * wheelK);
+  }
+  const targetBuffer = Math.round(cssSize * dpr);
+
+  const sig = `${rootNote}|${activeScaleKey}|${currentChordVoicing}|${currentChordRootStep}|${currentChordDeg}|${manualSig}|${themeSig}|${tanpuraSig}|${isPhone ? 1 : 0}|${isFullscreen ? 1 : 0}|${cssSize}`;
   if (sig === lastChordWheelSignature) return;
   lastChordWheelSignature = sig;
 
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
-  // Phones draw the wheel 1.44x (207px) so its note names and geometry are large and crisp.
-  const wheelK = isPhone ? 1.44 : 1;
-  const size = 144; const cssSize = Math.round(size * wheelK); const targetBuffer = Math.round(cssSize * dpr);
-  if (chordWheelCanvas.width !== targetBuffer || chordWheelCanvas.height !== targetBuffer) {
-    chordWheelCanvas.width = targetBuffer; chordWheelCanvas.height = targetBuffer;
-    chordWheelCanvas.style.width = cssSize + "px"; chordWheelCanvas.style.height = cssSize + "px";
+  if (chordWheelCanvas.width !== targetBuffer || chordWheelCanvas.height !== targetBuffer || chordWheelCanvas.style.width !== (cssSize + "px")) {
+    chordWheelCanvas.width = targetBuffer;
+    chordWheelCanvas.height = targetBuffer;
+    chordWheelCanvas.style.width = cssSize + "px";
+    chordWheelCanvas.style.height = cssSize + "px";
   }
-  chordWheelCtx.resetTransform(); chordWheelCtx.scale(dpr * wheelK, dpr * wheelK);
+  chordWheelCtx.resetTransform();
+  chordWheelCtx.scale(dpr * wheelK, dpr * wheelK);
 
+  const size = 144;
   const w = size; const h = size; const cx = w / 2; const cy = h / 2;
   chordWheelCtx.clearRect(0, 0, w, h);
 
@@ -229,7 +246,12 @@ function drawChordWheelCard() {
       chordWheelCtx.fill();
     }
 
-    chordWheelCtx.font = isRootTone ? "800 11.5px \"JetBrains Mono\", ui-monospace, monospace" : (isChordTone ? "700 10px \"JetBrains Mono\", ui-monospace, monospace" : "500 8.5px \"JetBrains Mono\", ui-monospace, monospace");
+    const rootFontSize = isFullscreen ? 12.5 : 11.5;
+    const chordFontSize = isFullscreen ? 10.8 : 10;
+    const dimFontSize = isFullscreen ? 9.0 : 8.5;
+    chordWheelCtx.font = isRootTone 
+      ? `800 ${rootFontSize}px "JetBrains Mono", ui-monospace, monospace` 
+      : (isChordTone ? `700 ${chordFontSize}px "JetBrains Mono", ui-monospace, monospace` : `500 ${dimFontSize}px "JetBrains Mono", ui-monospace, monospace`);
     chordWheelCtx.fillStyle = isRootTone ? "#ffffff" : (isChordTone ? themeHex("chord") : "rgba(255, 255, 255, 0.32)");
     chordWheelCtx.fillText(CIRCLE_OF_FIFTHS[k], lx, ly);
   }

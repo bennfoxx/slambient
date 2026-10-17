@@ -4667,9 +4667,25 @@ function togglePedalFullscreen(key, ev) {
 
   if (isCurrent) {
     document.body.classList.remove("module-focus-open");
+    if (window.workspaceManager) {
+      window.workspaceManager.state.fullscreenModule = null;
+      window.workspaceManager.saveState();
+    }
   } else {
     el.classList.add("module-fullscreen-active");
     document.body.classList.add("module-focus-open");
+    if (window.workspaceManager) {
+      window.workspaceManager.state.fullscreenModule = key;
+      window.workspaceManager.saveState();
+    }
+  }
+
+  if (typeof lastChordWheelSignature !== "undefined") lastChordWheelSignature = "";
+  if (typeof drawChordWheelCard === "function") drawChordWheelCard();
+  if (typeof triggerCanvasResizes === "function") {
+    triggerCanvasResizes();
+  } else if (window.workspaceManager && typeof window.workspaceManager.triggerCanvasResizes === "function") {
+    window.workspaceManager.triggerCanvasResizes();
   }
 }
 
@@ -8486,12 +8502,29 @@ updateMidiStatusUI();
 <script src="js/visualizers/orbital.js"></script>
 <script>
 document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    if (document.body.classList.contains("module-focus-open") || document.querySelector(".module-fullscreen-active")) {
+      e.preventDefault();
+      if (typeof exitModuleFullscreen === "function") {
+        exitModuleFullscreen();
+      } else if (window.workspaceManager && typeof window.workspaceManager.exitFullscreen === "function") {
+        window.workspaceManager.exitFullscreen();
+      } else {
+        document.querySelectorAll(".module-fullscreen-active").forEach(item => {
+          item.classList.remove("module-fullscreen-active");
+        });
+        document.body.classList.remove("module-focus-open");
+        if (typeof lastChordWheelSignature !== "undefined") lastChordWheelSignature = "";
+        if (typeof drawChordWheelCard === "function") drawChordWheelCard();
+        if (typeof triggerCanvasResizes === "function") triggerCanvasResizes();
+      }
+    }
+  }
   if ((e.key === "Enter" || e.key === " ") && e.target && e.target.classList && e.target.classList.contains("module-drawer-toggle")) {
     e.preventDefault();
     toggleModuleDrawer(e.target);
   }
 });
-
 </script>
 <script src="js/ui/mobile-macro.js"></script>
 

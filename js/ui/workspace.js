@@ -273,7 +273,7 @@
 
         btnExit.addEventListener("click", (e) => {
           e.stopPropagation();
-          this.toggleModuleFullscreen(mod.id);
+          this.exitFullscreen();
         });
 
         actionsContainer.insertBefore(controlsWrap, actionsContainer.firstChild);
@@ -500,17 +500,21 @@
       }
 
       this.saveState();
+      if (typeof lastChordWheelSignature !== "undefined") lastChordWheelSignature = "";
+      if (typeof drawChordWheelCard === "function") drawChordWheelCard();
       this.triggerCanvasResizes();
     }
 
     exitFullscreen() {
-      if (!document.body.classList.contains("module-focus-open")) return;
+      if (!document.body.classList.contains("module-focus-open") && !document.querySelector(".module-fullscreen-active")) return;
       document.querySelectorAll(".module-fullscreen-active").forEach(item => {
         item.classList.remove("module-fullscreen-active");
       });
       document.body.classList.remove("module-focus-open");
       this.state.fullscreenModule = null;
       this.saveState();
+      if (typeof lastChordWheelSignature !== "undefined") lastChordWheelSignature = "";
+      if (typeof drawChordWheelCard === "function") drawChordWheelCard();
       this.triggerCanvasResizes();
     }
 
@@ -863,7 +867,8 @@
         if (typeof orbitalNeedsResize !== "undefined") orbitalNeedsResize = true;
         if (typeof lastChordWheelSignature !== "undefined") lastChordWheelSignature = "";
 
-        if (typeof updateCanvasDimensions === "function") updateCanvasDimensions();
+        if (typeof resizeScopeCanvas === "function") resizeScopeCanvas();
+        else if (typeof updateCanvasDimensions === "function") updateCanvasDimensions();
         if (typeof drawChordWheelCard === "function") drawChordWheelCard();
         if (typeof drawScope === "function") drawScope();
         if (typeof buildKeyboard === "function") buildKeyboard();
@@ -879,7 +884,7 @@
     bindGlobalKeys() {
       window.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
-          if (document.body.classList.contains("module-focus-open")) {
+          if (document.body.classList.contains("module-focus-open") || document.querySelector(".module-fullscreen-active")) {
             e.preventDefault();
             this.exitFullscreen();
           }
@@ -898,6 +903,7 @@
   window.toggleModuleFullscreen = (modId) => manager.toggleModuleFullscreen(modId);
   window.toggleWorkspaceEditMode = (force) => manager.toggleEditMode(force);
   window.exitModuleFullscreen = () => manager.exitFullscreen();
+  window.triggerCanvasResizes = () => manager.triggerCanvasResizes();
   window.applyWorkspaceTemplate = (key) => manager.applyTemplate(key);
   window.resetWorkspaceLayout = () => manager.resetLayout();
 
