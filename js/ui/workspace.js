@@ -19,7 +19,7 @@
   const DEFAULT_STATE = {
     editMode: false,
     activeTemplate: "FULL_STUDIO",
-    headerOrder: ["brand", "presets", "transport", "harmony", "readout", "masterVol", "utilities", "generative", "eno"],
+    headerOrder: ["brand", "presets", "transport", "harmony", "masterVol", "readout", "utilities", "generative", "eno"],
     upperDeckOrder: ["chordWheel", "scope", "arcade", "keyboard"],
     rackOrder: ["drone", "chords", "noise", "drums", "arp", "field", "fxChain"],
     hiddenModules: ["arcade"],
@@ -425,72 +425,38 @@
         });
       }
 
-      // Header pods ordering across header rows
+      // Header pods ordering across header rows (always 3 on top, 3 on bottom)
       if (Array.isArray(this.state.headerOrder) && this.state.headerOrder.length >= 7) {
         const brandRow = document.querySelector(".top-bar-row.brand-row");
         const transportRow = document.querySelector(".top-bar-row.transport-row");
         const readoutRow = document.querySelector(".top-bar-row.readout-row");
-        const cluster = document.querySelector(".header-util-gen-cluster");
 
         const getSlot = (key) => document.querySelector(`[data-header-slot="${key}"]`);
 
         if (brandRow && transportRow && readoutRow) {
-          const slots = this.state.headerOrder.map(key => getSlot(key)).filter(Boolean);
+          const elBrand = getSlot("brand");
+          const elPresets = getSlot("presets");
+          if (elBrand && elBrand.parentNode !== brandRow) brandRow.appendChild(elBrand);
+          if (elPresets && elPresets.parentNode !== brandRow) brandRow.appendChild(elPresets);
 
-          // Canonical 3-row layout:
-          // Row 1: 2 items (brand, presets)
-          // Row 2: 2 items (transport, harmony)
-          // Row 3: remaining items (readout, masterVol, cluster [utilities, generative])
-          if (slots.length >= 8) {
-            if (slots[0]) brandRow.appendChild(slots[0]);
-            if (slots[1]) brandRow.appendChild(slots[1]);
+          const moduleKeys = this.state.headerOrder.filter(k => k !== "brand" && k !== "presets" && k !== "eno");
+          const topKeys = moduleKeys.slice(0, 3);
+          const bottomKeys = moduleKeys.slice(3, 6);
 
-            if (slots[2]) transportRow.appendChild(slots[2]);
-            if (slots[3]) transportRow.appendChild(slots[3]);
+          topKeys.forEach(k => {
+            const el = getSlot(k);
+            if (el && el.parentNode !== transportRow) transportRow.appendChild(el);
+          });
 
-            // Append row 3 items before the cluster if they aren't utilities/generative
-            for (let i = 4; i < slots.length; i++) {
-              const el = slots[i];
-              const slotName = el.getAttribute("data-header-slot");
-              if (slotName === "utilities" || slotName === "generative") {
-                if (cluster) cluster.appendChild(el);
-              } else if (slotName === "eno") {
-                const stacks = document.querySelector(".top-bar-stacks");
-                if (stacks && el.parentNode !== stacks) stacks.appendChild(el);
-              } else {
-                if (cluster && cluster.parentNode === readoutRow) {
-                  readoutRow.insertBefore(el, cluster);
-                } else {
-                  readoutRow.appendChild(el);
-                }
-              }
-            }
-            if (cluster && cluster.parentNode !== readoutRow) {
-              readoutRow.appendChild(cluster);
-            }
-          } else if (slots.length === 7) {
-            // Legacy 7-slot fallback
-            const el0 = getSlot(this.state.headerOrder[0]);
-            const el1 = getSlot(this.state.headerOrder[1]);
-            const el2 = getSlot(this.state.headerOrder[2]);
-            const el3 = getSlot(this.state.headerOrder[3]);
-            const el4 = getSlot(this.state.headerOrder[4]);
-            const el5 = getSlot(this.state.headerOrder[5]);
-            const el6 = getSlot(this.state.headerOrder[6]);
+          bottomKeys.forEach(k => {
+            const el = getSlot(k);
+            if (el && el.parentNode !== readoutRow) readoutRow.appendChild(el);
+          });
 
-            if (el0) brandRow.appendChild(el0);
-            if (el1) brandRow.appendChild(el1);
-
-            if (el2) transportRow.appendChild(el2);
-            if (el3) transportRow.appendChild(el3);
-
-            if (el4 && cluster) readoutRow.insertBefore(el4, cluster);
-            else if (el4) readoutRow.appendChild(el4);
-
-            if (cluster) {
-              if (el5) cluster.appendChild(el5);
-              if (el6) cluster.appendChild(el6);
-            }
+          const elEno = getSlot("eno");
+          const stacks = document.querySelector(".top-bar-stacks");
+          if (elEno && stacks && elEno.parentNode !== stacks) {
+            stacks.appendChild(elEno);
           }
         }
       }
