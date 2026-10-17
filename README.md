@@ -4,7 +4,33 @@
 
 Slambient is a dependency-free, zero-latency browser workstation and Progressive Web App (PWA) inspired by Brian Eno's coprime loop ecosystems, Boards of Canada's warm tape imperfections, Hiroshi Yoshimura's environmental minimalism, Four Tet's organic percussion, and the classical Maihar gharana raga tradition.
 
-It pairs a 9-module Web Audio synthesizer and physical modeling engine with a 4-layer vector CRT visualizer, real-time AudioWorklet sample-accurate clock, playable MIDI keyboard with scale quantization, drag-and-drop DSP pedalboard, and multi-track stem recording.
+It pairs a 10-module Web Audio synthesizer and physical modeling engine with a 4-layer vector CRT visualizer, real-time AudioWorklet sample-accurate clock, playable MIDI keyboard with scale quantization, drag-and-drop DSP pedalboard, and multi-track stem recording.
+
+---
+
+## Project Layout (decoupled, still zero-build)
+
+`index.html` used to hold everything (about 24,000 lines). It now holds only the page markup and the app's glue code (about 9,800 lines), and the rest lives in ordinary files the browser loads directly. There is no bundler, npm or build step; edit a file, reload, done. In plain terms, "decoupling" means each job has its own file, so a change to the drums cannot accidentally break the visualizers, and a person or AI tool only has to read the file it is changing.
+
+| Folder / file | What lives there |
+|---|---|
+| `css/slambient.css`, `css/field-recorder.css` | All styling (themes, phone layout, module cards) |
+| `js/audio/` | Drums and tabla, ambient noise, field recorder, stem/MP3/WAV recorder |
+| `js/midi/` | Web MIDI input/output, 4-channel DAW output, MIDI file recorder |
+| `js/theory/scales.js` | Scales and the 43 chord voicings |
+| `js/ui/` | Presets, keyboard, phone macro grid, theme palette, header helpers |
+| `js/visualizers/` | CRT scope and Invaders, orbital orbs, chord wheel |
+| `clock-processor.js`, `dsp-engines.js` | Sample-accurate clock and DSP helpers |
+| `sw.js`, `manifest.*` | Offline PWA (bump the cache version in `sw.js` when assets change) |
+| `scripts/qa-audit.js` | Automated QA and device audit, run by the pre-push hook |
+
+Docs: `GEMINI_SYNC.md` (dated change log and handoff notes, newest at the bottom), `MASTER_BLUEPRINT.md` (design, roadmap and phase status), `BRAND_GUIDELINES.md` (visual rules).
+
+## Status
+
+* Roadmap Phases 1-7 are done (engine, console rack, orbital view, presets, field recorder, phone layout, decoupling). Phase 8, the Modular Studio Workspace (edit mode, drag-and-drop layout, per-module fullscreen, saved workspaces), is planned in `MASTER_BLUEPRINT.md` and not started.
+* Modules are named SUB, DRUMS, CHORDS, ARP, NOISE, FILTER, DELAY, SPACE (reverb), OUT (master EQ) and FIELD.
+* Still open: check the phone layout, silent-switch audio, Invaders sound and the floating play bar on a real iPhone; try the 4-channel MIDI out in Logic; decide whether chords and arp should sit higher against the drone; judge the softer Khan Lineage tanpura by ear. The "7 voices / 7 nodes" chips in the engine readout are static text.
 
 ---
 
@@ -159,6 +185,9 @@ Connect any USB or 3.5mm MIDI controller. Click the **`MIDI`** button in the hea
 | **CC 7** | **Master Volume** | Master bus output level |
 | **CC 64** | **Sustain Pedal** | Sustains held notes; releases on pedal up |
 | **Pitch Bend** | **Synth Pitch Bend** | 14-bit continuous pitch glide (`±200 cents` / `±2 semitones`) |
+
+### MIDI Output to a DAW (e.g. Logic)
+Choose **Connect MIDI Device…** in the Hardware MIDI Output select (the browser only asks for MIDI permission then). Slambient sends four channels: **1 Sub, 2 Chords, 3 Arp, 4 Drums** (General MIDI drum map), with All Notes Off on pause. On a Mac, enable the IAC Driver in Audio MIDI Setup and create one track per channel in Logic.
 
 Incoming MIDI notes play the Chords or Arp engine directly based on the Keyboard panel's `TARGET` setting.
 
