@@ -246,30 +246,36 @@
     flex-direction: column;
     gap: 8px;
   }
+  .top-bar-row {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    gap: 10px;
+  }
   .transport-row {
     border-top: none;
     padding-top: 0;
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: space-between;
-    gap: 12px;
+    gap: 10px;
     width: 100%;
   }
   .readout-row {
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     padding-top: 8px;
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: space-between;
-    gap: 14px;
+    gap: 10px;
     width: 100%;
   }
   .header-util-gen-cluster {
-    display: inline-flex;
-    align-items: center;
+    display: flex;
+    flex: 2.3 1 auto;
     gap: 8px;
-    margin-left: auto;
-    flex-shrink: 0;
+    min-width: 0;
+    align-items: stretch;
   }
 
   .brand-group {
@@ -437,9 +443,50 @@
     align-items: center;
   }
   #presetBarUser {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: repeat(3, 24px);
+    display: grid;
+    grid-template-columns: repeat(20, minmax(0, 1fr));
+    grid-template-rows: repeat(2, 24px);
+    gap: 5px;
     width: 100%;
+  }
+  #presetBarUser .user-slot-chip:nth-child(-n+5) {
+    grid-column: span 4;
+  }
+  #presetBarUser .user-slot-chip:nth-child(n+6) {
+    grid-column: span 5;
+  }
+  .user-slot-chip {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    gap: 5px;
+    font-size: 11.5px;
+    padding: 0 8px;
+    width: 100%;
+    min-width: 0;
+  }
+  .user-slot-num {
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  .user-slot-name {
+    color: var(--text-primary);
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+  .user-slot-name.empty {
+    color: var(--text-muted, rgba(255, 255, 255, 0.35));
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    font-size: 10.5px;
+    opacity: 0.7;
   }
   .preset-bar .btn-preset-chip { padding: 0 8px; width: 100%; }
   .btn-preset-chip {
@@ -643,15 +690,13 @@
     margin: 0;
   }
   .header-sec-transport {
-    flex: 0 0 auto;
-    width: 326px;
-    min-width: 310px;
-    max-width: 335px;
+    flex: 1 1 290px;
+    min-width: 270px;
   }
   .header-sec-harmony {
-    flex: 1 1 auto;
-    min-width: 480px;
-    padding: 6px 14px;
+    flex: 1.5 1 380px;
+    min-width: 360px;
+    padding: 6px 12px;
   }
   .header-sec-transport .transport-row-top {
     display: flex;
@@ -667,25 +712,34 @@
     padding: 0 14px;
     font-size: 12px;
     letter-spacing: 0.8px;
-    flex-shrink: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    justify-content: center;
   }
   .header-sec-transport .transport-row-top .rec-ctrl-wrap {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     height: 28px;
-    flex-shrink: 0;
+    flex: 1 1 auto;
+    min-width: 0;
   }
   .header-sec-transport .transport-row-top .rec-ctrl-wrap .btn-record {
     height: 28px;
     padding: 0 10px;
     font-size: 12px;
     letter-spacing: 0.8px;
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    justify-content: center;
   }
   .header-sec-transport .transport-row-top .rec-ctrl-wrap .record-format-select {
     height: 28px;
     font-size: 10.5px;
     padding: 0 6px;
+    flex: 0 0 auto;
   }
   .header-sec-transport .transport-row-bottom {
     display: flex;
@@ -706,7 +760,7 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    flex: 0 0 auto;
+    flex: 1 1 auto;
     min-width: 0;
   }
   .header-sec-transport .transport-row-bottom .sample-ctrl .tag {
@@ -739,6 +793,7 @@
     color: var(--text-secondary);
     transition: all 0.12s ease;
     flex-shrink: 0;
+    white-space: nowrap;
   }
   .header-sec-transport .transport-row-bottom .sample-ctrl .btn-field:hover {
     color: #fff;
@@ -753,7 +808,8 @@
   .header-sec-transport .transport-row-bottom .sample-ctrl .field-wave {
     height: 20px;
     width: 60px;
-    flex: 0 0 60px;
+    flex: 1 1 60px;
+    min-width: 30px;
     box-sizing: border-box;
     border-radius: 2px;
   }
@@ -771,6 +827,7 @@
     letter-spacing: 0.6px;
     border-radius: 3px;
     flex-shrink: 0;
+    white-space: nowrap;
   }
   .header-sec-harmony .harmony-row-top {
     display: flex;
@@ -802,12 +859,12 @@
   }
   .header-sec-harmony #wrap_topScaleMode {
     flex: 1 1 auto;
-    min-width: 170px;
-    max-width: 360px;
+    min-width: 140px;
+    max-width: none;
   }
   .header-sec-harmony #wrap_topScaleMode .custom-dropdown-trigger {
     width: 100%;
-    min-width: 170px;
+    min-width: 0;
     padding: 0 8px;
     font-size: 12px;
     font-weight: 700;
@@ -919,6 +976,36 @@
     border-radius: 6px;
     padding: 6px 12px;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 8px rgba(0, 0, 0, 0.45);
+  }
+  .header-sec-utils {
+    flex: 1 1 250px;
+    min-width: 230px;
+  }
+  .header-sec-utils > .palette-wrap {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .header-sec-utils > .palette-wrap > .btn-header-util {
+    width: 100%;
+    white-space: nowrap;
+    justify-content: center;
+  }
+  .header-sec-utils .btn-header-util {
+    white-space: nowrap;
+  }
+  .header-sec-gen {
+    flex: 1.3 1 330px;
+    min-width: 310px;
+  }
+  .header-sec-gen > .btn-randomize-all {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    justify-content: center;
+  }
+  .header-sec-gen .btn-header-util {
+    white-space: nowrap;
+    flex: 0 0 auto;
   }
 
   .header-sec-transport,
@@ -1578,7 +1665,8 @@
     border-radius: 6px;
     padding: 6px 10px;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 8px rgba(0, 0, 0, 0.45);
-    flex: 0 0 365px;
+    flex: 1 1 220px;
+    min-width: 200px;
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 13px;
     color: var(--text-tertiary);
@@ -3542,17 +3630,21 @@
     border: 1px solid rgba(75, 123, 236, 0.4);
   }
 
-  .deck-routing-stream-compact .stream-out {
-    background: rgba(255, 95, 196, 0.18);
-    color: #ff5fc4;
-    border: 1px solid rgba(255, 95, 196, 0.4);
+  .deck-routing-stream-compact .stream-out,
+  .pedalboard-routing-ribbon .stream-out {
+    background: rgba(75, 123, 236, 0.18);
+    color: #4b7bec;
+    border: 1px solid rgba(75, 123, 236, 0.4);
     cursor: pointer;
     transition: all 0.12s ease;
   }
 
-  .deck-routing-stream-compact .stream-out:hover {
+  .deck-routing-stream-compact .stream-out:hover,
+  .pedalboard-routing-ribbon .stream-out:hover {
     color: #ffffff;
-    box-shadow: 0 0 8px rgba(255, 95, 196, 0.5);
+    background: rgba(75, 123, 236, 0.32);
+    border-color: #70a1ff;
+    box-shadow: 0 0 10px rgba(75, 123, 236, 0.55);
   }
 
   .deck-routing-stream-compact .stream-counter {
@@ -4696,17 +4788,17 @@
     justify-content: center;
   }
   .birds-eye-flow-bar .flow-bus-node.out-node {
-    color: #a855f7;
-    background: rgba(168, 85, 247, 0.15);
-    border-color: rgba(168, 85, 247, 0.35);
+    color: #4b7bec;
+    background: rgba(75, 123, 236, 0.15);
+    border-color: rgba(75, 123, 236, 0.35);
     cursor: pointer;
     transition: all 0.12s ease;
   }
   .birds-eye-flow-bar .flow-bus-node.out-node:hover {
     color: #ffffff;
-    background: rgba(168, 85, 247, 0.32);
-    border-color: #c084fc;
-    box-shadow: 0 0 10px rgba(168, 85, 247, 0.55);
+    background: rgba(75, 123, 236, 0.32);
+    border-color: #70a1ff;
+    box-shadow: 0 0 10px rgba(75, 123, 236, 0.55);
   }
   .birds-eye-flow-bar .flow-bus-label {
     color: var(--text-secondary);
@@ -4754,7 +4846,7 @@
   .mini-pedal-card.mini-card-filter { --card-accent: var(--color-filter); --card-rgb: var(--rgb-filter); }
   .mini-pedal-card.mini-card-delay { --card-accent: var(--color-delay); --card-rgb: var(--rgb-delay); }
   .mini-pedal-card.mini-card-space { --card-accent: var(--color-reverb); --card-rgb: var(--rgb-reverb); }
-  .mini-pedal-card.mini-card-master { --card-accent: var(--color-space); --card-rgb: var(--rgb-space); }
+  .mini-pedal-card.mini-card-master { --card-accent: #4b7bec; --card-rgb: 75, 123, 236; }
   .mini-pedal-card.mini-card-drive { --card-accent: #ff5252; --card-rgb: 255, 82, 82; }
   .mini-pedal-card.mini-card-phaser { --card-accent: #e056fd; --card-rgb: 224, 86, 253; }
   .mini-pedal-card.mini-card-tremolo { --card-accent: #00d2d3; --card-rgb: 0, 210, 211; }
@@ -4762,6 +4854,10 @@
   .mini-pedal-card.mini-card-digital-delay { --card-accent: #48dbfb; --card-rgb: 72, 219, 251; }
   .mini-pedal-card.mini-card-space-delay { --card-accent: #ff9f43; --card-rgb: 255, 159, 67; }
   .mini-pedal-card.mini-card-tape-echo { --card-accent: #feca57; --card-rgb: 254, 202, 87; }
+  .mini-pedal-card.mini-card-drive-filter { --card-accent: #ff5252; --card-rgb: 255, 82, 82; }
+  .mini-pedal-card.mini-card-mod-cluster { --card-accent: #a55eea; --card-rgb: 165, 94, 234; }
+  .mini-pedal-card.mini-card-analog-delay { --card-accent: #feca57; --card-rgb: 254, 202, 87; }
+  .mini-pedal-card.mini-card-space-reverb { --card-accent: #ff5fc4; --card-rgb: 255, 95, 196; }
 
   /* Micro Parameter Sliders for Birds-Eye Rack Cards */
   .mini-pedal-controls {
@@ -6307,9 +6403,8 @@
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 6px;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 8px rgba(0, 0, 0, 0.45);
-    flex: 1 1 200px;
-    max-width: 300px;
-    min-width: 160px;
+    flex: 1 1 180px;
+    min-width: 170px;
     user-select: none;
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
@@ -6381,6 +6476,7 @@
   }
   .master-vol-row-bottom input[type="range"] {
     width: 100%;
+    min-width: 0;
     height: 18px;
     background: transparent;
     border: none;
@@ -6906,6 +7002,14 @@
       font-size: 9px;
       letter-spacing: 0.2px;
       white-space: nowrap;
+    }
+    #presetBarUser {
+      grid-template-columns: none;
+      grid-template-rows: 24px;
+    }
+    #presetBarUser .user-slot-chip {
+      grid-column: auto !important;
+      width: auto !important;
     }
 
     /* ---- Modular App Toolbar (3 Symmetric Distinct Sections) ---- */

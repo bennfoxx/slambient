@@ -144,46 +144,49 @@ function drawStars(w, h) {
 }
 
 const ORBITAL_MODULES = [
-  { id: "drone",  name: "SUB",    num: "1", color: "#00e5ff", rgb: [0, 229, 255],   baseR: 40, x: 0, y: 0, vx: 0.18,  vy: 0.14,  chClass: "drone-ch",  analyser: () => droneAnalyser,  pulse: 0, bump: 0 },
-  { id: "drum",   name: "DRUMS",  num: "2", color: "#ff3838", rgb: [255, 56, 56],   baseR: 44, x: 0, y: 0, vx: -0.20, vy: 0.16,  chClass: "drum-ch",   analyser: () => drumAnalyser,   pulse: 0, bump: 0 },
-  { id: "chord",  name: "CHORDS", num: "3", color: "#fed330", rgb: [254, 211, 48],  baseR: 48, x: 0, y: 0, vx: 0.15,  vy: -0.19, chClass: "chord-ch",  analyser: () => chordAnalyser,  pulse: 0, bump: 0 },
-  { id: "arp",    name: "ARP",    num: "4", color: "#7d5fff", rgb: [125, 95, 255],  baseR: 42, x: 0, y: 0, vx: -0.16, vy: -0.14, chClass: "arp-ch",    analyser: () => arpAnalyser,    pulse: 0, bump: 0 },
-  { id: "noise",  name: "NOISE",  num: "5", color: "#1dd1a1", rgb: [29, 209, 161],  baseR: 40, x: 0, y: 0, vx: 0.16,  vy: -0.15, chClass: "noise-ch",  analyser: () => noiseAnalyser,  pulse: 0, bump: 0 },
-  { id: "field",  name: "FIELD",  num: "6", color: "#2bcbba", rgb: [43, 203, 186],  baseR: 41, x: 0, y: 0, vx: -0.15, vy: 0.16,  chClass: "field-ch",  analyser: () => (typeof fieldAnalyser !== "undefined" ? fieldAnalyser : noiseAnalyser), pulse: 0, bump: 0 },
-  { id: "filter", name: "FILTER", num: "7", color: "#2ed573", rgb: [46, 213, 115],  baseR: 37, x: 0, y: 0, vx: 0.14,  vy: 0.17,  chClass: "filter-ch", analyser: () => (typeof filterAnalyser !== "undefined" ? filterAnalyser : masterAnalyser), pulse: 0, bump: 0 },
-  { id: "delay",  name: "DELAY",  num: "8", color: "#ff793f", rgb: [255, 121, 63],  baseR: 35, x: 0, y: 0, vx: -0.18, vy: 0.12,  chClass: "delay-ch",  analyser: () => (typeof delayAnalyser !== "undefined" ? delayAnalyser : masterAnalyser),   pulse: 0, bump: 0 },
-  { id: "reverb", name: "SPACE",  num: "9", color: "#ff5fc4", rgb: [255, 95, 196],  baseR: 38, x: 0, y: 0, vx: 0.17,  vy: 0.13,  chClass: "reverb-ch", analyser: () => (typeof spaceAnalyser !== "undefined" ? spaceAnalyser : masterAnalyser),   pulse: 0, bump: 0 },
-  { id: "space",  name: "OUT",    num: "10", color: "#4b7bec", rgb: [75, 123, 236], baseR: 37, x: 0, y: 0, vx: 0.12,  vy: -0.16, chClass: "space-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 }
+  { id: "drone",       name: "SUB",            num: "1",  color: "#00e5ff", rgb: [0, 229, 255],   baseR: 40, x: 0, y: 0, vx: 0.18,  vy: 0.14,  chClass: "drone-ch",        analyser: () => droneAnalyser,  pulse: 0, bump: 0 },
+  { id: "drum",        name: "DRUMS",          num: "2",  color: "#ff3838", rgb: [255, 56, 56],   baseR: 44, x: 0, y: 0, vx: -0.20, vy: 0.16,  chClass: "drum-ch",         analyser: () => drumAnalyser,   pulse: 0, bump: 0 },
+  { id: "chord",       name: "CHORDS",         num: "3",  color: "#fed330", rgb: [254, 211, 48],  baseR: 48, x: 0, y: 0, vx: 0.15,  vy: -0.19, chClass: "chord-ch",        analyser: () => chordAnalyser,  pulse: 0, bump: 0 },
+  { id: "arp",         name: "ARP",            num: "4",  color: "#7d5fff", rgb: [125, 95, 255],  baseR: 42, x: 0, y: 0, vx: -0.16, vy: -0.14, chClass: "arp-ch",          analyser: () => arpAnalyser,    pulse: 0, bump: 0 },
+  { id: "noise",       name: "NOISE",          num: "5",  color: "#1dd1a1", rgb: [29, 209, 161],  baseR: 40, x: 0, y: 0, vx: 0.16,  vy: -0.15, chClass: "noise-ch",        analyser: () => noiseAnalyser,  pulse: 0, bump: 0 },
+  { id: "field",       name: "FIELD",          num: "6",  color: "#2bcbba", rgb: [43, 203, 186],  baseR: 41, x: 0, y: 0, vx: -0.15, vy: 0.16,  chClass: "field-ch",        analyser: () => (typeof fieldAnalyser !== "undefined" ? fieldAnalyser : noiseAnalyser), pulse: 0, bump: 0 },
+  { id: "drv_flt",     name: "DRIVE + FILTER", num: "7",  color: "#ff5252", rgb: [255, 82, 82],   baseR: 38, x: 0, y: 0, vx: 0.14,  vy: 0.17,  chClass: "drv-flt-ch",      analyser: () => (typeof filterAnalyser !== "undefined" ? filterAnalyser : masterAnalyser), pulse: 0, bump: 0 },
+  { id: "mod_cluster", name: "MOD CLUSTER",    num: "8",  color: "#a55eea", rgb: [165, 94, 234], baseR: 37, x: 0, y: 0, vx: -0.17, vy: -0.14, chClass: "mod-cluster-ch",  analyser: () => (typeof filterAnalyser !== "undefined" ? filterAnalyser : masterAnalyser), pulse: 0, bump: 0 },
+  { id: "tape_dly",    name: "ANALOG DELAY",   num: "9",  color: "#feca57", rgb: [254, 202, 87],  baseR: 36, x: 0, y: 0, vx: -0.18, vy: 0.12,  chClass: "tape-dly-ch",     analyser: () => (typeof delayAnalyser !== "undefined" ? delayAnalyser : masterAnalyser),   pulse: 0, bump: 0 },
+  { id: "dig_dly",     name: "DIGITAL DELAY",  num: "10", color: "#48dbfb", rgb: [72, 219, 251],  baseR: 36, x: 0, y: 0, vx: 0.13,  vy: -0.16, chClass: "dig-dly-ch",      analyser: () => (typeof delayAnalyser !== "undefined" ? delayAnalyser : masterAnalyser),   pulse: 0, bump: 0 },
+  { id: "spc_rev",     name: "SPACE REVERB",   num: "11", color: "#ff5fc4", rgb: [255, 95, 196],  baseR: 38, x: 0, y: 0, vx: 0.17,  vy: 0.13,  chClass: "spc-rev-ch",      analyser: () => (typeof spaceAnalyser !== "undefined" ? spaceAnalyser : masterAnalyser),   pulse: 0, bump: 0 },
+  { id: "space",       name: "OUT",            num: "12", color: "#4b7bec", rgb: [75, 123, 236], baseR: 37, x: 0, y: 0, vx: 0.12,  vy: -0.16, chClass: "space-ch",        analyser: () => masterAnalyser, pulse: 0, bump: 0 }
 ];
 
 // Maps a dspChainOrder pedal key to the orbital orb it corresponds to --
 const PEDAL_KEY_TO_ORBITAL_ID = {
-  DRIVE_FILTER: "filter",
-  MOD_CLUSTER: "filter",
-  ANALOG_DELAY: "delay",
-  DIGITAL_DELAY: "delay",
-  SPACE_REVERB: "reverb",
-  FILTER: "filter",
-  DELAY: "delay",
-  SPACE: "reverb",
-  OVERDRIVE: "filter",
-  TREMOLO: "filter",
-  PHASER: "filter",
-  FLANGER: "filter",
-  SPACE_DELAY: "delay",
-  TAPE_ECHO: "delay"
+  DRIVE_FILTER: "drv_flt",
+  MOD_CLUSTER: "mod_cluster",
+  ANALOG_DELAY: "tape_dly",
+  DIGITAL_DELAY: "dig_dly",
+  SPACE_REVERB: "spc_rev",
+  FILTER: "drv_flt",
+  OVERDRIVE: "drv_flt",
+  TREMOLO: "mod_cluster",
+  PHASER: "mod_cluster",
+  FLANGER: "mod_cluster",
+  DELAY: "tape_dly",
+  TAPE_ECHO: "tape_dly",
+  SPACE_DELAY: "dig_dly",
+  SPACE: "spc_rev",
+  REVERB: "spc_rev"
 };
 
-// The constellation chain always links all 8 orbs 1->2->...->8, but the
-// Filter/Delay/Reverb segment (orbs 5-7) follows the live DSP insert
-// order instead of the fixed array order, so dragging/shuffling the
-// pedal chain visibly rewires the orbital connections too. Recomputed
-// every draw frame, so it stays live with no extra event wiring.
+// The constellation chain always links all 12 orbs in active order.
+// The FX segment follows the live DSP insert order (dspChainOrder),
+// so dragging/shuffling the pedal chain visibly rewires the orbital connections.
+// Dynamic numbering updates every frame so OUT is always the final module.
 function getOrbitalConnectionChain() {
-  const pedalIds = ["filter", "delay", "reverb"];
-  const leading = ORBITAL_MODULES.filter(o => !pedalIds.includes(o.id) && o.id !== "space");
+  const pedalOrbIds = ["drv_flt", "mod_cluster", "tape_dly", "dig_dly", "spc_rev", "filter", "delay", "reverb"];
+  const leading = ORBITAL_MODULES.filter(o => !pedalOrbIds.includes(o.id) && o.id !== "space");
   const trailing = ORBITAL_MODULES.find(o => o.id === "space");
   if (typeof dspChainOrder === "undefined" || !Array.isArray(dspChainOrder)) {
+    ORBITAL_MODULES.forEach((orb, idx) => { orb.num = String(idx + 1); });
     return ORBITAL_MODULES;
   }
   const pedalOrbs = [];
@@ -196,20 +199,57 @@ function getOrbitalConnectionChain() {
       if (orb) pedalOrbs.push(orb);
     }
   });
-  return [...leading, ...pedalOrbs, trailing].filter(Boolean);
+  // Ensure any FX orbs not in dspChainOrder are also included
+  ORBITAL_MODULES.forEach(orb => {
+    if (pedalOrbIds.includes(orb.id) && orb.id !== "space" && !seen.has(orb.id)) {
+      seen.add(orb.id);
+      pedalOrbs.push(orb);
+    }
+  });
+  const fullChain = [...leading, ...pedalOrbs, trailing].filter(Boolean);
+  fullChain.forEach((orb, idx) => {
+    orb.num = String(idx + 1);
+  });
+  return fullChain;
 }
 
-const ORBITAL_ID_TO_PEDAL_KEY = { filter: "DRIVE_FILTER", delay: "ANALOG_DELAY", reverb: "SPACE_REVERB" };
+const ORBITAL_ID_TO_PEDAL_KEY = {
+  drv_flt: "FILTER",
+  mod_cluster: "TREMOLO",
+  tape_dly: "DELAY",
+  dig_dly: "DIGITAL_DELAY",
+  spc_rev: "SPACE",
+  filter: "FILTER",
+  delay: "DELAY",
+  reverb: "SPACE"
+};
 
-// The Filter/Delay/Reverb orbs' module is a .pedal-chassis card (id
-// pedalCard_FILTER etc), not a .strip-channel.<chClass> like every other
-// orb -- the pedal/stompbox redesign never updated this lookup, so
-// expanding those three orbs in orbital view opened an empty side panel.
-// Centralize "find this orb's actual control element" here so both
-// expandModuleOrb() and restoreStripsToRack() stay in sync.
+// Maps an orb to its real DOM card in the rack/pedalboard.
 function getOrbModuleElement(orb) {
+  if (!orb) return null;
+  if (orb.id === "drv_flt" || orb.id === "filter") {
+    return document.getElementById("pedalCard_FILTER") || document.getElementById("pedalCard_OVERDRIVE");
+  }
+  if (orb.id === "mod_cluster") {
+    return document.getElementById("pedalCard_TREMOLO");
+  }
+  if (orb.id === "tape_dly" || orb.id === "delay") {
+    return document.getElementById("pedalCard_DELAY");
+  }
+  if (orb.id === "dig_dly") {
+    return document.getElementById("pedalCard_DIGITAL_DELAY");
+  }
+  if (orb.id === "spc_rev" || orb.id === "reverb") {
+    return document.getElementById("pedalCard_SPACE");
+  }
+  if (orb.id === "space") {
+    return document.getElementById("pedalCard_SPACE") || document.getElementById("masterDspChainList") || document.getElementById("masterEqOutStrip") || document.querySelector(".strip-channel.space-ch");
+  }
   const pedalKey = ORBITAL_ID_TO_PEDAL_KEY[orb.id];
-  if (pedalKey) return document.getElementById("pedalCard_" + pedalKey);
+  if (pedalKey) {
+    const el = document.getElementById("pedalCard_" + pedalKey);
+    if (el) return el;
+  }
   return document.querySelector(`.strip-channel.${orb.chClass}`);
 }
 
@@ -626,7 +666,34 @@ function setModuleView(mode) {
 }
 
 function expandModuleOrb(orbId) {
-  const targetId = (orbId === 'MASTER' || orbId === 'master' || orbId === 'out' || orbId === 'OUT') ? 'space' : orbId;
+  let targetId = (orbId === 'MASTER' || orbId === 'master' || orbId === 'out' || orbId === 'OUT') ? 'space' : orbId;
+  const legacyOrbMap = {
+    unit1: "drv_flt",
+    filter: "drv_flt",
+    FILTER: "drv_flt",
+    OVERDRIVE: "drv_flt",
+    DRIVE_FILTER: "drv_flt",
+    unit2: "mod_cluster",
+    TREMOLO: "mod_cluster",
+    PHASER: "mod_cluster",
+    FLANGER: "mod_cluster",
+    MOD_CLUSTER: "mod_cluster",
+    unit3: "tape_dly",
+    delay: "tape_dly",
+    DELAY: "tape_dly",
+    TAPE_ECHO: "tape_dly",
+    ANALOG_DELAY: "tape_dly",
+    unit4: "dig_dly",
+    DIGITAL_DELAY: "dig_dly",
+    SPACE_DELAY: "dig_dly",
+    unit5: "spc_rev",
+    reverb: "spc_rev",
+    SPACE: "spc_rev",
+    SPACE_REVERB: "spc_rev"
+  };
+  if (legacyOrbMap[targetId]) targetId = legacyOrbMap[targetId];
+
+  if (typeof getOrbitalConnectionChain === "function") getOrbitalConnectionChain();
   const orb = ORBITAL_MODULES.find(o => o.id === targetId);
   if (!orb) return;
 
@@ -639,8 +706,8 @@ function expandModuleOrb(orbId) {
   const title = document.getElementById("orbitalModalTitle");
   const body = document.getElementById("orbitalModalBody");
 
-  const activeColor = (typeof themeHex === "function" ? themeHex(targetId) : null) || orb.color;
-  const activeRgb = (typeof themeRgb === "function" ? themeRgb(targetId) : null) || (Array.isArray(orb.rgb) ? orb.rgb.join(", ") : "0, 229, 255");
+  const activeColor = (typeof themeHex === "function" && themeHex(targetId) !== "#ffffff" ? themeHex(targetId) : null) || orb.color;
+  const activeRgb = (typeof themeRgb === "function" && themeHex(targetId) !== "#ffffff" ? themeRgb(targetId) : null) || (Array.isArray(orb.rgb) ? orb.rgb.join(", ") : "0, 229, 255");
 
   panel.style.setProperty("--modal-accent-color", activeColor);
   panel.style.setProperty("--modal-accent-glow", `rgba(${activeRgb}, 0.45)`);
@@ -718,8 +785,20 @@ function collapseOrbitalToPedals() {
 }
 
 function getSignalChainOrbList() {
-  const pedals = (Array.isArray(dspChainOrder) ? dspChainOrder : ["FILTER", "DELAY", "SPACE"])
-    .map(k => (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && PEDAL_KEY_TO_ORBITAL_ID[k]) ? PEDAL_KEY_TO_ORBITAL_ID[k] : k.toLowerCase());
+  const pedals = [];
+  const seen = new Set();
+  const order = (Array.isArray(dspChainOrder) && dspChainOrder.length)
+    ? dspChainOrder
+    : ["DRIVE_FILTER", "MOD_CLUSTER", "ANALOG_DELAY", "DIGITAL_DELAY", "SPACE_REVERB"];
+  order.forEach(k => {
+    const oid = (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && PEDAL_KEY_TO_ORBITAL_ID[k])
+      ? PEDAL_KEY_TO_ORBITAL_ID[k]
+      : k.toLowerCase();
+    if (oid && !seen.has(oid)) {
+      seen.add(oid);
+      pedals.push(oid);
+    }
+  });
   return ["drone", "drum", "chord", "arp", "noise", "field", ...pedals, "space"];
 }
 
@@ -730,7 +809,7 @@ function renderSignalRibbon(activeOrbId) {
   ribbon.innerHTML = "";
 
   chain.forEach((orbId, idx) => {
-    if (idx === 6 || idx === 9) {
+    if (idx === 6 || idx === chain.length - 1) {
       const sep = document.createElement("span");
       sep.className = "orbital-signal-ribbon-arrow";
       sep.textContent = "➔";
@@ -1050,7 +1129,7 @@ function updateAndDrawOrbitalCanvas() {
   // Ensure orbs are properly laid out across the canvas area if dimensions were not ready at boot
   if (!ORBITAL_MODULES[0].initialized || isNaN(ORBITAL_MODULES[0].x) || ORBITAL_MODULES[0].x <= 0) {
     const orbitR = Math.min(w * 0.38, h * 0.36);
-    const initialHeadings = [0.35, -0.75, 1.40, -1.90, 2.50, -2.85, 0.85, -1.15];
+    const initialHeadings = [0.35, -0.75, 1.40, -1.90, 2.50, -2.85, 0.85, -1.15, 1.75, -2.10, 0.45, -0.95];
     ORBITAL_MODULES.forEach((orb, i) => {
       const angle = (i / ORBITAL_MODULES.length) * Math.PI * 2 - Math.PI / 2;
       orb.x = cx + Math.cos(angle) * orbitR;

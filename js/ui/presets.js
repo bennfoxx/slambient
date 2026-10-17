@@ -1300,10 +1300,10 @@ function renderUserPatchSlots() {
     if (!btn) continue;
     const entry = patches[i];
     if (entry && entry.name) {
-      btn.textContent = `U${i}: ${entry.name}`;
+      btn.innerHTML = `<span class="user-slot-num">U${i}</span><span class="user-slot-name">${entry.name}</span>`;
       btn.title = `Slot U${i} (${entry.name}) — Click to load, Shift-click to overwrite`;
     } else {
-      btn.textContent = `U${i}: Empty`;
+      btn.innerHTML = `<span class="user-slot-num">U${i}</span><span class="user-slot-name empty">[ EMPTY ]</span>`;
       btn.title = `Slot U${i} (Empty) — Click to store current soundscape`;
     }
   }

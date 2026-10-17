@@ -294,7 +294,11 @@ const INSTRUMENT_METERS = [
   { el: "lvlChord", ring: "chord",    ref: 0.08, e: 0, barEl: null, lastPct: -1 },
   { el: "lvlArp",   ring: "arp_main", ref: 0.04, e: 0, barEl: null, lastPct: -1 }
 ];
+let lastMetersUpdateTs = 0;
 function updateInstrumentMeters() {
+  const now = performance.now();
+  if (now - lastMetersUpdateTs < 32) return;
+  lastMetersUpdateTs = now;
   for (const m of INSTRUMENT_METERS) {
     if (!m.barEl) m.barEl = document.getElementById(m.el);
     const bar = m.barEl;

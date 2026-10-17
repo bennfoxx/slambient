@@ -11,6 +11,7 @@ let scopeAngle = 0;
 // number of beats, so the angular speed itself scales with bpm.
 let scopeRotationAngle = 0;
 let lastScopeFrameTs = null;
+let lastScopeDomThrottleTs = 0;
 
 let cachedScopeW = 0, cachedScopeH = 0, scopeNeedsResize = true;
 let scopeCanvasVisible = true;
@@ -1974,7 +1975,7 @@ function drawScope(ts) {
     // visibly faster. Keeps a faint drift (not a hard stop) while paused, to
     // match how the rest of the visualizer dims rather than freezes when idle.
     if (lastScopeFrameTs === null) lastScopeFrameTs = ts || now;
-    const dtSec = Math.min(0.1, ((ts || now) - lastScopeFrameTs) / 1000);
+    const dtSec = Math.min(0.06, ((ts || now) - lastScopeFrameTs) / 1000);
     lastScopeFrameTs = ts || now;
     const beatsPerSec = bpm / 60;
     const revolutionBeats = 480; // one full 360 deg turn every 480 beats -- slow, "slight" rotation
@@ -1990,11 +1991,18 @@ function drawScope(ts) {
       drawVisualizerCenterCore(cx, cy);
       scopeCtx.restore();
     }
-    scopeAngle += 0.008;
+    scopeAngle += dtSec * 0.48;
+  } else {
+    lastScopeFrameTs = ts || now;
   }
 
   if (typeof drawChordWheelCard === "function") drawChordWheelCard();
-  if (typeof renderKeyboardHighlights === "function") renderKeyboardHighlights();
+
+  if (now - lastScopeDomThrottleTs >= 32) {
+    lastScopeDomThrottleTs = now;
+    if (typeof updateInstrumentMeters === "function") updateInstrumentMeters();
+    if (typeof renderKeyboardHighlights === "function") renderKeyboardHighlights();
+  }
 
   requestAnimationFrame(drawScope);
 }

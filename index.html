@@ -99,15 +99,15 @@
             <button class="btn-preset-chip" onclick="applyPreset(14)" title="Chillhop — 4/4 boom-bap pocket, dusty tine keys, rain crackle, tape warmth">Chillhop</button>
           </div>
           <div class="preset-bar" id="presetBarUser" style="display:none;">
-            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot1" onclick="handleUserSlotClick(1, event)" oncontextmenu="handleUserSlotContextMenu(event, 1)" title="Slot U1 — Click to load / Shift-click to save">U1: Empty</button>
-            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot2" onclick="handleUserSlotClick(2, event)" oncontextmenu="handleUserSlotContextMenu(event, 2)" title="Slot U2 — Click to load / Shift-click to save">U2: Empty</button>
-            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot3" onclick="handleUserSlotClick(3, event)" oncontextmenu="handleUserSlotContextMenu(event, 3)" title="Slot U3 — Click to load / Shift-click to save">U3: Empty</button>
-            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot4" onclick="handleUserSlotClick(4, event)" oncontextmenu="handleUserSlotContextMenu(event, 4)" title="Slot U4 — Click to load / Shift-click to save">U4: Empty</button>
-            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot5" onclick="handleUserSlotClick(5, event)" oncontextmenu="handleUserSlotContextMenu(event, 5)" title="Slot U5 — Click to load / Shift-click to save">U5: Empty</button>
-            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot6" onclick="handleUserSlotClick(6, event)" oncontextmenu="handleUserSlotContextMenu(event, 6)" title="Slot U6 — Click to load / Shift-click to save">U6: Empty</button>
-            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot7" onclick="handleUserSlotClick(7, event)" oncontextmenu="handleUserSlotContextMenu(event, 7)" title="Slot U7 — Click to load / Shift-click to save">U7: Empty</button>
-            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot8" onclick="handleUserSlotClick(8, event)" oncontextmenu="handleUserSlotContextMenu(event, 8)" title="Slot U8 — Click to load / Shift-click to save">U8: Empty</button>
-            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot9" onclick="handleUserSlotClick(9, event)" oncontextmenu="handleUserSlotContextMenu(event, 9)" title="Slot U9 — Click to load / Shift-click to save">U9: Empty</button>
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot1" onclick="handleUserSlotClick(1, event)" oncontextmenu="handleUserSlotContextMenu(event, 1)" title="Slot U1 — Click to load / Shift-click to save"><span class="user-slot-num">U1</span><span class="user-slot-name empty">[ EMPTY ]</span></button>
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot2" onclick="handleUserSlotClick(2, event)" oncontextmenu="handleUserSlotContextMenu(event, 2)" title="Slot U2 — Click to load / Shift-click to save"><span class="user-slot-num">U2</span><span class="user-slot-name empty">[ EMPTY ]</span></button>
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot3" onclick="handleUserSlotClick(3, event)" oncontextmenu="handleUserSlotContextMenu(event, 3)" title="Slot U3 — Click to load / Shift-click to save"><span class="user-slot-num">U3</span><span class="user-slot-name empty">[ EMPTY ]</span></button>
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot4" onclick="handleUserSlotClick(4, event)" oncontextmenu="handleUserSlotContextMenu(event, 4)" title="Slot U4 — Click to load / Shift-click to save"><span class="user-slot-num">U4</span><span class="user-slot-name empty">[ EMPTY ]</span></button>
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot5" onclick="handleUserSlotClick(5, event)" oncontextmenu="handleUserSlotContextMenu(event, 5)" title="Slot U5 — Click to load / Shift-click to save"><span class="user-slot-num">U5</span><span class="user-slot-name empty">[ EMPTY ]</span></button>
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot6" onclick="handleUserSlotClick(6, event)" oncontextmenu="handleUserSlotContextMenu(event, 6)" title="Slot U6 — Click to load / Shift-click to save"><span class="user-slot-num">U6</span><span class="user-slot-name empty">[ EMPTY ]</span></button>
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot7" onclick="handleUserSlotClick(7, event)" oncontextmenu="handleUserSlotContextMenu(event, 7)" title="Slot U7 — Click to load / Shift-click to save"><span class="user-slot-num">U7</span><span class="user-slot-name empty">[ EMPTY ]</span></button>
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot8" onclick="handleUserSlotClick(8, event)" oncontextmenu="handleUserSlotContextMenu(event, 8)" title="Slot U8 — Click to load / Shift-click to save"><span class="user-slot-num">U8</span><span class="user-slot-name empty">[ EMPTY ]</span></button>
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot9" onclick="handleUserSlotClick(9, event)" oncontextmenu="handleUserSlotContextMenu(event, 9)" title="Slot U9 — Click to load / Shift-click to save"><span class="user-slot-num">U9</span><span class="user-slot-name empty">[ EMPTY ]</span></button>
           </div>
         </div>
       </div>
@@ -619,7 +619,7 @@
           <span class="stream-arr">➔</span>
           <span class="stream-counter" id="deckStreamActiveCount">10 DSP INSERTS</span>
           <span class="stream-arr">➔</span>
-          <button type="button" class="stream-pill stream-out" onclick="openMiniPedalInspector('space', event)" title="Open Master EQ &amp; Out (10. OUT)">OUT</button>
+          <button type="button" class="stream-pill stream-out" onclick="openMiniPedalInspector('space', event)" title="Open Master EQ &amp; Out (OUT)">OUT</button>
         </div>
         <div class="deck-header-actions">
           <button type="button" class="btn-deck-quick-action" onclick="randomizeDspChain(event)" title="Intelligent safe staging randomizer">
@@ -1060,7 +1060,7 @@
               <!-- Dynamically rendered stream badges: 1: TUBE DRIVE ➔ 2: FILTER ➔ ... -->
             </div>
             <span class="routing-arrow">➔</span>
-            <button type="button" class="routing-node-badge stream-out" onclick="openMiniPedalInspector('space', event)" title="Open Master EQ &amp; Out (10. OUT)">OUT</button>
+            <button type="button" class="routing-node-badge stream-out" onclick="openMiniPedalInspector('space', event)" title="Open Master EQ &amp; Out (OUT)">OUT</button>
           </div>
           <div class="routing-ribbon-actions">
             <button type="button" class="btn-pedal-action btn-pedal-shuffle" onclick="randomizeDspChain(event)" title="Randomize FX Chain (intelligent safe staging)">
@@ -1791,7 +1791,7 @@
         <div class="pedalboard-master-section" id="pedalboardMasterSection">
           <div class="strip-channel master-eq-ch space-ch" id="masterEqOutStrip">
         <div class="panel-header">
-          <span>10. OUT</span>
+          <span>OUT</span>
           <button class="badge-tag" style="color: var(--color-space); border-color: rgba(75,123,236,0.3);" onclick="randomizeSpace()" title="Randomize Out"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
         </div>
         <div class="control-row">
@@ -1894,7 +1894,7 @@
             </div>
 
             <!-- UNIT 2: MOD CLUSTER -->
-            <div class="mini-fx-card mini-fx-unit-2" id="miniCard_unit2" data-unit="unit2" style="--unit-accent: #e056fd;">
+            <div class="mini-fx-card mini-fx-unit-2" id="miniCard_unit2" data-unit="unit2" style="--unit-accent: #a55eea;">
               <div class="mini-fx-pip" aria-hidden="true"></div>
               <div class="mini-fx-badge-group">
                 <span class="mini-fx-slot">#02</span>
@@ -1969,7 +1969,7 @@
             </div>
 
             <!-- UNIT 5: REVERB & SPACE -->
-            <div class="mini-fx-card mini-fx-unit-5" id="miniCard_unit5" data-unit="unit5" style="--unit-accent: #a55eea;">
+            <div class="mini-fx-card mini-fx-unit-5" id="miniCard_unit5" data-unit="unit5" style="--unit-accent: #ff5fc4;">
               <div class="mini-fx-pip" aria-hidden="true"></div>
               <div class="mini-fx-badge-group">
                 <span class="mini-fx-slot">#05</span>
@@ -3936,7 +3936,7 @@ const PEDAL_REGISTRY = {
     shortName: "MOD",
     orbId: "filter",
     class: "mini-card-mod-cluster",
-    color: "#00d2d3",
+    color: "#a55eea",
     desc: "Optical Tremolo, 12-Pole Phaser & Flanger",
     subPedals: ["TREMOLO", "PHASER", "FLANGER"],
     params: [
@@ -3951,7 +3951,7 @@ const PEDAL_REGISTRY = {
     shortName: "A-DLY",
     orbId: "delay",
     class: "mini-card-analog-delay",
-    color: "#ff793f",
+    color: "#feca57",
     desc: "Warm Tape Saturation & 3-Head Multi-Tap",
     subPedals: ["DELAY", "TAPE_ECHO"],
     params: [
@@ -4371,6 +4371,12 @@ function updatePedalsOrderUI() {
   if (eqStrip && masterSec && !eqStrip.closest("#orbitalModalBody") && !eqStrip.parentElement) {
     masterSec.appendChild(eqStrip);
   }
+  if (eqStrip) {
+    const outHeader = eqStrip.querySelector(".panel-header > span:first-child");
+    if (outHeader) {
+      outHeader.textContent = (typeof globalSlot !== "undefined" && globalSlot) ? `${globalSlot}. OUT` : "OUT";
+    }
+  }
 
   renderPedalboardRoutingRibbon();
 
@@ -4727,15 +4733,20 @@ function updateUnitBypassUI(unitKey) {
 function inspectConsolidatedUnit(unitKey, event) {
   if (event) event.stopPropagation();
   setLowerDeckMode("fx");
-  const targetMap = {
-    unit1: "pedalCard_OVERDRIVE",
-    unit2: "pedalCard_TREMOLO",
-    unit3: "pedalCard_DELAY",
-    unit4: "pedalCard_DIGITAL_DELAY",
-    unit5: "pedalCard_SPACE"
-  };
-  const targetId = targetMap[unitKey];
-  const targetEl = document.getElementById(targetId);
+  let targetEl = null;
+  if (unitKey === "unit1") {
+    targetEl = document.getElementById("pedalCard_FILTER") || document.getElementById("pedalCard_OVERDRIVE");
+  } else if (unitKey === "unit2") {
+    targetEl = document.getElementById("pedalCard_TREMOLO");
+  } else if (unitKey === "unit3") {
+    targetEl = document.getElementById("pedalCard_DELAY");
+  } else if (unitKey === "unit4") {
+    targetEl = document.getElementById("pedalCard_DIGITAL_DELAY");
+  } else if (unitKey === "unit5") {
+    targetEl = document.getElementById("pedalCard_SPACE");
+  } else {
+    targetEl = document.getElementById(unitKey) || document.getElementById("pedalCard_" + unitKey);
+  }
   if (targetEl) {
     targetEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
     targetEl.classList.add("unit-target-highlight");
@@ -5550,12 +5561,14 @@ function openModuleInOrbital(moduleEl) {
   else if (moduleEl.classList.contains("noise-ch")) orbId = "noise";
   else if (moduleEl.classList.contains("field-ch")) orbId = "field";
   else if (moduleEl.classList.contains("pedal-chain-module")) {
-    const firstPedal = (Array.isArray(dspChainOrder) && dspChainOrder[0]) ? dspChainOrder[0] : "FILTER";
-    orbId = (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && PEDAL_KEY_TO_ORBITAL_ID[firstPedal]) ? PEDAL_KEY_TO_ORBITAL_ID[firstPedal] : "filter";
+    const firstPedal = (Array.isArray(dspChainOrder) && dspChainOrder[0]) ? dspChainOrder[0] : "DRIVE_FILTER";
+    orbId = (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && PEDAL_KEY_TO_ORBITAL_ID[firstPedal]) ? PEDAL_KEY_TO_ORBITAL_ID[firstPedal] : "drv_flt";
   }
-  else if (moduleEl.classList.contains("pedal-filter") || moduleEl.getAttribute("data-module") === "FILTER") orbId = "filter";
-  else if (moduleEl.classList.contains("pedal-delay") || moduleEl.getAttribute("data-module") === "DELAY") orbId = "delay";
-  else if (moduleEl.classList.contains("pedal-space") || moduleEl.getAttribute("data-module") === "SPACE") orbId = "reverb";
+  else if (moduleEl.classList.contains("pedal-filter") || moduleEl.classList.contains("pedal-drive") || moduleEl.getAttribute("data-module") === "FILTER" || moduleEl.getAttribute("data-module") === "OVERDRIVE") orbId = "drv_flt";
+  else if (moduleEl.classList.contains("pedal-tremolo") || moduleEl.classList.contains("pedal-phaser") || moduleEl.classList.contains("pedal-flanger") || moduleEl.getAttribute("data-module") === "TREMOLO" || moduleEl.getAttribute("data-module") === "PHASER" || moduleEl.getAttribute("data-module") === "FLANGER") orbId = "mod_cluster";
+  else if (moduleEl.classList.contains("pedal-delay") || moduleEl.classList.contains("pedal-tape-echo") || moduleEl.getAttribute("data-module") === "DELAY" || moduleEl.getAttribute("data-module") === "TAPE_ECHO") orbId = "tape_dly";
+  else if (moduleEl.classList.contains("pedal-digital-delay") || moduleEl.classList.contains("pedal-space-delay") || moduleEl.getAttribute("data-module") === "DIGITAL_DELAY" || moduleEl.getAttribute("data-module") === "SPACE_DELAY") orbId = "dig_dly";
+  else if (moduleEl.classList.contains("pedal-space") || moduleEl.classList.contains("pedal-reverb") || moduleEl.getAttribute("data-module") === "SPACE") orbId = "spc_rev";
   else if (moduleEl.classList.contains("space-ch")) orbId = "space";
 
   if (orbId && typeof expandModuleOrb === "function") {
@@ -5568,7 +5581,46 @@ function openMiniPedalInspector(orbId, ev) {
     if (typeof ev.stopPropagation === "function") ev.stopPropagation();
     if (typeof ev.preventDefault === "function") ev.preventDefault();
   }
-  const id = (orbId === 'MASTER' || orbId === 'master' || orbId === 'out' || orbId === 'OUT') ? 'space' : orbId;
+  const orbMap = {
+    unit1: "drv_flt",
+    drv_flt: "drv_flt",
+    filter: "drv_flt",
+    FILTER: "drv_flt",
+    OVERDRIVE: "drv_flt",
+    DRIVE_FILTER: "drv_flt",
+
+    unit2: "mod_cluster",
+    mod_cluster: "mod_cluster",
+    TREMOLO: "mod_cluster",
+    PHASER: "mod_cluster",
+    FLANGER: "mod_cluster",
+    MOD_CLUSTER: "mod_cluster",
+
+    unit3: "tape_dly",
+    tape_dly: "tape_dly",
+    delay: "tape_dly",
+    DELAY: "tape_dly",
+    TAPE_ECHO: "tape_dly",
+    ANALOG_DELAY: "tape_dly",
+
+    unit4: "dig_dly",
+    dig_dly: "dig_dly",
+    DIGITAL_DELAY: "dig_dly",
+    SPACE_DELAY: "dig_dly",
+
+    unit5: "spc_rev",
+    spc_rev: "spc_rev",
+    reverb: "spc_rev",
+    SPACE: "spc_rev",
+    SPACE_REVERB: "spc_rev",
+
+    master: "space",
+    MASTER: "space",
+    out: "space",
+    OUT: "space",
+    space: "space"
+  };
+  const id = orbMap[orbId] || (orbMap[String(orbId).toLowerCase()] || orbId);
   if (id && typeof expandModuleOrb === "function") {
     expandModuleOrb(id);
   }
