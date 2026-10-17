@@ -10,7 +10,7 @@ It pairs a 10-module Web Audio synthesizer and physical modeling engine with a 4
 
 ## Project Layout (decoupled, still zero-build)
 
-`index.html` used to hold everything (about 24,000 lines). It now holds only the page markup and the app's glue code (about 9,800 lines), and the rest lives in ordinary files the browser loads directly. There is no bundler, npm or build step; edit a file, reload, done. In plain terms, "decoupling" means each job has its own file, so a change to the drums cannot accidentally break the visualizers, and a person or AI tool only has to read the file it is changing.
+`index.html` used to hold everything (about 24,000 lines). It now holds the page markup and the app's glue code (about 7,100 lines), and the rest lives in ordinary files the browser loads directly. The decoupling was done by Gemini agents in Antigravity, working from the plan in `MASTER_BLUEPRINT.md`. There is no bundler, npm or build step; edit a file, reload, done. In plain terms, "decoupling" means each job has its own file, so a change to the drums cannot accidentally break the visualizers, and a person or AI tool only has to read the file it is changing.
 
 | Folder / file | What lives there |
 |---|---|
