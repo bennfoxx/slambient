@@ -614,7 +614,7 @@
     flex-direction: column;
     justify-content: center;
     gap: 4px;
-    padding: 6px 12px;
+    padding: 6px 10px;
     border-radius: 6px;
     min-height: 74px;
     max-height: 74px;
@@ -624,9 +624,18 @@
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 8px rgba(0, 0, 0, 0.45);
     box-sizing: border-box;
     align-items: stretch;
-    flex: 1 1 0;
-    min-width: 0;
     margin: 0;
+  }
+  .header-sec-transport {
+    flex: 0 0 auto;
+    width: 326px;
+    min-width: 310px;
+    max-width: 335px;
+  }
+  .header-sec-harmony {
+    flex: 1 1 auto;
+    min-width: 480px;
+    padding: 6px 14px;
   }
   .header-sec-transport .transport-row-top {
     display: flex;
@@ -666,7 +675,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
     min-width: 0;
     height: 26px;
@@ -680,15 +689,15 @@
     padding: 0;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    flex: 1 1 auto;
+    gap: 4px;
+    flex: 0 0 auto;
     min-width: 0;
   }
   .header-sec-transport .transport-row-bottom .sample-ctrl .tag {
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 800;
     color: var(--color-noise);
-    letter-spacing: 0.8px;
+    letter-spacing: 0.6px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -699,16 +708,16 @@
   }
   .header-sec-transport .transport-row-bottom .sample-ctrl .btn-field {
     height: 24px;
-    padding: 0 8px;
-    font-size: 11px;
+    padding: 0 6px;
+    font-size: 10.5px;
     font-weight: 800;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.5px;
     border-radius: 3px;
     box-sizing: border-box;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 3px;
     background: #101420;
     border: 1px solid var(--border-light);
     color: var(--text-secondary);
@@ -721,15 +730,14 @@
     background: #161c2c;
   }
   .header-sec-transport .transport-row-bottom .sample-ctrl .btn-field svg {
-    width: 13px;
-    height: 13px;
+    width: 12px;
+    height: 12px;
     flex-shrink: 0;
   }
   .header-sec-transport .transport-row-bottom .sample-ctrl .field-wave {
     height: 20px;
-    flex: 1 1 70px;
-    min-width: 40px;
-    max-width: 130px;
+    width: 60px;
+    flex: 0 0 60px;
     box-sizing: border-box;
     border-radius: 2px;
   }
@@ -741,7 +749,7 @@
   }
   .header-sec-transport .transport-row-bottom .btn-header-midi {
     height: 24px;
-    padding: 0 9px;
+    padding: 0 8px;
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.6px;
@@ -752,7 +760,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 10px;
     width: 100%;
     min-width: 0;
     height: 28px;
@@ -761,25 +769,66 @@
   .header-sec-harmony .harmony-row-top .root-scale-ctrl {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     background: transparent;
     border: none;
     box-shadow: none;
     height: 26px;
-    padding: 0 8px 0 0;
+    padding: 0 10px 0 0;
     margin: 0;
     border-right: 1px solid rgba(255, 255, 255, 0.08);
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .header-sec-harmony #wrap_topRootKey {
+    flex: 0 0 46px;
+    min-width: 44px;
+  }
+  .header-sec-harmony #wrap_topScaleMode {
+    flex: 1 1 auto;
+    min-width: 170px;
+    max-width: 360px;
+  }
+  .header-sec-harmony #wrap_topScaleMode .custom-dropdown-trigger {
+    width: 100%;
+    min-width: 170px;
+    padding: 0 8px;
+    font-size: 12px;
+    font-weight: 700;
   }
   .header-sec-harmony .harmony-row-top .time-sig-ctrl {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     background: transparent;
     border: none;
     box-shadow: none;
     height: 26px;
     padding: 0;
     margin: 0;
+    flex: 0 0 auto;
+  }
+  .header-sec-harmony #wrap_selTimeSig {
+    flex: 0 0 auto;
+    min-width: 76px;
+  }
+  .header-sec-harmony #wrap_selTimeSig .custom-dropdown-trigger {
+    height: 24px;
+    padding: 0 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+  }
+  .header-sec-harmony select#topRootKey {
+    width: 46px;
+    flex: 0 0 46px;
+  }
+  .header-sec-harmony select#topScaleMode {
+    flex: 1 1 auto;
+    min-width: 170px;
+    max-width: 360px;
+  }
+  .header-sec-harmony select#selTimeSig {
+    min-width: 76px;
   }
   .header-sec-harmony .harmony-row-bottom {
     display: flex;
@@ -1500,9 +1549,9 @@
   }
   .sys-readout {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1.3fr 1fr;
     grid-template-rows: repeat(2, 26px);
-    gap: 4px 8px;
+    gap: 4px 6px;
     min-height: 74px;
     max-height: 74px;
     height: 74px;
@@ -1511,9 +1560,9 @@
     background: linear-gradient(180deg, #161b26 0%, #0d1118 100%);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 6px;
-    padding: 6px 12px;
+    padding: 6px 10px;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 8px rgba(0, 0, 0, 0.45);
-    flex: 0 0 310px;
+    flex: 0 0 365px;
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 13px;
     color: var(--text-tertiary);
@@ -1521,11 +1570,11 @@
   .telemetry-pill {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     background: rgba(16, 20, 32, 0.65);
     border: 1px solid var(--border-light);
     border-radius: 4px;
-    padding: 2px 8px;
+    padding: 2px 7px;
     height: 28px;
     box-sizing: border-box;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6);
@@ -1534,9 +1583,9 @@
     white-space: nowrap;
   }
   .telemetry-pill .pill-k {
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 800;
-    letter-spacing: 0.8px;
+    letter-spacing: 0.6px;
     color: var(--text-tertiary);
     text-transform: uppercase;
     flex-shrink: 0;
@@ -1544,12 +1593,23 @@
   .telemetry-pill .val {
     color: var(--accent);
     font-weight: 700;
-    font-size: 12.5px;
-    letter-spacing: 0.5px;
+    font-size: 12px;
+    letter-spacing: 0.4px;
     text-shadow: 0 0 6px rgba(var(--rgb-chord), 0.3);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .telemetry-pill.pill-root-scale {
+    padding: 2px 6px;
+  }
+  .telemetry-pill.pill-root-scale .pill-k {
+    font-size: 9.5px;
+    letter-spacing: 0.3px;
+  }
+  .telemetry-pill.pill-root-scale .val {
+    font-size: 11.5px;
+    letter-spacing: 0.3px;
   }
   .telemetry-pill .dot-live {
     width: 5px;
@@ -6231,9 +6291,9 @@
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 6px;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 8px rgba(0, 0, 0, 0.45);
-    flex: 1 1 240px;
-    max-width: 380px;
-    min-width: 180px;
+    flex: 1 1 200px;
+    max-width: 300px;
+    min-width: 160px;
     user-select: none;
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
