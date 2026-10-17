@@ -1910,8 +1910,16 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Added to `PRECACHE_URLS` in `sw.js` and bumped offline cache to `slambient-v13`.
   - `index.html` reduced by another 592 lines down to **7,071 lines** (71% code reduction from the original 24,200+ line document).
 
+## Update — 2026-10-16 (Stage 2 Mobile UI Fixes & Stage 3 Bird's-Eye Macro Overview Completed)
 
-
-
-
-
+- **Stage 2: High-Priority Mobile UI Bug Fixes (Strictly Scoped to Mobile Breakpoints)**:
+  - **Header Centering**: Enforced true absolute center alignment (`position: absolute; left: 50%; transform: translateX(-50%);`) on `.orbital-side-panel .orbital-nav-group` and full-width centered flex alignment on mobile `.brand-group`.
+  - **Sticky Header & Scroll Confinement**: Confined module inspector scrolling strictly inside `.orbital-modal-body` (`overflow-y: auto; overscroll-behavior: contain`) with `.header-bar-wrapper` static on phones so inertial scrolling never pulls headers over controls.
+  - **25-Key vs 88-Key Keyboard Header Lock**: Locked `.keyboard-panel > .keyboard-meta` (`height: 68px`), `.keyboard-panel-header` (`height: 24px`), and `.keyboard-meta-controls` (`height: 36px`) with `font-variant-numeric: tabular-nums` and `visibility: hidden` on `.oct-controls` in 88-Key Radar mode, eliminating vertical layout jumps.
+  - **Info (`?`) Panel Anchor**: Anchored `.shortcuts-panel` top edge to a static coordinate (`position: fixed; top: max(16px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); max-height: calc(100dvh - 32px); overflow-y: auto; overscroll-behavior: contain;`) so switching tabs never causes vertical modal jumping.
+  - **Preset Name Limits**: Enforced 15-character string truncation in `js/ui/presets.js` (`slice(0, 15)`), `js/ui/mobile-macro.js` (`slice(0, 15)`), and CSS (`.btn-preset-chip` `max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;`).
+  - **Mobile Chord Voicing Stack**: Updated mobile `.chord-wheel-voicing` rule to preserve the centered 2-line `.voicing-main` + `.voicing-sub` stack.
+- **Stage 3: Mobile Architecture Overhaul ("Bird's-Eye Overview")**:
+  - Verified 2-column compact macro grid (`#mobileMacroGrid`, `grid-template-columns: repeat(2, minmax(0, 1fr))`, `110px` summary tiles with live audio meters and instant `PWR` toggles) across both mobile portrait and mobile landscape Rack View.
+  - Verified slide-up Micro Inspect bottom sheet (`.orbital-side-panel`, `max-height: 85dvh`) when any module tile is tapped.
+  - Updated `scripts/qa-audit.js` to validate `js/ui/header-utils.js`, `js/ui/palette.js`, and `js/ui/visualizers.js`, and bumped `sw.js` cache to `slambient-v15`.

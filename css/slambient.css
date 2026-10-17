@@ -5694,18 +5694,19 @@
     .key-label { font-size: 9px !important; letter-spacing: 0 !important; }
     .black-key-label { font-size: 8px !important; letter-spacing: 0 !important; }
 
-    /* Lower deck & console racks in landscape: clean 3-column / 2-column grid */
+    /* Lower deck & console racks in landscape: 2-column compact macro grid */
     .lower-deck {
-      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      grid-template-columns: 1fr !important;
       gap: 8px !important;
     }
-    #masterDeckUnified {
+    .lower-deck > .strip-channel { display: none !important; }
+    #masterDeckUnified > .pedal-chassis,
+    #masterDeckUnified > .strip-channel { display: none !important; }
+    .mobile-macro-grid {
+      display: grid !important;
       grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
       gap: 8px !important;
-    }
-    .pedals-deck {
-      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-      gap: 8px !important;
+      width: 100% !important;
     }
 
     /* Floating transport bar in landscape: compact height */
@@ -6770,12 +6771,15 @@
     .orbital-side-panel .orbital-nav-group {
       grid-column: 2;
       grid-row: 1;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
       justify-self: center;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: clamp(14px, 4.5vw, 22px);
-      max-width: 100%;
+      max-width: calc(100% - 140px);
       min-width: 0;
       text-align: center;
       margin: 0 auto;
@@ -7522,12 +7526,18 @@
 
     /* ---- Shortcuts overlay ---- */
     .shortcuts-overlay {
-      padding: max(12px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+      align-items: flex-start;
+      padding: max(16px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
     }
     .shortcuts-panel {
-      width: 100%;
+      position: fixed;
+      top: max(16px, env(safe-area-inset-top));
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100vw - 24px);
       max-width: 580px;
-      max-height: 100%;
+      max-height: calc(100dvh - 32px);
+      overflow-y: auto;
       padding: 0 14px 14px;
       overscroll-behavior: contain;
     }
@@ -7706,7 +7716,9 @@
     .chord-wheel-root { font-size: 1.5rem; }
     .chord-wheel-quality { font-size: 1.125rem; }
     .chord-wheel-mode-pill { font-size: 0.65rem; padding: 3px 7px; }
-    .chord-wheel-voicing { font-size: 0.75rem; text-align: left; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chord-wheel-voicing { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-align: center; min-width: 0; min-height: 28px; }
+    .chord-wheel-voicing .voicing-main { font-size: 0.72rem; }
+    .chord-wheel-voicing .voicing-sub { font-size: 0.62rem; }
     .chord-meta-block { padding: 10px 12px; gap: 6px; }
     .telem-row { font-size: 11px; gap: 12px; }
     .telem-k { font-size: 11px; }
@@ -7724,34 +7736,40 @@
       min-height: 0 !important;
     }
     .keyboard-panel > .keyboard-meta {
-      height: auto;
-      min-height: auto;
+      height: 68px;
+      min-height: 68px;
       display: flex;
       flex-direction: column;
       align-items: stretch;
+      justify-content: space-between;
       gap: 8px;
       padding-bottom: 8px;
       flex-wrap: nowrap;
       font-variant-numeric: tabular-nums;
+      box-sizing: border-box;
     }
     .keyboard-hint { display: none; }
     .keyboard-panel-header {
       width: 100%;
-      height: 28px;
-      min-height: 28px;
+      height: 24px;
+      min-height: 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       overflow: hidden;
+      font-variant-numeric: tabular-nums;
     }
     .keyboard-meta-controls {
       width: 100%;
+      height: 36px;
+      min-height: 36px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 6px;
       box-sizing: border-box;
       flex-wrap: nowrap;
+      font-variant-numeric: tabular-nums;
     }
     .keyboard-view-toggle {
       flex: 1 1 auto;
