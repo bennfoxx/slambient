@@ -580,8 +580,52 @@
     <div class="orbital-modal-body" id="orbitalModalBody"></div>
   </div>
 
-  <div class="lower-deck view-grid-hidden">
-    <div class="strip-channel drone-ch">
+  <div class="lower-deck view-grid-hidden" id="lowerDeck">
+    <!-- LOWER DECK VIEW SWITCHER HEADER -->
+    <div class="lower-deck-header" id="lowerDeckHeader">
+      <div class="deck-mode-switcher" role="tablist" aria-label="Lower Deck View Selector">
+        <button type="button" class="btn-deck-mode active" id="btnDeckModeInstruments" onclick="setLowerDeckMode('instruments')" role="tab" aria-selected="true" title="Focus 6 Instrument Synthesizers">
+          <span class="mode-icon">🎹</span>
+          <span class="mode-label">INSTRUMENTS</span>
+          <span class="mode-count">6</span>
+        </button>
+        <button type="button" class="btn-deck-mode" id="btnDeckModeFx" onclick="setLowerDeckMode('fx')" role="tab" aria-selected="false" title="Full-Sized Studio FX Pedalboard (10 Inserts)">
+          <span class="mode-icon">🎛️</span>
+          <span class="mode-label">STUDIO FX RACK</span>
+          <span class="mode-count">10</span>
+        </button>
+        <button type="button" class="btn-deck-mode btn-deck-mode-split" id="btnDeckModeSplit" onclick="setLowerDeckMode('split')" role="tab" aria-selected="false" title="Side-by-Side: 6 Instruments (60%) + 2-Column FX Rack (40%)">
+          <span class="mode-icon">◫</span>
+          <span class="mode-label">SPLIT VIEW</span>
+        </button>
+      </div>
+
+      <div class="deck-header-telemetry">
+        <div class="deck-routing-stream-compact" id="deckRoutingStreamCompact">
+          <span class="stream-label">SIGNAL:</span>
+          <span class="stream-pill stream-bus">PRE</span>
+          <span class="stream-arr">➔</span>
+          <span class="stream-counter" id="deckStreamActiveCount">10 DSP INSERTS</span>
+          <span class="stream-arr">➔</span>
+          <button type="button" class="stream-pill stream-out" onclick="openMiniPedalInspector('space', event)" title="Open Master EQ &amp; Out (10. OUT)">OUT</button>
+        </div>
+        <div class="deck-header-actions">
+          <button type="button" class="btn-deck-quick-action" onclick="randomizeDspChain(event)" title="Intelligent safe staging randomizer">
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg>
+            <span>RANDOMIZE FX</span>
+          </button>
+          <button type="button" class="btn-deck-quick-action" onclick="resetDspChain(event)" title="Reset FX chain order to default">
+            <span>RESET</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOWER DECK BODY -->
+    <div class="lower-deck-body" id="lowerDeckBody">
+      <!-- 1. INSTRUMENTS SUB-DECK (6 Synthesizers) -->
+      <div class="instruments-deck" id="instrumentsDeck">
+        <div class="strip-channel drone-ch">
       <div class="panel-header">
         <span>1. SUB</span>
         <div class="panel-header-actions">
@@ -991,288 +1035,671 @@
       </div>
       <div class="field-hint">Hold to record (a quick tap records 5 s, max 8 s). Phrases enter on bar turnarounds, choir retunes to live chord, and clicks ghost into drums.</div>
     </div>
+      </div><!-- End instruments-deck -->
 
-    <!-- BIRDS-EYE VIEW PEDAL CHAIN MODULE (Entire chain in one instrument-sized module) -->
-    <div class="strip-channel pedal-chain-module" id="pedalChainModule">
-      <div class="panel-header">
-        <span onclick="openModuleInOrbital(this.closest('.strip-channel'))" style="cursor: pointer;" title="DSP FX CHAIN — Click to open modular inspector">DSP FX CHAIN</span>
-        <div class="panel-header-actions">
-          <button type="button" class="btn-pedal-action btn-pedal-shuffle" onclick="randomizeDspChain(event)" title="Randomize FX Chain (intelligent safe staging)">
-            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/>
-              <polyline points="21 3 21 8 16 8"/>
-              <path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/>
-              <polyline points="3 21 3 16 8 16"/>
-            </svg>
-            <span>⚄ RANDOMIZE</span>
-          </button>
-          <button type="button" class="btn-pedal-action btn-pedal-reset" onclick="resetDspChain(event)" title="Reset FX chain order to default">
-            <span>RESET</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="birds-eye-flow-bar">
-        <span class="flow-bus-node">BUS PRE</span>
-        <span class="flow-arrow">➔</span>
-        <span class="flow-bus-label">LIVE INSERT MATRIX</span>
-        <span class="flow-arrow">➔</span>
-        <button type="button" class="flow-bus-node out-node" onclick="openMiniPedalInspector('space', event)" title="Open Master EQ & Out (10. OUT)">OUT</button>
-      </div>
-
-      <!-- Birds-eye list of rectangular pedal cards -->
-      <div class="pedal-birds-eye-rack" id="pedalBirdsEyeRack">
-        <!-- Kept dynamically rendered and synchronized by updatePedalsOrderUI() -->
-      </div>
-    </div>
-
-    <!-- MOBILE MACRO OVERVIEW GRID (2-column compact grid, ~110px summary tiles) -->
-    <div class="mobile-macro-grid" id="mobileMacroGrid" aria-label="Mobile Macro Rack Grid">
-      <!-- Dynamically rendered and synchronized with live module parameters -->
-    </div>
-  </div>
-
-  <!-- BACKING STORE FOR PEDAL CONTROLS (Borrowed into popup on inspection) -->
-  <div class="pedals-deck view-grid-hidden" id="pedalsContainer" style="display: none !important;">
-    <div class="pedals-routing-header">
-      <div class="pedals-header-left">
-        <span class="pedals-deck-title">DSP INSERT CHAIN // LIVE REWIRING MATRIX</span>
-        <span class="pedals-deck-sub">Drag &amp; drop pedals or click shift arrows to dynamically rewire Web Audio API graph in real-time</span>
-      </div>
-      <div class="pedals-routing-stream" id="pedalsRoutingStream">
-        <span class="routing-node-badge">BUS PRE</span>
-        <span class="routing-arrow">➔</span>
-        <span class="routing-pill pill-mod1" id="routeBadge1">1: FILTER</span>
-        <span class="routing-arrow">➔</span>
-        <span class="routing-pill pill-mod2" id="routeBadge2">2: DELAY</span>
-        <span class="routing-arrow">➔</span>
-        <span class="routing-pill pill-mod3" id="routeBadge3">3: SPACE</span>
-        <span class="routing-arrow">➔</span>
-        <span class="routing-node-badge" style="color: var(--color-space); border-color: rgba(75, 123, 236, 0.4);">OUT</span>
-      </div>
-      <div class="pedals-header-actions">
-        <button type="button" class="btn-pedal-action btn-pedal-shuffle" onclick="randomizeDspChain(event)" title="Randomize FX Chain (intelligent safe staging)">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/>
-            <polyline points="21 3 21 8 16 8"/>
-            <path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/>
-            <polyline points="3 21 3 16 8 16"/>
-          </svg>
-          <span>⚄ RANDOMIZE</span>
-        </button>
-        <button type="button" class="btn-pedal-action btn-pedal-reset" onclick="resetDspChain(event)" title="Reset FX chain order to default">
-          <span>RESET</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="master-deck-unified" id="masterDeckUnified">
-      <!-- 1. FILTER PEDAL -->
-      <div class="pedal-chassis pedal-filter" id="pedalCard_FILTER" data-module="FILTER">
-        <div class="panel-header">
-          <span id="pedalTitle_FILTER">7. FILTER</span>
-          <div class="panel-header-actions">
-            <span class="pedal-slot-badge" id="slotBadge_FILTER">IN</span>
-            <button class="btn-pedal-shift" onclick="shiftPedalLeft('FILTER')" id="shiftLeft_FILTER" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
-            <button class="btn-pedal-shift" onclick="shiftPedalRight('FILTER')" id="shiftRight_FILTER" title="Shift Right"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg></button>
-            <span class="pedal-drag-handle" title="Drag to reorder"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg></span>
-            <button class="btn-power active" id="stompBtn_FILTER" onclick="togglePedalBypass('FILTER')" title="Bypass/engage Filter"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="11"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/></svg></button>
+      <!-- 2. FULL-SIZED EURORACK STUDIO FX PEDALBOARD (10 Inserts) -->
+      <div class="studio-fx-pedalboard" id="studioFxPedalboard" data-module-id="fxChain">
+        <div class="pedalboard-routing-ribbon" id="pedalboardRoutingRibbon">
+          <div class="routing-ribbon-left">
+            <span class="routing-node-badge stream-bus">BUS PRE</span>
+            <span class="routing-arrow">➔</span>
+            <div class="routing-stream-list" id="pedalboardRoutingStream">
+              <!-- Dynamically rendered stream badges: 1: TUBE DRIVE ➔ 2: FILTER ➔ ... -->
+            </div>
+            <span class="routing-arrow">➔</span>
+            <button type="button" class="routing-node-badge stream-out" onclick="openMiniPedalInspector('space', event)" title="Open Master EQ &amp; Out (10. OUT)">OUT</button>
+          </div>
+          <div class="routing-ribbon-actions">
+            <button type="button" class="btn-pedal-action btn-pedal-shuffle" onclick="randomizeDspChain(event)" title="Randomize FX Chain (intelligent safe staging)">
+              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/>
+                <polyline points="21 3 21 8 16 8"/>
+                <path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/>
+                <polyline points="3 21 3 16 8 16"/>
+              </svg>
+              <span>⚄ RANDOMIZE</span>
+            </button>
+            <button type="button" class="btn-pedal-action btn-pedal-reset" onclick="resetDspChain(event)" title="Reset FX chain order to default">
+              <span>RESET</span>
+            </button>
           </div>
         </div>
 
-        <div class="pedal-controls-body">
-          <div class="control-row">
-            <div class="control-label"><span>Cutoff Frequency</span><span class="control-val filter-val" id="lblMasterCutoff">2400 Hz</span></div>
-            <input type="range" id="knobMasterCutoff" min="0" max="100" step="0.1" value="64.4" oninput="updateAudioParams()">
+        <!-- 10 Full-Sized Eurorack Hardware Pedal Cards Grid -->
+        <div class="studio-fx-grid" id="studioFxGrid">
+
+        <!-- 1. TUBE DRIVE (OVERDRIVE) -->
+        <div class="strip-channel module-card pedal-chassis mini-card-drive pedal-drive active" id="pedalCard_OVERDRIVE" data-pedal="OVERDRIVE" data-module="OVERDRIVE" data-module-id="fx_overdrive" style="--pedal-color: #ff5252; --pedal-color-rgb: 255, 82, 82;">
+          <div class="panel-header">
+            <div class="panel-header-left">
+              <span class="pedal-drag-handle upper-drag-handle" title="Drag to reorder in signal chain" aria-label="Drag Handle">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg>
+              </span>
+              <span class="pedal-slot-index" id="slotIndex_OVERDRIVE">#01</span>
+              <span class="pedal-card-title" id="pedalTitle_OVERDRIVE">1. TUBE DRIVE</span>
+              <span class="pedal-slot-badge" id="slotBadge_OVERDRIVE">IN</span>
+            </div>
+            <div class="panel-header-actions">
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('OVERDRIVE', -1, event)" id="shiftLeft_OVERDRIVE" title="Shift Left in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+              </button>
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('OVERDRIVE', 1, event)" id="shiftRight_OVERDRIVE" title="Shift Right in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg>
+              </button>
+              <button type="button" class="badge-tag btn-pedal-rand" onclick="randomizePedalModule('OVERDRIVE', event)" title="Randomize Tube Drive parameters">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg>
+              </button>
+              <button type="button" class="btn-win-action btn-win-focus" onclick="togglePedalFullscreen('OVERDRIVE', event)" title="Expand to Fullscreen Focus (Esc to Exit)" aria-label="Focus Tube Drive">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none"><path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="btn-exit-focus" onclick="togglePedalFullscreen('OVERDRIVE', event)" title="Exit Fullscreen Focus (Esc)" aria-label="Exit Focus">
+                <svg viewBox="0 0 16 16" width="11" height="11" fill="none"><path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>✕ Exit Focus</span>
+              </button>
+              <button type="button" class="btn-power active" id="stompBtn_OVERDRIVE" onclick="togglePedalBypass('OVERDRIVE', event)" title="Bypass / Engage Tube Drive">PWR</button>
+            </div>
           </div>
-          <div class="control-row">
-            <div class="control-label"><span>Resonance (Q)</span><span class="control-val filter-val" id="lblMasterRes">2.8</span></div>
-            <input type="range" id="knobMasterRes" min="0.5" max="12.0" step="0.1" value="2.8" oninput="updateAudioParams()">
+          <div class="pedal-faceplate-banner">
+            <span class="pedal-silk-role">Tube Saturation &amp; Warmth</span>
+            <span class="pedal-silk-model">ANALOG DSP // ASYMMETRIC</span>
           </div>
-          <div class="module-drawer-toggle expanded" onclick="toggleModuleDrawer(this)" aria-expanded="true" role="button" tabindex="0" title="Expand / collapse secondary filter envelope & modulation parameters">
-            <span class="drawer-arrow">▸</span>
-            <span class="drawer-title">FILTER ENVELOPE & MODULATION</span>
+          <div class="pedal-controls-body">
+            <div class="control-row">
+              <div class="control-label"><span>Drive / Gain</span><span class="control-val" id="lbl_OVERDRIVE_drive">2.0x</span></div>
+              <input type="range" id="slider_OVERDRIVE_drive" min="0.2" max="8.0" step="0.1" value="2.0" oninput="updateFxParam('OVERDRIVE', 'drive', this.value, event)" onchange="updateFxParam('OVERDRIVE', 'drive', this.value, event)">
+            </div>
+            <div class="control-row">
+              <div class="control-label"><span>Tone Tilt</span><span class="control-val" id="lbl_OVERDRIVE_tone">3200 Hz</span></div>
+              <input type="range" id="slider_OVERDRIVE_tone" min="400" max="10000" step="100" value="3200" oninput="updateFxParam('OVERDRIVE', 'tone', this.value, event)" onchange="updateFxParam('OVERDRIVE', 'tone', this.value, event)">
+            </div>
+            <div class="control-row">
+              <div class="control-label"><span>Wet / Dry Mix</span><span class="control-val" id="lbl_OVERDRIVE_mix">50%</span></div>
+              <input type="range" id="slider_OVERDRIVE_mix" min="0" max="100" step="1" value="50" oninput="updateFxParam('OVERDRIVE', 'mix', this.value, event)" onchange="updateFxParam('OVERDRIVE', 'mix', this.value, event)">
+            </div>
           </div>
-          <div class="module-drawer-content open">
-            <div class="drawer-inner">
-              <div class="control-row">
-                <div class="control-label"><span>Attack / Decay</span><span class="control-val filter-val" id="lblFilterEnvTimes">45 ms / 650 ms</span></div>
-                <div style="display: flex; gap: 8px;">
-                  <div style="flex: 1;">
-                    <div class="control-sublabel">Attack</div>
-                    <input type="range" id="knobFilterAttack" min="5" max="1200" value="45" oninput="updateAudioParams()">
-                  </div>
-                  <div style="flex: 1;">
-                    <div class="control-sublabel">Decay</div>
-                    <input type="range" id="knobFilterDecay" min="50" max="3200" value="650" oninput="updateAudioParams()">
+        </div>
+
+        <!-- 2. SVF FILTER (FILTER) -->
+        <div class="strip-channel module-card pedal-chassis mini-card-filter pedal-filter active" id="pedalCard_FILTER" data-pedal="FILTER" data-module="FILTER" data-module-id="fx_filter" style="--pedal-color: #2ed573; --pedal-color-rgb: 46, 213, 115;">
+          <div class="panel-header">
+            <div class="panel-header-left">
+              <span class="pedal-drag-handle upper-drag-handle" title="Drag to reorder in signal chain" aria-label="Drag Handle">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg>
+              </span>
+              <span class="pedal-slot-index" id="slotIndex_FILTER">#02</span>
+              <span class="pedal-card-title" id="pedalTitle_FILTER">2. FILTER</span>
+              <span class="pedal-slot-badge" id="slotBadge_FILTER">INSERT</span>
+            </div>
+            <div class="panel-header-actions">
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('FILTER', -1, event)" id="shiftLeft_FILTER" title="Shift Left in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+              </button>
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('FILTER', 1, event)" id="shiftRight_FILTER" title="Shift Right in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg>
+              </button>
+              <button type="button" class="badge-tag btn-pedal-rand" onclick="randomizePedalModule('FILTER', event)" title="Randomize Filter parameters">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg>
+              </button>
+              <button type="button" class="btn-win-action btn-win-focus" onclick="togglePedalFullscreen('FILTER', event)" title="Expand to Fullscreen Focus (Esc to Exit)" aria-label="Focus Filter">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none"><path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="btn-exit-focus" onclick="togglePedalFullscreen('FILTER', event)" title="Exit Fullscreen Focus (Esc)" aria-label="Exit Focus">
+                <svg viewBox="0 0 16 16" width="11" height="11" fill="none"><path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>✕ Exit Focus</span>
+              </button>
+              <button type="button" class="btn-power active" id="stompBtn_FILTER" onclick="togglePedalBypass('FILTER', event)" title="Bypass / Engage Filter">PWR</button>
+            </div>
+          </div>
+          <div class="pedal-faceplate-banner">
+            <span class="pedal-silk-role">SVF Filter &amp; Envelope</span>
+            <span class="pedal-silk-model">STATE-VARIABLE // 24DB CASCADE</span>
+          </div>
+          <div class="pedal-controls-body">
+            <div class="control-row">
+              <div class="control-label"><span>Cutoff Frequency</span><span class="control-val filter-val" id="lblMasterCutoff">2400 Hz</span></div>
+              <input type="range" id="knobMasterCutoff" min="60" max="12000" step="20" value="2400" oninput="updateAudioParams(); updateFxParam('FILTER', 'cutoff', this.value, event);">
+            </div>
+            <div class="control-row">
+              <div class="control-label"><span>Resonance (Q)</span><span class="control-val filter-val" id="lblMasterRes">2.8</span></div>
+              <input type="range" id="knobMasterRes" min="0.1" max="12.0" step="0.1" value="2.8" oninput="updateAudioParams(); updateFxParam('FILTER', 'res', this.value, event);">
+            </div>
+            <div class="module-drawer-toggle expanded" onclick="toggleModuleDrawer(this)" aria-expanded="true" role="button" tabindex="0" title="Expand / collapse secondary filter envelope & modulation parameters">
+              <span class="drawer-arrow">▸</span>
+              <span class="drawer-title">FILTER ENVELOPE &amp; MODULATION</span>
+            </div>
+            <div class="module-drawer-content open">
+              <div class="drawer-inner">
+                <div class="control-row">
+                  <div class="control-label"><span>Attack / Decay</span><span class="control-val filter-val" id="lblFilterEnvTimes">45 ms / 650 ms</span></div>
+                  <div style="display: flex; gap: 8px;">
+                    <div style="flex: 1;">
+                      <div class="control-sublabel">Attack</div>
+                      <input type="range" id="knobFilterAttack" min="5" max="1200" value="45" oninput="updateAudioParams()">
+                    </div>
+                    <div style="flex: 1;">
+                      <div class="control-sublabel">Decay</div>
+                      <input type="range" id="knobFilterDecay" min="50" max="3200" value="650" oninput="updateAudioParams()">
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="control-row">
-                <div class="control-label"><span>Envelope Depth</span><span class="control-val filter-val" id="lblFilterEnvDepth">60%</span></div>
-                <input type="range" id="knobFilterEnvDepth" min="0" max="100" value="60" oninput="updateAudioParams()">
-              </div>
-              <div class="control-row">
-                <div class="control-label"><span>LFO Rate / Depth</span><span class="control-val filter-val" id="lblFilterLfoValues">0.08 Hz / 25%</span></div>
-                <div style="display: flex; gap: 8px;">
-                  <div style="flex: 1;">
-                    <div class="control-sublabel">Rate</div>
-                    <input type="range" id="knobFilterLfoRate" min="0.02" max="2" step="0.01" value="0.08" oninput="updateAudioParams()">
-                  </div>
-                  <div style="flex: 1;">
-                    <div class="control-sublabel">Depth</div>
-                    <input type="range" id="knobFilterLfoDepth" min="0" max="100" value="25" oninput="updateAudioParams()">
-                  </div>
+                <div class="control-row">
+                  <div class="control-label"><span>Envelope Depth</span><span class="control-val filter-val" id="lblFilterEnvDepth">60%</span></div>
+                  <input type="range" id="knobFilterEnvDepth" min="0" max="100" value="60" oninput="updateAudioParams(); updateFxParam('FILTER', 'lfo', this.value, event);">
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 2. DELAY PEDAL -->
-      <div class="pedal-chassis pedal-delay" id="pedalCard_DELAY" data-module="DELAY">
-        <div class="panel-header">
-          <span id="pedalTitle_DELAY">8. DELAY</span>
-          <div class="panel-header-actions">
-            <span class="pedal-slot-badge" id="slotBadge_DELAY">INSERT</span>
-            <button class="btn-pedal-shift" onclick="shiftPedalLeft('DELAY')" id="shiftLeft_DELAY" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
-            <button class="btn-pedal-shift" onclick="shiftPedalRight('DELAY')" id="shiftRight_DELAY" title="Shift Right"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg></button>
-            <span class="pedal-drag-handle" title="Drag to reorder"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg></span>
-            <button class="btn-power active" id="stompBtn_DELAY" onclick="togglePedalBypass('DELAY')" title="Bypass/engage Delay"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="11"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/></svg></button>
-          </div>
-        </div>
-
-        <div class="pedal-controls-body">
-          <div class="control-row">
-            <div class="control-label">
-              <span>Delay Time</span>
-              <span class="control-val delay-val" id="lblDelayTime">360 ms</span>
-            </div>
-            <div class="select-with-toggle" style="margin-bottom: 6px;">
-              <select id="selDelayNoteDivision" onchange="updateAudioParams()">
-                <option value="0.25">1/16 Note</option>
-                <option value="0.3333333333">1/8 Triplet</option>
-                <option value="0.5" selected>1/8 Note</option>
-                <option value="0.75">1/8 Dotted (Dub Skip)</option>
-                <option value="0.6666666667">1/4 Triplet</option>
-                <option value="1">1/4 (Quarter Beat)</option>
-                <option value="1.5">1/4 Dotted</option>
-                <option value="2">1/2 (Half Measure)</option>
-                <option value="4">1/1 (Whole Measure)</option>
-              </select>
-              <label class="toggle-switch" title="Lock delay time to master tempo grid">
-                <input type="checkbox" id="chkDelayTempoSync" onchange="updateAudioParams()">
-                <span class="toggle-track"></span>
-              </label>
-            </div>
-            <input type="range" id="knobDelayTime" min="60" max="1100" value="360" oninput="updateAudioParams()">
-          </div>
-          <div class="control-row">
-            <div class="control-label"><span>Feedback (Repeats / 48% Safe)</span><span class="control-val delay-val" id="lblDelayFeedback">35%</span></div>
-            <input type="range" id="knobDelayFeedback" min="0" max="48" value="35" oninput="updateAudioParams()">
-          </div>
-          <div class="module-drawer-toggle expanded" onclick="toggleModuleDrawer(this)" aria-expanded="true" role="button" tabindex="0" title="Expand / collapse secondary multi-delay & tape wow/flutter parameters">
-            <span class="drawer-arrow">▸</span>
-            <span class="drawer-title">MULTI-DELAY & TAPE WOW/FLUTTER</span>
-          </div>
-          <div class="module-drawer-content open">
-            <div class="drawer-inner">
-              <div class="control-row">
-                <div class="control-label"><span>BBD Dark Damping (Tone)</span><span class="control-val delay-val" id="lblDelayTone">1900 Hz</span></div>
-                <input type="range" id="knobDelayTone" min="400" max="4800" value="1900" oninput="updateAudioParams()">
-              </div>
-              <div class="control-row">
-                <div class="control-label"><span>Tape Flutter / Wet Mix</span><span class="control-val delay-val" id="lblDelayMix">35% flt / 42% mix</span></div>
-                <div style="display: flex; gap: 8px;">
-                  <div style="flex: 1;">
-                    <div class="control-sublabel">Flutter</div>
-                    <input type="range" id="knobDelayFlutter" min="0" max="100" value="35" oninput="updateAudioParams()">
-                  </div>
-                  <div style="flex: 1;">
-                    <div class="control-sublabel">Mix</div>
-                    <input type="range" id="knobDelayMix" min="0" max="100" value="42" oninput="updateAudioParams()">
+                <div class="control-row">
+                  <div class="control-label"><span>LFO Rate / Depth</span><span class="control-val filter-val" id="lblFilterLfoValues">0.08 Hz / 25%</span></div>
+                  <div style="display: flex; gap: 8px;">
+                    <div style="flex: 1;">
+                      <div class="control-sublabel">Rate</div>
+                      <input type="range" id="knobFilterLfoRate" min="0.02" max="2" step="0.01" value="0.08" oninput="updateAudioParams()">
+                    </div>
+                    <div style="flex: 1;">
+                      <div class="control-sublabel">Depth</div>
+                      <input type="range" id="knobFilterLfoDepth" min="0" max="100" value="25" oninput="updateAudioParams()">
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- 3. REVERB & CHORUS PEDAL (Pink) -->
-      <div class="pedal-chassis pedal-space pedal-reverb" id="pedalCard_SPACE" data-module="SPACE">
-        <div class="panel-header">
-          <span id="pedalTitle_SPACE">9. SPACE</span>
-          <div class="panel-header-actions">
-            <span class="pedal-slot-badge" id="slotBadge_SPACE">OUT</span>
-            <button class="btn-pedal-shift" onclick="shiftPedalLeft('SPACE')" id="shiftLeft_SPACE" title="Shift Left"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg></button>
-            <button class="btn-pedal-shift" onclick="shiftPedalRight('SPACE')" id="shiftRight_SPACE" title="Shift Right"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg></button>
-            <span class="pedal-drag-handle" title="Drag to reorder"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg></span>
-            <button class="btn-power active" id="stompBtn_SPACE" onclick="togglePedalBypass('SPACE')" title="Bypass/engage Space"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="11"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/></svg></button>
+        <!-- 3. OPTO TREMOLO (TREMOLO) -->
+        <div class="strip-channel module-card pedal-chassis mini-card-tremolo pedal-tremolo active" id="pedalCard_TREMOLO" data-pedal="TREMOLO" data-module="TREMOLO" data-module-id="fx_tremolo" style="--pedal-color: #00d2d3; --pedal-color-rgb: 0, 210, 211;">
+          <div class="panel-header">
+            <div class="panel-header-left">
+              <span class="pedal-drag-handle upper-drag-handle" title="Drag to reorder in signal chain" aria-label="Drag Handle">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg>
+              </span>
+              <span class="pedal-slot-index" id="slotIndex_TREMOLO">#03</span>
+              <span class="pedal-card-title" id="pedalTitle_TREMOLO">3. OPTO TREMOLO</span>
+              <span class="pedal-slot-badge" id="slotBadge_TREMOLO">INSERT</span>
+            </div>
+            <div class="panel-header-actions">
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('TREMOLO', -1, event)" id="shiftLeft_TREMOLO" title="Shift Left in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+              </button>
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('TREMOLO', 1, event)" id="shiftRight_TREMOLO" title="Shift Right in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg>
+              </button>
+              <button type="button" class="badge-tag btn-pedal-rand" onclick="randomizePedalModule('TREMOLO', event)" title="Randomize Opto Tremolo parameters">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg>
+              </button>
+              <button type="button" class="btn-win-action btn-win-focus" onclick="togglePedalFullscreen('TREMOLO', event)" title="Expand to Fullscreen Focus (Esc to Exit)" aria-label="Focus Opto Tremolo">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none"><path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="btn-exit-focus" onclick="togglePedalFullscreen('TREMOLO', event)" title="Exit Fullscreen Focus (Esc)" aria-label="Exit Focus">
+                <svg viewBox="0 0 16 16" width="11" height="11" fill="none"><path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>✕ Exit Focus</span>
+              </button>
+              <button type="button" class="btn-power active" id="stompBtn_TREMOLO" onclick="togglePedalBypass('TREMOLO', event)" title="Bypass / Engage Opto Tremolo">PWR</button>
+            </div>
+          </div>
+          <div class="pedal-faceplate-banner">
+            <span class="pedal-silk-role">Optical Tremolo &amp; Pan</span>
+            <span class="pedal-silk-model">OPTOCOUPLER // QUAD-PHASE</span>
+          </div>
+          <div class="pedal-controls-body">
+            <div class="control-row">
+              <div class="control-label"><span>Modulation Rate</span><span class="control-val" id="lbl_TREMOLO_rate">3.5 Hz</span></div>
+              <input type="range" id="slider_TREMOLO_rate" min="0.2" max="12.0" step="0.1" value="3.5" oninput="updateFxParam('TREMOLO', 'rate', this.value, event)" onchange="updateFxParam('TREMOLO', 'rate', this.value, event)">
+            </div>
+            <div class="control-row">
+              <div class="control-label"><span>Tremolo Depth</span><span class="control-val" id="lbl_TREMOLO_depth">60%</span></div>
+              <input type="range" id="slider_TREMOLO_depth" min="0" max="100" step="1" value="60" oninput="updateFxParam('TREMOLO', 'depth', this.value, event)" onchange="updateFxParam('TREMOLO', 'depth', this.value, event)">
+            </div>
+            <div class="control-row">
+              <div class="control-label"><span>Stereo Pan Spread</span><span class="control-val" id="lbl_TREMOLO_pan">40%</span></div>
+              <input type="range" id="slider_TREMOLO_pan" min="0" max="100" step="1" value="40" oninput="updateFxParam('TREMOLO', 'pan', this.value, event)" onchange="updateFxParam('TREMOLO', 'pan', this.value, event)">
+            </div>
           </div>
         </div>
 
-        <div class="pedal-controls-body">
-          <div class="control-row">
-            <div class="control-label">Reverb Architecture</div>
-            <select id="selReverbMode" onchange="updateAudioParams()">
-              <option value="PLATE">Plate (Dense &amp; Shimmer)</option>
-              <option value="HALL" selected>Hall (Warm &amp; Wide Space)</option>
-              <option value="CATHEDRAL">Cathedral (Infinite Cavern)</option>
-            </select>
-          </div>
-          <div class="control-row">
-            <div class="control-label"><span>Reverb Mix / Tone</span><span class="control-val reverb-val" id="lblReverbMix">35% / 5200 Hz</span></div>
-            <div style="display: flex; gap: 8px;">
-              <div style="flex: 1;">
-                <div class="control-sublabel">Mix</div>
-                <input type="range" id="knobReverbMix" min="0" max="100" value="35" oninput="updateAudioParams()">
-              </div>
-              <div style="flex: 1;">
-                <div class="control-sublabel">Tone</div>
-                <input type="range" id="knobReverbTone" min="600" max="12000" value="5200" oninput="updateAudioParams()">
-              </div>
+        <!-- 4. 12-POLE PHASER (PHASER) -->
+        <div class="strip-channel module-card pedal-chassis mini-card-phaser pedal-phaser active" id="pedalCard_PHASER" data-pedal="PHASER" data-module="PHASER" data-module-id="fx_phaser" style="--pedal-color: #e056fd; --pedal-color-rgb: 224, 86, 253;">
+          <div class="panel-header">
+            <div class="panel-header-left">
+              <span class="pedal-drag-handle upper-drag-handle" title="Drag to reorder in signal chain" aria-label="Drag Handle">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg>
+              </span>
+              <span class="pedal-slot-index" id="slotIndex_PHASER">#04</span>
+              <span class="pedal-card-title" id="pedalTitle_PHASER">4. 12-POLE PHASER</span>
+              <span class="pedal-slot-badge" id="slotBadge_PHASER">INSERT</span>
+            </div>
+            <div class="panel-header-actions">
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('PHASER', -1, event)" id="shiftLeft_PHASER" title="Shift Left in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+              </button>
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('PHASER', 1, event)" id="shiftRight_PHASER" title="Shift Right in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg>
+              </button>
+              <button type="button" class="badge-tag btn-pedal-rand" onclick="randomizePedalModule('PHASER', event)" title="Randomize Phaser parameters">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg>
+              </button>
+              <button type="button" class="btn-win-action btn-win-focus" onclick="togglePedalFullscreen('PHASER', event)" title="Expand to Fullscreen Focus (Esc to Exit)" aria-label="Focus Phaser">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none"><path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="btn-exit-focus" onclick="togglePedalFullscreen('PHASER', event)" title="Exit Fullscreen Focus (Esc)" aria-label="Exit Focus">
+                <svg viewBox="0 0 16 16" width="11" height="11" fill="none"><path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>✕ Exit Focus</span>
+              </button>
+              <button type="button" class="btn-power active" id="stompBtn_PHASER" onclick="togglePedalBypass('PHASER', event)" title="Bypass / Engage Phaser">PWR</button>
             </div>
           </div>
-          <div class="module-drawer-toggle expanded" onclick="toggleModuleDrawer(this)" aria-expanded="true" role="button" tabindex="0" title="Expand / collapse secondary stereo chorus & modulation engine parameters">
-            <span class="drawer-arrow">▸</span>
-            <span class="drawer-title">STEREO CHORUS & MODULATION</span>
+          <div class="pedal-faceplate-banner">
+            <span class="pedal-silk-role">12-Pole All-Pass Sweep</span>
+            <span class="pedal-silk-model">OTA CASCADE // QUAD LFO</span>
           </div>
-          <div class="module-drawer-content open">
-            <div class="drawer-inner">
-              <div class="control-row">
-                <div class="control-label">Stereo Chorus Mode</div>
-                <select id="selChorusMode" onchange="updateAudioParams()">
-                  <option value="CLASSIC" selected>Classic (2-Voice Dimension)</option>
-                  <option value="ENSEMBLE">Ensemble (3-Voice Lush Chorus)</option>
-                  <option value="VIBRATO">Vibrato (Pure Wobble)</option>
+          <div class="pedal-controls-body">
+            <div class="control-row">
+              <div class="control-label"><span>Sweep Speed</span><span class="control-val" id="lbl_PHASER_rate">0.35 Hz</span></div>
+              <input type="range" id="slider_PHASER_rate" min="0.05" max="6.0" step="0.05" value="0.35" oninput="updateFxParam('PHASER', 'rate', this.value, event)" onchange="updateFxParam('PHASER', 'rate', this.value, event)">
+            </div>
+            <div class="control-row">
+              <div class="control-label"><span>Phaser Depth</span><span class="control-val" id="lbl_PHASER_depth">65%</span></div>
+              <input type="range" id="slider_PHASER_depth" min="0" max="100" step="1" value="65" oninput="updateFxParam('PHASER', 'depth', this.value, event)" onchange="updateFxParam('PHASER', 'depth', this.value, event)">
+            </div>
+            <div class="control-row">
+              <div class="control-label"><span>All-Pass Feedback</span><span class="control-val" id="lbl_PHASER_feedback">45%</span></div>
+              <input type="range" id="slider_PHASER_feedback" min="0" max="90" step="1" value="45" oninput="updateFxParam('PHASER', 'feedback', this.value, event)" onchange="updateFxParam('PHASER', 'feedback', this.value, event)">
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. ANALOG FLANGER (FLANGER) -->
+        <div class="strip-channel module-card pedal-chassis mini-card-flanger pedal-flanger active" id="pedalCard_FLANGER" data-pedal="FLANGER" data-module="FLANGER" data-module-id="fx_flanger" style="--pedal-color: #54a0ff; --pedal-color-rgb: 84, 160, 255;">
+          <div class="panel-header">
+            <div class="panel-header-left">
+              <span class="pedal-drag-handle upper-drag-handle" title="Drag to reorder in signal chain" aria-label="Drag Handle">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg>
+              </span>
+              <span class="pedal-slot-index" id="slotIndex_FLANGER">#05</span>
+              <span class="pedal-card-title" id="pedalTitle_FLANGER">5. ANALOG FLANGER</span>
+              <span class="pedal-slot-badge" id="slotBadge_FLANGER">INSERT</span>
+            </div>
+            <div class="panel-header-actions">
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('FLANGER', -1, event)" id="shiftLeft_FLANGER" title="Shift Left in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+              </button>
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('FLANGER', 1, event)" id="shiftRight_FLANGER" title="Shift Right in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg>
+              </button>
+              <button type="button" class="badge-tag btn-pedal-rand" onclick="randomizePedalModule('FLANGER', event)" title="Randomize Flanger parameters">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg>
+              </button>
+              <button type="button" class="btn-win-action btn-win-focus" onclick="togglePedalFullscreen('FLANGER', event)" title="Expand to Fullscreen Focus (Esc to Exit)" aria-label="Focus Flanger">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none"><path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="btn-exit-focus" onclick="togglePedalFullscreen('FLANGER', event)" title="Exit Fullscreen Focus (Esc)" aria-label="Exit Focus">
+                <svg viewBox="0 0 16 16" width="11" height="11" fill="none"><path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>✕ Exit Focus</span>
+              </button>
+              <button type="button" class="btn-power active" id="stompBtn_FLANGER" onclick="togglePedalBypass('FLANGER', event)" title="Bypass / Engage Flanger">PWR</button>
+            </div>
+          </div>
+          <div class="pedal-faceplate-banner">
+            <span class="pedal-silk-role">Comb-Filter Micro-Delay</span>
+            <span class="pedal-silk-model">BBD BRIGADE // BIPOLAR FDBK</span>
+          </div>
+          <div class="pedal-controls-body">
+            <div class="control-row">
+              <div class="control-label"><span>Flanger Rate</span><span class="control-val" id="lbl_FLANGER_rate">0.25 Hz</span></div>
+              <input type="range" id="slider_FLANGER_rate" min="0.05" max="5.0" step="0.05" value="0.25" oninput="updateFxParam('FLANGER', 'rate', this.value, event)" onchange="updateFxParam('FLANGER', 'rate', this.value, event)">
+            </div>
+            <div class="control-row">
+              <div class="control-label"><span>Delay Modulation</span><span class="control-val" id="lbl_FLANGER_depth">70%</span></div>
+              <input type="range" id="slider_FLANGER_depth" min="0" max="100" step="1" value="70" oninput="updateFxParam('FLANGER', 'depth', this.value, event)" onchange="updateFxParam('FLANGER', 'depth', this.value, event)">
+            </div>
+            <div class="control-row">
+              <div class="control-label"><span>Resonant Feedback</span><span class="control-val" id="lbl_FLANGER_feedback">50%</span></div>
+              <input type="range" id="slider_FLANGER_feedback" min="-85" max="85" step="1" value="50" oninput="updateFxParam('FLANGER', 'feedback', this.value, event)" onchange="updateFxParam('FLANGER', 'feedback', this.value, event)">
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. TAPE DELAY (DELAY) -->
+        <div class="strip-channel module-card pedal-chassis mini-card-delay pedal-delay active" id="pedalCard_DELAY" data-pedal="DELAY" data-module="DELAY" data-module-id="fx_delay" style="--pedal-color: #ff793f; --pedal-color-rgb: 255, 121, 63;">
+          <div class="panel-header">
+            <div class="panel-header-left">
+              <span class="pedal-drag-handle upper-drag-handle" title="Drag to reorder in signal chain" aria-label="Drag Handle">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg>
+              </span>
+              <span class="pedal-slot-index" id="slotIndex_DELAY">#06</span>
+              <span class="pedal-card-title" id="pedalTitle_DELAY">6. TAPE DELAY</span>
+              <span class="pedal-slot-badge" id="slotBadge_DELAY">INSERT</span>
+            </div>
+            <div class="panel-header-actions">
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('DELAY', -1, event)" id="shiftLeft_DELAY" title="Shift Left in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+              </button>
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('DELAY', 1, event)" id="shiftRight_DELAY" title="Shift Right in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg>
+              </button>
+              <button type="button" class="badge-tag btn-pedal-rand" onclick="randomizePedalModule('DELAY', event)" title="Randomize Tape Delay parameters">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg>
+              </button>
+              <button type="button" class="btn-win-action btn-win-focus" onclick="togglePedalFullscreen('DELAY', event)" title="Expand to Fullscreen Focus (Esc to Exit)" aria-label="Focus Tape Delay">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none"><path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="btn-exit-focus" onclick="togglePedalFullscreen('DELAY', event)" title="Exit Fullscreen Focus (Esc)" aria-label="Exit Focus">
+                <svg viewBox="0 0 16 16" width="11" height="11" fill="none"><path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>✕ Exit Focus</span>
+              </button>
+              <button type="button" class="btn-power active" id="stompBtn_DELAY" onclick="togglePedalBypass('DELAY', event)" title="Bypass / Engage Tape Delay">PWR</button>
+            </div>
+          </div>
+          <div class="pedal-faceplate-banner">
+            <span class="pedal-silk-role">Analog Tape Delay</span>
+            <span class="pedal-silk-model">BBD LINE // TAPE SLOW SLEW</span>
+          </div>
+          <div class="pedal-controls-body">
+            <div class="control-row">
+              <div class="control-label">
+                <span>Delay Time</span>
+                <span class="control-val delay-val" id="lblDelayTime">360 ms</span>
+              </div>
+              <div class="select-with-toggle" style="margin-bottom: 6px;">
+                <select id="selDelayNoteDivision" onchange="updateAudioParams()">
+                  <option value="0.25">1/16 Note</option>
+                  <option value="0.3333333333">1/8 Triplet</option>
+                  <option value="0.5" selected>1/8 Note</option>
+                  <option value="0.75">1/8 Dotted (Dub Skip)</option>
+                  <option value="0.6666666667">1/4 Triplet</option>
+                  <option value="1">1/4 (Quarter Beat)</option>
+                  <option value="1.5">1/4 Dotted</option>
+                  <option value="2">1/2 (Half Measure)</option>
+                  <option value="4">1/1 (Whole Measure)</option>
                 </select>
+                <label class="toggle-switch" title="Lock delay time to master tempo grid">
+                  <input type="checkbox" id="chkDelayTempoSync" onchange="updateAudioParams()">
+                  <span class="toggle-track"></span>
+                </label>
               </div>
-              <div class="control-row">
-                <div class="control-label"><span>Chorus Rate</span><span class="control-val reverb-val" id="lblChorusRate">0.45 Hz</span></div>
-                <input type="range" id="knobChorusRate" min="0.05" max="3" step="0.01" value="0.45" oninput="updateAudioParams()">
-              </div>
-              <div class="control-row">
-                <div class="control-label"><span>Chorus Depth / Mix</span><span class="control-val reverb-val" id="lblChorusDepth">40% / 30%</span></div>
-                <div style="display: flex; gap: 8px;">
-                  <div style="flex: 1;">
-                    <div class="control-sublabel">Depth</div>
-                    <input type="range" id="knobChorusDepth" min="0" max="100" value="40" oninput="updateAudioParams()">
-                  </div>
-                  <div style="flex: 1;">
-                    <div class="control-sublabel">Mix</div>
-                    <input type="range" id="knobChorusMix" min="0" max="100" value="30" oninput="updateAudioParams()">
+              <input type="range" id="knobDelayTime" min="60" max="1100" value="360" oninput="updateAudioParams(); updateFxParam('DELAY', 'time', this.value, event);">
+            </div>
+            <div class="control-row">
+              <div class="control-label"><span>Feedback (Repeats / 48% Safe)</span><span class="control-val delay-val" id="lblDelayFeedback">35%</span></div>
+              <input type="range" id="knobDelayFeedback" min="0" max="48" value="35" oninput="updateAudioParams(); updateFxParam('DELAY', 'feedback', this.value, event);">
+            </div>
+            <div class="module-drawer-toggle expanded" onclick="toggleModuleDrawer(this)" aria-expanded="true" role="button" tabindex="0" title="Expand / collapse secondary multi-delay & tape wow/flutter parameters">
+              <span class="drawer-arrow">▸</span>
+              <span class="drawer-title">MULTI-DELAY &amp; TAPE WOW/FLUTTER</span>
+            </div>
+            <div class="module-drawer-content open">
+              <div class="drawer-inner">
+                <div class="control-row">
+                  <div class="control-label"><span>BBD Dark Damping (Tone)</span><span class="control-val delay-val" id="lblDelayTone">1900 Hz</span></div>
+                  <input type="range" id="knobDelayTone" min="400" max="4800" value="1900" oninput="updateAudioParams()">
+                </div>
+                <div class="control-row">
+                  <div class="control-label"><span>Tape Flutter / Wet Mix</span><span class="control-val delay-val" id="lblDelayMix">35% flt / 42% mix</span></div>
+                  <div style="display: flex; gap: 8px;">
+                    <div style="flex: 1;">
+                      <div class="control-sublabel">Flutter</div>
+                      <input type="range" id="knobDelayFlutter" min="0" max="100" value="35" oninput="updateAudioParams()">
+                    </div>
+                    <div style="flex: 1;">
+                      <div class="control-sublabel">Mix</div>
+                      <input type="range" id="knobDelayMix" min="0" max="100" value="42" oninput="updateAudioParams(); updateFxParam('DELAY', 'mix', this.value, event);">
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- 4. FINAL ELEMENT: MASTER EQ & OUT -->
-      <div class="strip-channel master-eq-ch space-ch" id="masterEqOutStrip">
+        <!-- 7. DIGITAL DELAY (DIGITAL_DELAY) -->
+        <div class="strip-channel module-card pedal-chassis mini-card-digital-delay pedal-digital-delay active" id="pedalCard_DIGITAL_DELAY" data-pedal="DIGITAL_DELAY" data-module="DIGITAL_DELAY" data-module-id="fx_digital_delay" style="--pedal-color: #48dbfb; --pedal-color-rgb: 72, 219, 251;">
+          <div class="panel-header">
+            <div class="panel-header-left">
+              <span class="pedal-drag-handle upper-drag-handle" title="Drag to reorder in signal chain" aria-label="Drag Handle">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg>
+              </span>
+              <span class="pedal-slot-index" id="slotIndex_DIGITAL_DELAY">#07</span>
+              <span class="pedal-card-title" id="pedalTitle_DIGITAL_DELAY">7. DIGITAL DELAY</span>
+              <span class="pedal-slot-badge" id="slotBadge_DIGITAL_DELAY">INSERT</span>
+            </div>
+            <div class="panel-header-actions">
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('DIGITAL_DELAY', -1, event)" id="shiftLeft_DIGITAL_DELAY" title="Shift Left in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+              </button>
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('DIGITAL_DELAY', 1, event)" id="shiftRight_DIGITAL_DELAY" title="Shift Right in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg>
+              </button>
+              <button type="button" class="badge-tag btn-pedal-rand" onclick="randomizePedalModule('DIGITAL_DELAY', event)" title="Randomize Digital Delay parameters">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg>
+              </button>
+              <button type="button" class="btn-win-action btn-win-focus" onclick="togglePedalFullscreen('DIGITAL_DELAY', event)" title="Expand to Fullscreen Focus (Esc to Exit)" aria-label="Focus Digital Delay">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none"><path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="btn-exit-focus" onclick="togglePedalFullscreen('DIGITAL_DELAY', event)" title="Exit Fullscreen Focus (Esc)" aria-label="Exit Focus">
+                <svg viewBox="0 0 16 16" width="11" height="11" fill="none"><path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>✕ Exit Focus</span>
+              </button>
+              <button type="button" class="btn-power active" id="stompBtn_DIGITAL_DELAY" onclick="togglePedalBypass('DIGITAL_DELAY', event)" title="Bypass / Engage Digital Delay">PWR</button>
+            </div>
+          </div>
+          <div class="pedal-faceplate-banner">
+            <span class="pedal-silk-role">Ping-Pong Delay</span>
+            <span class="pedal-silk-model">PRISTINE 64-BIT // TEMPO GRID</span>
+          </div>
+          <div class="pedal-controls-body">
+            <div class="control-row">
+              <div class="control-label"><span>Echo Interval</span><span class="control-val" id="lbl_DIGITAL_DELAY_time">0.38 s</span></div>
+              <input type="range" id="slider_DIGITAL_DELAY_time" min="0.05" max="2.0" step="0.025" value="0.375" oninput="updateFxParam('DIGITAL_DELAY', 'time', this.value, event)" onchange="updateFxParam('DIGITAL_DELAY', 'time', this.value, event)">
+            </div>
+            <div class="control-row">
+              <div class="control-label"><span>Ping-Pong Repeats</span><span class="control-val" id="lbl_DIGITAL_DELAY_feedback">45%</span></div>
+              <input type="range" id="slider_DIGITAL_DELAY_feedback" min="0" max="85" step="1" value="45" oninput="updateFxParam('DIGITAL_DELAY', 'feedback', this.value, event)" onchange="updateFxParam('DIGITAL_DELAY', 'feedback', this.value, event)">
+            </div>
+            <div class="control-row">
+              <div class="control-label"><span>Wet / Dry Balance</span><span class="control-val" id="lbl_DIGITAL_DELAY_mix">40%</span></div>
+              <input type="range" id="slider_DIGITAL_DELAY_mix" min="0" max="100" step="1" value="40" oninput="updateFxParam('DIGITAL_DELAY', 'mix', this.value, event)" onchange="updateFxParam('DIGITAL_DELAY', 'mix', this.value, event)">
+            </div>
+          </div>
+        </div>
+
+        <!-- 8. SPACE DELAY (SPACE_DELAY) -->
+        <div class="strip-channel module-card pedal-chassis mini-card-space-delay pedal-space-delay active" id="pedalCard_SPACE_DELAY" data-pedal="SPACE_DELAY" data-module="SPACE_DELAY" data-module-id="fx_space_delay" style="--pedal-color: #ff9f43; --pedal-color-rgb: 255, 159, 67;">
+          <div class="panel-header">
+            <div class="panel-header-left">
+              <span class="pedal-drag-handle upper-drag-handle" title="Drag to reorder in signal chain" aria-label="Drag Handle">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg>
+              </span>
+              <span class="pedal-slot-index" id="slotIndex_SPACE_DELAY">#08</span>
+              <span class="pedal-card-title" id="pedalTitle_SPACE_DELAY">8. SPACE DELAY</span>
+              <span class="pedal-slot-badge" id="slotBadge_SPACE_DELAY">INSERT</span>
+            </div>
+            <div class="panel-header-actions">
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('SPACE_DELAY', -1, event)" id="shiftLeft_SPACE_DELAY" title="Shift Left in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+              </button>
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('SPACE_DELAY', 1, event)" id="shiftRight_SPACE_DELAY" title="Shift Right in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg>
+              </button>
+              <button type="button" class="badge-tag btn-pedal-rand" onclick="randomizePedalModule('SPACE_DELAY', event)" title="Randomize Space Delay parameters">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg>
+              </button>
+              <button type="button" class="btn-win-action btn-win-focus" onclick="togglePedalFullscreen('SPACE_DELAY', event)" title="Expand to Fullscreen Focus (Esc to Exit)" aria-label="Focus Space Delay">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none"><path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="btn-exit-focus" onclick="togglePedalFullscreen('SPACE_DELAY', event)" title="Exit Fullscreen Focus (Esc)" aria-label="Exit Focus">
+                <svg viewBox="0 0 16 16" width="11" height="11" fill="none"><path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>✕ Exit Focus</span>
+              </button>
+              <button type="button" class="btn-power active" id="stompBtn_SPACE_DELAY" onclick="togglePedalBypass('SPACE_DELAY', event)" title="Bypass / Engage Space Delay">PWR</button>
+            </div>
+          </div>
+          <div class="pedal-faceplate-banner">
+            <span class="pedal-silk-role">Flutter Delay Diffusion</span>
+            <span class="pedal-silk-model">TAPE WARBLE // DAMPED DIFFUSION</span>
+          </div>
+          <div class="pedal-controls-body">
+            <div class="control-row">
+              <div class="control-label"><span>Diffusion Time</span><span class="control-val" id="lbl_SPACE_DELAY_time">0.52 s</span></div>
+              <input type="range" id="slider_SPACE_DELAY_time" min="0.1" max="2.5" step="0.025" value="0.52" oninput="updateFxParam('SPACE_DELAY', 'time', this.value, event)" onchange="updateFxParam('SPACE_DELAY', 'time', this.value, event)">
+            </div>
+            <div class="control-row">
+              <div class="control-label"><span>Tape Wow &amp; Flutter</span><span class="control-val" id="lbl_SPACE_DELAY_flutter">40%</span></div>
+              <input type="range" id="slider_SPACE_DELAY_flutter" min="0" max="100" step="1" value="40" oninput="updateFxParam('SPACE_DELAY', 'flutter', this.value, event)" onchange="updateFxParam('SPACE_DELAY', 'flutter', this.value, event)">
+            </div>
+            <div class="control-row">
+              <div class="control-label"><span>Diffusion Mix</span><span class="control-val" id="lbl_SPACE_DELAY_mix">45%</span></div>
+              <input type="range" id="slider_SPACE_DELAY_mix" min="0" max="100" step="1" value="45" oninput="updateFxParam('SPACE_DELAY', 'mix', this.value, event)" onchange="updateFxParam('SPACE_DELAY', 'mix', this.value, event)">
+            </div>
+          </div>
+        </div>
+
+        <!-- 9. TAPE ECHO (TAPE_ECHO) -->
+        <div class="strip-channel module-card pedal-chassis mini-card-tape-echo pedal-tape-echo active" id="pedalCard_TAPE_ECHO" data-pedal="TAPE_ECHO" data-module="TAPE_ECHO" data-module-id="fx_tape_echo" style="--pedal-color: #feca57; --pedal-color-rgb: 254, 202, 87;">
+          <div class="panel-header">
+            <div class="panel-header-left">
+              <span class="pedal-drag-handle upper-drag-handle" title="Drag to reorder in signal chain" aria-label="Drag Handle">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg>
+              </span>
+              <span class="pedal-slot-index" id="slotIndex_TAPE_ECHO">#09</span>
+              <span class="pedal-card-title" id="pedalTitle_TAPE_ECHO">9. TAPE ECHO</span>
+              <span class="pedal-slot-badge" id="slotBadge_TAPE_ECHO">INSERT</span>
+            </div>
+            <div class="panel-header-actions">
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('TAPE_ECHO', -1, event)" id="shiftLeft_TAPE_ECHO" title="Shift Left in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+              </button>
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('TAPE_ECHO', 1, event)" id="shiftRight_TAPE_ECHO" title="Shift Right in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg>
+              </button>
+              <button type="button" class="badge-tag btn-pedal-rand" onclick="randomizePedalModule('TAPE_ECHO', event)" title="Randomize Tape Echo parameters">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg>
+              </button>
+              <button type="button" class="btn-win-action btn-win-focus" onclick="togglePedalFullscreen('TAPE_ECHO', event)" title="Expand to Fullscreen Focus (Esc to Exit)" aria-label="Focus Tape Echo">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none"><path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="btn-exit-focus" onclick="togglePedalFullscreen('TAPE_ECHO', event)" title="Exit Fullscreen Focus (Esc)" aria-label="Exit Focus">
+                <svg viewBox="0 0 16 16" width="11" height="11" fill="none"><path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>✕ Exit Focus</span>
+              </button>
+              <button type="button" class="btn-power active" id="stompBtn_TAPE_ECHO" onclick="togglePedalBypass('TAPE_ECHO', event)" title="Bypass / Engage Tape Echo">PWR</button>
+            </div>
+          </div>
+          <div class="pedal-faceplate-banner">
+            <span class="pedal-silk-role">3-Head Multi-Tap Inertia</span>
+            <span class="pedal-silk-model">CAPSTAN SLEW // TRIPLE PICKUP</span>
+          </div>
+          <div class="pedal-controls-body">
+            <div class="control-row">
+              <div class="control-label"><span>Capstan Motor Speed</span><span class="control-val" id="lbl_TAPE_ECHO_speed">1.0x</span></div>
+              <input type="range" id="slider_TAPE_ECHO_speed" min="0.2" max="2.5" step="0.05" value="1.0" oninput="updateFxParam('TAPE_ECHO', 'speed', this.value, event)" onchange="updateFxParam('TAPE_ECHO', 'speed', this.value, event)">
+            </div>
+            <div class="control-row">
+              <div class="control-label"><span>Motor Inertia / Slew</span><span class="control-val" id="lbl_TAPE_ECHO_inertia">0.12 s</span></div>
+              <input type="range" id="slider_TAPE_ECHO_inertia" min="0.01" max="0.5" step="0.01" value="0.12" oninput="updateFxParam('TAPE_ECHO', 'inertia', this.value, event)" onchange="updateFxParam('TAPE_ECHO', 'inertia', this.value, event)">
+            </div>
+            <div class="control-row">
+              <div class="control-label"><span>3-Head Blend Mix</span><span class="control-val" id="lbl_TAPE_ECHO_mix">45%</span></div>
+              <input type="range" id="slider_TAPE_ECHO_mix" min="0" max="100" step="1" value="45" oninput="updateFxParam('TAPE_ECHO', 'mix', this.value, event)" onchange="updateFxParam('TAPE_ECHO', 'mix', this.value, event)">
+            </div>
+          </div>
+        </div>
+
+        <!-- 10. SPACE REVERB (SPACE) -->
+        <div class="strip-channel module-card pedal-chassis mini-card-space pedal-space pedal-reverb active" id="pedalCard_SPACE" data-pedal="SPACE" data-module="SPACE" data-module-id="fx_space" style="--pedal-color: #ff5fc4; --pedal-color-rgb: 255, 95, 196;">
+          <div class="panel-header">
+            <div class="panel-header-left">
+              <span class="pedal-drag-handle upper-drag-handle" title="Drag to reorder in signal chain" aria-label="Drag Handle">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg>
+              </span>
+              <span class="pedal-slot-index" id="slotIndex_SPACE">#10</span>
+              <span class="pedal-card-title" id="pedalTitle_SPACE">10. SPACE REVERB</span>
+              <span class="pedal-slot-badge" id="slotBadge_SPACE">OUT</span>
+            </div>
+            <div class="panel-header-actions">
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('SPACE', -1, event)" id="shiftLeft_SPACE" title="Shift Left in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+              </button>
+              <button type="button" class="btn-pedal-shift" onclick="shiftMasterDspChain('SPACE', 1, event)" id="shiftRight_SPACE" title="Shift Right in Signal Chain">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></svg>
+              </button>
+              <button type="button" class="badge-tag btn-pedal-rand" onclick="randomizePedalModule('SPACE', event)" title="Randomize Space parameters">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg>
+              </button>
+              <button type="button" class="btn-win-action btn-win-focus" onclick="togglePedalFullscreen('SPACE', event)" title="Expand to Fullscreen Focus (Esc to Exit)" aria-label="Focus Space Reverb">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none"><path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button type="button" class="btn-exit-focus" onclick="togglePedalFullscreen('SPACE', event)" title="Exit Fullscreen Focus (Esc)" aria-label="Exit Focus">
+                <svg viewBox="0 0 16 16" width="11" height="11" fill="none"><path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>✕ Exit Focus</span>
+              </button>
+              <button type="button" class="btn-power active" id="stompBtn_SPACE" onclick="togglePedalBypass('SPACE', event)" title="Bypass / Engage Space Reverb">PWR</button>
+            </div>
+          </div>
+          <div class="pedal-faceplate-banner">
+            <span class="pedal-silk-role">Shimmer Reverb &amp; Chorus</span>
+            <span class="pedal-silk-model">SCHROEDER-MOORER // DIFFUSED CHORUS</span>
+          </div>
+          <div class="pedal-controls-body">
+            <div class="control-row">
+              <div class="control-label">Reverb Architecture</div>
+              <select id="selReverbMode" onchange="updateAudioParams()">
+                <option value="PLATE">Plate (Dense &amp; Shimmer)</option>
+                <option value="HALL" selected>Hall (Warm &amp; Wide Space)</option>
+                <option value="CATHEDRAL">Cathedral (Infinite Cavern)</option>
+              </select>
+            </div>
+            <div class="control-row">
+              <div class="control-label"><span>Reverb Mix / Tone</span><span class="control-val reverb-val" id="lblReverbMix">35% / 5200 Hz</span></div>
+              <div style="display: flex; gap: 8px;">
+                <div style="flex: 1;">
+                  <div class="control-sublabel">Mix</div>
+                  <input type="range" id="knobReverbMix" min="0" max="100" value="35" oninput="updateAudioParams(); updateFxParam('SPACE', 'mix', this.value, event);">
+                </div>
+                <div style="flex: 1;">
+                  <div class="control-sublabel">Tone</div>
+                  <input type="range" id="knobReverbTone" min="600" max="12000" value="5200" oninput="updateAudioParams()">
+                </div>
+              </div>
+            </div>
+            <div class="module-drawer-toggle expanded" onclick="toggleModuleDrawer(this)" aria-expanded="true" role="button" tabindex="0" title="Expand / collapse secondary stereo chorus & modulation engine parameters">
+              <span class="drawer-arrow">▸</span>
+              <span class="drawer-title">STEREO CHORUS &amp; MODULATION</span>
+            </div>
+            <div class="module-drawer-content open">
+              <div class="drawer-inner">
+                <div class="control-row">
+                  <div class="control-label">Stereo Chorus Mode</div>
+                  <select id="selChorusMode" onchange="updateAudioParams()">
+                    <option value="CLASSIC" selected>Classic (2-Voice Dimension)</option>
+                    <option value="ENSEMBLE">Ensemble (3-Voice Lush Chorus)</option>
+                    <option value="VIBRATO">Vibrato (Pure Wobble)</option>
+                  </select>
+                </div>
+                <div class="control-row">
+                  <div class="control-label"><span>Chorus Rate</span><span class="control-val reverb-val" id="lblChorusRate">0.45 Hz</span></div>
+                  <input type="range" id="knobChorusRate" min="0.05" max="3" step="0.01" value="0.45" oninput="updateAudioParams()">
+                </div>
+                <div class="control-row">
+                  <div class="control-label"><span>Chorus Depth / Mix</span><span class="control-val reverb-val" id="lblChorusDepth">40% / 30%</span></div>
+                  <div style="display: flex; gap: 8px;">
+                    <div style="flex: 1;">
+                      <div class="control-sublabel">Depth</div>
+                      <input type="range" id="knobChorusDepth" min="0" max="100" value="40" oninput="updateAudioParams(); updateFxParam('SPACE', 'chorus', this.value, event);">
+                    </div>
+                    <div style="flex: 1;">
+                      <div class="control-sublabel">Mix</div>
+                      <input type="range" id="knobChorusMix" min="0" max="100" value="30" oninput="updateAudioParams()">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        </div>
+
+        <!-- Terminal Master Section: Master EQ, Tape Saturation & Out -->
+        <div class="pedalboard-master-section" id="pedalboardMasterSection">
+          <div class="strip-channel master-eq-ch space-ch" id="masterEqOutStrip">
         <div class="panel-header">
           <span>10. OUT</span>
           <button class="badge-tag" style="color: var(--color-space); border-color: rgba(75,123,236,0.3);" onclick="randomizeSpace()" title="Randomize Out"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg></button>
@@ -1334,6 +1761,13 @@
           </div>
         </div>
       </div>
+        </div>
+      </div><!-- End studio-fx-pedalboard -->
+    </div><!-- End lower-deck-body -->
+
+    <!-- MOBILE MACRO OVERVIEW GRID (2-column compact grid, ~110px summary tiles) -->
+    <div class="mobile-macro-grid" id="mobileMacroGrid" aria-label="Mobile Macro Rack Grid">
+      <!-- Dynamically rendered and synchronized with live module parameters -->
     </div>
   </div>
 
@@ -3517,53 +3951,65 @@ function swapPedalOrbPositions(keyA, keyB) {
 }
 
 function updatePedalsOrderUI() {
-  const container = document.getElementById("masterDeckUnified") || document.getElementById("pedalsGrid");
+  const container = document.getElementById("studioFxGrid") || document.getElementById("masterDeckUnified");
 
-  // Synchronize backing-store card headers and slot badges if they exist
-  dspChainOrder.forEach((key, idx) => {
-    const el = document.getElementById("pedalCard_" + key);
-    if (el && container && !el.closest("#orbitalModalBody")) container.appendChild(el);
+  // Synchronize pedal cards and slot badges in the pedalboard grid
+  if (container) {
+    dspChainOrder.forEach((key, idx) => {
+      const el = document.getElementById("pedalCard_" + key);
+      if (el && !el.closest("#orbitalModalBody")) {
+        container.appendChild(el);
+      }
 
-    const chainNum = 7 + idx;
-    const titleEl = document.getElementById("pedalTitle_" + key) || (el ? el.querySelector(".panel-header > span:first-child") : null);
-    if (titleEl) {
-      titleEl.textContent = `${chainNum}. ${PEDAL_BASE_NAMES[key] || key}`;
-    }
+      const chainNum = idx + 1;
+      const formattedSlot = "#" + (chainNum < 10 ? "0" + chainNum : chainNum);
+      const slotIndexEl = document.getElementById("slotIndex_" + key);
+      if (slotIndexEl) slotIndexEl.textContent = formattedSlot;
 
-    if (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && typeof ORBITAL_MODULES !== "undefined") {
-      const orbId = PEDAL_KEY_TO_ORBITAL_ID[key];
-      const orb = orbId ? ORBITAL_MODULES.find(o => o.id === orbId) : null;
-      if (orb) {
-        orb.num = String(chainNum);
-        if (typeof expandedOrbId !== "undefined" && expandedOrbId === orbId) {
-          const modalTitle = document.getElementById("orbitalModalTitle");
-          if (modalTitle) modalTitle.textContent = `${orb.num}. ${orb.name}`;
+      const titleEl = document.getElementById("pedalTitle_" + key) || (el ? el.querySelector(".panel-header .pedal-card-title, .panel-header > span:first-child") : null);
+      if (titleEl) {
+        const meta = PEDAL_REGISTRY[key];
+        titleEl.textContent = `${chainNum}. ${meta ? meta.name : (PEDAL_BASE_NAMES[key] || key)}`;
+      }
+
+      if (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && typeof ORBITAL_MODULES !== "undefined") {
+        const orbId = PEDAL_KEY_TO_ORBITAL_ID[key];
+        const orb = orbId ? ORBITAL_MODULES.find(o => o.id === orbId) : null;
+        if (orb) {
+          orb.num = String(chainNum);
+          if (typeof expandedOrbId !== "undefined" && expandedOrbId === orbId) {
+            const modalTitle = document.getElementById("orbitalModalTitle");
+            if (modalTitle) modalTitle.textContent = `${orb.num}. ${orb.name}`;
+          }
         }
       }
-    }
 
-    const slotBadge = document.getElementById("slotBadge_" + key);
-    if (slotBadge) {
-      if (idx === 0) slotBadge.textContent = "IN";
-      else if (idx === dspChainOrder.length - 1) slotBadge.textContent = "OUT";
-      else slotBadge.textContent = "INSERT";
-    }
+      const slotBadge = document.getElementById("slotBadge_" + key);
+      if (slotBadge) {
+        if (idx === 0) slotBadge.textContent = "IN";
+        else if (idx === dspChainOrder.length - 1) slotBadge.textContent = "OUT";
+        else slotBadge.textContent = "INSERT";
+      }
 
-    const shiftL = document.getElementById("shiftLeft_" + key);
-    const shiftR = document.getElementById("shiftRight_" + key);
-    if (shiftL) shiftL.disabled = (idx === 0);
-    if (shiftR) shiftR.disabled = (idx === dspChainOrder.length - 1);
+      const shiftL = document.getElementById("shiftLeft_" + key);
+      const shiftR = document.getElementById("shiftRight_" + key);
+      if (shiftL) shiftL.disabled = (idx === 0);
+      if (shiftR) shiftR.disabled = (idx === dspChainOrder.length - 1);
 
-    const routeBadge = document.getElementById("routeBadge" + (idx + 1));
-    if (routeBadge) {
-      routeBadge.textContent = (idx + 1) + ": " + key;
-    }
-  });
+      const routeBadge = document.getElementById("routeBadge" + (idx + 1));
+      if (routeBadge) {
+        routeBadge.textContent = (idx + 1) + ": " + key;
+      }
+    });
+  }
 
   const eqStrip = document.getElementById("masterEqOutStrip");
-  if (eqStrip && container && !eqStrip.closest("#orbitalModalBody")) {
-    container.appendChild(eqStrip);
+  const masterSec = document.getElementById("pedalboardMasterSection") || container;
+  if (eqStrip && masterSec && !eqStrip.closest("#orbitalModalBody") && !eqStrip.parentElement) {
+    masterSec.appendChild(eqStrip);
   }
+
+  renderPedalboardRoutingRibbon();
 
   if (typeof renderBirdsEyePedalRack === "function") {
     renderBirdsEyePedalRack();
@@ -3576,6 +4022,139 @@ function updatePedalsOrderUI() {
   }
   if (typeof expandedOrbId !== "undefined" && expandedOrbId && typeof renderSignalRibbon === "function") {
     renderSignalRibbon(expandedOrbId);
+  }
+}
+
+function renderPedalboardRoutingRibbon() {
+  const container = document.getElementById("pedalboardRoutingStream");
+  if (!container) return;
+
+  const order = Array.isArray(dspChainOrder) ? dspChainOrder : Object.keys(PEDAL_REGISTRY);
+  let html = "";
+
+  order.forEach((key, idx) => {
+    const meta = PEDAL_REGISTRY[key];
+    if (!meta) return;
+    const isBypassed = !!(typeof pedalBypassState !== "undefined" && pedalBypassState[key]);
+    const num = idx + 1;
+
+    html += `
+      <div class="routing-pill-node ${isBypassed ? 'bypassed' : 'active'}" style="--node-color: ${meta.color};" onclick="focusOrInspectPedal('${key}', event)" title="Slot #${num}: ${meta.name} • Click to focus">
+        <span class="node-idx">${num}</span>
+        <span class="node-name">${meta.shortName || meta.name}</span>
+      </div>
+      ${idx < order.length - 1 ? '<span class="routing-arrow">➔</span>' : ''}
+    `;
+  });
+
+  container.innerHTML = html;
+
+  const countEl = document.getElementById("deckStreamActiveCount");
+  if (countEl) {
+    const activeCount = order.filter(k => !(typeof pedalBypassState !== "undefined" && pedalBypassState[k])).length;
+    countEl.textContent = `${activeCount} / ${order.length} ACTIVE INSERTS`;
+  }
+}
+
+function focusOrInspectPedal(key, ev) {
+  if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
+  const el = document.getElementById("pedalCard_" + key);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+    el.classList.add("pedal-highlight-flash");
+    setTimeout(() => el.classList.remove("pedal-highlight-flash"), 1200);
+  }
+}
+
+function togglePedalFullscreen(key, ev) {
+  if (ev) {
+    if (typeof ev.stopPropagation === "function") ev.stopPropagation();
+    if (typeof ev.preventDefault === "function") ev.preventDefault();
+  }
+  const el = document.getElementById("pedalCard_" + key);
+  if (!el) return;
+
+  const isCurrent = el.classList.contains("module-fullscreen-active");
+  document.querySelectorAll(".module-fullscreen-active").forEach(item => {
+    item.classList.remove("module-fullscreen-active");
+  });
+
+  if (isCurrent) {
+    document.body.classList.remove("module-focus-open");
+  } else {
+    el.classList.add("module-fullscreen-active");
+    document.body.classList.add("module-focus-open");
+  }
+}
+
+let currentLowerDeckMode = "instruments";
+
+function setLowerDeckMode(mode) {
+  const isCompact = window.innerWidth <= 1200;
+  if (isCompact && mode === "split") {
+    mode = "instruments";
+  }
+
+  currentLowerDeckMode = mode;
+  try {
+    localStorage.setItem("slambient_lower_deck_mode", mode);
+  } catch (e) {}
+
+  const lowerDeck = document.querySelector(".lower-deck") || document.getElementById("lowerDeck");
+  if (!lowerDeck) return;
+
+  lowerDeck.classList.remove("deck-mode-instruments", "deck-mode-fx", "deck-mode-split");
+  lowerDeck.classList.add("deck-mode-" + mode);
+
+  const btnInst = document.getElementById("btnDeckModeInstruments");
+  const btnFx = document.getElementById("btnDeckModeFx");
+  const btnSplit = document.getElementById("btnDeckModeSplit");
+
+  if (btnInst) {
+    btnInst.classList.toggle("active", mode === "instruments");
+    btnInst.setAttribute("aria-selected", mode === "instruments" ? "true" : "false");
+  }
+  if (btnFx) {
+    btnFx.classList.toggle("active", mode === "fx");
+    btnFx.setAttribute("aria-selected", mode === "fx" ? "true" : "false");
+  }
+  if (btnSplit) {
+    btnSplit.classList.toggle("active", mode === "split");
+    btnSplit.setAttribute("aria-selected", mode === "split" ? "true" : "false");
+  }
+
+  if (mode === "fx" || mode === "split") {
+    if (typeof updatePedalsOrderUI === "function") updatePedalsOrderUI();
+  }
+
+  window.dispatchEvent(new Event("resize"));
+}
+
+function initLowerDeckView() {
+  let saved = null;
+  try {
+    saved = localStorage.getItem("slambient_lower_deck_mode");
+  } catch (e) {}
+
+  const isCompact = window.innerWidth <= 1200;
+  let targetMode = "instruments";
+
+  if (!isCompact) {
+    targetMode = (saved === "instruments" || saved === "fx" || saved === "split") ? saved : "split";
+  } else {
+    targetMode = (saved === "fx") ? "fx" : "instruments";
+  }
+
+  setLowerDeckMode(targetMode);
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth <= 1200 && currentLowerDeckMode === "split") {
+      setLowerDeckMode("instruments");
+    }
+  });
+
+  if (typeof initStudioFxDragAndDrop === "function") {
+    initStudioFxDragAndDrop();
   }
 }
 
@@ -3870,6 +4449,109 @@ function randomizePedalModule(key, ev) {
       });
     }
   }
+}
+
+function initStudioFxDragAndDrop() {
+  const grid = document.getElementById("studioFxGrid");
+  if (!grid) return;
+  const cards = grid.querySelectorAll(".pedal-chassis[data-pedal]");
+  let draggedKey = null;
+
+  cards.forEach(card => {
+    card.setAttribute("draggable", "true");
+
+    card.addEventListener("dragstart", (e) => {
+      if (e.target.closest("button, a, input, select, .custom-dropdown-wrap")) {
+        e.preventDefault();
+        return;
+      }
+      draggedKey = card.getAttribute("data-pedal");
+      card.classList.add("pedal-dragging");
+      document.body.classList.add("pedal-drag-in-progress");
+      if (e.dataTransfer) {
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", draggedKey);
+      }
+    });
+
+    card.addEventListener("dragend", () => {
+      card.classList.remove("pedal-dragging");
+      document.body.classList.remove("pedal-drag-in-progress");
+      cards.forEach(c => c.classList.remove("pedal-drag-over"));
+      draggedKey = null;
+    });
+
+    card.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
+      const targetCard = e.currentTarget;
+      if (targetCard && targetCard !== card) {
+        targetCard.classList.add("pedal-drag-over");
+      }
+    });
+
+    card.addEventListener("dragleave", (e) => {
+      e.currentTarget.classList.remove("pedal-drag-over");
+    });
+
+    card.addEventListener("drop", (e) => {
+      e.preventDefault();
+      e.currentTarget.classList.remove("pedal-drag-over");
+      const targetKey = e.currentTarget.getAttribute("data-pedal");
+      if (draggedKey && targetKey && draggedKey !== targetKey) {
+        reorderDspChainModules(draggedKey, targetKey);
+      }
+    });
+
+    const handle = card.querySelector(".pedal-drag-handle");
+    if (handle) {
+      handle.addEventListener("pointerdown", (e) => {
+        const startX = e.clientX, startY = e.clientY;
+        let isPointerDragging = false;
+        const dragId = e.pointerId;
+        const sourceKey = card.getAttribute("data-pedal");
+
+        const onMove = (ev) => {
+          if (ev.pointerId !== dragId) return;
+          if (Math.hypot(ev.clientX - startX, ev.clientY - startY) > 6) {
+            if (!isPointerDragging) {
+              isPointerDragging = true;
+              card.classList.add("pedal-dragging");
+              document.body.classList.add("pedal-drag-in-progress");
+              try { handle.setPointerCapture(dragId); } catch (_) {}
+            }
+            const elUnder = document.elementFromPoint(ev.clientX, ev.clientY);
+            const overCard = elUnder ? elUnder.closest(".studio-fx-grid .pedal-chassis") : null;
+            cards.forEach(c => c.classList.toggle("pedal-drag-over", c === overCard && c !== card));
+          }
+        };
+
+        const onUp = (ev) => {
+          if (ev.pointerId !== dragId) return;
+          window.removeEventListener("pointermove", onMove);
+          window.removeEventListener("pointerup", onUp);
+          window.removeEventListener("pointercancel", onUp);
+
+          if (isPointerDragging) {
+            try { handle.releasePointerCapture(dragId); } catch (_) {}
+            card.classList.remove("pedal-dragging");
+            document.body.classList.remove("pedal-drag-in-progress");
+            cards.forEach(c => c.classList.remove("pedal-drag-over"));
+            const elUnder = document.elementFromPoint(ev.clientX, ev.clientY);
+            const targetCard = elUnder ? elUnder.closest(".studio-fx-grid .pedal-chassis") : null;
+            const targetKey = targetCard ? targetCard.getAttribute("data-pedal") : null;
+            if (sourceKey && targetKey && sourceKey !== targetKey) {
+              reorderDspChainModules(sourceKey, targetKey);
+            }
+          }
+        };
+
+        window.addEventListener("pointermove", onMove);
+        window.addEventListener("pointerup", onUp);
+        window.addEventListener("pointercancel", onUp);
+      });
+    }
+  });
 }
 
 function initMiniPedalDragAndDrop() {
@@ -6474,9 +7156,13 @@ function randomizeEverything() {
   randomizeReverbChorus();
   randomizeSpace();
 
-  // Dynamic DSP routing shuffle on full randomization
-  const shuffledChain = ['FILTER', 'DELAY', 'SPACE'].sort(() => Math.random() - 0.5);
-  rewireDspChain(shuffledChain, false);
+  // Dynamic DSP routing shuffle on full randomization across all active effects
+  if (window.slambientFxRackManager && typeof window.slambientFxRackManager.randomizeChain === "function") {
+    window.slambientFxRackManager.randomizeChain("SAFE");
+  } else if (typeof rewireDspChain === "function") {
+    const shuffledChain = ['FILTER', 'DELAY', 'SPACE'].sort(() => Math.random() - 0.5);
+    rewireDspChain(shuffledChain, false);
+  }
 
   document.querySelectorAll(".preset-bar button").forEach(b => b.classList.remove("active"));
 
@@ -7453,6 +8139,7 @@ let deferredInstallPrompt = null;
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
+    try { initLowerDeckView(); } catch(e) { console.warn('[LowerDeck] init failed:', e); }
     navigator.serviceWorker.register('./sw.js').then((reg) => {
       reg.addEventListener('updatefound', () => {
         const newWorker = reg.installing;

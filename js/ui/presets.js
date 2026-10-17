@@ -20,7 +20,7 @@ function applyPreset(idx) {
 
   // Reset module controls and DSP pedal routing that only certain presets override
   // so switching presets or coming from Randomize All never leaks stale state.
-  if (typeof rewireDspChain === "function") {
+  if (!window.slambientFxRackManager && typeof rewireDspChain === "function") {
     rewireDspChain(['FILTER', 'DELAY', 'SPACE'], false);
   }
   const selDroneTimbre = document.getElementById("selDroneTimbre");
