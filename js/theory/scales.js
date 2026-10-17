@@ -44,63 +44,63 @@ const CHORD_LIBRARY = [
 // Scale-Tied Modal Signature Voicings: Authentic harmonic morphologies tailored to each mode's character
 const SCALE_SIGNATURE_VOICINGS = {
   LYDIAN: [
-    { name: "LYDIAN_QUARTAL_11",   degrees: [0, 4, 6, 10], mainLabel: "Lydian Quartal",   subLabel: "#11 Cloud",                westernQuality: "maj7#11", label: "Lydian Quartal (#11)", allowTritone: true },
-    { name: "LYDIAN_MAJ7_SHARP11", degrees: [0, 4, 6, 10], mainLabel: "Lydian Maj7",      subLabel: "Bright Cinematic #11",     westernQuality: "maj9#11", label: "Lydian Maj7 (#11)", allowTritone: true },
-    { name: "ETHER_DROP2",         degrees: [0, 3, 6, 8],  mainLabel: "Ether Drop-2",     subLabel: "#11 / 9 Open Spread",      westernQuality: "maj7#11", label: "Ether Drop-2 (#11/9)", allowTritone: true }
+    { name: "LYDIAN_QUARTAL_11",   degrees: [0, 4, 6, 10], mainLabel: "Lydian Quartal",   subLabel: "#11 Cloud",         westernQuality: "maj7#11", label: "Lydian Quartal (#11)", allowTritone: true },
+    { name: "LYDIAN_MAJ7_SHARP11", degrees: [0, 4, 6, 10], mainLabel: "Lydian Maj7",      subLabel: "Cinematic #11",     westernQuality: "maj9#11", label: "Lydian Maj7 (#11)", allowTritone: true },
+    { name: "ETHER_DROP2",         degrees: [0, 3, 6, 8],  mainLabel: "Ether Drop-2",     subLabel: "Open #11 Spread",   westernQuality: "maj7#11", label: "Ether Drop-2 (#11/9)", allowTritone: true }
   ],
   LYDIAN_DOM: [
-    { name: "OVERTONE_ACOUSTIC",   degrees: [0, 2, 3, 6, 8], mainLabel: "Overtone Acoustic", subLabel: "#11 / b7 Acoustic Scale", westernQuality: "9#11",    label: "Overtone Acoustic (#11/b7)", allowTritone: true },
-    { name: "LYDIAN_DOM_SPREAD",   degrees: [0, 4, 6, 10],   mainLabel: "Lydian Dominant",   subLabel: "Dominant 9(#11) Spread", westernQuality: "7#11",    label: "Lydian Dominant 9(#11)", allowTritone: true }
+    { name: "OVERTONE_ACOUSTIC",   degrees: [0, 2, 3, 6, 8], mainLabel: "Overtone Acoustic", subLabel: "Acoustic #11",  westernQuality: "9#11",    label: "Overtone Acoustic (#11/b7)", allowTritone: true },
+    { name: "LYDIAN_DOM_SPREAD",   degrees: [0, 4, 6, 10],   mainLabel: "Lydian Dominant",   subLabel: "Dominant #11",  westernQuality: "7#11",    label: "Lydian Dominant 9(#11)", allowTritone: true }
   ],
   DORIAN: [
-    { name: "SO_WHAT_MODAL",       degrees: [0, 3, 6, 9, 11], mainLabel: "So What Modal", subLabel: "Bill Evans Fourths",      westernQuality: "m11",     label: "So What Modal Fourths" },
-    { name: "DORIAN_NAT6_NINTH",   degrees: [0, 2, 5, 8],     mainLabel: "Dorian 6/9",    subLabel: "Natural 6th Drop-2",       westernQuality: "m6/9",    label: "Dorian 6/9 Drop-2" },
-    { name: "DEEP_DORIAN_11",      degrees: [0, 2, 4, 10],    mainLabel: "Deep Dorian",   subLabel: "Nocturnal 11th",           westernQuality: "m11",     label: "Deep Dorian 11th" }
+    { name: "SO_WHAT_MODAL",       degrees: [0, 3, 6, 9, 11], mainLabel: "So What Modal", subLabel: "Bill Evans Fourths", westernQuality: "m11",     label: "So What Modal Fourths" },
+    { name: "DORIAN_NAT6_NINTH",   degrees: [0, 2, 5, 8],     mainLabel: "Dorian 6/9",    subLabel: "Natural 6th Drop-2", westernQuality: "m6/9",    label: "Dorian 6/9 Drop-2" },
+    { name: "DEEP_DORIAN_11",      degrees: [0, 2, 4, 10],    mainLabel: "Deep Dorian",   subLabel: "Nocturnal 11th",    westernQuality: "m11",     label: "Deep Dorian 11th" }
   ],
   PHRYGIAN: [
-    { name: "PHRYGIAN_DARK_HALO",   degrees: [0, 4, 7, 8],  mainLabel: "Phrygian Halo",   subLabel: "b2 / b6 Dark Drone",       westernQuality: "m(b9)",   label: "Phrygian Dark Halo", allowFlatTwo: true },
-    { name: "PHRYGIAN_SUS_CLUSTER", degrees: [0, 4, 8, 10], mainLabel: "Phrygian Sus",    subLabel: "Mystic Modal Cluster",     westernQuality: "sus4b9",  label: "Phrygian Sus b2/b6", allowFlatTwo: true },
-    { name: "MYSTIC_FIFTH_B9",      degrees: [0, 4, 7, 8],  mainLabel: "Mystic 5th",      subLabel: "b9 Drone Hover",           westernQuality: "5b9",     label: "Mystic 5th (b9 Hover)", allowFlatTwo: true }
+    { name: "PHRYGIAN_DARK_HALO",   degrees: [0, 4, 7, 8],  mainLabel: "Phrygian Halo",   subLabel: "Dark Drone b2",     westernQuality: "m(b9)",   label: "Phrygian Dark Halo", allowFlatTwo: true },
+    { name: "PHRYGIAN_SUS_CLUSTER", degrees: [0, 4, 8, 10], mainLabel: "Phrygian Sus",    subLabel: "Modal Cluster",     westernQuality: "sus4b9",  label: "Phrygian Sus b2/b6", allowFlatTwo: true },
+    { name: "MYSTIC_FIFTH_B9",      degrees: [0, 4, 7, 8],  mainLabel: "Mystic 5th",      subLabel: "b9 Drone Hover",    westernQuality: "5b9",     label: "Mystic 5th (b9 Hover)", allowFlatTwo: true }
   ],
   MIXOLYDIAN: [
-    { name: "MIXO_SUS4_SPREAD",    degrees: [0, 3, 6, 8], mainLabel: "Mixolydian Sus4", subLabel: "Pastoral Unresolved 4th",   westernQuality: "7sus4",   label: "Mixolydian Sus4 (Dominant)" },
-    { name: "FLOATING_DOM9",       degrees: [0, 2, 4, 6, 8], mainLabel: "Floating 9th", subLabel: "Modal 7th Solina",          westernQuality: "9",       label: "Floating 9th (Modal 7th)" }
+    { name: "MIXO_SUS4_SPREAD",    degrees: [0, 3, 6, 8], mainLabel: "Mixolydian Sus4", subLabel: "Unresolved 4th",    westernQuality: "7sus4",   label: "Mixolydian Sus4 (Dominant)" },
+    { name: "FLOATING_DOM9",       degrees: [0, 2, 4, 6, 8], mainLabel: "Floating 9th", subLabel: "Modal 7th Solina",   westernQuality: "9",       label: "Floating 9th (Modal 7th)" }
   ],
   AEOLIAN: [
-    { name: "DEEP_AEOLIAN_9TH",    degrees: [0, 2, 4, 8], mainLabel: "Deep Aeolian",   subLabel: "Nordic Melancholy",        westernQuality: "m9",      label: "Deep Aeolian 9th" },
-    { name: "NORDIC_SUS2_B6",      degrees: [0, 1, 4, 5], mainLabel: "Nordic Sus2",    subLabel: "b6 Cloud Ambient",         westernQuality: "sus2b6",  label: "Nordic Sus2 (b6 Cloud)" }
+    { name: "DEEP_AEOLIAN_9TH",    degrees: [0, 2, 4, 8], mainLabel: "Deep Aeolian",   subLabel: "Nordic Melancholy", westernQuality: "m9",      label: "Deep Aeolian 9th" },
+    { name: "NORDIC_SUS2_B6",      degrees: [0, 1, 4, 5], mainLabel: "Nordic Sus2",    subLabel: "b6 Cloud Ambient",  westernQuality: "sus2b6",  label: "Nordic Sus2 (b6 Cloud)" }
   ],
   MAJOR9: [
-    { name: "PRISM_MAJ9_WIDE",     degrees: [0, 2, 4, 5], mainLabel: "Prism Maj9",     subLabel: "Crystalline Spread",       westernQuality: "maj9",    label: "Prism Maj9 Spread" },
-    { name: "LYRIC_OCTAVE_ADD9",   degrees: [0, 2, 4, 7], mainLabel: "Lyric Octave",   subLabel: "Add9 Overtone Bloom",      westernQuality: "add9",    label: "Lyric Octave Add9" }
+    { name: "PRISM_MAJ9_WIDE",     degrees: [0, 2, 4, 5], mainLabel: "Prism Maj9",     subLabel: "Crystalline Spread", westernQuality: "maj9",    label: "Prism Maj9 Spread" },
+    { name: "LYRIC_OCTAVE_ADD9",   degrees: [0, 2, 4, 7], mainLabel: "Lyric Octave",   subLabel: "Add9 Bloom",         westernQuality: "add9",    label: "Lyric Octave Add9" }
   ],
   PENTATONIC: [
-    { name: "OPEN_QUINTAL_PENT",   degrees: [0, 2, 3, 5], mainLabel: "Open Quintal",   subLabel: "Deep Space Pentatonic",    westernQuality: "m7sus4",  label: "Open Quintal Pentatonic" },
-    { name: "SUS_PENTATONIC_ARK",  degrees: [0, 1, 3, 6], mainLabel: "Suspended Ark",  subLabel: "Open Fifth Space",         westernQuality: "sus4",    label: "Suspended Pentatonic Ark" }
+    { name: "OPEN_QUINTAL_PENT",   degrees: [0, 2, 3, 5], mainLabel: "Open Quintal",   subLabel: "Space Pentatonic",  westernQuality: "m7sus4",  label: "Open Quintal Pentatonic" },
+    { name: "SUS_PENTATONIC_ARK",  degrees: [0, 1, 3, 6], mainLabel: "Suspended Ark",  subLabel: "Open Fifth Space",  westernQuality: "sus4",    label: "Suspended Pentatonic Ark" }
   ],
   MAJ_PENTATONIC: [
-    { name: "PASTORAL_69_SPREAD",  degrees: [0, 2, 4, 6], mainLabel: "Pastoral 6/9",   subLabel: "Sunbreak Spread",          westernQuality: "6/9",     label: "Pastoral 6/9 Spread" },
-    { name: "GOLDEN_FIFTH_STACK",  degrees: [0, 2, 4, 7], mainLabel: "Golden 5th",     subLabel: "Quintal Stack",            westernQuality: "5",       label: "Golden Fifth Stack" }
+    { name: "PASTORAL_69_SPREAD",  degrees: [0, 2, 4, 6], mainLabel: "Pastoral 6/9",   subLabel: "Sunbreak Spread",   westernQuality: "6/9",     label: "Pastoral 6/9 Spread" },
+    { name: "GOLDEN_FIFTH_STACK",  degrees: [0, 2, 4, 7], mainLabel: "Golden 5th",     subLabel: "Quintal Stack",     westernQuality: "5",       label: "Golden Fifth Stack" }
   ],
   HIRAJOSHI: [
-    { name: "HIRAJOSHI_QUINTAL",   degrees: [0, 3, 5, 8], mainLabel: "Hirajoshi",      subLabel: "Japanese Kankyō Quintal",  westernQuality: "mb6",     label: "Hirajoshi Quintal Stack" },
-    { name: "KOTO_REFLECTION",     degrees: [0, 2, 4, 7], mainLabel: "Koto Sakura",    subLabel: "Cherry Blossom Reflection", westernQuality: "m(add4)", label: "Koto Reflection (Cherry Blossom)" }
+    { name: "HIRAJOSHI_QUINTAL",   degrees: [0, 3, 5, 8], mainLabel: "Hirajoshi",      subLabel: "Kankyō Quintal",    westernQuality: "mb6",     label: "Hirajoshi Quintal Stack" },
+    { name: "KOTO_REFLECTION",     degrees: [0, 2, 4, 7], mainLabel: "Koto Sakura",    subLabel: "Cherry Blossom",    westernQuality: "m(add4)", label: "Koto Reflection (Cherry Blossom)" }
   ],
   INSEN: [
-    { name: "INSEN_TEMPLE_BELL",   degrees: [0, 2, 4, 7], mainLabel: "Insen Bell",     subLabel: "Shakuhachi Temple Tone",   westernQuality: "sus4b9",  label: "Insen Temple Bell (Shakuhachi)" },
-    { name: "ZEN_QUARTAL",         degrees: [0, 2, 5, 8], mainLabel: "Zen Quartal",    subLabel: "Floating Stone Fourths",   westernQuality: "sus4",    label: "Zen Quartal (Floating Stone)" }
+    { name: "INSEN_TEMPLE_BELL",   degrees: [0, 2, 4, 7], mainLabel: "Insen Bell",     subLabel: "Shakuhachi Bell",   westernQuality: "sus4b9",  label: "Insen Temple Bell (Shakuhachi)" },
+    { name: "ZEN_QUARTAL",         degrees: [0, 2, 5, 8], mainLabel: "Zen Quartal",    subLabel: "Floating Stone Fourths", westernQuality: "sus4", label: "Zen Quartal (Floating Stone)" }
   ],
   WHOLE_TONE: [
-    { name: "IMPRESSIONIST_AUG",   degrees: [0, 2, 4, 7], mainLabel: "Impressionist",  subLabel: "Debussy Augmented Prism",  westernQuality: "aug",     label: "Impressionist Augmented Prism", allowTritone: true },
-    { name: "FLOATING_MYSTIC_STACK", degrees: [0, 3, 5, 8], mainLabel: "Mystic Stack", subLabel: "Floating Whole-Tone",     westernQuality: "7b5",     label: "Floating Mystic Stack", allowTritone: true }
+    { name: "IMPRESSIONIST_AUG",   degrees: [0, 2, 4, 7], mainLabel: "Impressionist",  subLabel: "Augmented Prism",   westernQuality: "aug",     label: "Impressionist Augmented Prism", allowTritone: true },
+    { name: "FLOATING_MYSTIC_STACK", degrees: [0, 3, 5, 8], mainLabel: "Mystic Stack", subLabel: "Whole-Tone Mystic", westernQuality: "7b5",     label: "Floating Mystic Stack", allowTritone: true }
   ],
   BHAIRAV: [
-    { name: "MAIHAR_RESONANCE",    degrees: [0, 3, 5, 8], mainLabel: "Maihar Raga",    subLabel: "Morning Raga Resonance",   westernQuality: "5(b2)",   label: "Maihar Morning Resonance", allowFlatTwo: true },
-    { name: "SENIA_RAGA_PILLAR",   degrees: [0, 4, 7, 8], mainLabel: "Senia Gharana",  subLabel: "Classical Maihar Pillar",  westernQuality: "5(b2)",   label: "Senia Raga Pillar", allowFlatTwo: true }
+    { name: "MAIHAR_RESONANCE",    degrees: [0, 3, 5, 8], mainLabel: "Maihar Raga",    subLabel: "Morning Resonance", westernQuality: "5(b2)",   label: "Maihar Morning Resonance", allowFlatTwo: true },
+    { name: "SENIA_RAGA_PILLAR",   degrees: [0, 4, 7, 8], mainLabel: "Senia Gharana",  subLabel: "Maihar Pillar",     westernQuality: "5(b2)",   label: "Senia Raga Pillar", allowFlatTwo: true }
   ],
   BILAWAL: [
-    { name: "BILAWAL_SHUDDHA",     degrees: [0, 2, 4, 7], mainLabel: "Bilawal Thaat",  subLabel: "Shuddha Swara Harmony",    westernQuality: "maj",     label: "Bilawal Shuddha Swaras" },
-    { name: "HINDUSTANI_PRISM",    degrees: [0, 3, 5, 8], mainLabel: "Hindustani",     subLabel: "Classical Consonant Prism", westernQuality: "maj7",    label: "Hindustani Consonant Prism" }
+    { name: "BILAWAL_SHUDDHA",     degrees: [0, 2, 4, 7], mainLabel: "Bilawal Thaat",  subLabel: "Shuddha Harmony",   westernQuality: "maj",     label: "Bilawal Shuddha Swaras" },
+    { name: "HINDUSTANI_PRISM",    degrees: [0, 3, 5, 8], mainLabel: "Hindustani",     subLabel: "Consonant Prism",   westernQuality: "maj7",    label: "Hindustani Consonant Prism" }
   ]
 };
 
@@ -248,7 +248,7 @@ const SCALE_BADGE_LABELS = {
   DORIAN: "DORIAN",
   LYDIAN: "LYDIAN",
   AEOLIAN: "AEOLIAN",
-  MIXOLYDIAN: "MIXOLYDIAN",
+  MIXOLYDIAN: "MIXOLYD",
   PENTATONIC: "MIN PENT",
   MAJOR9: "MAJOR 9",
   HIRAJOSHI: "HIRAJOSHI",
@@ -368,3 +368,20 @@ function pickNextVoicingIdx(prevIdx, scaleKey) {
   do { next = randRange(0, CHORD_LIBRARY.length - 1); } while (next === prevIdx);
   return next;
 }
+
+function getIntervalLabel(semis) {
+  const norm = semis % 12;
+  const octs = Math.floor(semis / 12);
+  const map = {
+    0: "R", 1: "b9", 2: "2", 3: "m3", 4: "3", 5: "4", 6: "#11",
+    7: "5", 8: "b13", 9: "6", 10: "m7", 11: "M7"
+  };
+  if (octs > 0) {
+    if (norm === 2) return "9";
+    if (norm === 4) return "10";
+    if (norm === 5) return "11";
+    if (norm === 9) return "13";
+  }
+  return map[norm] || `+${semis}`;
+}
+

@@ -1874,5 +1874,23 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Updated PWA offline cache to `slambient-v9` in `sw.js`.
   - 100% zero-build vanilla browser runtime with zero runtime or syntax errors.
 
+## Update — 2026-10-16 (Chord Analysis Visualizer Redesign & Non-Wrapping Typography Hierarchy)
+
+- **Root & Western Quality Prominence**:
+  - Chord root letter (`.chord-wheel-root`) rendered in crisp bold white (`1.45rem`, `850` weight) with a warm amber halo.
+  - Western chord quality symbol (`.chord-wheel-quality`, e.g. `m9b6`, `m11`, `6/9`, `7sus4`, `maj7#11`) styled in prominent theme amber (`1.05rem`, `800` weight) with baseline alignment.
+  - Scale mode pill badge (`.chord-wheel-mode-pill`) pinned to top right with concise mode designations (`AEOLIAN`, `DORIAN`, `LYDIAN`, `MIXOLYD`, `MIN PENT`, `MAJOR 9`, `HIRAJOSHI`, `INSEN`).
+- **Zero-Truncation Stacked Subtitle Architecture**:
+  - Redesigned `.chord-wheel-voicing` into a clean two-line vertical stack with zero awkward ellipsis truncation (`..`):
+    - Line 1 (`.voicing-main`): Voicing architecture / harmonic texture in luminous lavender (`--color-arp`, `0.68rem`, `800` weight).
+    - Line 2 (`.voicing-sub`): Cultural acknowledgement / harmonic color in radiant cyan/teal (`--color-field`, `0.58rem`, `700` weight).
+  - Curated all 43 modal signature voicings across `js/theory/scales.js` so titles and subtitles are punchy, poetic, and guaranteed <= 18–22 characters (under half the card's available width).
+- **Circle of Fifths Hero Centerpiece**:
+  - Canvas enlarged to 144x144px (`rimR = 65`, `dotR = 42`, `labelR = 54.5`), eliminating excess empty top/bottom card dead-space.
+  - Added dual-tone linear polygon fill, glowing radial spoke lines, center reticle crosshair, and crisp pitch-class compass degree ticks.
+  - Responsive panel width upgraded to `clamp(285px, 20vw, 320px)` on desktop and `clamp(235px, 32vw, 290px)` on mobile landscape deck.
+  - Bumped PWA offline cache to `slambient-v10` in `sw.js`.
+
+
 
 
