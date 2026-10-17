@@ -7960,3 +7960,398 @@
     }
     .scope-panel.is-fullscreen .arcade-pad { margin-bottom: 2px; }
   }
+
+  /* =====================================================================
+     PHASE 8 (Part A): CONTAINER QUERY ISOLATION & STUDIO EDIT MODE UI
+     ===================================================================== */
+
+  /* 1. CSS Container Query Isolation */
+  .strip-channel,
+  .pedal-chassis,
+  .upper-deck-card,
+  .scope-panel,
+  .chord-info-panel,
+  .keyboard-panel {
+    container-type: inline-size;
+    container-name: moduleCard;
+  }
+
+  /* Fluid scaling across container query dimensions */
+  @container moduleCard (max-width: 235px) {
+    .panel-header > span:first-child,
+    .panel-title-text {
+      font-size: 11px;
+      letter-spacing: 0.4px;
+    }
+    .control-label {
+      font-size: 11px;
+    }
+    .control-val {
+      font-size: 11px;
+    }
+    .badge-tag,
+    .btn-power,
+    .btn-mute,
+    .btn-solo {
+      padding: 1px 4px;
+      font-size: 8.5px;
+    }
+    .custom-dropdown-trigger {
+      padding: 0 6px;
+      font-size: 10.5px;
+    }
+    input[type="range"] {
+      height: 14px;
+    }
+  }
+
+  @container moduleCard (min-width: 680px) {
+    .panel-header {
+      padding-bottom: 8px;
+    }
+    .panel-header > span:first-child,
+    .panel-title-text {
+      font-size: 16px;
+      letter-spacing: 1.2px;
+    }
+    .control-label {
+      font-size: 14px;
+    }
+    .control-val {
+      font-size: 14px;
+    }
+    .custom-dropdown-trigger {
+      height: 32px;
+      font-size: 13px;
+    }
+    input[type="range"] {
+      height: 20px;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 3px;
+    }
+    input[type="range"]::-moz-range-track {
+      height: 6px;
+      border-radius: 3px;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      width: 18px;
+      height: 18px;
+      margin-top: -6px;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  /* 2. Module Window Chrome & Controls */
+  .module-window-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-right: 4px;
+  }
+
+  .module-win-drag {
+    display: none;
+    cursor: var(--cursor-grab) !important;
+    padding: 2px 5px;
+    background: #0a0d14;
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    color: var(--text-tertiary);
+    transition: all 0.12s ease;
+    user-select: none;
+  }
+
+  .btn-win-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    box-sizing: border-box;
+    background: #090c14;
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .btn-win-action:hover {
+    color: #fff;
+    border-color: var(--accent);
+    background: rgba(var(--rgb-chord), 0.15);
+    box-shadow: 0 0 8px rgba(var(--rgb-chord), 0.35);
+  }
+  .btn-win-action:active {
+    transform: scale(0.92);
+  }
+
+  .btn-exit-focus {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 26px;
+    padding: 0 10px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    color: #ff4757;
+    background: rgba(255, 71, 87, 0.12);
+    border: 1px solid rgba(255, 71, 87, 0.5);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.14s ease;
+  }
+  .btn-exit-focus:hover {
+    background: rgba(255, 71, 87, 0.28);
+    border-color: #ff4757;
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(255, 71, 87, 0.45);
+  }
+
+  /* 3. Fullscreen Focus Studio Modal (.module-fullscreen-active) */
+  .module-fullscreen-active {
+    position: fixed !important;
+    inset: 12px !important;
+    top: 12px !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 12px !important;
+    width: calc(100vw - 24px) !important;
+    height: calc(100vh - 24px) !important;
+    height: calc(100dvh - 24px) !important;
+    max-width: none !important;
+    max-height: none !important;
+    z-index: 250000 !important;
+    background: rgba(8, 10, 16, 0.98) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--accent) !important;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.95), 0 0 30px rgba(var(--rgb-chord), 0.35) !important;
+    border-radius: 8px !important;
+    overflow-y: auto !important;
+    padding: 18px 24px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    animation: studioFocusIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes studioFocusIn {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .module-fullscreen-active .btn-win-focus {
+    display: none;
+  }
+  .module-fullscreen-active .btn-exit-focus {
+    display: inline-flex;
+  }
+  .module-fullscreen-active .module-win-drag {
+    display: none !important;
+  }
+
+  body.module-focus-open {
+    overflow: hidden !important;
+  }
+  body.module-focus-open::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 240000;
+    pointer-events: auto;
+  }
+
+  /* Hidden module in dock */
+  .module-hidden-in-dock {
+    display: none !important;
+  }
+
+  /* 4. Edit Mode Visual State (body.workspace-edit-mode) */
+  body.workspace-edit-mode .module-win-drag,
+  body.workspace-edit-mode .upper-drag-handle {
+    display: inline-flex !important;
+  }
+
+  body.workspace-edit-mode .brand-row,
+  body.workspace-edit-mode .brand-group,
+  body.workspace-edit-mode .preset-group,
+  body.workspace-edit-mode .global-transport,
+  body.workspace-edit-mode .header-sec-transport,
+  body.workspace-edit-mode .header-sec-harmony,
+  body.workspace-edit-mode .header-sec-utils,
+  body.workspace-edit-mode .header-sec-gen,
+  body.workspace-edit-mode .master-vol-pod,
+  body.workspace-edit-mode .eno-standalone-pod {
+    outline: 1.5px dashed rgba(254, 211, 48, 0.65) !important;
+    outline-offset: 3px;
+    position: relative;
+    transition: outline-color 0.15s ease;
+  }
+
+  body.workspace-edit-mode .strip-channel,
+  body.workspace-edit-mode .upper-deck-card,
+  body.workspace-edit-mode .pedal-chassis {
+    outline: 1.5px dashed rgba(0, 229, 255, 0.65) !important;
+    outline-offset: 3px;
+    position: relative;
+  }
+
+  body.workspace-edit-mode .strip-channel:hover,
+  body.workspace-edit-mode .upper-deck-card:hover,
+  body.workspace-edit-mode .pedal-chassis:hover {
+    outline-color: #00e5ff !important;
+    box-shadow: 0 0 16px rgba(0, 229, 255, 0.3) !important;
+  }
+
+  /* Edit Mode Header Toggle Button */
+  .btn-edit-workspace {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 24px;
+    padding: 0 8px;
+    background: #0c0f18;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .btn-edit-workspace:hover {
+    color: #fff;
+    border-color: #fed330;
+    background: rgba(254, 211, 48, 0.1);
+  }
+  .btn-edit-workspace.active {
+    background: rgba(254, 211, 48, 0.2);
+    border-color: #fed330;
+    color: #fed330;
+    box-shadow: 0 0 8px rgba(254, 211, 48, 0.4);
+  }
+
+  /* 5. Workspace Module Dock (Collapsible Pill Bar) */
+  .workspace-module-dock {
+    width: 100%;
+    margin-bottom: 12px;
+    display: none;
+    box-sizing: border-box;
+  }
+  .workspace-module-dock.has-hidden {
+    display: block;
+    animation: dockSlideDown 0.18s ease-out forwards;
+  }
+
+  @keyframes dockSlideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .workspace-dock-inner {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 6px 12px;
+    background: rgba(13, 17, 26, 0.95);
+    border: 1px solid var(--border);
+    border-left: 3px solid #00e5ff;
+    border-radius: 6px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  }
+
+  .workspace-dock-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    color: #00e5ff;
+  }
+
+  .workspace-dock-chips {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    flex: 1 1 auto;
+  }
+
+  .btn-dock-restore-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    height: 24px;
+    background: #141926;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .btn-dock-restore-chip .chip-plus {
+    color: #00e5ff;
+    font-weight: 800;
+  }
+  .btn-dock-restore-chip:hover {
+    background: rgba(0, 229, 255, 0.18);
+    border-color: #00e5ff;
+    color: #fff;
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.35);
+  }
+  .btn-dock-restore-chip:active {
+    transform: scale(0.95);
+  }
+
+  .btn-dock-restore-all {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    height: 22px;
+    background: transparent;
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    color: var(--text-tertiary);
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    margin-left: auto;
+  }
+  .btn-dock-restore-all:hover {
+    color: #fff;
+    border-color: var(--text-secondary);
+    background: #181d2a;
+  }

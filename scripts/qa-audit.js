@@ -51,6 +51,7 @@ const jsFiles = [
   'js/ui/header-utils.js',
   'js/ui/palette.js',
   'js/ui/visualizers.js',
+  'js/ui/workspace.js',
   'js/audio/drums.js',
   'js/audio/ambient-noise.js',
   'js/visualizers/chord-wheel.js',
