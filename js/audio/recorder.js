@@ -271,6 +271,16 @@ async function finishStemsRecording(sampleRate) {
       { name: "session_info.txt", data: encoder.encode(metaTxt) }
     ];
 
+    if (window.midiRecorder) {
+      try {
+        window.midiRecorder.stop();
+        const midiBytes = window.midiRecorder.exportMultiTrackMidiBytes();
+        zipFiles.unshift({ name: "00_arrangement.mid", data: midiBytes });
+      } catch (e) {
+        console.warn("Could not attach MIDI arrangement to stems ZIP:", e);
+      }
+    }
+
     setRecordStatus("Compressing stems archive…");
     const zipBytes = buildZip(zipFiles);
     const zipBlob = new Blob([zipBytes], { type: "application/zip" });
@@ -341,6 +351,17 @@ function toggleRecord() {
   if (!isRecording) {
     if (currentRecordFormat === "MP3") loadLameJs().catch(() => {});
     
+    // Always start MIDI session recorder in parallel
+    if (window.midiRecorder) {
+      let mNum = 4, mDen = 4;
+      if (typeof currentTimeSig === "string" && currentTimeSig.includes("/")) {
+        const parts = currentTimeSig.split("/");
+        mNum = parseInt(parts[0], 10) || 4;
+        mDen = parseInt(parts[1], 10) || 4;
+      }
+      window.midiRecorder.start({ bpm: bpm || 72, meterNum: mNum, meterDen: mDen });
+    }
+
     recordChunksL = []; recordChunksR = [];
     stemChunks = {
       masterL: [], masterR: [],
@@ -386,6 +407,8 @@ function toggleRecord() {
           console.warn("Failed to tap bus for stems:", e);
         }
       });
+    } else if (currentRecordFormat === "MIDI" || currentRecordFormat === "MIDI_STEMS") {
+      // Pure MIDI session recording - skip audio buffer processing
     } else {
       recordTap = audioCtx.createScriptProcessor(4096, 2, 2);
       recordTap.channelCount = 2;
@@ -426,6 +449,46 @@ function toggleRecord() {
     if (recordSilentOut) {
       try { recordSilentOut.disconnect(); } catch (e) {}
       recordSilentOut = null;
+    }
+
+    if (currentRecordFormat === "MIDI") {
+      if (window.midiRecorder) {
+        window.midiRecorder.stop();
+        const blob = window.midiRecorder.exportMultiTrackMidi();
+        const fileName = `slambient-arrangement-${Date.now()}.mid`;
+        downloadBlob(blob, fileName);
+        setRecordStatus(`Saved ${fileName} (${(blob.size / 1024).toFixed(1)} KB Multi-Track MIDI)`);
+      }
+      return;
+    }
+
+    if (currentRecordFormat === "MIDI_STEMS") {
+      if (window.midiRecorder) {
+        window.midiRecorder.stop();
+        const stems = window.midiRecorder.exportStems();
+        const hex = "#" + seed.toString(16).toUpperCase().padStart(8, '0').slice(0, 4) + "-" + seed.toString(16).toUpperCase().padStart(8, '0').slice(4);
+        const metaTxt = `Slambient Meander Engine -- Multi-Track MIDI Stems\n`
+          + `Date: ${new Date().toISOString()}\n`
+          + `BPM: ${bpm}\n`
+          + `Time Signature: ${currentTimeSig}\n`
+          + `Root Key / Scale: ${document.getElementById("hudScale") ? document.getElementById("hudScale").textContent : ""}\n`
+          + `Seed: ${hex}\n\n`
+          + `Stems Included:\n`
+          + `slambient_sub.mid    - Sub Bass & Drone (Ch 1)\n`
+          + `slambient_chords.mid - Harmonic Voicings (Ch 2)\n`
+          + `slambient_arp.mid    - Shimmer Arpeggio (Ch 3)\n`
+          + `slambient_drums.mid  - General MIDI Drums & Tabla (Ch 4)\n`
+          + (window.midiRecorder.tracks && window.midiRecorder.tracks.manual && window.midiRecorder.tracks.manual.length > 0 ? `slambient_lead.mid   - Live Manual Keyboard (Ch 5)\n` : "");
+        const encoder = new TextEncoder();
+        const zipFiles = stems.map(s => ({ name: s.filename, data: s.bytes }));
+        zipFiles.push({ name: "session_info.txt", data: encoder.encode(metaTxt) });
+        const zipBytes = buildZip(zipFiles);
+        const zipBlob = new Blob([zipBytes], { type: "application/zip" });
+        const fileName = `slambient-midi-stems-${Date.now()}.zip`;
+        downloadBlob(zipBlob, fileName);
+        setRecordStatus(`Saved ${fileName} (${(zipBlob.size / 1024).toFixed(1)} KB, ${stems.length} MIDI stems)`);
+      }
+      return;
     }
 
     if (currentRecordFormat === "STEMS") {

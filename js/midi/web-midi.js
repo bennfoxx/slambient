@@ -177,8 +177,36 @@ function connectMidi(select) {
     updateMidiStatusUI();
     return;
   }
+  if (window.midiEngine) {
+    window.midiEngine.setCallbacks({
+      onNoteStart: (note, vel) => startNoteLive(note, vel),
+      onNoteStop: (note) => stopNoteLive(note),
+      onFilterCutoff: (pct) => {
+        const k = document.getElementById("knobMasterCutoff");
+        if (k) { k.value = pct.toFixed(1); updateAudioParams(); }
+      },
+      onFilterRes: (res) => {
+        const k = document.getElementById("knobMasterRes");
+        if (k) { k.value = res.toFixed(1); updateAudioParams(); }
+      },
+      onReverbSpace: (pct) => {
+        const k = document.getElementById("knobWeather");
+        if (k) { k.value = pct; updateAudioParams(); }
+      },
+      onMasterVolume: (pct) => {
+        const k = document.getElementById("knobMasterVolume");
+        if (k) { k.value = pct; updateMasterVolume(k.value); }
+      },
+      onActivity: () => flashMidiActivityIndicator(),
+      onStatusChange: () => updateMidiStatusUI()
+    });
+  }
   navigator.requestMIDIAccess().then((access) => {
     midiAccess = access;
+    if (window.midiEngine) {
+      window.midiEngine.midiAccess = access;
+      window.midiEngine.attachInputs();
+    }
     if (select) {
       populateMidiSelect(select, null);
       select.dispatchEvent(new Event("change", { bubbles: true }));
@@ -187,6 +215,7 @@ function connectMidi(select) {
     updateMidiStatusUI();
     access.onstatechange = () => {
       attachMidiInputs(access);
+      if (window.midiEngine) window.midiEngine.attachInputs();
       if (select) {
         populateMidiSelect(select, midiOutput && midiOutput.id);
         select.dispatchEvent(new Event("change", { bubbles: true }));
@@ -213,6 +242,9 @@ function connectMidi(select) {
   }
   select.addEventListener("change", () => {
     if (select.value === "__connect") { connectMidi(select); return; }
+    if (window.midiEngine) {
+      window.midiEngine.setOutput(select.value);
+    }
     if (midiAccess) {
       midiAllNotesOff();
       midiOutput = select.value ? midiAccess.outputs.get(select.value) : null;

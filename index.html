@@ -1366,19 +1366,27 @@ function midiNoteTimed(ch, note, vel, durationSec, delaySec = 0) {
 }
 function midiDrumHit(key, vel = 100) { midiNoteTimed(MIDI_CH.DRUMS, MIDI_DRUM_NOTE[key], vel, 0.1); }
 function midiAllNotesOff() {
-  if (!midiOutput) return;
-  midiSubNote = null;
-  for (let ch = 0; ch < 4; ch++) { try { midiOutput.send([0xB0 | ch, 123, 0]); } catch (e) {} }
+  if (window.midiEngine) {
+    window.midiEngine.allNotesOff();
+  } else if (midiOutput) {
+    midiSubNote = null;
+    for (let ch = 0; ch < 4; ch++) { try { midiOutput.send([0xB0 | ch, 123, 0]); } catch (e) {} }
+  }
 }
 // The sub drone is a held note: re-sent whenever its pitch changes.
 let midiSubNote = null;
 function midiSubSync() {
-  if (!midiOutput || !isPlaying) return;
+  if (!isPlaying) return;
   const note = currentDroneMidi();
-  if (note === midiSubNote) return;
-  if (midiSubNote !== null) midiNoteOff(MIDI_CH.SUB, midiSubNote);
-  midiSubNote = note;
-  midiNoteOn(MIDI_CH.SUB, note, 90);
+  if (window.midiEngine) {
+    window.midiEngine.subSync(note);
+  } else {
+    if (!midiOutput) return;
+    if (note === midiSubNote) return;
+    if (midiSubNote !== null) midiNoteOff(MIDI_CH.SUB, midiSubNote);
+    midiSubNote = note;
+    midiNoteOn(MIDI_CH.SUB, note, 90);
+  }
 }
 
 /* ==========================================================================
