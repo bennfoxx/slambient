@@ -160,5 +160,15 @@ const driveIdx = randomized.indexOf("TUBE_DRIVE");
 const delayIdx = randomized.indexOf("DIGITAL_DELAY");
 assert(driveIdx < delayIdx, "SAFE randomizer must keep pre-gain/modulation ahead of time-based delays");
 
+// Test reorderChain
+manager.setChainOrder(["TUBE_DRIVE", "PHASER", "TREMOLO"], true);
+manager.reorderChain("TREMOLO", "TUBE_DRIVE");
+assert.deepStrictEqual(manager.chain, ["TREMOLO", "TUBE_DRIVE", "PHASER"], "reorderChain must insert source before target");
+
+// Test shiftModule
+manager.shiftModule("TREMOLO", 1);
+assert.deepStrictEqual(manager.chain, ["TUBE_DRIVE", "TREMOLO", "PHASER"], "shiftModule must move item by delta");
+
+console.log("✔ SlambientFxRackManager reorderChain and shiftModule verified");
 console.log("✔ SlambientFxRackManager routing and safe intelligent randomizer passed");
 console.log("ALL DSP RACK UNIT TESTS PASSED CLEANLY!");

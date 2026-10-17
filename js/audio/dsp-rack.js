@@ -536,6 +536,30 @@
       this.rewire(immediate);
     }
 
+    reorderChain(sourceKey, targetKey) {
+      if (!sourceKey || !targetKey || sourceKey === targetKey) return [...this.chain];
+      const fromIdx = this.chain.indexOf(sourceKey);
+      const toIdx = this.chain.indexOf(targetKey);
+      if (fromIdx !== -1 && toIdx !== -1) {
+        this.chain.splice(fromIdx, 1);
+        this.chain.splice(toIdx, 0, sourceKey);
+        this.rewire(false);
+      }
+      return [...this.chain];
+    }
+
+    shiftModule(key, delta) {
+      const idx = this.chain.indexOf(key);
+      if (idx === -1) return [...this.chain];
+      const targetIdx = idx + delta;
+      if (targetIdx >= 0 && targetIdx < this.chain.length) {
+        const item = this.chain.splice(idx, 1)[0];
+        this.chain.splice(targetIdx, 0, item);
+        this.rewire(false);
+      }
+      return [...this.chain];
+    }
+
     rewire(immediate = false) {
       if (!this.ctx || !this.busPre || !this.busPost) return;
 

@@ -3341,6 +3341,70 @@
   .mini-pedal-card.mini-card-delay { --card-accent: var(--color-delay); --card-rgb: var(--rgb-delay); }
   .mini-pedal-card.mini-card-space { --card-accent: var(--color-reverb); --card-rgb: var(--rgb-reverb); }
   .mini-pedal-card.mini-card-master { --card-accent: var(--color-space); --card-rgb: var(--rgb-space); }
+  .mini-pedal-card.mini-card-drive { --card-accent: #ff5252; --card-rgb: 255, 82, 82; }
+  .mini-pedal-card.mini-card-phaser { --card-accent: #e056fd; --card-rgb: 224, 86, 253; }
+  .mini-pedal-card.mini-card-tremolo { --card-accent: #00d2d3; --card-rgb: 0, 210, 211; }
+  .mini-pedal-card.mini-card-flanger { --card-accent: #54a0ff; --card-rgb: 84, 160, 255; }
+  .mini-pedal-card.mini-card-digital-delay { --card-accent: #48dbfb; --card-rgb: 72, 219, 251; }
+  .mini-pedal-card.mini-card-space-delay { --card-accent: #ff9f43; --card-rgb: 255, 159, 67; }
+  .mini-pedal-card.mini-card-tape-echo { --card-accent: #feca57; --card-rgb: 254, 202, 87; }
+
+  /* Micro Parameter Sliders for Birds-Eye Rack Cards */
+  .mini-pedal-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 10px;
+    flex: 2 1 auto;
+    min-width: 0;
+  }
+  .mini-pedal-param {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    flex: 1 1 0;
+    min-width: 44px;
+  }
+  .mini-pedal-param-label {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 8px;
+    font-weight: 700;
+    color: var(--text-dim, #718096);
+    display: flex;
+    justify-content: space-between;
+    line-height: 1;
+    letter-spacing: 0.2px;
+  }
+  .mini-pedal-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    margin: 2px 0 0;
+  }
+  .mini-pedal-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--card-accent, #00e5ff);
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(var(--card-rgb, 0, 229, 255), 0.7);
+  }
+  .mini-pedal-slider::-moz-range-thumb {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--card-accent, #00e5ff);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 5px rgba(var(--card-rgb, 0, 229, 255), 0.7);
+  }
   .mini-pedal-card.mini-card-master,
   .mini-pedal-card.mini-card-master .mini-pedal-left {
     cursor: var(--cursor-pointer) !important;
@@ -6292,15 +6356,17 @@
       overflow: hidden;
     }
     .header-sec-transport > .sample-ctrl .tag {
-      font-size: 10px;
-      letter-spacing: 1px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
       flex: 0 0 auto;
-      min-width: 38px;
+      min-width: 44px;
     }
     .header-sec-transport > .sample-ctrl .btn-field {
       height: 32px;
       padding: 0 8px;
-      font-size: 11px;
+      font-size: 12px;
+      font-weight: 700;
       flex: 1 1 0;
       min-width: 0;
       display: inline-flex;
@@ -6370,8 +6436,9 @@
     }
     .root-scale-ctrl .tag {
       flex: 0 0 auto;
-      font-size: 10px;
-      letter-spacing: 1px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
     }
     #wrap_topRootKey { flex: 0 0 62px; }
     #wrap_topScaleMode { flex: 1 1 auto; min-width: 0; }
@@ -6389,8 +6456,9 @@
       min-width: 0;
     }
     .time-sig-ctrl .tag {
-      font-size: 10px;
-      letter-spacing: 1px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
       flex: 0 0 auto;
     }
     #wrap_selTimeSig { flex: 1 1 auto; min-width: 96px; }
@@ -6419,8 +6487,9 @@
       min-width: 0;
     }
     .header-sec-harmony > .tempo-ctrl .tag {
-      font-size: 10px;
-      letter-spacing: 0.5px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
       flex: 0 0 auto;
     }
     .header-sec-harmony > .tempo-ctrl input[type="range"] {
@@ -6465,9 +6534,9 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 700;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.5px;
       white-space: nowrap;
       overflow: hidden;
       border-radius: 4px;
@@ -6575,15 +6644,17 @@
       padding: 5px 8px;
     }
     .telemetry-pill .pill-k {
-      font-size: 9.5px;
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #94a3b8;
       white-space: nowrap;
       line-height: 1.2;
     }
     .telemetry-pill .val {
       flex: 1 0 100%;
       min-width: 0;
-      font-size: 11.5px;
-      font-weight: 700;
+      font-size: 13.5px;
+      font-weight: 800;
       line-height: 1.2;
       white-space: nowrap;
       overflow: hidden;
@@ -7188,8 +7259,8 @@
       align-items: center;
       width: 100%;
       min-height: 22px;
-      font-size: 12px;
-      line-height: 1.2;
+      font-size: 13.5px;
+      line-height: 1.25;
       box-sizing: border-box;
       white-space: nowrap;
     }
@@ -7200,8 +7271,9 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap !important;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #b4bfd6;
     }
     #orbitalSidePanel .control-label > :last-child:not(:first-child) {
       flex: 0 0 auto;
@@ -7209,10 +7281,10 @@
       white-space: nowrap !important;
       text-align: right;
     }
-    #orbitalSidePanel .pedal-controls-body .control-label { font-size: 11px; }
+    #orbitalSidePanel .pedal-controls-body .control-label { font-size: 13px; font-weight: 700; color: #b4bfd6; }
     #orbitalSidePanel .control-val {
-      font-size: 12px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 800;
       white-space: nowrap !important;
       font-variant-numeric: tabular-nums;
       flex-shrink: 0;
@@ -7221,7 +7293,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 10px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #8a97b2;
       margin-bottom: 0;
       white-space: nowrap !important;
     }
