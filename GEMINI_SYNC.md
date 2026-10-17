@@ -1764,3 +1764,17 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Expanded the gap between `‹` / `›` switcher buttons and the module title from 6px to `clamp(14px, 4.5vw, 22px)` on mobile and from 8px to 16px on desktop.
   - Added horizontal padding on `.orbital-modal-title` (`padding: 0 4px;`) and enlarged nav buttons to 32x32px with 5px border-radius.
   - Gives the center title and switchers ample breathing room across all screen widths.
+
+## Update — 2026-10-16 (Mobile Macro Tile Interactive Volume & Trigger Meters)
+
+- **Interactive Volume / Trigger Dynamics for Module Buttons in Mobile Rack View**:
+  - Replaced legacy `(orb.pulse || 0) * 160` with the dual RMS + frequency band analysis engine from the Chord Analysis module (`INSTRUMENT_METERS`).
+  - Added dedicated Web Audio AnalyserNodes for effects pedals: `filterAnalyser`, `delayAnalyser`, and `spaceAnalyser` (connected respectively to `masterFilterCompGain`, `delayWetGain`, and reverb/chorus wet output stages).
+  - Configured `MOBILE_MACRO_METERS` for all 10 modules with calibrated reference ceilings (`ref`), frequency bands (`fLow`/`fHigh`), and channel power / pedal bypass / mute states.
+  - **Ballistics**: Fast-attack trigger integration (`m.e = m.e * 0.40 + energy * 0.60`) on note strikes and drum hits, paired with smooth musical decay (`m.e = m.e * 0.78 + energy * 0.22`) and non-linear power curve `Math.pow(m.e / m.ref, 0.65) * 100`.
+  - **UI Polish & Styling**:
+    - Updated `.mobile-macro-tile-meter-wrap` background to `#141722` matching `.act-bar-bg`.
+    - Updated `.mobile-macro-tile-meter-bar` transition to `width 0.05s ease-out` matching `.act-bar-fill`.
+    - Added `pointer-events: none` and `will-change: width` on the meter elements to guarantee zero impact on tile tapping, scrolling, and inspector interactions.
+    - Added DOM meter cache invalidation in `renderMobileMacroGrid()` to ensure instant meter response upon theme shifts or pedal reordering.
+    - Updated `ORBITAL_MODULES` sphere pulse physics in `loopOrbitalPhysics()` to also use full waveform RMS + frequency energy.
