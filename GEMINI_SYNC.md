@@ -1706,3 +1706,27 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Reconnects Web Audio nodes sequentially wrapped in `audioCtx.suspend()` and `audioCtx.resume()` to guarantee zero audio popping or clicks during reordering.
   - Synchronized dynamically with `updatePedalsOrderUI()` and macro grid rendering.
 
+## Update — 2026-10-16 (Mobile & Popup QoL Bug Fixes: Cutoff, Dynamic Palettes, Fullscreen Visualizer, Keyboard Header, Label Consistency)
+
+- **Popup Cutoff by Floating Transport Bar**:
+  - Elevated `.orbital-modal-backdrop` to `z-index: 100000` and `.orbital-side-panel` to `z-index: 100001` (above `.mini-transport` at `99999`).
+  - Added desktop and mobile CSS rule: `body:has(.orbital-side-panel.active) .mini-transport, body.orbital-panel-open .mini-transport { display: none !important; opacity: 0 !important; pointer-events: none !important; }`.
+  - Added `overflow-y: auto; flex: 1 1 auto; max-height: calc(88vh - 100px);` to `.orbital-side-panel .orbital-modal-body` on desktop.
+  - Bound `document.body.classList.add("orbital-panel-open")` in `expandModuleOrb()` and `classList.remove("orbital-panel-open")` in `closeOrbitalModal()`.
+- **Dynamic Palette Color Inheritance**:
+  - Rewrote `expandModuleOrb(orbId)` to compute `activeColor` and `activeRgb` dynamically via `themeHex(targetId)` and `themeRgb(targetId)` instead of static `orb.color`/`orb.rgb`.
+  - Rewrote `renderSignalRibbon(activeOrbId)` to dynamically pull node colors via `themeHex(orb.id)`.
+  - Updated `.mini-pedal-card.mini-card-master` from hardcoded `#a855f7` to `var(--color-space)` / `var(--rgb-space)`.
+  - Updated `renderMobileMacroGrid()` to style tiles with `var(--color-${mod.orbId})` and `var(--rgb-${mod.orbId})`.
+  - Updated `applyColorTheme()` to re-render `#orbitalSidePanel` CSS properties, `renderSignalRibbon()`, and `renderMobileMacroGrid()` upon theme changes and randomizations.
+- **Visualizer Fullscreen Mobile Viewport & Stacking Order**:
+  - Boosted `.scope-panel.is-fullscreen` on both desktop and mobile (`@media (max-width: 640px)`) to `position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100dvh !important; z-index: 200000 !important;` (strictly above `.header-bar-wrapper` at `10002` and master volume / Eno pods).
+- **Playable MIDI Keyboard Header Wrapping & Full Width**:
+  - Restructured `.keyboard-panel > .keyboard-meta` on mobile into a clean vertical 2-row layout:
+    - Row 1: `.keyboard-panel-header` (Title + Drag handle, 28px height, 100% width).
+    - Row 2: `.keyboard-meta-controls` (`width: 100%`, flex stretch with `takeover-badge` [32px], `keyboard-view-toggle` [flex: 1 1 auto], and `oct-controls` [flex: 1 1 auto]).
+  - Allowed `.keyboard-panel` height to adjust naturally (`height: auto !important; min-height: 0 !important;`) while leaving `.piano-keys-wrapper` keyboard key sizing 100% untouched.
+- **Inconsistent Text Wrapping on Popup Module View**:
+  - Replaced `flex-wrap: wrap` in `#orbitalSidePanel .control-label` with `display: flex; flex-wrap: nowrap !important; justify-content: space-between; align-items: center; width: 100%; min-height: 22px; white-space: nowrap;`.
+  - Added `flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap !important;` to label text, and `flex: 0 0 auto; margin-left: 8px; white-space: nowrap !important; font-variant-numeric: tabular-nums;` to `.control-val`.
+  - Adjusted `.orbital-signal-ribbon` on desktop so all 10 module nodes fit across the 580px popup without horizontal scroll clipping.
