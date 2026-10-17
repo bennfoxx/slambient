@@ -112,7 +112,9 @@
         </div>
       </div>
 
-      <div class="top-bar-row transport-row">
+      <div class="top-bar-stacks">
+        <div class="top-bar-stack-main">
+          <div class="top-bar-row transport-row">
         <!-- SECTION 1: Transport & Audio (play/pause, record, sample, MIDI) -->
         <div class="header-section header-sec-transport" data-header-slot="transport">
           <div class="transport-row-top">
@@ -286,23 +288,25 @@
             </button>
           </div>
         </div>
-      </div>
-    </header>
+      </div><!-- End top-bar-stack-main -->
 
-    <div class="eno-standalone-pod" onclick="toggleEnoPhosphor()" title="S.L.A.M. 6000 // CORE MESH (Click to cycle primary phosphor)">
-      <div class="eno-pod-header">
-        <span class="eno-bio-scan-label">Bio-Scan</span>
-        <span class="eno-status-pill"><i class="eno-status-pulse"></i>LIVE</span>
+      <!-- 2-STACKS TALL SQUARE ENO / PHOSPHOR POD -->
+      <div class="eno-standalone-pod" data-header-slot="eno" onclick="toggleEnoPhosphor()" title="S.L.A.M. 6000 // CORE MESH (Click to cycle primary phosphor)">
+        <div class="eno-pod-header">
+          <span class="eno-bio-scan-label">Bio-Scan</span>
+          <span class="eno-status-pill"><i class="eno-status-pulse"></i>LIVE</span>
+        </div>
+        <div class="eno-crt-screen">
+          <canvas id="enoWidgetCanvas" width="140" height="140"></canvas>
+        </div>
+        <div class="eno-crt-meta">
+          <span class="eno-sub" id="lblEnoPhos">SLAM · Y</span>
+          <span class="eno-meta-cycle">CYCLE ⤾</span>
+        </div>
       </div>
-      <div class="eno-crt-screen">
-        <canvas id="enoWidgetCanvas" width="140" height="140"></canvas>
-      </div>
-      <div class="eno-crt-meta">
-        <span class="eno-sub" id="lblEnoPhos">SLAM · Y</span>
-        <span class="eno-meta-cycle">CYCLE ⤾</span>
-      </div>
-    </div>
-  </div>
+    </div><!-- End top-bar-stacks -->
+  </header>
+</div><!-- End header-bar-wrapper -->
 
   <div class="upper-deck">
     <div class="scope-panel upper-deck-card" id="scopePanel" draggable="true" data-upper-widget="scope">
@@ -1045,236 +1049,6 @@
     </div>
       </div><!-- End instruments-deck -->
 
-      <!-- 2A. CONSOLIDATED SPLIT FX SIDEBAR (5 Mini-Cards for Split View Mode) -->
-      <div class="split-fx-sidebar" id="splitFxSidebar" aria-label="Consolidated Effects Sidebar">
-        <!-- 1. DRIVE + FILTER -->
-        <div class="mini-fx-card mini-card-drive-filter" id="miniCard_unit1" data-unit="unit1" data-pedal="DRIVE_FILTER">
-          <div class="mini-fx-card-header" onclick="toggleMiniCardDrawer('unit1', event)">
-            <div class="mini-fx-card-meta">
-              <span class="mini-fx-led lit" id="mini_led_unit1"></span>
-              <span class="mini-fx-idx">#01</span>
-              <div class="mini-fx-titles">
-                <span class="mini-fx-name">DRIVE + FILTER</span>
-                <span class="mini-fx-desc">Tube Saturation &amp; SVF Filter</span>
-              </div>
-            </div>
-            <div class="mini-fx-header-actions" onclick="event.stopPropagation()">
-              <button type="button" class="btn-card-expand" onclick="toggleMiniCardDrawer('unit1', event)" title="Toggle unit settings">MORE</button>
-              <button type="button" class="btn-power active" id="mini_pwr_unit1" onclick="toggleUnitBypass('unit1', event)" title="Bypass / Engage Unit">PWR</button>
-            </div>
-          </div>
-          <div class="mini-fx-sliders-row">
-            <div class="mini-fx-param">
-              <div class="mini-fx-param-label"><span>DRIVE</span><span id="lbl_mini_drive">2.0x</span></div>
-              <input type="range" class="mini-fx-slider" id="mini_slider_drive" min="0.2" max="8.0" step="0.1" value="2.0" oninput="syncMiniParam('OVERDRIVE', 'drive', this.value, 'lbl_mini_drive', 'x')">
-            </div>
-            <div class="mini-fx-param">
-              <div class="mini-fx-param-label"><span>CUTOFF</span><span id="lbl_mini_cutoff">2.4kHz</span></div>
-              <input type="range" class="mini-fx-slider" id="mini_slider_cutoff" min="60" max="12000" step="20" value="2400" oninput="syncMiniParam('FILTER', 'cutoff', this.value, 'lbl_mini_cutoff', 'Hz')">
-            </div>
-          </div>
-          <div class="mini-fx-drawer">
-            <div class="mini-fx-drawer-title">
-              <span>ADVANCED TWEAKS</span>
-              <button type="button" class="btn-mini-inspect-modal" onclick="inspectConsolidatedUnit('unit1', event)">Inspect in Rack ➔</button>
-            </div>
-            <div class="mini-fx-drawer-grid">
-              <div class="mini-fx-param">
-                <div class="mini-fx-param-label"><span>RESONANCE</span></div>
-                <input type="range" class="mini-fx-slider" min="0.1" max="12.0" step="0.1" value="2.4" oninput="updateFxParam('FILTER', 'res', this.value)">
-              </div>
-              <div class="mini-fx-param">
-                <div class="mini-fx-param-label"><span>TUBE TONE</span></div>
-                <input type="range" class="mini-fx-slider" min="400" max="10000" step="100" value="3200" oninput="updateFxParam('OVERDRIVE', 'tone', this.value)">
-              </div>
-            </div>
-            <div class="mini-fx-sub-toggles">
-              <button type="button" class="btn-sub-pedal-pwr active" id="sub_pwr_OVERDRIVE" onclick="toggleSubPedalBypass('OVERDRIVE', event)">OVERDRIVE</button>
-              <button type="button" class="btn-sub-pedal-pwr active" id="sub_pwr_FILTER" onclick="toggleSubPedalBypass('FILTER', event)">FILTER</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2. MOD CLUSTER -->
-        <div class="mini-fx-card mini-card-mod-cluster" id="miniCard_unit2" data-unit="unit2" data-pedal="MOD_CLUSTER">
-          <div class="mini-fx-card-header" onclick="toggleMiniCardDrawer('unit2', event)">
-            <div class="mini-fx-card-meta">
-              <span class="mini-fx-led lit" id="mini_led_unit2"></span>
-              <span class="mini-fx-idx">#02</span>
-              <div class="mini-fx-titles">
-                <span class="mini-fx-name">MOD CLUSTER</span>
-                <span class="mini-fx-desc">Opto Tremolo, 12-Pole Phaser &amp; Flanger</span>
-              </div>
-            </div>
-            <div class="mini-fx-header-actions" onclick="event.stopPropagation()">
-              <button type="button" class="btn-card-expand" onclick="toggleMiniCardDrawer('unit2', event)" title="Toggle unit settings">MORE</button>
-              <button type="button" class="btn-power active" id="mini_pwr_unit2" onclick="toggleUnitBypass('unit2', event)" title="Bypass / Engage Unit">PWR</button>
-            </div>
-          </div>
-          <div class="mini-fx-sliders-row">
-            <div class="mini-fx-param">
-              <div class="mini-fx-param-label"><span>RATE</span><span id="lbl_mini_mod_rate">0.35Hz</span></div>
-              <input type="range" class="mini-fx-slider" id="mini_slider_mod_rate" min="0.05" max="8.0" step="0.05" value="0.35" oninput="syncMiniModParam('rate', this.value, 'lbl_mini_mod_rate', 'Hz')">
-            </div>
-            <div class="mini-fx-param">
-              <div class="mini-fx-param-label"><span>DEPTH</span><span id="lbl_mini_mod_depth">65%</span></div>
-              <input type="range" class="mini-fx-slider" id="mini_slider_mod_depth" min="0" max="100" step="1" value="65" oninput="syncMiniModParam('depth', this.value, 'lbl_mini_mod_depth', '%')">
-            </div>
-          </div>
-          <div class="mini-fx-drawer">
-            <div class="mini-fx-drawer-title">
-              <span>STAGE SELECTION</span>
-              <button type="button" class="btn-mini-inspect-modal" onclick="inspectConsolidatedUnit('unit2', event)">Inspect in Rack ➔</button>
-            </div>
-            <div class="mod-cluster-pills" style="display:flex;gap:6px;">
-              <button type="button" class="btn-sub-pedal-pwr mod-pill" onclick="selectModSubStage('TREMOLO', event)">OPTO</button>
-              <button type="button" class="btn-sub-pedal-pwr mod-pill active" onclick="selectModSubStage('PHASER', event)">PHASE</button>
-              <button type="button" class="btn-sub-pedal-pwr mod-pill" onclick="selectModSubStage('FLANGER', event)">FLANGE</button>
-            </div>
-            <div class="mini-fx-sub-toggles">
-              <button type="button" class="btn-sub-pedal-pwr active" id="sub_pwr_TREMOLO" onclick="toggleSubPedalBypass('TREMOLO', event)">TREMOLO</button>
-              <button type="button" class="btn-sub-pedal-pwr active" id="sub_pwr_PHASER" onclick="toggleSubPedalBypass('PHASER', event)">PHASER</button>
-              <button type="button" class="btn-sub-pedal-pwr active" id="sub_pwr_FLANGER" onclick="toggleSubPedalBypass('FLANGER', event)">FLANGER</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3. ANALOG DELAY -->
-        <div class="mini-fx-card mini-card-analog-delay" id="miniCard_unit3" data-unit="unit3" data-pedal="ANALOG_DELAY">
-          <div class="mini-fx-card-header" onclick="toggleMiniCardDrawer('unit3', event)">
-            <div class="mini-fx-card-meta">
-              <span class="mini-fx-led lit" id="mini_led_unit3"></span>
-              <span class="mini-fx-idx">#03</span>
-              <div class="mini-fx-titles">
-                <span class="mini-fx-name">ANALOG DELAY</span>
-                <span class="mini-fx-desc">Warm Tape Saturation &amp; 3-Head Multi-Tap</span>
-              </div>
-            </div>
-            <div class="mini-fx-header-actions" onclick="event.stopPropagation()">
-              <button type="button" class="btn-card-expand" onclick="toggleMiniCardDrawer('unit3', event)" title="Toggle unit settings">MORE</button>
-              <button type="button" class="btn-power active" id="mini_pwr_unit3" onclick="toggleUnitBypass('unit3', event)" title="Bypass / Engage Unit">PWR</button>
-            </div>
-          </div>
-          <div class="mini-fx-sliders-row">
-            <div class="mini-fx-param">
-              <div class="mini-fx-param-label"><span>TIME</span><span id="lbl_mini_tape_time">380ms</span></div>
-              <input type="range" class="mini-fx-slider" id="mini_slider_tape_time" min="0.05" max="1.5" step="0.025" value="0.38" oninput="syncMiniParam('DELAY', 'time', this.value, 'lbl_mini_tape_time', 's')">
-            </div>
-            <div class="mini-fx-param">
-              <div class="mini-fx-param-label"><span>FLUTTER</span><span id="lbl_mini_tape_flutter">35%</span></div>
-              <input type="range" class="mini-fx-slider" id="mini_slider_tape_flutter" min="0" max="100" step="1" value="35" oninput="syncMiniParam('TAPE_ECHO', 'flutter', this.value, 'lbl_mini_tape_flutter', '%')">
-            </div>
-          </div>
-          <div class="mini-fx-drawer">
-            <div class="mini-fx-drawer-title">
-              <span>DELAY PARAMS</span>
-              <button type="button" class="btn-mini-inspect-modal" onclick="inspectConsolidatedUnit('unit3', event)">Inspect in Rack ➔</button>
-            </div>
-            <div class="mini-fx-drawer-grid">
-              <div class="mini-fx-param">
-                <div class="mini-fx-param-label"><span>FEEDBACK</span></div>
-                <input type="range" class="mini-fx-slider" min="0" max="48" step="1" value="28" oninput="updateFxParam('DELAY', 'feedback', this.value)">
-              </div>
-              <div class="mini-fx-param">
-                <div class="mini-fx-param-label"><span>MIX</span></div>
-                <input type="range" class="mini-fx-slider" min="0" max="100" step="1" value="42" oninput="updateFxParam('DELAY', 'mix', this.value)">
-              </div>
-            </div>
-            <div class="mini-fx-sub-toggles">
-              <button type="button" class="btn-sub-pedal-pwr active" id="sub_pwr_DELAY" onclick="toggleSubPedalBypass('DELAY', event)">TAPE DELAY</button>
-              <button type="button" class="btn-sub-pedal-pwr active" id="sub_pwr_TAPE_ECHO" onclick="toggleSubPedalBypass('TAPE_ECHO', event)">TAPE ECHO</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4. DIGITAL DELAY -->
-        <div class="mini-fx-card mini-card-digital-delay" id="miniCard_unit4" data-unit="unit4" data-pedal="DIGITAL_DELAY">
-          <div class="mini-fx-card-header" onclick="toggleMiniCardDrawer('unit4', event)">
-            <div class="mini-fx-card-meta">
-              <span class="mini-fx-led lit" id="mini_led_unit4"></span>
-              <span class="mini-fx-idx">#04</span>
-              <div class="mini-fx-titles">
-                <span class="mini-fx-name">DIGITAL DELAY</span>
-                <span class="mini-fx-desc">Ping-Pong &amp; Space Diffusion Repeats</span>
-              </div>
-            </div>
-            <div class="mini-fx-header-actions" onclick="event.stopPropagation()">
-              <button type="button" class="btn-card-expand" onclick="toggleMiniCardDrawer('unit4', event)" title="Toggle unit settings">MORE</button>
-              <button type="button" class="btn-power active" id="mini_pwr_unit4" onclick="toggleUnitBypass('unit4', event)" title="Bypass / Engage Unit">PWR</button>
-            </div>
-          </div>
-          <div class="mini-fx-sliders-row">
-            <div class="mini-fx-param">
-              <div class="mini-fx-param-label"><span>TIME</span><span id="lbl_mini_dig_time">375ms</span></div>
-              <input type="range" class="mini-fx-slider" id="mini_slider_dig_time" min="0.05" max="2.0" step="0.025" value="0.375" oninput="syncMiniParam('DIGITAL_DELAY', 'time', this.value, 'lbl_mini_dig_time', 's')">
-            </div>
-            <div class="mini-fx-param">
-              <div class="mini-fx-param-label"><span>FEEDBACK</span><span id="lbl_mini_dig_fdbk">45%</span></div>
-              <input type="range" class="mini-fx-slider" id="mini_slider_dig_fdbk" min="0" max="85" step="1" value="45" oninput="syncMiniParam('DIGITAL_DELAY', 'feedback', this.value, 'lbl_mini_dig_fdbk', '%')">
-            </div>
-          </div>
-          <div class="mini-fx-drawer">
-            <div class="mini-fx-drawer-title">
-              <span>TEMPO SYNC DIVISIONS</span>
-              <button type="button" class="btn-mini-inspect-modal" onclick="inspectConsolidatedUnit('unit4', event)">Inspect in Rack ➔</button>
-            </div>
-            <div class="delay-divisions-row" style="display:flex;gap:4px;">
-              <button type="button" class="btn-sub-pedal-pwr btn-division" onclick="setDelayDivision('1/16', event)">1/16</button>
-              <button type="button" class="btn-sub-pedal-pwr btn-division" onclick="setDelayDivision('1/8', event)">1/8</button>
-              <button type="button" class="btn-sub-pedal-pwr btn-division active" onclick="setDelayDivision('1/8d', event)">1/8d</button>
-              <button type="button" class="btn-sub-pedal-pwr btn-division" onclick="setDelayDivision('1/4', event)">1/4</button>
-              <button type="button" class="btn-sub-pedal-pwr btn-division" onclick="setDelayDivision('1/2', event)">1/2</button>
-            </div>
-            <div class="mini-fx-sub-toggles">
-              <button type="button" class="btn-sub-pedal-pwr active" id="sub_pwr_DIGITAL_DELAY" onclick="toggleSubPedalBypass('DIGITAL_DELAY', event)">DIGITAL DELAY</button>
-              <button type="button" class="btn-sub-pedal-pwr active" id="sub_pwr_SPACE_DELAY" onclick="toggleSubPedalBypass('SPACE_DELAY', event)">SPACE DELAY</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 5. SPACE REVERB -->
-        <div class="mini-fx-card mini-card-space-reverb" id="miniCard_unit5" data-unit="unit5" data-pedal="SPACE_REVERB">
-          <div class="mini-fx-card-header" onclick="toggleMiniCardDrawer('unit5', event)">
-            <div class="mini-fx-card-meta">
-              <span class="mini-fx-led lit" id="mini_led_unit5"></span>
-              <span class="mini-fx-idx">#05</span>
-              <div class="mini-fx-titles">
-                <span class="mini-fx-name">SPACE REVERB</span>
-                <span class="mini-fx-desc">Cathedral Acoustics, Shimmer &amp; Plate</span>
-              </div>
-            </div>
-            <div class="mini-fx-header-actions" onclick="event.stopPropagation()">
-              <button type="button" class="btn-card-expand" onclick="toggleMiniCardDrawer('unit5', event)" title="Toggle unit settings">MORE</button>
-              <button type="button" class="btn-power active" id="mini_pwr_unit5" onclick="toggleUnitBypass('unit5', event)" title="Bypass / Engage Unit">PWR</button>
-            </div>
-          </div>
-          <div class="mini-fx-sliders-row">
-            <div class="mini-fx-param">
-              <div class="mini-fx-param-label"><span>SIZE</span><span id="lbl_mini_spc_size">65%</span></div>
-              <input type="range" class="mini-fx-slider" id="mini_slider_spc_size" min="0" max="100" step="1" value="65" oninput="syncMiniParam('SPACE', 'weather', this.value, 'lbl_mini_spc_size', '%')">
-            </div>
-            <div class="mini-fx-param">
-              <div class="mini-fx-param-label"><span>MIX</span><span id="lbl_mini_spc_mix">48%</span></div>
-              <input type="range" class="mini-fx-slider" id="mini_slider_spc_mix" min="0" max="100" step="1" value="48" oninput="syncMiniParam('SPACE', 'mix', this.value, 'lbl_mini_spc_mix', '%')">
-            </div>
-          </div>
-          <div class="mini-fx-drawer">
-            <div class="mini-fx-drawer-title">
-              <span>ACOUSTIC ENVIRONMENT</span>
-              <button type="button" class="btn-mini-inspect-modal" onclick="inspectConsolidatedUnit('unit5', event)">Inspect in Rack ➔</button>
-            </div>
-            <div class="reverb-modes-row" style="display:flex;gap:4px;">
-              <button type="button" class="btn-sub-pedal-pwr btn-reverb-mode" onclick="setReverbCathedralMode('PLATE', event)">PLATE</button>
-              <button type="button" class="btn-sub-pedal-pwr btn-reverb-mode" onclick="setReverbCathedralMode('ROOM', event)">ROOM</button>
-              <button type="button" class="btn-sub-pedal-pwr btn-reverb-mode active" onclick="setReverbCathedralMode('CATHEDRAL', event)">CATHEDRAL</button>
-              <button type="button" class="btn-sub-pedal-pwr btn-reverb-mode" onclick="setReverbCathedralMode('INFINITE', event)">INFINITE</button>
-            </div>
-            <div class="mini-fx-sub-toggles">
-              <button type="button" class="btn-sub-pedal-pwr active" id="sub_pwr_SPACE" onclick="toggleSubPedalBypass('SPACE', event)">SPACE REVERB</button>
-            </div>
-          </div>
-        </div>
-      </div><!-- End split-fx-sidebar -->
 
       <!-- 2. FULL-SIZED EURORACK STUDIO FX PEDALBOARD (10 Inserts) -->
       <div class="studio-fx-pedalboard" id="studioFxPedalboard" data-module-id="fxChain">
@@ -4733,6 +4507,7 @@ function setLowerDeckMode(mode) {
 
   if (mode === "fx" || mode === "split") {
     if (typeof updatePedalsOrderUI === "function") updatePedalsOrderUI();
+    if (mode === "split" && typeof renderSplitFxSidebar === "function") renderSplitFxSidebar();
   }
 
   window.dispatchEvent(new Event("resize"));
@@ -4849,7 +4624,7 @@ function toggleSubPedalBypass(spKey, event) {
 }
 
 function renderSplitFxSidebar() {
-  const sidebar = document.getElementById("splitFxSidebar");
+  const sidebar = document.getElementById("splitRailCards") || document.getElementById("splitFxSidebar");
   if (!sidebar) return;
 
   const keyToUnit = {
@@ -4879,7 +4654,7 @@ function renderSplitFxSidebar() {
       const card = document.getElementById("miniCard_" + unitKey);
       if (card) {
         sidebar.appendChild(card);
-        const idxEl = card.querySelector(".mini-fx-idx");
+        const idxEl = card.querySelector(".mini-fx-slot, .mini-fx-idx");
         if (idxEl) {
           idxEl.textContent = `#0${seenUnits.size}`;
         }

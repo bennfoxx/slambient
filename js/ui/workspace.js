@@ -19,7 +19,7 @@
   const DEFAULT_STATE = {
     editMode: false,
     activeTemplate: "FULL_STUDIO",
-    headerOrder: ["brand", "presets", "transport", "harmony", "readout", "masterVol", "utilities", "generative"],
+    headerOrder: ["brand", "presets", "transport", "harmony", "readout", "masterVol", "utilities", "generative", "eno"],
     upperDeckOrder: ["chordWheel", "scope", "keyboard"],
     rackOrder: ["drone", "chords", "noise", "drums", "arp", "field", "fxChain"],
     hiddenModules: [],
@@ -115,6 +115,9 @@
                   if (readIdx !== -1) list.splice(readIdx + 1, 0, "masterVol");
                   else list.push("masterVol");
                 }
+                if (!list.includes("eno")) {
+                  list.push("eno");
+                }
                 return list;
               }
               return [...DEFAULT_STATE.headerOrder];
@@ -175,7 +178,8 @@
         { slot: "readout", selector: ".sys-readout" },
         { slot: "masterVol", selector: ".master-vol-pod" },
         { slot: "utilities", selector: ".header-sec-utils" },
-        { slot: "generative", selector: ".header-sec-gen" }
+        { slot: "generative", selector: ".header-sec-gen" },
+        { slot: "eno", selector: ".eno-standalone-pod" }
       ];
 
       headerBindings.forEach(({ slot, selector }) => {
@@ -447,6 +451,9 @@
               const slotName = el.getAttribute("data-header-slot");
               if (slotName === "utilities" || slotName === "generative") {
                 if (cluster) cluster.appendChild(el);
+              } else if (slotName === "eno") {
+                const stacks = document.querySelector(".top-bar-stacks");
+                if (stacks && el.parentNode !== stacks) stacks.appendChild(el);
               } else {
                 if (cluster && cluster.parentNode === readoutRow) {
                   readoutRow.insertBefore(el, cluster);
@@ -750,6 +757,10 @@
           card.setAttribute("draggable", "true");
 
           card.addEventListener("dragstart", (e) => {
+            if (card.classList.contains("module-fullscreen-active") || document.body.classList.contains("module-focus-open") || document.querySelector(".module-fullscreen-active")) {
+              e.preventDefault();
+              return;
+            }
             if (!this.state.editMode && !card.classList.contains("upper-deck-card")) {
               e.preventDefault();
               return;
@@ -829,6 +840,7 @@
           let startX = 0, startY = 0, isDragging = false, pointerId = null;
 
           el.addEventListener("pointerdown", (e) => {
+            if (el.classList.contains("module-fullscreen-active") || document.body.classList.contains("module-focus-open") || document.querySelector(".module-fullscreen-active")) return;
             if (typeName === "header" && !this.state.editMode) return;
             if (e.target.closest("button, select, input, a, canvas, .custom-dropdown-wrap")) {
               if (!e.target.closest(".module-win-drag, .upper-drag-handle")) return;

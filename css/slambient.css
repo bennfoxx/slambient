@@ -230,9 +230,25 @@
     gap: 20px;
     width: 100%;
   }
-  .transport-row {
+  .top-bar-stacks {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: stretch;
+    width: 100%;
     border-top: 1px solid var(--border);
-    padding-top: 10px;
+    padding-top: 8px;
+  }
+  .top-bar-stack-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .transport-row {
+    border-top: none;
+    padding-top: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -6419,20 +6435,23 @@
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 12px rgba(0, 206, 209, 0.15);
   }
 
-  /* S.L.A.M. Eno CRT Head Tower */
+  /* S.L.A.M. Eno CRT Head (2-Stacks Tall Square in Header Rack) */
   .eno-standalone-pod {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 4px;
     background: #090a10;
     border: 1px solid var(--eno-glow-border, var(--border-light));
     border-radius: 6px;
-    padding: 10px 10px 8px 10px;
+    padding: 8px 8px 6px 8px;
     box-sizing: border-box;
-    flex-shrink: 0;
-    width: 164px;
+    flex: 0 0 156px;
+    width: 156px;
+    height: 156px;
+    max-height: 156px;
+    aspect-ratio: 1 / 1;
     align-self: stretch;
     cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23fed330' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67'/%3E%3Ccircle cx='12' cy='12' r='2' fill='%2300e5ff'/%3E%3C/svg%3E") 12 12, grab !important;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.8), 0 4px 16px rgba(0,0,0,0.6), var(--eno-glow-shadow, 0 0 16px rgba(var(--rgb-chord), 0.18));
@@ -6485,9 +6504,9 @@
   }
   .eno-crt-screen {
     position: relative;
-    width: 140px;
-    height: 140px;
-    flex: 0 0 140px;
+    width: 98px;
+    height: 98px;
+    flex: 0 0 98px;
     background: #020402;
     border-radius: 4px;
     overflow: hidden;
@@ -7600,8 +7619,15 @@
       flex: 1 1 100%;
       width: 100%;
       min-width: 0;
-      padding: 12px;
-      gap: 12px;
+      padding: 10px;
+      gap: 8px;
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+    }
+    .top-bar-stacks,
+    .top-bar-stack-main,
+    .readout-row {
+      display: contents !important;
     }
     header.top-bar:has(.palette-menu.open) { z-index: 9000; }
 
@@ -8038,7 +8064,9 @@
        side by side at the same height / level */
     .header-sec-gen {
       grid-column: 1 / -1;
-      height: auto;
+      height: auto !important;
+      min-height: auto !important;
+      max-height: none !important;
       display: grid;
       grid-template-columns: 1fr 1fr;
       align-items: stretch;
@@ -8073,7 +8101,9 @@
        PALETTE + ? as two equal buttons */
     .header-sec-utils {
       grid-column: 1 / -1;
-      height: auto;
+      height: auto !important;
+      min-height: auto !important;
+      max-height: none !important;
       display: flex;
       align-items: stretch;
       justify-content: stretch;
@@ -8131,68 +8161,27 @@
     /* iPhone Safari has no Fullscreen API for pages (class set from JS) */
     html.no-fullscreen-api #btnAppFullscreen { display: none; }
     .readout-row {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+      display: contents !important;
     }
     .header-util-gen-cluster {
-      order: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      width: 100%;
+      grid-column: 1 / -1 !important;
+      order: 5 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 6px !important;
+      width: 100% !important;
     }
     .header-util-gen-cluster > .header-sec-gen { order: 1; }
     .header-util-gen-cluster > .header-sec-utils { order: 2; }
-    .readout-row > .sys-readout {
-      order: 2;
-    }
-    /* Telemetry: compact 2x2 grid of label-over-value tiles */
-    .sys-readout {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 6px;
-      padding-top: 6px;
-      margin-top: 0;
-      width: 100%;
-    }
-    .telemetry-pill {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 2px 6px;
-      min-width: 0;
-      padding: 5px 8px;
-    }
-    .telemetry-pill .pill-k {
-      font-size: 11.5px;
-      font-weight: 800;
-      color: #94a3b8;
-      white-space: nowrap;
-      line-height: 1.2;
-    }
-    .telemetry-pill .val {
-      flex: 1 0 100%;
-      min-width: 0;
-      font-size: 13.5px;
-      font-weight: 800;
-      line-height: 1.2;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
 
-    /* Readout row: Generative/Utils -> Telemetry -> Master Volume */
-    .readout-row > .master-vol-pod {
-      order: 3;
-    }
+    /* Readout row: Master Volume full width above Dual Cockpit Squares */
     .master-vol-pod {
-      flex: 1 1 auto;
-      min-width: 0;
-      width: 100%;
-      height: auto;
-      min-height: 60px;
+      grid-column: 1 / -1 !important;
+      order: 3 !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: 56px !important;
+      max-height: none !important;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -8242,43 +8231,108 @@
     .master-vol-row-bottom input[type="range"]::-moz-range-track { height: 6px; border-radius: 3px; }
     .master-vol-row-bottom input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 5px; }
 
-    .eno-standalone-pod {
-      position: relative;
-      flex: 1 1 100%;
+    /* Dual Square 1: Telemetry Readout (TIME / METER / ROOT-SCALE / SEED) */
+    .sys-readout {
+      grid-column: 1 !important;
+      order: 4 !important;
+      aspect-ratio: 1 / 1 !important;
       width: 100% !important;
-      height: 72px;
-      aspect-ratio: auto;
-      padding: 6px 14px;
-      gap: 10px;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      box-sizing: border-box;
+      height: auto !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      grid-template-rows: 1fr 1fr !important;
+      gap: 4px !important;
+      padding: 6px !important;
+      box-sizing: border-box !important;
+      background: #080a11 !important;
+      border: 1px solid var(--border-light) !important;
+      border-radius: 6px !important;
+      margin: 0 !important;
+    }
+    .telemetry-pill {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      align-items: flex-start !important;
+      padding: 4px 6px !important;
+      background: #06070a !important;
+      border: 1px solid var(--border-light) !important;
+      border-radius: 4px !important;
+      min-width: 0 !important;
+      overflow: hidden !important;
+      gap: 2px !important;
+      box-sizing: border-box !important;
+    }
+    .telemetry-pill .pill-k {
+      font-size: 9.5px !important;
+      font-weight: 800 !important;
+      color: #94a3b8 !important;
+      letter-spacing: 0.5px !important;
+      line-height: 1 !important;
+      margin: 0 !important;
+      white-space: nowrap !important;
+    }
+    .telemetry-pill .val {
+      font-size: 11px !important;
+      font-weight: 800 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      width: 100% !important;
+      line-height: 1.1 !important;
+      margin: 0 !important;
+    }
+
+    /* Dual Square 2: S.L.A.M. Eno / Phosphor Bio-Scan Pod */
+    .eno-standalone-pod {
+      grid-column: 2 !important;
+      order: 4 !important;
+      aspect-ratio: 1 / 1 !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      padding: 6px !important;
+      box-sizing: border-box !important;
+      background: #090a10 !important;
+      border: 1px solid var(--eno-glow-border, var(--border-light)) !important;
+      border-radius: 6px !important;
+      margin: 0 !important;
+      align-self: auto !important;
     }
     .eno-standalone-pod .eno-pod-header {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 2px;
-      width: auto;
-      padding: 0;
+      display: flex !important;
+      flex-direction: row !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      width: 100% !important;
+      padding: 0 2px !important;
+      box-sizing: border-box !important;
     }
     .eno-standalone-pod .eno-crt-screen {
-      flex: 0 0 54px;
-      width: 54px;
-      height: 54px;
-      border-radius: 4px;
+      flex: 1 1 auto !important;
+      width: 78% !important;
+      max-width: 96px !important;
+      aspect-ratio: 1 / 1 !important;
+      height: auto !important;
+      min-height: 0 !important;
     }
     .eno-standalone-pod .eno-crt-meta {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 2px;
-      width: auto;
-      padding: 0;
-      position: static;
-      background: none;
+      display: flex !important;
+      flex-direction: row !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      width: 100% !important;
+      padding: 0 2px !important;
+      box-sizing: border-box !important;
+      position: static !important;
+      background: none !important;
     }
     .eno-standalone-pod .eno-sub {
       font-size: 11px;
@@ -10174,7 +10228,21 @@
     color: currentColor;
     font-weight: 800;
   }
-  .module-fullscreen-active .module-win-drag {
+  .module-fullscreen-active .strip-header,
+  .module-fullscreen-active .panel-header,
+  .module-fullscreen-active .pedal-card-header,
+  .module-fullscreen-active .module-header {
+    padding-right: 56px !important;
+    box-sizing: border-box !important;
+    flex-wrap: nowrap !important;
+  }
+  .module-fullscreen-active,
+  .module-fullscreen-active * {
+    -webkit-user-drag: none !important;
+    user-drag: none !important;
+  }
+  .module-fullscreen-active .module-win-drag,
+  .module-fullscreen-active .upper-drag-handle {
     display: none !important;
   }
 
