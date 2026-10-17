@@ -5380,6 +5380,8 @@
       letter-spacing: 1px;
       line-height: 1;
     }
+    .brand-group .brand-jack-glyph { width: 14px; height: 14px; }
+    .brand-group .brand-stepper-glyph { width: 9px; height: 9px; }
     .app-sub {
       font-size: 8.5px;
       letter-spacing: 0.4px;
