@@ -1839,3 +1839,21 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
     - **Step 4 (UI, Gestures & State Modules)**: Extract keyboard routing, gestures, drawers, and JSON presets into `js/ui/` (`keyboard.js`, `gestures.js`, `presets.js`).
     - **Parity Verification**: Complete offline PWA service worker caching (`sw.js`), Cloudflare Pages edge delivery, and `file:///` standalone execution must remain 100% intact.
 
+## Update — 2026-10-16 (Decoupling Stages 1 & 2 Completed & Harmony Hierarchy Standardized)
+
+- **Stage 1 (CSS Decoupling)**:
+  - Extracted 8,100+ lines of monolithic inline `<style>` into `css/slambient.css` and `css/field-recorder.css`.
+  - Linked both via standard `<link rel="stylesheet">` in `<head>`.
+  - Added to PWA precache manifest in `sw.js`.
+- **Chord Analysis Visualizer & Hierarchy Redesign**:
+  - Circle of Fifths visualizer enlarged to 136x136px canvas with radial chord-tone spokes and compass ticks.
+  - Root note is prominent (18px bold), followed by concise Western chord symbol (e.g. `m7`, `maj7#11`, `dim9`, `6/9`, `sus4`) — max 7–10 characters to guarantee zero text wrapping on mobile and upper deck cards.
+  - Standardized all 43 chord voicings across `CHORD_LIBRARY` and `SCALE_SIGNATURE_VOICINGS` with `mainLabel`, `subLabel`, `westernQuality`, and `formatChordVoicingSubtitleHTML`.
+  - Cultural and textural descriptions live in dedicated subtitle line (`10.5px`) with CSS truncation protection.
+- **Stage 2 (Theory & Presets Decoupling)**:
+  - Extracted `SCALES`, `CHORD_LIBRARY`, `SCALE_SIGNATURE_VOICINGS`, `getActiveVoicingObject`, `getVoicingDisplayName`, `getWesternChordQuality`, and `getVoicingIntervals` into `js/theory/scales.js` (370 lines).
+  - Extracted factory preset configurations, bank definitions, and state serialization into `js/ui/presets.js` (1,373 lines).
+  - Linked both scripts in `index.html` and safely purged duplicate inline code.
+  - Bumped PWA cache to `slambient-v6` in `sw.js` and verified 0 JS syntax or runtime errors. `index.html` reduced from 24,200+ lines to 14,669 lines (~40% reduction).
+
+
