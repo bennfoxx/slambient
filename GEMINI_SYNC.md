@@ -1817,3 +1817,11 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Added `updateChordVoicingSelectOptions()` which dynamically injects mode signature voicings (labeled with `★`) under an optgroup whenever the scale shifts, while retaining the full universal library.
   - `updateChordHud()` and `renderChordWheel()` now use `getActiveVoicingObject()` and `getVoicingDisplayName()` to accurately display signature names (e.g., `D Lydian Quartal (#11)`, `D So What Modal Fourths`) and their exact harmonic intervals on the wheel and HUD telemetry.
   - Generative downbeat advance and randomizers pick scale signature voicings with a 60% weighting while preserving full backward compatibility with stored user patches and numeric indices.
+
+## Update — 2026-10-16 (Temporal Dead Zone Fix for `activeTheme` and `MOBILE_MACRO_METERS`)
+
+- **Resolved Startup Temporal Dead Zone (`ReferenceError`) Restoring Visualizers & Audio Engine**:
+  - In `d6b9fb9`, calling `renderMobileMacroGrid()` inside `updateAudioParams()` and `updateMuteSoloUI()` during early top-level script execution referenced `let activeTheme` and `const MOBILE_MACRO_METERS` before their declarations were reached.
+  - Because `let activeTheme` was still in its ES6 Temporal Dead Zone, `themeHex()` threw `ReferenceError: Cannot access 'activeTheme' before initialization`, aborting script initialization and leaving `activeTheme` permanently in the TDZ on every subsequent visualizer frame (`drawScope`, `drawChordWheelCard`) and audio playback call (`togglePlay`).
+  - Converted `MOBILE_MACRO_MODULES`, `MOBILE_MACRO_METERS`, `THEME_KEYS`, `COLOR_THEMES`, `THEME_STORAGE_KEY`, `DEFAULT_ROADSIDE_COLORS`, and `activeTheme` to hoisted `var` bindings with safe fallback initialization (`FALLBACK_THEME_HEX` / `FALLBACK_THEME_RGB`), and added null-safe guards inside `themeHex()`, `themeRgbArr()`, and `themeRgb()`.
+
