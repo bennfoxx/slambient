@@ -8616,6 +8616,51 @@
     box-shadow: 0 0 16px rgba(0, 229, 255, 0.3) !important;
   }
 
+  /* Live Visual Drop Indicator & Swap Target Highlighting */
+  .drag-target-indicator,
+  [data-header-slot].drag-over,
+  .upper-deck-card.drag-over,
+  .strip-channel.drag-over {
+    outline: 2px dashed #00e5ff !important;
+    outline-offset: 4px !important;
+    box-shadow: 0 0 24px rgba(0, 229, 255, 0.55), inset 0 0 16px rgba(0, 229, 255, 0.25) !important;
+    transform: scale(1.02);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, outline 0.15s ease;
+    position: relative !important;
+    z-index: 100 !important;
+  }
+
+  [data-header-slot].drag-over::after,
+  .upper-deck-card.drag-over::after,
+  .strip-channel.drag-over::after {
+    content: "⇄ SWAP TARGET";
+    position: absolute;
+    top: -12px;
+    right: 12px;
+    background: #00e5ff;
+    color: #06080e;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 8.5px;
+    font-weight: 900;
+    letter-spacing: 0.6px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    z-index: 110;
+    animation: swapPulse 0.8s ease-in-out infinite alternate;
+  }
+
+  @keyframes swapPulse {
+    from { transform: scale(0.96); opacity: 0.9; }
+    to { transform: scale(1.04); opacity: 1; }
+  }
+
+  .workspace-dragging .dragging {
+    opacity: 0.45 !important;
+    transform: scale(0.98);
+  }
+
   /* Edit Mode Header Toggle Button */
   .btn-edit-workspace {
     display: inline-flex;

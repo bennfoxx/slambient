@@ -396,21 +396,38 @@
         });
       }
 
-      // Header pods ordering within their row containers
-      const headerRows = document.querySelectorAll(".top-bar-row");
-      if (headerRows.length && Array.isArray(this.state.headerOrder)) {
-        // Group slots into their respective rows and reorder
-        headerRows.forEach(row => {
-          const slotsInRow = Array.from(row.querySelectorAll("[data-header-slot]"));
-          if (slotsInRow.length > 1) {
-            slotsInRow.sort((a, b) => {
-              const aKey = a.getAttribute("data-header-slot");
-              const bKey = b.getAttribute("data-header-slot");
-              return this.state.headerOrder.indexOf(aKey) - this.state.headerOrder.indexOf(bKey);
-            });
-            slotsInRow.forEach(slotEl => row.appendChild(slotEl));
+      // Header pods ordering across header rows
+      if (Array.isArray(this.state.headerOrder) && this.state.headerOrder.length >= 7) {
+        const brandRow = document.querySelector(".top-bar-row.brand-row");
+        const transportRow = document.querySelector(".top-bar-row.transport-row");
+        const readoutRow = document.querySelector(".top-bar-row.readout-row");
+        const cluster = document.querySelector(".header-util-gen-cluster");
+
+        const getSlot = (key) => document.querySelector(`[data-header-slot="${key}"]`);
+
+        if (brandRow && transportRow && readoutRow) {
+          const el0 = getSlot(this.state.headerOrder[0]);
+          const el1 = getSlot(this.state.headerOrder[1]);
+          const el2 = getSlot(this.state.headerOrder[2]);
+          const el3 = getSlot(this.state.headerOrder[3]);
+          const el4 = getSlot(this.state.headerOrder[4]);
+          const el5 = getSlot(this.state.headerOrder[5]);
+          const el6 = getSlot(this.state.headerOrder[6]);
+
+          if (el0) brandRow.appendChild(el0);
+          if (el1) brandRow.appendChild(el1);
+
+          if (el2) transportRow.appendChild(el2);
+          if (el3) transportRow.appendChild(el3);
+
+          if (el4 && cluster) readoutRow.insertBefore(el4, cluster);
+          else if (el4) readoutRow.appendChild(el4);
+
+          if (cluster) {
+            if (el5) cluster.appendChild(el5);
+            if (el6) cluster.appendChild(el6);
           }
-        });
+        }
       }
     }
 
@@ -562,91 +579,130 @@
       }
     }
 
-    // 11. HTML5 and Pointer Drag & Drop Reordering
+    // True 2-way positional DOM swap between two elements
+    swapElements(elA, elB) {
+      if (!elA || !elB || elA === elB || !elA.parentNode || !elB.parentNode) return;
+      const placeholder = document.createTextNode("");
+      elA.parentNode.insertBefore(placeholder, elA);
+      elB.parentNode.insertBefore(elA, elB);
+      placeholder.parentNode.insertBefore(elB, placeholder);
+      placeholder.parentNode.removeChild(placeholder);
+    }
+
+    // Swap indices of two keys in a state array
+    swapStateOrder(stateKey, keyA, keyB) {
+      if (!Array.isArray(this.state[stateKey]) || !keyA || !keyB || keyA === keyB) return;
+      const list = this.state[stateKey];
+      const idxA = list.indexOf(keyA);
+      const idxB = list.indexOf(keyB);
+      if (idxA !== -1 && idxB !== -1) {
+        const temp = list[idxA];
+        list[idxA] = list[idxB];
+        list[idxB] = temp;
+      }
+    }
+
+    // 11. HTML5 and Pointer Drag & Drop Reordering (True 2-Way Positional Swapping)
     bindDragAndDrop() {
-      // A. Header Slots Reordering
+      // Helper to clear all drag indicator classes across the entire document
+      const clearAllDragIndicators = () => {
+        document.body.classList.remove("workspace-dragging");
+        document.querySelectorAll(".dragging").forEach(el => el.classList.remove("dragging"));
+        document.querySelectorAll(".drag-over, .drag-target-indicator").forEach(el => {
+          el.classList.remove("drag-over", "drag-target-indicator");
+        });
+      };
+
+      // A. Header Slots Reordering (Cross-Row True 2-Way Positional Swapping)
       const headerSlots = document.querySelectorAll("[data-header-slot]");
       headerSlots.forEach(slot => {
         slot.setAttribute("draggable", "true");
+
         slot.addEventListener("dragstart", (e) => {
           if (!this.state.editMode) {
+            e.preventDefault();
+            return;
+          }
+          if (e.target.closest("button, select, input, a, .custom-dropdown-wrap")) {
             e.preventDefault();
             return;
           }
           this.draggedElement = slot;
           this.draggedType = "header";
           slot.classList.add("dragging");
+          document.body.classList.add("workspace-dragging");
           if (e.dataTransfer) {
             e.dataTransfer.effectAllowed = "move";
-            e.dataTransfer.setData("text/plain", slot.getAttribute("data-header-slot"));
+            e.dataTransfer.setData("text/plain", slot.getAttribute("data-header-slot") || "");
           }
         });
 
         slot.addEventListener("dragover", (e) => {
           if (!this.state.editMode || this.draggedType !== "header") return;
+          if (!this.draggedElement || this.draggedElement === slot) return;
           e.preventDefault();
           if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
-          slot.classList.add("drag-over");
+
+          headerSlots.forEach(s => {
+            if (s !== slot) s.classList.remove("drag-over", "drag-target-indicator");
+          });
+          slot.classList.add("drag-over", "drag-target-indicator");
         });
 
-        slot.addEventListener("dragleave", () => {
-          slot.classList.remove("drag-over");
+        slot.addEventListener("dragleave", (e) => {
+          if (slot.contains(e.relatedTarget)) return;
+          slot.classList.remove("drag-over", "drag-target-indicator");
         });
 
         slot.addEventListener("drop", (e) => {
           if (!this.state.editMode || this.draggedType !== "header") return;
           e.preventDefault();
-          slot.classList.remove("drag-over");
+          slot.classList.remove("drag-over", "drag-target-indicator");
           if (!this.draggedElement || this.draggedElement === slot) return;
 
-          // Swap DOM order if in same parent container
-          if (this.draggedElement.parentElement === slot.parentElement) {
-            const parent = slot.parentElement;
-            const children = Array.from(parent.children);
-            const fromIdx = children.indexOf(this.draggedElement);
-            const toIdx = children.indexOf(slot);
-            if (fromIdx < toIdx) {
-              parent.insertBefore(this.draggedElement, slot.nextSibling);
-            } else {
-              parent.insertBefore(this.draggedElement, slot);
-            }
+          const keyA = this.draggedElement.getAttribute("data-header-slot");
+          const keyB = slot.getAttribute("data-header-slot");
 
-            // Sync order in state
-            const newOrder = Array.from(document.querySelectorAll("[data-header-slot]"))
-              .map(el => el.getAttribute("data-header-slot"))
-              .filter(Boolean);
-            this.state.headerOrder = newOrder;
-            this.saveState();
-          }
+          // True 2-way positional DOM swap (supports cross-row swapping!)
+          this.swapElements(this.draggedElement, slot);
+
+          // Swap indices in state.headerOrder
+          this.swapStateOrder("headerOrder", keyA, keyB);
+
+          // Immediately persist updated order in localStorage
+          this.saveState();
+
+          clearAllDragIndicators();
+          this.draggedElement = null;
+          this.draggedType = null;
         });
 
         slot.addEventListener("dragend", () => {
-          slot.classList.remove("dragging");
-          headerSlots.forEach(s => s.classList.remove("drag-over"));
+          clearAllDragIndicators();
           this.draggedElement = null;
           this.draggedType = null;
         });
       });
 
-      // B. Upper Deck & Rack Module Reordering
-      const setupModuleDrag = (containerSelector, itemSelector, stateKey) => {
-        const container = document.querySelector(containerSelector);
-        if (!container) return;
-
-        const items = container.querySelectorAll(itemSelector);
+      // B. Upper Deck & Rack Module Reordering (True 2-Way Positional Swapping)
+      const setupModuleDrag = (itemSelector, stateKey, typeName) => {
+        const items = document.querySelectorAll(itemSelector);
         items.forEach(card => {
           card.setAttribute("draggable", "true");
 
           card.addEventListener("dragstart", (e) => {
-            if (!this.state.editMode) {
-              // Allow default upper-deck drag if already enabled, else require edit mode
-              if (!card.classList.contains("upper-deck-card")) {
+            if (!this.state.editMode && !card.classList.contains("upper-deck-card")) {
+              e.preventDefault();
+              return;
+            }
+            if (e.target.closest("button, select, input, a, canvas, .custom-dropdown-wrap")) {
+              if (!e.target.closest(".module-win-drag, .upper-drag-handle")) {
                 e.preventDefault();
                 return;
               }
             }
             this.draggedElement = card;
-            this.draggedType = stateKey;
+            this.draggedType = typeName;
             card.classList.add("dragging");
             document.body.classList.add("workspace-dragging");
             if (e.dataTransfer) {
@@ -656,56 +712,138 @@
           });
 
           card.addEventListener("dragover", (e) => {
-            if (this.draggedType !== stateKey) return;
+            if (this.draggedType !== typeName) return;
+            if (!this.draggedElement || this.draggedElement === card) return;
             e.preventDefault();
             if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
-            card.classList.add("drag-over");
+
+            items.forEach(c => {
+              if (c !== card) c.classList.remove("drag-over", "drag-target-indicator");
+            });
+            card.classList.add("drag-over", "drag-target-indicator");
           });
 
-          card.addEventListener("dragleave", () => {
-            card.classList.remove("drag-over");
+          card.addEventListener("dragleave", (e) => {
+            if (card.contains(e.relatedTarget)) return;
+            card.classList.remove("drag-over", "drag-target-indicator");
           });
 
           card.addEventListener("drop", (e) => {
-            if (this.draggedType !== stateKey) return;
+            if (this.draggedType !== typeName) return;
             e.preventDefault();
-            card.classList.remove("drag-over");
+            card.classList.remove("drag-over", "drag-target-indicator");
             if (!this.draggedElement || this.draggedElement === card) return;
 
-            const children = Array.from(container.children).filter(c => c.matches(itemSelector));
-            const fromIdx = children.indexOf(this.draggedElement);
-            const toIdx = children.indexOf(card);
+            const keyA = this.draggedElement.getAttribute("data-module-id");
+            const keyB = card.getAttribute("data-module-id");
 
-            if (fromIdx !== -1 && toIdx !== -1) {
-              if (fromIdx < toIdx) {
-                container.insertBefore(this.draggedElement, card.nextSibling);
-              } else {
-                container.insertBefore(this.draggedElement, card);
-              }
+            // True 2-way positional DOM swap
+            this.swapElements(this.draggedElement, card);
 
-              // Update state order
-              const updatedOrder = Array.from(container.querySelectorAll(itemSelector))
-                .map(el => el.getAttribute("data-module-id"))
-                .filter(Boolean);
+            // Swap indices in state
+            this.swapStateOrder(stateKey, keyA, keyB);
 
-              this.state[stateKey] = updatedOrder;
-              this.saveState();
-              this.triggerCanvasResizes();
-            }
+            // Immediately persist updated order in localStorage
+            this.saveState();
+            this.triggerCanvasResizes();
+
+            clearAllDragIndicators();
+            this.draggedElement = null;
+            this.draggedType = null;
           });
 
           card.addEventListener("dragend", () => {
-            card.classList.remove("dragging");
-            document.body.classList.remove("workspace-dragging");
-            items.forEach(c => c.classList.remove("drag-over"));
+            clearAllDragIndicators();
             this.draggedElement = null;
             this.draggedType = null;
           });
         });
       };
 
-      setupModuleDrag(".upper-deck", ".upper-deck-card", "upperDeckOrder");
-      setupModuleDrag(".lower-deck", ".strip-channel", "rackOrder");
+      setupModuleDrag(".upper-deck-card", "upperDeckOrder", "upper");
+      setupModuleDrag(".strip-channel", "rackOrder", "rack");
+
+      // C. Pointer Event Tactile Drag & Touch Support
+      const bindPointerSwapping = (selector, typeName, stateKey, attrName) => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(el => {
+          let startX = 0, startY = 0, isDragging = false, pointerId = null;
+
+          el.addEventListener("pointerdown", (e) => {
+            if (typeName === "header" && !this.state.editMode) return;
+            if (e.target.closest("button, select, input, a, canvas, .custom-dropdown-wrap")) {
+              if (!e.target.closest(".module-win-drag, .upper-drag-handle")) return;
+            }
+
+            startX = e.clientX;
+            startY = e.clientY;
+            isDragging = false;
+            pointerId = e.pointerId;
+
+            const onPointerMove = (ev) => {
+              if (ev.pointerId !== pointerId) return;
+              const dist = Math.hypot(ev.clientX - startX, ev.clientY - startY);
+              if (dist > 8) {
+                if (!isDragging) {
+                  isDragging = true;
+                  this.draggedElement = el;
+                  this.draggedType = typeName;
+                  el.classList.add("dragging");
+                  document.body.classList.add("workspace-dragging");
+                  try { el.setPointerCapture(pointerId); } catch (_) {}
+                }
+
+                const elUnder = document.elementFromPoint(ev.clientX, ev.clientY);
+                const target = elUnder ? elUnder.closest(selector) : null;
+                elements.forEach(c => {
+                  const isTarget = (c === target && c !== el);
+                  c.classList.toggle("drag-over", isTarget);
+                  c.classList.toggle("drag-target-indicator", isTarget);
+                });
+              }
+            };
+
+            const onPointerUp = (ev) => {
+              if (ev.pointerId !== pointerId) return;
+              window.removeEventListener("pointermove", onPointerMove);
+              window.removeEventListener("pointerup", onPointerUp);
+              window.removeEventListener("pointercancel", onPointerUp);
+
+              if (isDragging) {
+                try { el.releasePointerCapture(ev.pointerId); } catch (_) {}
+                el.classList.remove("dragging");
+                document.body.classList.remove("workspace-dragging");
+
+                const elUnder = document.elementFromPoint(ev.clientX, ev.clientY);
+                const target = elUnder ? elUnder.closest(selector) : null;
+                elements.forEach(c => c.classList.remove("drag-over", "drag-target-indicator"));
+
+                if (target && target !== el) {
+                  const keyA = el.getAttribute(attrName);
+                  const keyB = target.getAttribute(attrName);
+
+                  this.swapElements(el, target);
+                  this.swapStateOrder(stateKey, keyA, keyB);
+                  this.saveState();
+                  this.triggerCanvasResizes();
+                }
+
+                isDragging = false;
+                this.draggedElement = null;
+                this.draggedType = null;
+              }
+            };
+
+            window.addEventListener("pointermove", onPointerMove);
+            window.addEventListener("pointerup", onPointerUp);
+            window.addEventListener("pointercancel", onPointerUp);
+          });
+        });
+      };
+
+      bindPointerSwapping("[data-header-slot]", "header", "headerOrder", "data-header-slot");
+      bindPointerSwapping(".upper-deck-card", "upper", "upperDeckOrder", "data-module-id");
+      bindPointerSwapping(".strip-channel", "rack", "rackOrder", "data-module-id");
     }
 
     // 12. Trigger Canvas and Layout Resizes
