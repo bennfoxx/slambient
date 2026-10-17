@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Slambient — Generative Ambient Instrument</title>
+<title>Meander Engine — Generative Ambient Instrument</title>
 <meta name="description" content="Generative ambient music synthesizer, tape drone, and polyrhythmic instrument">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#07080c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Slambient">
-<meta name="application-name" content="Slambient">
+<meta name="apple-mobile-web-app-title" content="Meander Engine">
+<meta name="application-name" content="Meander Engine">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="format-detection" content="telephone=no">
 <link rel="manifest" href="manifest.webmanifest">
@@ -36,7 +36,7 @@
   <div class="header-bar-wrapper">
     <header class="top-bar">
       <div class="top-bar-row brand-row">
-        <div class="brand-group" title="Slambient · Modular Ambient Console">
+        <div class="brand-group" title="Meander Engine · Modular Generative Console">
           <div class="app-title">
             <svg class="brand-jack-glyph" viewBox="0 0 28 28" width="22" height="22" fill="none" aria-hidden="true">
               <polygon points="14,1 23,5 27,14 23,23 14,27 5,23 1,14 5,5" fill="#121624" stroke="#fed330" stroke-width="1.6"/>
@@ -47,7 +47,7 @@
               <line x1="1" y1="14" x2="4" y2="14" stroke="#fed330" stroke-width="1.6" stroke-linecap="round"/>
               <line x1="24" y1="14" x2="27" y2="14" stroke="#fed330" stroke-width="1.6" stroke-linecap="round"/>
             </svg>
-            <span class="app-title-letters"><span>S</span><span>L</span><span>A</span><span>M</span><span>B</span><span>I</span><span>E</span><span>N</span><span>T</span></span>
+            <span class="app-title-letters"><span>M</span><span>E</span><span>A</span><span>N</span><span>D</span><span>E</span><span>R</span><span>&nbsp;</span><span>E</span><span>N</span><span>G</span><span>I</span><span>N</span><span>E</span></span>
           </div>
           <div class="app-sub">
             <svg class="brand-stepper-glyph" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true">
@@ -56,7 +56,7 @@
               <line x1="8" y1="1" x2="8" y2="3.2" stroke="#fed330" stroke-width="1.2" stroke-linecap="round"/>
               <line x1="15" y1="8" x2="12.8" y2="8" stroke="#fed330" stroke-width="1.2" stroke-linecap="round"/>
             </svg>
-            <span class="app-sub-letters"><span>m</span><span>e</span><span>a</span><span>n</span><span>d</span><span>e</span><span>r</span><span>&nbsp;</span><span>e</span><span>n</span><span>g</span><span>i</span><span>n</span><span>e</span></span>
+            <span class="app-sub-letters"><span>m</span><span>o</span><span>d</span><span>u</span><span>l</span><span>a</span><span>r</span><span>&nbsp;</span><span>a</span><span>m</span><span>b</span><span>i</span><span>e</span><span>n</span><span>t</span><span>&nbsp;</span><span>c</span><span>o</span><span>n</span><span>s</span><span>o</span><span>l</span><span>e</span></span>
           </div>
         </div>
 
@@ -258,7 +258,7 @@
               <div class="palette-menu" id="paletteMenu" role="menu"></div>
             </div>
             <button class="btn-header-util btn-header-help" id="btnShortcuts" onclick="toggleShortcutsPanel()" title="Keyboard shortcuts (?)">?</button>
-            <button class="btn-header-util btn-install-app" id="btnInstallApp" onclick="installAppPrompt()" title="Install Slambient as App" style="display: none;">
+            <button class="btn-header-util btn-install-app" id="btnInstallApp" onclick="installAppPrompt()" title="Install Meander Engine as App" style="display: none;">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2V10M8 10L5 7M8 10L11 7M2 13H14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
               <span>Install</span>
             </button>
@@ -1105,6 +1105,10 @@
             <span class="pedal-silk-role">Tube Saturation &amp; Warmth</span>
             <span class="pedal-silk-model">ANALOG DSP // ASYMMETRIC</span>
           </div>
+          <div class="dual-stage-header-pip">
+            <span class="dual-stage-tag">STAGE 1A: DRIVE</span>
+            <span class="dual-stage-link-indicator">DUAL-STAGE LINK ➔</span>
+          </div>
           <div class="pedal-controls-body">
             <div class="control-row">
               <div class="control-label"><span>Drive / Gain</span><span class="control-val" id="lbl_OVERDRIVE_drive">2.0x</span></div>
@@ -1155,6 +1159,10 @@
           <div class="pedal-faceplate-banner">
             <span class="pedal-silk-role">SVF Filter &amp; Envelope</span>
             <span class="pedal-silk-model">STATE-VARIABLE // 24DB CASCADE</span>
+          </div>
+          <div class="dual-stage-header-pip">
+            <span class="dual-stage-tag">STAGE 1B: 24dB SVF</span>
+            <span class="dual-stage-link-indicator">➔ FILTER STAGE</span>
           </div>
           <div class="pedal-controls-body">
             <div class="control-row">
@@ -1240,6 +1248,11 @@
           <div class="pedal-faceplate-banner">
             <span class="pedal-silk-role">Optical Tremolo &amp; Pan</span>
             <span class="pedal-silk-model">OPTOCOUPLER // QUAD-PHASE</span>
+          </div>
+          <div class="mod-cluster-pills" role="tablist" aria-label="Modulation Cluster Selector">
+            <button type="button" class="mod-pill active" onclick="selectModSubStage('TREMOLO', event)" title="Select Opto Tremolo">OPTO</button>
+            <button type="button" class="mod-pill" onclick="selectModSubStage('PHASER', event)" title="Select 12-Pole Phaser">PHASE</button>
+            <button type="button" class="mod-pill" onclick="selectModSubStage('FLANGER', event)" title="Select Analog Flanger">FLANGE</button>
           </div>
           <div class="pedal-controls-body">
             <div class="control-row">
@@ -1763,6 +1776,148 @@
           </div>
         </div>
       </div>
+        </div>
+
+        <!-- 3. SPLIT VIEW MINI-CARDS VERTICAL RAIL (5 Consolidated Units, 52-60px compact) -->
+        <div class="split-fx-rail" id="splitFxRail">
+          <div class="split-rail-header">
+            <div class="split-rail-title">
+              <span class="rail-icon">🎛️</span>
+              <span class="rail-label">STUDIO FX RAIL</span>
+              <span class="rail-tag">5 CONSOLIDATED UNITS</span>
+            </div>
+            <button type="button" class="btn-rail-expand" onclick="setLowerDeckMode('fx')" title="Expand to Full Eurorack Studio FX Rack">
+              <span>FULL RACK</span>
+              <svg viewBox="0 0 16 16" width="10" height="10" fill="none"><path d="M2 8h10M8 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+
+          <div class="split-rail-cards" id="splitRailCards">
+            <!-- UNIT 1: DRIVE & FILTER -->
+            <div class="mini-fx-card mini-fx-unit-1" id="miniCard_unit1" data-unit="unit1" style="--unit-accent: #ff5252;">
+              <div class="mini-fx-pip" aria-hidden="true"></div>
+              <div class="mini-fx-badge-group">
+                <span class="mini-fx-slot">#01</span>
+                <span class="mini-fx-name" title="Unit 1: Drive & Filter">DRV/FLT</span>
+              </div>
+              <div class="mini-fx-sliders">
+                <div class="mini-fx-slider-row" title="Drive Gain">
+                  <span class="mini-fx-lbl">DRV</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_drive" min="0.2" max="8.0" step="0.1" value="2.0" oninput="syncMiniParam('OVERDRIVE', 'drive', this.value, 'lbl_mini_drive', 'x')">
+                  <span class="mini-fx-val" id="lbl_mini_drive">2.0x</span>
+                </div>
+                <div class="mini-fx-slider-row" title="Filter Cutoff">
+                  <span class="mini-fx-lbl">CUT</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_cutoff" min="60" max="12000" step="20" value="2400" oninput="syncMiniParam('FILTER', 'cutoff', this.value, 'lbl_mini_cutoff', 'Hz')">
+                  <span class="mini-fx-val" id="lbl_mini_cutoff">2.4k</span>
+                </div>
+              </div>
+              <div class="mini-fx-actions">
+                <button type="button" class="btn-mini-fx-pwr active" id="mini_pwr_unit1" onclick="toggleUnitBypass('unit1', event)" title="Toggle Drive & Filter Bypass">PWR</button>
+                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('unit1', event)" title="Inspect full Drive & Filter controls">EDIT ↗</button>
+              </div>
+            </div>
+
+            <!-- UNIT 2: MOD CLUSTER -->
+            <div class="mini-fx-card mini-fx-unit-2" id="miniCard_unit2" data-unit="unit2" style="--unit-accent: #e056fd;">
+              <div class="mini-fx-pip" aria-hidden="true"></div>
+              <div class="mini-fx-badge-group">
+                <span class="mini-fx-slot">#02</span>
+                <span class="mini-fx-name" title="Unit 2: Modulation Cluster">MOD</span>
+              </div>
+              <div class="mini-fx-sliders">
+                <div class="mini-fx-slider-row" title="Modulation Rate">
+                  <span class="mini-fx-lbl">RATE</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_mod_rate" min="0.1" max="10.0" step="0.1" value="0.35" oninput="syncMiniModParam('rate', this.value, 'lbl_mini_mod_rate', 'Hz')">
+                  <span class="mini-fx-val" id="lbl_mini_mod_rate">0.35Hz</span>
+                </div>
+                <div class="mini-fx-slider-row" title="Modulation Depth">
+                  <span class="mini-fx-lbl">DPTH</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_mod_depth" min="0" max="100" step="1" value="65" oninput="syncMiniModParam('depth', this.value, 'lbl_mini_mod_depth', '%')">
+                  <span class="mini-fx-val" id="lbl_mini_mod_depth">65%</span>
+                </div>
+              </div>
+              <div class="mini-fx-actions">
+                <button type="button" class="btn-mini-fx-pwr active" id="mini_pwr_unit2" onclick="toggleUnitBypass('unit2', event)" title="Toggle Mod Cluster Bypass">PWR</button>
+                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('unit2', event)" title="Inspect full Modulation Cluster">EDIT ↗</button>
+              </div>
+            </div>
+
+            <!-- UNIT 3: ANALOG TAPE DELAY -->
+            <div class="mini-fx-card mini-fx-unit-3" id="miniCard_unit3" data-unit="unit3" style="--unit-accent: #feca57;">
+              <div class="mini-fx-pip" aria-hidden="true"></div>
+              <div class="mini-fx-badge-group">
+                <span class="mini-fx-slot">#03</span>
+                <span class="mini-fx-name" title="Unit 3: Analog Tape Delay">TAPE</span>
+              </div>
+              <div class="mini-fx-sliders">
+                <div class="mini-fx-slider-row" title="Tape Delay Time">
+                  <span class="mini-fx-lbl">TIME</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_tape_time" min="0.05" max="2.5" step="0.01" value="0.38" oninput="syncMiniParam('DELAY', 'time', this.value, 'lbl_mini_tape_time', 's')">
+                  <span class="mini-fx-val" id="lbl_mini_tape_time">380ms</span>
+                </div>
+                <div class="mini-fx-slider-row" title="Motor Wow & Flutter">
+                  <span class="mini-fx-lbl">FLUT</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_tape_flutter" min="0" max="100" step="1" value="35" oninput="syncMiniParam('TAPE_ECHO', 'flutter', this.value, 'lbl_mini_tape_flutter', '%')">
+                  <span class="mini-fx-val" id="lbl_mini_tape_flutter">35%</span>
+                </div>
+              </div>
+              <div class="mini-fx-actions">
+                <button type="button" class="btn-mini-fx-pwr active" id="mini_pwr_unit3" onclick="toggleUnitBypass('unit3', event)" title="Toggle Tape Delay Bypass">PWR</button>
+                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('unit3', event)" title="Inspect full Tape Delay controls">EDIT ↗</button>
+              </div>
+            </div>
+
+            <!-- UNIT 4: DIGITAL DELAY -->
+            <div class="mini-fx-card mini-fx-unit-4" id="miniCard_unit4" data-unit="unit4" style="--unit-accent: #48dbfb;">
+              <div class="mini-fx-pip" aria-hidden="true"></div>
+              <div class="mini-fx-badge-group">
+                <span class="mini-fx-slot">#04</span>
+                <span class="mini-fx-name" title="Unit 4: Digital Delay">D-DLY</span>
+              </div>
+              <div class="mini-fx-sliders">
+                <div class="mini-fx-slider-row" title="Delay Division Time">
+                  <span class="mini-fx-lbl">TIME</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_dig_time" min="0.02" max="2.0" step="0.01" value="0.375" oninput="syncMiniParam('DIGITAL_DELAY', 'time', this.value, 'lbl_mini_dig_time', 's')">
+                  <span class="mini-fx-val" id="lbl_mini_dig_time">375ms</span>
+                </div>
+                <div class="mini-fx-slider-row" title="Delay Feedback">
+                  <span class="mini-fx-lbl">FDBK</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_dig_fdbk" min="0" max="95" step="1" value="45" oninput="syncMiniParam('DIGITAL_DELAY', 'feedback', this.value, 'lbl_mini_dig_fdbk', '%')">
+                  <span class="mini-fx-val" id="lbl_mini_dig_fdbk">45%</span>
+                </div>
+              </div>
+              <div class="mini-fx-actions">
+                <button type="button" class="btn-mini-fx-pwr active" id="mini_pwr_unit4" onclick="toggleUnitBypass('unit4', event)" title="Toggle Digital Delay Bypass">PWR</button>
+                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('unit4', event)" title="Inspect full Digital Delay controls">EDIT ↗</button>
+              </div>
+            </div>
+
+            <!-- UNIT 5: REVERB & SPACE -->
+            <div class="mini-fx-card mini-fx-unit-5" id="miniCard_unit5" data-unit="unit5" style="--unit-accent: #a55eea;">
+              <div class="mini-fx-pip" aria-hidden="true"></div>
+              <div class="mini-fx-badge-group">
+                <span class="mini-fx-slot">#05</span>
+                <span class="mini-fx-name" title="Unit 5: Reverb & Space">SPACE</span>
+              </div>
+              <div class="mini-fx-sliders">
+                <div class="mini-fx-slider-row" title="Reverb Size / Decay">
+                  <span class="mini-fx-lbl">SIZE</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_spc_size" min="10" max="95" step="1" value="65" oninput="syncMiniParam('SPACE', 'weather', this.value, 'lbl_mini_spc_size', '%')">
+                  <span class="mini-fx-val" id="lbl_mini_spc_size">65%</span>
+                </div>
+                <div class="mini-fx-slider-row" title="Reverb Wet/Dry Mix">
+                  <span class="mini-fx-lbl">MIX</span>
+                  <input type="range" class="mini-fx-range" id="mini_slider_spc_mix" min="0" max="100" step="1" value="48" oninput="syncMiniParam('SPACE', 'mix', this.value, 'lbl_mini_spc_mix', '%')">
+                  <span class="mini-fx-val" id="lbl_mini_spc_mix">48%</span>
+                </div>
+              </div>
+              <div class="mini-fx-actions">
+                <button type="button" class="btn-mini-fx-pwr active" id="mini_pwr_unit5" onclick="toggleUnitBypass('unit5', event)" title="Toggle Reverb & Space Bypass">PWR</button>
+                <button type="button" class="btn-mini-fx-edit" onclick="inspectConsolidatedUnit('unit5', event)" title="Inspect full Reverb & Space controls">EDIT ↗</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div><!-- End studio-fx-pedalboard -->
     </div><!-- End lower-deck-body -->

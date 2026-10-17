@@ -160,7 +160,7 @@ async function runDeviceAudit() {
     await sleep(2500);
 
     const desktopTitle = await cdp.eval('document.title');
-    if (desktopTitle && desktopTitle.includes('Slambient')) {
+    if (desktopTitle && (desktopTitle.includes('Meander') || desktopTitle.includes('Slambient'))) {
       pass(`App loaded cleanly on Desktop: "${desktopTitle}"`);
     } else {
       fail(`App title mismatch: got "${desktopTitle}"`);

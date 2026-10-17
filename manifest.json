@@ -1,6 +1,6 @@
 {
-  "name": "Slambient — Generative Ambient Instrument",
-  "short_name": "Slambient",
+  "name": "Meander Engine — Generative Ambient Instrument",
+  "short_name": "Meander Engine",
   "description": "Generative ambient music synthesizer, tape drone, and polyrhythmic instrument",
   "start_url": "./",
   "scope": "./",
