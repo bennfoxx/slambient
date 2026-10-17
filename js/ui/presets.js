@@ -1,4 +1,365 @@
 /* ==========================================================================
+   PRESET SOUND DESIGN MATRIX (15 Distinct Acoustic Worlds)
+   Couples each inspiration to its authentic modal scale, signature voicings,
+   rhythmic meter (Tala), spatial staging, and 10-pedal DSP chain.
+   ========================================================================== */
+const PRESET_SOUND_DESIGN_MATRIX = {
+  // 0. NOSTALGIA — Boards of Canada (The Campfire Headphase)
+  0: {
+    name: "Nostalgia",
+    scale: "DORIAN",
+    signatureVoicing: "DORIAN_SO_WHAT",
+    timeSig: "4/4",
+    bpm: 68,
+    tanpura: false,
+    synth: { preset: "WARM_ANALOG", vol: 82, sustain: 110, dynamics: 80, strum: 65, fxSend: 85 },
+    arp: { pattern: "PENDULUM", timbre: "KALIMBA", gate: 340, rest: 35, vol: 72, fxSend: 75 },
+    drums: { enabled: true, kit: "ORGANIC_KIT", groove: "TAPE_DUB", vol: 64, punch: 72, density: 40, fxSend: 45 },
+    noise: { profile: "WHITE_TAPE", mode: "GUSTS", vol: 32, color: 38, drift: 65, fxSend: 60 },
+    fxChain: {
+      order: ["TUBE_DRIVE", "OPTICAL_TREMOLO", "SPACE_DELAY", "SPACE"],
+      bypass: { PHASER: true, FLANGER: true, DIGITAL_DELAY: true, ECHO: true, FILTER: false },
+      params: {
+        TUBE_DRIVE: { drive: 36, tone: 42, mix: 55 },
+        OPTICAL_TREMOLO: { rate: 2.2, depth: 45, stereo: true },
+        SPACE_DELAY: { time: 540, flutter: 52, diffusion: 65, mix: 44 },
+        SPACE: { size: 68, damp: 45, mix: 42 }
+      }
+    }
+  },
+
+  // 1. ORGANIC — Four Tet (Rounds / Morning Evening)
+  1: {
+    name: "Organic",
+    scale: "PENTATONIC",
+    signatureVoicing: "OPEN_QUINTAL_PENT",
+    timeSig: "7/4",
+    bpm: 78,
+    tanpura: false,
+    synth: { preset: "VIBES_CELESTE", vol: 80, sustain: 95, dynamics: 90, strum: 45, fxSend: 70 },
+    arp: { pattern: "SHIMMER", timbre: "WATER_DROPLET", gate: 240, rest: 20, vol: 84, fxSend: 80 },
+    drums: { enabled: true, kit: "ORGANIC_KIT", groove: "FOUR_TET_GLITCH", vol: 76, punch: 85, density: 70, fxSend: 50 },
+    noise: { profile: "BROOK", mode: "RHYTHMIC", vol: 24, color: 62, drift: 45, fxSend: 55 },
+    fxChain: {
+      order: ["TUBE_DRIVE", "ECHO", "OPTICAL_TREMOLO", "FILTER", "SPACE"],
+      bypass: { PHASER: true, FLANGER: true, DIGITAL_DELAY: true, SPACE_DELAY: true },
+      params: {
+        TUBE_DRIVE: { drive: 28, tone: 60, mix: 40 },
+        ECHO: { time: 320, feedback: 42, mix: 38 },
+        OPTICAL_TREMOLO: { rate: 4.8, depth: 35, stereo: true },
+        FILTER: { cutoff: 3200, res: 2.2, topology: "SEM_12DB" }
+      }
+    }
+  },
+
+  // 2. SHIMMER — Brian Eno & Harold Budd (The Pearl)
+  2: {
+    name: "Shimmer",
+    scale: "MAJOR9",
+    signatureVoicing: "PRISM_MAJ9_WIDE",
+    timeSig: "3/4",
+    bpm: 58,
+    tanpura: false,
+    synth: { preset: "PURE_GLASS", vol: 86, sustain: 150, dynamics: 85, strum: 90, fxSend: 92 },
+    arp: { pattern: "SHIMMER", timbre: "GLASS_FM", gate: 480, rest: 45, vol: 78, fxSend: 95 },
+    drums: { enabled: false, kit: "MINIMAL_CLICK", groove: "ORGANIC", vol: 0, punch: 0, density: 0, fxSend: 0 },
+    noise: { profile: "WIND", mode: "STORM_SWELL", vol: 20, color: 55, drift: 70, fxSend: 70 },
+    fxChain: {
+      order: ["DIGITAL_DELAY", "PHASER", "SPACE"],
+      bypass: { TUBE_DRIVE: true, OPTICAL_TREMOLO: true, FLANGER: true, ECHO: true, SPACE_DELAY: true },
+      params: {
+        DIGITAL_DELAY: { time: "3/16", feedback: 55, mix: 48 },
+        PHASER: { rate: 0.18, depth: 55, feedback: 30 },
+        SPACE: { size: 92, damp: 25, mix: 65 }
+      }
+    }
+  },
+
+  // 3. HAUNTOLOGY — The Caretaker (An Empty Bliss Beyond This World)
+  3: {
+    name: "Hauntology",
+    scale: "AEOLIAN",
+    signatureVoicing: "NORDIC_SUS2_B6",
+    timeSig: "3/4",
+    bpm: 52,
+    tanpura: false,
+    synth: { preset: "CHAMBER_WOODS", vol: 78, sustain: 120, dynamics: 70, strum: 110, fxSend: 88 },
+    arp: { pattern: "UP", timbre: "MUSIC_BOX", gate: 360, rest: 50, vol: 65, fxSend: 82 },
+    drums: { enabled: false, kit: "ORGANIC_KIT", groove: "MINIMAL_CLICK", vol: 0, punch: 0, density: 0, fxSend: 0 },
+    noise: { profile: "WHITE_TAPE", mode: "CONTINUOUS", vol: 38, color: 32, drift: 50, fxSend: 75 },
+    fxChain: {
+      order: ["TAPE_ECHO", "TUBE_DRIVE", "SPACE_DELAY", "SPACE"],
+      bypass: { PHASER: true, FLANGER: true, DIGITAL_DELAY: true, OPTICAL_TREMOLO: true },
+      params: {
+        TAPE_ECHO: { time: 480, feedback: 48, mix: 45 },
+        TUBE_DRIVE: { drive: 42, tone: 32, mix: 60 },
+        SPACE_DELAY: { time: 620, flutter: 75, diffusion: 70, mix: 40 }
+      }
+    }
+  },
+
+  // 4. VELVET — Pastoral Ambient (Windham Hill / Eno)
+  4: {
+    name: "Velvet",
+    scale: "MAJ_PENTATONIC",
+    signatureVoicing: "PASTORAL_69_SPREAD",
+    timeSig: "4/4",
+    bpm: 64,
+    tanpura: false,
+    synth: { preset: "WARM_ANALOG", vol: 84, sustain: 130, dynamics: 80, strum: 75, fxSend: 80 },
+    arp: { pattern: "PENDULUM", timbre: "CONCERT_HARP", gate: 380, rest: 30, vol: 78, fxSend: 75 },
+    drums: { enabled: true, kit: "ORGANIC_KIT", groove: "HEARTBEAT", vol: 48, punch: 60, density: 30, fxSend: 35 },
+    noise: { profile: "BROOK", mode: "CONTINUOUS", vol: 20, color: 48, drift: 40, fxSend: 50 },
+    fxChain: {
+      order: ["PHASER", "TUBE_DRIVE", "SPACE_DELAY", "SPACE"],
+      bypass: { FLANGER: true, DIGITAL_DELAY: true, OPTICAL_TREMOLO: true, ECHO: true },
+      params: {
+        PHASER: { rate: 0.25, depth: 65, feedback: 25 },
+        TUBE_DRIVE: { drive: 22, tone: 52, mix: 35 },
+        SPACE: { size: 75, damp: 40, mix: 45 }
+      }
+    }
+  },
+
+  // 5. PALE BLOOM — Arvo Pärt (Tintinnabuli)
+  5: {
+    name: "Pale Bloom",
+    scale: "AEOLIAN",
+    signatureVoicing: "DEEP_AEOLIAN_9TH",
+    timeSig: "4/4",
+    bpm: 48,
+    tanpura: false,
+    synth: { preset: "CELESTIAL_FLUTE", vol: 85, sustain: 160, dynamics: 90, strum: 120, fxSend: 95 },
+    arp: { pattern: "UP", timbre: "SINE_CRYSTAL", gate: 600, rest: 60, vol: 70, fxSend: 90 },
+    drums: { enabled: false, kit: "ORGANIC_KIT", groove: "ORGANIC", vol: 0, punch: 0, density: 0, fxSend: 0 },
+    noise: { profile: "WIND", mode: "SPARSE", vol: 18, color: 40, drift: 60, fxSend: 60 },
+    fxChain: {
+      order: ["SPACE_DELAY", "SPACE"],
+      bypass: { TUBE_DRIVE: true, OPTICAL_TREMOLO: true, PHASER: true, FLANGER: true, DIGITAL_DELAY: true, ECHO: true },
+      params: {
+        SPACE_DELAY: { time: 720, flutter: 15, diffusion: 80, mix: 50 },
+        SPACE: { size: 96, damp: 20, mix: 70 }
+      }
+    }
+  },
+
+  // 6. GREEN — Hiroshi Yoshimura (Green / Surround — Kankyō Ongaku)
+  6: {
+    name: "Green",
+    scale: "HIRAJOSHI",
+    signatureVoicing: "HIRAJOSHI_QUINTAL",
+    timeSig: "3/4",
+    bpm: 62,
+    tanpura: false,
+    synth: { preset: "PURE_GLASS", vol: 82, sustain: 120, dynamics: 85, strum: 80, fxSend: 75 },
+    arp: { pattern: "SHIMMER", timbre: "WATER_DROPLET", gate: 280, rest: 40, vol: 86, fxSend: 85 },
+    drums: { enabled: false, kit: "MINIMAL_CLICK", groove: "ORGANIC", vol: 0, punch: 0, density: 0, fxSend: 0 },
+    noise: { profile: "BROOK", mode: "CONTINUOUS", vol: 26, color: 65, drift: 50, fxSend: 60 },
+    fxChain: {
+      order: ["DIGITAL_DELAY", "SPACE_DELAY", "SPACE"],
+      bypass: { TUBE_DRIVE: true, OPTICAL_TREMOLO: true, PHASER: true, FLANGER: true, ECHO: true, FILTER: true },
+      params: {
+        DIGITAL_DELAY: { time: "3/16", feedback: 42, mix: 38 },
+        SPACE_DELAY: { time: 580, flutter: 12, diffusion: 70, mix: 45 },
+        SPACE: { size: 78, damp: 35, mix: 48 }
+      }
+    }
+  },
+
+  // 7. LINEAGE — Ustad Allauddin Khan (Maihar Gharana Morning Raga)
+  7: {
+    name: "Lineage",
+    scale: "BHAIRAV",
+    signatureVoicing: "MAIHAR_RESONANCE",
+    timeSig: "7/4", // Rupak Tala (3+2+2)
+    bpm: 72,
+    tanpura: true,
+    tanpuraParams: { volume: 22, javari: 58 },
+    synth: { preset: "SITAR_STRINGS", vol: 85, sustain: 110, dynamics: 85, strum: 85, fxSend: 82 },
+    arp: { pattern: "PENDULUM", timbre: "BANSURI_FLUTE", gate: 420, rest: 25, vol: 82, fxSend: 80 },
+    drums: { enabled: true, kit: "ORGANIC_KIT", groove: "TABLA_RUPAK", vol: 74, punch: 68, density: 65, fxSend: 45 },
+    noise: { profile: "WIND", mode: "SPARSE", vol: 15, color: 42, drift: 35, fxSend: 40 },
+    fxChain: {
+      order: ["FILTER", "SPACE_DELAY", "SPACE"],
+      bypass: { TUBE_DRIVE: true, OPTICAL_TREMOLO: true, PHASER: true, FLANGER: true, DIGITAL_DELAY: true, ECHO: true },
+      params: {
+        FILTER: { cutoff: 3800, res: 2.8, topology: "FORMANT_VOCAL" },
+        SPACE_DELAY: { time: 440, flutter: 20, diffusion: 60, mix: 40 },
+        SPACE: { size: 84, damp: 30, mix: 45 }
+      }
+    }
+  },
+
+  // 8. AFTER HOURS — Lofi / Late Night Tape
+  8: {
+    name: "After Hours",
+    scale: "DORIAN",
+    signatureVoicing: "WARM_9TH",
+    timeSig: "4/4",
+    bpm: 66,
+    tanpura: false,
+    synth: { preset: "WARM_ANALOG", vol: 84, sustain: 100, dynamics: 80, strum: 60, fxSend: 75 },
+    arp: { pattern: "UP", timbre: "PIZZICATO_STRING", gate: 260, rest: 30, vol: 76, fxSend: 70 },
+    drums: { enabled: true, kit: "ORGANIC_KIT", groove: "TAPE_DUB", vol: 78, punch: 80, density: 50, fxSend: 45 },
+    noise: { profile: "WHITE_TAPE", mode: "CONTINUOUS", vol: 34, color: 36, drift: 45, fxSend: 50 },
+    fxChain: {
+      order: ["TUBE_DRIVE", "OPTICAL_TREMOLO", "ECHO", "SPACE"],
+      bypass: { PHASER: true, FLANGER: true, DIGITAL_DELAY: true, SPACE_DELAY: true },
+      params: {
+        TUBE_DRIVE: { drive: 30, tone: 46, mix: 45 },
+        OPTICAL_TREMOLO: { rate: 3.2, depth: 38, stereo: true },
+        ECHO: { time: 380, feedback: 40, mix: 35 }
+      }
+    }
+  },
+
+  // 9. AIRPORTS — Brian Eno (Ambient 1: Music for Airports)
+  9: {
+    name: "Airports",
+    scale: "LYDIAN",
+    signatureVoicing: "LYDIAN_ETHER",
+    timeSig: "4/4",
+    bpm: 54,
+    tanpura: false,
+    synth: { preset: "PURE_GLASS", vol: 88, sustain: 180, dynamics: 85, strum: 130, fxSend: 95 },
+    arp: { pattern: "SHIMMER", timbre: "MUSIC_BOX", gate: 520, rest: 55, vol: 74, fxSend: 92 },
+    drums: { enabled: false, kit: "ORGANIC_KIT", groove: "ORGANIC", vol: 0, punch: 0, density: 0, fxSend: 0 },
+    noise: { profile: "WHITE_TAPE", mode: "CONTINUOUS", vol: 20, color: 45, drift: 60, fxSend: 70 },
+    fxChain: {
+      order: ["SPACE_DELAY", "SPACE"],
+      bypass: { TUBE_DRIVE: true, OPTICAL_TREMOLO: true, PHASER: true, FLANGER: true, DIGITAL_DELAY: true, ECHO: true },
+      params: {
+        SPACE_DELAY: { time: 820, flutter: 25, diffusion: 85, mix: 55 },
+        SPACE: { size: 98, damp: 18, mix: 75 }
+      }
+    }
+  },
+
+  // 10. DOUGLAS FIRS — Angelo Badalamenti (Twin Peaks / Julee Cruise)
+  10: {
+    name: "Douglas Firs",
+    scale: "AEOLIAN",
+    signatureVoicing: "DEEP_AEOLIAN_9TH",
+    timeSig: "6/8", // Noir ballad
+    bpm: 54,
+    tanpura: false,
+    synth: { preset: "VIBES_CELESTE", vol: 86, sustain: 160, dynamics: 75, strum: 75, fxSend: 82 },
+    arp: { pattern: "PENDULUM", timbre: "GLASS_FM", gate: 520, rest: 45, vol: 68, fxSend: 75 },
+    drums: { enabled: true, kit: "ORGANIC_KIT", groove: "HEARTBEAT", vol: 60, punch: 65, density: 35, fxSend: 40 },
+    noise: { profile: "RAIN", mode: "GUSTS", vol: 28, color: 42, drift: 65, fxSend: 65 },
+    fxChain: {
+      order: ["OPTICAL_TREMOLO", "TUBE_DRIVE", "SPACE_DELAY", "SPACE"],
+      bypass: { PHASER: true, FLANGER: true, DIGITAL_DELAY: true, ECHO: true },
+      params: {
+        OPTICAL_TREMOLO: { rate: 2.8, depth: 65, stereo: true }, // Signature noir guitar tremolo
+        TUBE_DRIVE: { drive: 24, tone: 40, mix: 40 },
+        SPACE_DELAY: { time: 580, flutter: 42, diffusion: 65, mix: 44 }
+      }
+    }
+  },
+
+  // 11. TWINNING — Aphex Twin (Selected Ambient Works Vol II / Drukqs)
+  11: {
+    name: "Twinning",
+    scale: "PHRYGIAN",
+    signatureVoicing: "PHRYGIAN_DARK_HALO",
+    timeSig: "5/8", // Asymmetric polyrhythmic braindance
+    bpm: 86,
+    tanpura: false,
+    synth: { preset: "PURE_GLASS", vol: 80, sustain: 90, dynamics: 92, strum: 40, fxSend: 78 },
+    arp: { pattern: "SHIMMER", timbre: "KALIMBA", gate: 220, rest: 20, vol: 85, fxSend: 85 },
+    drums: { enabled: true, kit: "MINIMAL_CLICK", groove: "FOUR_TET_GLITCH", vol: 82, punch: 90, density: 75, fxSend: 55 },
+    noise: { profile: "WHITE_TAPE", mode: "RHYTHMIC", vol: 24, color: 70, drift: 55, fxSend: 65 },
+    fxChain: {
+      order: ["FLANGER", "TUBE_DRIVE", "DIGITAL_DELAY", "PHASER"],
+      bypass: { OPTICAL_TREMOLO: true, ECHO: true, SPACE_DELAY: true, SPACE: false },
+      params: {
+        FLANGER: { rate: 0.35, depth: 75, feedback: 60 },
+        TUBE_DRIVE: { drive: 45, tone: 68, mix: 50 },
+        DIGITAL_DELAY: { time: "3/16", feedback: 55, mix: 42 },
+        PHASER: { rate: 0.8, depth: 60, feedback: 40 }
+      }
+    }
+  },
+
+  // 12. TANGERINE — Tangerine Dream (Phaedra / Rubycon — Berlin School)
+  12: {
+    name: "Tangerine",
+    scale: "DORIAN",
+    signatureVoicing: "QUARTAL_STACK",
+    timeSig: "4/4",
+    bpm: 114,
+    tanpura: false,
+    synth: { preset: "WARM_ANALOG", vol: 78, sustain: 140, dynamics: 75, strum: 60, fxSend: 85 },
+    arp: { pattern: "UP", timbre: "GLASS_FM", gate: 240, rest: 10, vol: 90, fxSend: 88 },
+    drums: { enabled: true, kit: "MINIMAL_CLICK", groove: "ORGANIC", vol: 65, punch: 75, density: 55, fxSend: 40 },
+    noise: { profile: "WIND", mode: "GUSTS", vol: 22, color: 55, drift: 60, fxSend: 60 },
+    fxChain: {
+      order: ["PHASER", "DIGITAL_DELAY", "SPACE"],
+      bypass: { TUBE_DRIVE: true, OPTICAL_TREMOLO: true, FLANGER: true, ECHO: true, SPACE_DELAY: true },
+      params: {
+        PHASER: { rate: 0.45, depth: 80, feedback: 50 }, // Iconic 12-pole Moog phaser sweep
+        DIGITAL_DELAY: { time: "3/16", feedback: 52, mix: 48 }, // Dotted-8th Berlin school sequence
+        SPACE: { size: 82, damp: 30, mix: 50 }
+      }
+    }
+  },
+
+  // 13. DISINTEGRATION — William Basinski (The Disintegration Loops)
+  13: {
+    name: "Disintegration",
+    scale: "LYDIAN",
+    signatureVoicing: "LYDIAN_ETHER",
+    timeSig: "4/4",
+    bpm: 50,
+    tanpura: false,
+    synth: { preset: "CHAMBER_WOODS", vol: 86, sustain: 160, dynamics: 70, strum: 110, fxSend: 92 },
+    arp: { pattern: "PENDULUM", timbre: "WATER_DROPLET", gate: 480, rest: 40, vol: 65, fxSend: 80 },
+    drums: { enabled: false, kit: "ORGANIC_KIT", groove: "ORGANIC", vol: 0, punch: 0, density: 0, fxSend: 0 },
+    noise: { profile: "WHITE_TAPE", mode: "CONTINUOUS", vol: 36, color: 28, drift: 65, fxSend: 70 },
+    fxChain: {
+      order: ["TAPE_ECHO", "TUBE_DRIVE", "SPACE_DELAY", "SPACE"],
+      bypass: { PHASER: true, FLANGER: true, DIGITAL_DELAY: true, OPTICAL_TREMOLO: true },
+      params: {
+        TAPE_ECHO: { time: 640, feedback: 55, mix: 52 },
+        TUBE_DRIVE: { drive: 38, tone: 34, mix: 55 },
+        SPACE_DELAY: { time: 780, flutter: 85, diffusion: 75, mix: 45 }
+      }
+    }
+  },
+
+  // 14. CHILLHOP — Sunday Morning Vinyl Tape Beats
+  14: {
+    name: "Chillhop",
+    scale: "MAJOR9",
+    signatureVoicing: "PRISM_MAJ9_WIDE",
+    timeSig: "4/4",
+    bpm: 74,
+    tanpura: false,
+    synth: { preset: "VIBES_CELESTE", vol: 82, sustain: 100, dynamics: 80, strum: 50, fxSend: 75 },
+    arp: { pattern: "UP", timbre: "CONCERT_HARP", gate: 300, rest: 30, vol: 75, fxSend: 72 },
+    drums: { enabled: true, kit: "ORGANIC_KIT", groove: "TAPE_DUB", vol: 82, punch: 85, density: 60, fxSend: 45 },
+    noise: { profile: "WHITE_TAPE", mode: "GUSTS", vol: 30, color: 40, drift: 50, fxSend: 50 },
+    fxChain: {
+      order: ["TUBE_DRIVE", "ECHO", "OPTICAL_TREMOLO", "SPACE"],
+      bypass: { PHASER: true, FLANGER: true, DIGITAL_DELAY: true, SPACE_DELAY: true },
+      params: {
+        TUBE_DRIVE: { drive: 26, tone: 48, mix: 40 },
+        ECHO: { time: 340, feedback: 38, mix: 32 },
+        OPTICAL_TREMOLO: { rate: 3.6, depth: 30, stereo: true }
+      }
+    }
+  }
+};
+
+if (typeof window !== "undefined") {
+  window.PRESET_SOUND_DESIGN_MATRIX = PRESET_SOUND_DESIGN_MATRIX;
+}
+if (typeof global !== "undefined") {
+  global.PRESET_SOUND_DESIGN_MATRIX = PRESET_SOUND_DESIGN_MATRIX;
+}
+
+/* ==========================================================================
    DYNAMIC SIGNATURE FX CHAINS FOR FACTORY PRESETS (0 - 14)
    ========================================================================== */
 const PRESET_FX_CONFIGS = {
@@ -473,951 +834,135 @@ function applyPreset(idx) {
   if (document.getElementById("knobEqHigh")) document.getElementById("knobEqHigh").value = 0;
   if (document.getElementById("knobMasterDrive")) document.getElementById("knobMasterDrive").value = 12;
 
-  if (idx === 0) {
-    document.getElementById("selTimeSig").value = "7/4";
-    activeScaleKey = "DORIAN";
-    document.getElementById("knobBpm").value = 72;
-    document.getElementById("knobWeather").value = 45;
-    document.getElementById("knobMutation").value = 35;
-    document.getElementById("selDrumStyle").value = "ORGANIC";
-    document.getElementById("chkAutoEvolveDrums").checked = true;
-    document.getElementById("knobDrumEvolveChance").value = 25;
-    document.getElementById("knobDrumVol").value = 85;
-    document.getElementById("knobDrumPunch").value = 75;
-    document.getElementById("knobDrumDensity").value = 65;
-    document.getElementById("knobStrum").value = 55;
-    document.getElementById("knobDrone").value = 70;
-    document.getElementById("knobDroneFilter").value = 180;
-    document.getElementById("knobDroneDetune").value = 3.5;
-    document.getElementById("knobDroneWander").value = 20;
-    if (document.getElementById("selTanpuraTuning")) document.getElementById("selTanpuraTuning").value = "PA";
-    if (document.getElementById("knobTanpura")) document.getElementById("knobTanpura").value = 45;
-    if (document.getElementById("knobJavari")) document.getElementById("knobJavari").value = 60;
-    document.getElementById("selChordTimbre").value = "WARM_PAD";
-    document.getElementById("selArpPattern").value = "SHIMMER";
-    document.getElementById("chkAutoEvolveArpPattern").checked = true;
-    document.getElementById("selArpTimbre").value = "MUSIC_BOX";
-    document.getElementById("chkAutoEvolveArpTimbre").checked = true;
-    document.getElementById("knobArpEvolveChance").value = 25;
-    document.getElementById("knobArpGate").value = 320;
-    document.getElementById("knobArpRest").value = 15;
-    document.getElementById("knobArpOctaves").value = 2;
-    document.getElementById("knobArpVol").value = 85;
-    document.getElementById("knobMasterCutoff").value = 64.4;
-    document.getElementById("knobMasterRes").value = 2.8;
-    document.getElementById("knobFilterAttack").value = 45;
-    document.getElementById("knobFilterDecay").value = 650;
-    document.getElementById("knobFilterEnvDepth").value = 60;
-    document.getElementById("knobFilterLfoRate").value = 0.08;
-    document.getElementById("knobFilterLfoDepth").value = 20;
-    document.getElementById("knobDelayTime").value = 360;
-    document.getElementById("knobDelayFeedback").value = 48;
-    document.getElementById("knobDelayTone").value = 1900;
-    document.getElementById("knobDelayFlutter").value = 35;
-    document.getElementById("knobDelayMix").value = 42;
-    document.getElementById("selReverbMode").value = "HALL";
-    document.getElementById("knobReverbMix").value = 40;
-    document.getElementById("knobReverbTone").value = 4500;
-    document.getElementById("selChorusMode").value = "CLASSIC";
-    document.getElementById("knobChorusRate").value = 0.35;
-    document.getElementById("knobChorusDepth").value = 35;
-    document.getElementById("knobChorusMix").value = 25;
-  } else if (idx === 1) {
-    document.getElementById("selTimeSig").value = "5/8";
-    activeScaleKey = "DORIAN";
-    document.getElementById("knobBpm").value = 88;
-    document.getElementById("knobWeather").value = 55;
-    document.getElementById("knobMutation").value = 45;
-    document.getElementById("selDrumStyle").value = "ORGANIC";
-    document.getElementById("chkAutoEvolveDrums").checked = true;
-    document.getElementById("knobDrumEvolveChance").value = 20;
-    document.getElementById("knobDrumVol").value = 95;
-    document.getElementById("knobDrumPunch").value = 85;
-    document.getElementById("knobDrumDensity").value = 80;
-    document.getElementById("knobStrum").value = 40;
-    document.getElementById("knobDrone").value = 65;
-    document.getElementById("knobDroneFilter").value = 210;
-    document.getElementById("knobDroneDetune").value = 4.0;
-    document.getElementById("knobDroneWander").value = 15;
-    if (document.getElementById("selTanpuraTuning")) document.getElementById("selTanpuraTuning").value = "MA";
-    if (document.getElementById("knobTanpura")) document.getElementById("knobTanpura").value = 35;
-    if (document.getElementById("knobJavari")) document.getElementById("knobJavari").value = 50;
-    document.getElementById("selChordTimbre").value = "LOFI_KEYS";
-    document.getElementById("selArpPattern").value = "PENDULUM";
-    document.getElementById("chkAutoEvolveArpPattern").checked = true;
-    document.getElementById("selArpTimbre").value = "KALIMBA";
-    document.getElementById("chkAutoEvolveArpTimbre").checked = true;
-    document.getElementById("knobArpEvolveChance").value = 20;
-    document.getElementById("knobArpGate").value = 180;
-    document.getElementById("knobArpRest").value = 8;
-    document.getElementById("knobArpOctaves").value = 2;
-    document.getElementById("knobArpVol").value = 90;
-    document.getElementById("knobMasterCutoff").value = 71.8;
-    document.getElementById("knobMasterRes").value = 3.5;
-    document.getElementById("knobFilterAttack").value = 25;
-    document.getElementById("knobFilterDecay").value = 450;
-    document.getElementById("knobFilterEnvDepth").value = 70;
-    document.getElementById("knobFilterLfoRate").value = 0.15;
-    document.getElementById("knobFilterLfoDepth").value = 15;
-    document.getElementById("knobDelayTime").value = 240;
-    document.getElementById("knobDelayFeedback").value = 42;
-    document.getElementById("knobDelayTone").value = 2400;
-    document.getElementById("knobDelayFlutter").value = 20;
-    document.getElementById("knobDelayMix").value = 38;
-    document.getElementById("selReverbMode").value = "PLATE";
-    document.getElementById("knobReverbMix").value = 25;
-    document.getElementById("knobReverbTone").value = 6000;
-    document.getElementById("selChorusMode").value = "CLASSIC";
-    document.getElementById("knobChorusRate").value = 0.5;
-    document.getElementById("knobChorusDepth").value = 25;
-    document.getElementById("knobChorusMix").value = 18;
-  } else if (idx === 2) {
-    document.getElementById("selTimeSig").value = "7/8";
-    activeScaleKey = "LYDIAN";
-    document.getElementById("knobBpm").value = 62;
-    document.getElementById("knobWeather").value = 65;
-    document.getElementById("knobMutation").value = 25;
-    document.getElementById("selDrumStyle").value = "HEARTBEAT";
-    document.getElementById("chkAutoEvolveDrums").checked = true;
-    document.getElementById("knobDrumEvolveChance").value = 15;
-    document.getElementById("knobDrumVol").value = 70;
-    document.getElementById("knobDrumPunch").value = 60;
-    document.getElementById("knobDrumDensity").value = 40;
-    document.getElementById("knobStrum").value = 80;
-    document.getElementById("knobDrone").value = 75;
-    document.getElementById("knobDroneFilter").value = 160;
-    document.getElementById("knobDroneDetune").value = 2.5;
-    document.getElementById("knobDroneWander").value = 10;
-    if (document.getElementById("selTanpuraTuning")) document.getElementById("selTanpuraTuning").value = "PA";
-    if (document.getElementById("knobTanpura")) document.getElementById("knobTanpura").value = 55;
-    if (document.getElementById("knobJavari")) document.getElementById("knobJavari").value = 65;
-    document.getElementById("selChordTimbre").value = "DIGITAL_STRINGS";
-    document.getElementById("selArpPattern").value = "UP";
-    document.getElementById("chkAutoEvolveArpPattern").checked = true;
-    document.getElementById("selArpTimbre").value = "GLASS_FM";
-    document.getElementById("chkAutoEvolveArpTimbre").checked = true;
-    document.getElementById("knobArpEvolveChance").value = 15;
-    document.getElementById("knobArpGate").value = 450;
-    document.getElementById("knobArpRest").value = 18;
-    document.getElementById("knobArpOctaves").value = 2;
-    document.getElementById("knobArpVol").value = 72;
-    document.getElementById("knobMasterCutoff").value = 78.0;
-    document.getElementById("knobMasterRes").value = 1.8;
-    document.getElementById("knobFilterAttack").value = 65;
-    document.getElementById("knobFilterDecay").value = 850;
-    document.getElementById("knobFilterEnvDepth").value = 42;
-    document.getElementById("knobFilterLfoRate").value = 0.16;
-    document.getElementById("knobFilterLfoDepth").value = 24;
-    document.getElementById("knobDelayTime").value = 480;
-    document.getElementById("knobDelayFeedback").value = 46;
-    document.getElementById("knobDelayTone").value = 2800;
-    document.getElementById("knobDelayFlutter").value = 35;
-    document.getElementById("knobDelayMix").value = 48;
-    document.getElementById("selReverbMode").value = "CATHEDRAL";
-    document.getElementById("knobReverbMix").value = 52;
-    document.getElementById("knobReverbTone").value = 6200;
-    document.getElementById("selChorusMode").value = "ENSEMBLE";
-    document.getElementById("knobChorusRate").value = 0.6;
-    document.getElementById("knobChorusDepth").value = 55;
-    document.getElementById("knobChorusMix").value = 40;
-  } else if (idx === 3) {
-    document.getElementById("selTimeSig").value = "5/4";
-    activeScaleKey = "AEOLIAN";
-    document.getElementById("knobBpm").value = 64;
-    document.getElementById("knobWeather").value = 75;
-    document.getElementById("knobMutation").value = 55;
-    document.getElementById("selDrumStyle").value = "DUB_TAPE";
-    document.getElementById("chkAutoEvolveDrums").checked = true;
-    document.getElementById("knobDrumEvolveChance").value = 35;
-    document.getElementById("knobDrumVol").value = 90;
-    document.getElementById("knobDrumPunch").value = 70;
-    document.getElementById("knobDrumDensity").value = 70;
-    document.getElementById("knobStrum").value = 45;
-    document.getElementById("knobDrone").value = 60;
-    document.getElementById("knobDroneFilter").value = 140;
-    document.getElementById("knobDroneDetune").value = 5.0;
-    document.getElementById("knobDroneWander").value = 40;
-    document.getElementById("selChordTimbre").value = "CHAMBER_WOODS";
-    document.getElementById("selArpPattern").value = "SHIMMER";
-    document.getElementById("chkAutoEvolveArpPattern").checked = true;
-    document.getElementById("selArpTimbre").value = "CONCERT_HARP";
-    document.getElementById("chkAutoEvolveArpTimbre").checked = true;
-    document.getElementById("knobArpEvolveChance").value = 35;
-    document.getElementById("knobArpGate").value = 250;
-    document.getElementById("knobArpRest").value = 25;
-    document.getElementById("knobArpOctaves").value = 2;
-    document.getElementById("knobArpVol").value = 80;
-    document.getElementById("knobMasterCutoff").value = 53.9;
-    document.getElementById("knobMasterRes").value = 4.2;
-    document.getElementById("knobFilterAttack").value = 35;
-    document.getElementById("knobFilterDecay").value = 900;
-    document.getElementById("knobFilterEnvDepth").value = 75;
-    document.getElementById("knobFilterLfoRate").value = 0.06;
-    document.getElementById("knobFilterLfoDepth").value = 35;
-    document.getElementById("knobDelayTime").value = 520;
-    document.getElementById("knobDelayFeedback").value = 48;
-    document.getElementById("knobDelayTone").value = 1200;
-    document.getElementById("knobDelayFlutter").value = 70;
-    document.getElementById("knobDelayMix").value = 50;
-    document.getElementById("selReverbMode").value = "HALL";
-    document.getElementById("knobReverbMix").value = 45;
-    document.getElementById("knobReverbTone").value = 3200;
-    document.getElementById("selChorusMode").value = "VIBRATO";
-    document.getElementById("knobChorusRate").value = 0.8;
-    document.getElementById("knobChorusDepth").value = 70;
-    document.getElementById("knobChorusMix").value = 45;
-  } else if (idx === 4) {
-    document.getElementById("selTimeSig").value = "4/4";
-    activeScaleKey = "MAJOR9";
-    document.getElementById("knobBpm").value = 56;
-    document.getElementById("knobWeather").value = 60;
-    document.getElementById("knobMutation").value = 15;
-    document.getElementById("selDrumStyle").value = "MUTED";
-    document.getElementById("chkAutoEvolveDrums").checked = false;
-    document.getElementById("knobDrumEvolveChance").value = 10;
-    document.getElementById("knobDrumVol").value = 0;
-    document.getElementById("knobDrumPunch").value = 30;
-    document.getElementById("knobDrumDensity").value = 20;
-    document.getElementById("knobStrum").value = 95;
-    document.getElementById("knobDrone").value = 85;
-    document.getElementById("knobDroneFilter").value = 140;
-    document.getElementById("knobDroneDetune").value = 1.8;
-    document.getElementById("knobDroneWander").value = 25;
-    if (document.getElementById("selTanpuraTuning")) document.getElementById("selTanpuraTuning").value = "PA";
-    if (document.getElementById("knobTanpura")) document.getElementById("knobTanpura").value = 50;
-    if (document.getElementById("knobJavari")) document.getElementById("knobJavari").value = 75;
-    document.getElementById("selChordTimbre").value = "CELESTIAL_ORGAN";
-    document.getElementById("selArpPattern").value = "CHORD_BURST";
-    document.getElementById("chkAutoEvolveArpPattern").checked = false;
-    document.getElementById("selArpTimbre").value = "WATER_DROPLET";
-    document.getElementById("chkAutoEvolveArpTimbre").checked = false;
-    document.getElementById("knobArpEvolveChance").value = 15;
-    document.getElementById("knobArpGate").value = 500;
-    document.getElementById("knobArpRest").value = 35;
-    document.getElementById("knobArpOctaves").value = 1;
-    document.getElementById("knobArpVol").value = 55;
-    document.getElementById("knobMasterCutoff").value = 56.9;
-    document.getElementById("knobMasterRes").value = 1.2;
-    document.getElementById("knobFilterAttack").value = 80;
-    document.getElementById("knobFilterDecay").value = 1100;
-    document.getElementById("knobFilterEnvDepth").value = 35;
-    document.getElementById("knobFilterLfoRate").value = 0.05;
-    document.getElementById("knobFilterLfoDepth").value = 20;
-    document.getElementById("knobDelayTime").value = 420;
-    document.getElementById("knobDelayFeedback").value = 38;
-    document.getElementById("knobDelayTone").value = 1500;
-    document.getElementById("knobDelayFlutter").value = 25;
-    document.getElementById("knobDelayMix").value = 45;
-    document.getElementById("selReverbMode").value = "HALL";
-    document.getElementById("knobReverbMix").value = 50;
-    document.getElementById("knobReverbTone").value = 5500;
-    document.getElementById("selChorusMode").value = "ENSEMBLE";
-    document.getElementById("knobChorusRate").value = 0.3;
-    document.getElementById("knobChorusDepth").value = 45;
-    document.getElementById("knobChorusMix").value = 35;
-  } else if (idx === 5) {
-    document.getElementById("selTimeSig").value = "3/4";
-    activeScaleKey = "MAJ_PENTATONIC";
-    document.getElementById("knobBpm").value = 68;
-    document.getElementById("knobWeather").value = 45;
-    document.getElementById("knobMutation").value = 20;
-    document.getElementById("selDrumStyle").value = "MINIMAL_CLICK";
-    document.getElementById("chkAutoEvolveDrums").checked = true;
-    document.getElementById("knobDrumEvolveChance").value = 15;
-    document.getElementById("knobDrumVol").value = 40;
-    document.getElementById("knobDrumPunch").value = 35;
-    document.getElementById("knobDrumDensity").value = 20;
-    document.getElementById("knobStrum").value = 75;
-    document.getElementById("knobDrone").value = 65;
-    document.getElementById("knobDroneFilter").value = 160;
-    document.getElementById("knobDroneDetune").value = 2.4;
-    document.getElementById("knobDroneWander").value = 20;
-    document.getElementById("selChordTimbre").value = "VIBES_CELESTE";
-    document.getElementById("selArpPattern").value = "UP";
-    document.getElementById("chkAutoEvolveArpPattern").checked = true;
-    document.getElementById("selArpTimbre").value = "PIZZICATO_STRING";
-    document.getElementById("chkAutoEvolveArpTimbre").checked = true;
-    document.getElementById("knobArpEvolveChance").value = 20;
-    document.getElementById("knobArpGate").value = 380;
-    document.getElementById("knobArpRest").value = 20;
-    document.getElementById("knobArpOctaves").value = 2;
-    document.getElementById("knobArpVol").value = 60;
-    document.getElementById("knobMasterCutoff").value = 59.6;
-    document.getElementById("knobMasterRes").value = 1.6;
-    document.getElementById("knobFilterAttack").value = 55;
-    document.getElementById("knobFilterDecay").value = 900;
-    document.getElementById("knobFilterEnvDepth").value = 40;
-    document.getElementById("knobFilterLfoRate").value = 0.1;
-    document.getElementById("knobFilterLfoDepth").value = 18;
-    document.getElementById("knobDelayTime").value = 390;
-    document.getElementById("knobDelayFeedback").value = 35;
-    document.getElementById("knobDelayTone").value = 1700;
-    document.getElementById("knobDelayFlutter").value = 20;
-    document.getElementById("knobDelayMix").value = 40;
-    document.getElementById("selReverbMode").value = "CATHEDRAL";
-    document.getElementById("knobReverbMix").value = 48;
-    document.getElementById("knobReverbTone").value = 7000;
-    document.getElementById("selChorusMode").value = "CLASSIC";
-    document.getElementById("knobChorusRate").value = 0.4;
-    document.getElementById("knobChorusDepth").value = 30;
-    document.getElementById("knobChorusMix").value = 22;
-  } else if (idx === 6) { // Kankyō Green (Hiroshi Yoshimura & Midori Takada Environmental Ambient)
-    document.getElementById("selTimeSig").value = "4/4";
-    activeScaleKey = "HIRAJOSHI";
-    document.getElementById("knobBpm").value = 58;
-    document.getElementById("knobWeather").value = 32; // Pure, pristine transparent space
-    document.getElementById("knobMutation").value = 12; // Serene, meditative harmonic stability
-    
-    // Traditional percussion silenced completely in favor of natural environmental textures
-    document.getElementById("selDrumStyle").value = "MUTED";
-    document.getElementById("chkAutoEvolveDrums").checked = false;
-    document.getElementById("knobDrumEvolveChance").value = 0;
-    document.getElementById("knobDrumVol").value = 0;
-    document.getElementById("knobDrumPunch").value = 0;
-    document.getElementById("knobDrumDensity").value = 0;
-    document.getElementById("knobDrumFx").value = 0;
-    
-    // Synthesized environmental textures (gentle water drops, breeze drift, resonant stone reflections)
-    if (document.getElementById("selNoiseProfile")) document.getElementById("selNoiseProfile").value = "BROOK";
-    if (document.getElementById("selNoiseMode")) document.getElementById("selNoiseMode").value = "SPARSE";
-    if (document.getElementById("knobNoiseColor")) document.getElementById("knobNoiseColor").value = 68; // Crystalline clarity
-    if (document.getElementById("knobNoiseRate")) document.getElementById("knobNoiseRate").value = 30;  // Gentle droplet intervals
-    if (document.getElementById("knobNoiseDrift")) document.getElementById("knobNoiseDrift").value = 78; // Wide stereo air drift
-    if (document.getElementById("knobNoiseVol")) document.getElementById("knobNoiseVol").value = 46;
-    if (document.getElementById("knobNoiseFx")) document.getElementById("knobNoiseFx").value = 65;
-
-    // Weightless, subtle harmonic drone foundation
-    document.getElementById("selDroneOctave").value = "D1";
-    document.getElementById("knobDrone").value = 38;
-    document.getElementById("knobDroneFilter").value = 150;
-    document.getElementById("knobDroneDetune").value = 1.2;
-    document.getElementById("knobDroneWander").value = 22;
-    document.getElementById("knobDroneFx").value = 28;
-
-    // Crystalline chord glass
-    document.getElementById("knobStrum").value = 92;
-    document.getElementById("selChordTimbre").value = "PURE_SINE_GLASS";
-    document.getElementById("knobChordVol").value = 76;
-    document.getElementById("knobChordFx").value = 75;
-
-    // Meditative, crystalline arpeggio resembling water ripples and raindrops
-    document.getElementById("selArpPattern").value = "PENDULUM";
-    document.getElementById("chkAutoEvolveArpPattern").checked = false;
-    document.getElementById("selArpTimbre").value = "SINE_CRYSTAL";
-    document.getElementById("chkAutoEvolveArpTimbre").checked = false;
-    document.getElementById("knobArpEvolveChance").value = 0;
-    document.getElementById("knobArpGate").value = 340;
-    document.getElementById("knobArpRest").value = 44; // Intentional breathing room / Ma (間)
-    document.getElementById("knobArpOctaves").value = 2;
-    document.getElementById("knobArpVol").value = 70;
-    document.getElementById("knobArpFx").value = 85;
-
-    // Natural acoustic envelope with gentle open cutoff and low resonance
-    document.getElementById("knobMasterCutoff").value = 78; // Transparent, open acoustic field
-    document.getElementById("knobMasterRes").value = 1.1; // Smooth, uncolored resonance
-    document.getElementById("knobFilterAttack").value = 65;
-    document.getElementById("knobFilterDecay").value = 1200;
-    document.getElementById("knobFilterEnvDepth").value = 28;
-    document.getElementById("knobFilterLfoRate").value = 0.035;
-    document.getElementById("knobFilterLfoDepth").value = 10;
-
-    // Prismatic spatial analog delay (echo chamber reflections)
-    document.getElementById("knobDelayTime").value = 480;
-    document.getElementById("knobDelayFeedback").value = 45;
-    document.getElementById("knobDelayTone").value = 3200;
-    document.getElementById("knobDelayFlutter").value = 14;
-    document.getElementById("knobDelayMix").value = 42;
-
-    // Crystalline shimmer space and slow binaural swells
-    document.getElementById("selReverbMode").value = "SHIMMER";
-    document.getElementById("knobReverbMix").value = 42;
-    document.getElementById("knobReverbTone").value = 7200;
-    document.getElementById("selChorusMode").value = "ENSEMBLE";
-    document.getElementById("knobChorusRate").value = 0.08; // Ultra-slow binaural drift
-    document.getElementById("knobChorusDepth").value = 38;
-    document.getElementById("knobChorusMix").value = 26;
-  } else if (idx === 7) { // Classical Lineage (Indian Classical Raga / Maihar Tradition)
-    document.getElementById("selTimeSig").value = "7/4"; // Rupak Taal (7 matras: 3 + 2 + 2)
-    activeScaleKey = "BILAWAL";
-    document.getElementById("knobBpm").value = 68; // Meditative vilambit / madhya laya
-    document.getElementById("knobWeather").value = 40;
-    document.getElementById("knobMutation").value = 20;
-
-    // Classical Indian Tabla theka - calibrated for chamber acoustics
-    document.getElementById("selDrumStyle").value = "TABLA_GROOVE";
-    document.getElementById("chkAutoEvolveDrums").checked = false;
-    document.getElementById("knobDrumEvolveChance").value = 10;
-    document.getElementById("knobDrumVol").value = 76;
-    document.getElementById("knobDrumPunch").value = 68;
-    document.getElementById("knobDrumDensity").value = 65;
-    document.getElementById("knobDrumFx").value = 45;
-
-    // Maihar Sitar Strings with authentic jawari buzz and mizrab attack
-    document.getElementById("knobStrum").value = 75;
-    document.getElementById("selChordTimbre").value = "SITAR_STRINGS";
-    document.getElementById("knobChordVol").value = 84;
-    document.getElementById("knobChordFx").value = 78;
-
-    // Resonant Indian Tanpura drone - quiet, meditative bed sitting peacefully behind sub
-    document.getElementById("selDroneOctave").value = "D2";
-    if (chkTanpura) chkTanpura.checked = true;
-    if (document.getElementById("selTanpuraTuning")) document.getElementById("selTanpuraTuning").value = "PA";
-    if (document.getElementById("knobTanpura")) document.getElementById("knobTanpura").value = 14;
-    if (document.getElementById("knobJavari")) document.getElementById("knobJavari").value = 52;
-    document.getElementById("knobDrone").value = 74;
-    document.getElementById("knobDroneFilter").value = 210;
-    document.getElementById("knobDroneDetune").value = 3.5;
-    document.getElementById("knobDroneWander").value = 15;
-    document.getElementById("knobDroneFx").value = 42;
-
-    // Breathy Indian Bamboo Flute (Bansuri) arpeggios in Raga Taan phrasing
-    document.getElementById("selArpPattern").value = "RAGA_TAAN";
-    document.getElementById("chkAutoEvolveArpPattern").checked = false;
-    document.getElementById("selArpTimbre").value = "BANSURI_FLUTE";
-    document.getElementById("chkAutoEvolveArpTimbre").checked = false;
-    document.getElementById("knobArpEvolveChance").value = 15;
-    document.getElementById("knobArpGate").value = 420;
-    document.getElementById("knobArpRest").value = 18;
-    document.getElementById("knobArpOctaves").value = 2;
-    document.getElementById("knobArpVol").value = 82;
-    document.getElementById("knobArpFx").value = 78;
-
-    // Warm temple resonance and spatial depth
-    document.getElementById("knobMasterCutoff").value = 74.0;
-    document.getElementById("knobMasterRes").value = 2.0;
-    document.getElementById("knobFilterAttack").value = 50;
-    document.getElementById("knobFilterDecay").value = 950;
-    document.getElementById("knobFilterEnvDepth").value = 45;
-    document.getElementById("knobFilterLfoRate").value = 0.06;
-    document.getElementById("knobFilterLfoDepth").value = 18;
-
-    document.getElementById("knobDelayTime").value = 440;
-    document.getElementById("knobDelayFeedback").value = 45;
-    document.getElementById("knobDelayTone").value = 2400;
-    document.getElementById("knobDelayFlutter").value = 26;
-    document.getElementById("knobDelayMix").value = 44;
-
-    // Temple-like hall for the tanpura/sitar to breathe in, with light chorus
-    document.getElementById("selReverbMode").value = "CATHEDRAL";
-    document.getElementById("knobReverbMix").value = 44;
-    document.getElementById("knobReverbTone").value = 5200;
-    document.getElementById("selChorusMode").value = "CLASSIC";
-    document.getElementById("knobChorusRate").value = 0.2;
-    document.getElementById("knobChorusDepth").value = 15;
-    document.getElementById("knobChorusMix").value = 10;
-  } else if (idx === 8) { // After Hours Deep (Super Chill Deep House)
-    document.getElementById("selTimeSig").value = "4/4";
-    activeScaleKey = "DORIAN";
-    document.getElementById("knobBpm").value = 112; // laid-back, still a real house pulse
-    document.getElementById("knobWeather").value = 35;
-    document.getElementById("knobMutation").value = 20; // slow-evolving, not twitchy
-
-    // Four-on-the-floor, kept well behind "full/hard" -- present but relaxed
-    document.getElementById("selDrumStyle").value = "FOUR_ON_FLOOR";
-    document.getElementById("chkAutoEvolveDrums").checked = false;
-    document.getElementById("knobDrumEvolveChance").value = 10;
-    document.getElementById("knobDrumVol").value = 78;
-    document.getElementById("knobDrumPunch").value = 55;
-    document.getElementById("knobDrumDensity").value = 45;
-    document.getElementById("knobDrumFx").value = 35;
-
-    // Rhodes chords -- the quintessential deep house stab/pad instrument
-    document.getElementById("knobStrum").value = 40;
-    document.getElementById("selChordTimbre").value = "RHODES";
-    document.getElementById("knobChordFx").value = 70;
-
-    // Deep sub-bass drone, locked to the root rather than wandering --
-    // house bass sits still, it doesn't noodle
-    document.getElementById("selDroneOctave").value = "D1";
-    document.getElementById("knobDrone").value = 78;
-    document.getElementById("knobDroneFilter").value = 140;
-    document.getElementById("knobDroneDetune").value = 2;
-    document.getElementById("knobDroneWander").value = 10;
-    document.getElementById("knobDroneFx").value = 30;
-
-    // Organic pluck arp, locked to a hypnotic up/down pattern rather
-    // than evolving mid-groove
-    document.getElementById("selArpPattern").value = "PENDULUM";
-    document.getElementById("chkAutoEvolveArpPattern").checked = false;
-    document.getElementById("selArpTimbre").value = "WATER_DROPLET";
-    document.getElementById("chkAutoEvolveArpTimbre").checked = false;
-    document.getElementById("knobArpEvolveChance").value = 10;
-    document.getElementById("knobArpGate").value = 180;
-    document.getElementById("knobArpRest").value = 20;
-    document.getElementById("knobArpOctaves").value = 2;
-    document.getElementById("knobArpVol").value = 75;
-    document.getElementById("knobArpFx").value = 55;
-
-    // Gentle filter breathing, not a dramatic sweep -- tasteful movement,
-    // a little squelch, nothing acid
-    document.getElementById("knobMasterCutoff").value = 68;
-    document.getElementById("knobMasterRes").value = 3.2;
-    document.getElementById("knobFilterAttack").value = 80;
-    document.getElementById("knobFilterDecay").value = 900;
-    document.getElementById("knobFilterEnvDepth").value = 35;
-    document.getElementById("knobFilterLfoRate").value = 0.1;
-    document.getElementById("knobFilterLfoDepth").value = 20;
-
-    // Tempo-synced dotted-eighth dub delay -- classic deep house skip,
-    // always lands in time with the 4/4 pulse regardless of tempo tweaks
-    document.getElementById("chkDelayTempoSync").checked = true;
-    document.getElementById("selDelayNoteDivision").value = "0.75";
-    document.getElementById("knobDelayFeedback").value = 35;
-    document.getElementById("knobDelayTone").value = 2200;
-    document.getElementById("knobDelayFlutter").value = 15;
-    document.getElementById("knobDelayMix").value = 28;
-
-    // Tight plate reverb (keeps the groove from getting washy) plus a
-    // touch of classic chorus for that Rhodes-through-a-chorus-pedal width
-    document.getElementById("selReverbMode").value = "PLATE";
-    document.getElementById("knobReverbMix").value = 22;
-    document.getElementById("knobReverbTone").value = 6000;
-    document.getElementById("selChorusMode").value = "CLASSIC";
-    document.getElementById("knobChorusRate").value = 0.3;
-    document.getElementById("knobChorusDepth").value = 35;
-    document.getElementById("knobChorusMix").value = 20;
-  } else if (idx === 9) { // Airports (Generative Tape Loops & Glass Diffusion)
-    document.getElementById("selTimeSig").value = "4/4";
-    activeScaleKey = "LYDIAN";
-    document.getElementById("knobBpm").value = 58;
-    document.getElementById("knobWeather").value = 15;
-    document.getElementById("knobMutation").value = 12;
-
-    document.getElementById("selDrumStyle").value = "MUTED";
-    document.getElementById("chkAutoEvolveDrums").checked = false;
-    document.getElementById("knobDrumVol").value = 0;
-
-    document.getElementById("knobStrum").value = 85;
-    // PURE_SINE_GLASS provides the treated, glassy tape-piano
-    // timbre for this generative ambient preset.
-    document.getElementById("selChordTimbre").value = "PURE_SINE_GLASS";
-    document.getElementById("knobChordFx").value = 88;
-
-    // "C2" isn't a real selDroneOctave option (only D0/D1/D2 exist).
-    document.getElementById("selDroneOctave").value = "D2";
-    document.getElementById("knobDrone").value = 55;
-    document.getElementById("knobDroneFilter").value = 240;
-    document.getElementById("knobDroneDetune").value = 3;
-    document.getElementById("knobDroneWander").value = 20;
-    document.getElementById("knobDroneFx").value = 40;
-
-    // WANDER / GLASS_BELL aren't real options either -- PENDULUM (slow
-    // up/down) with a high rest% approximates the random drifting piano
-    // notes, and SINE_CRYSTAL is the closest glassy-bell timbre available.
-    document.getElementById("selArpPattern").value = "PENDULUM";
-    document.getElementById("selArpTimbre").value = "SINE_CRYSTAL";
-    document.getElementById("knobArpGate").value = 260;
-    document.getElementById("knobArpRest").value = 50;
-    document.getElementById("knobArpOctaves").value = 2;
-    document.getElementById("knobArpVol").value = 60;
-    document.getElementById("knobArpFx").value = 75;
-
-    document.getElementById("knobMasterCutoff").value = 85;
-    document.getElementById("knobMasterRes").value = 1.5;
-    document.getElementById("knobFilterAttack").value = 140;
-    document.getElementById("knobFilterDecay").value = 1600;
-    document.getElementById("knobFilterEnvDepth").value = 25;
-    document.getElementById("knobFilterLfoRate").value = 0.05;
-    document.getElementById("knobFilterLfoDepth").value = 15;
-
-    document.getElementById("chkDelayTempoSync").checked = false;
-    document.getElementById("knobDelayTime").value = 720;
-    document.getElementById("knobDelayFeedback").value = 48;
-    document.getElementById("knobDelayTone").value = 1800;
-    document.getElementById("knobDelayFlutter").value = 40;
-    document.getElementById("knobDelayMix").value = 45;
-
-    // SHIMMER / DIMENSION aren't real selReverbMode / selChorusMode
-    // options -- CATHEDRAL gives the same vast, washed-out space, and
-    // ENSEMBLE the same lush, wide chorus.
-    document.getElementById("selReverbMode").value = "CATHEDRAL";
-    document.getElementById("knobReverbMix").value = 50;
-    document.getElementById("knobReverbTone").value = 5000;
-    document.getElementById("selChorusMode").value = "ENSEMBLE";
-    document.getElementById("knobChorusRate").value = 0.12;
-    document.getElementById("knobChorusDepth").value = 40;
-    document.getElementById("knobChorusMix").value = 28;
-  } else if (idx === 10) { // Douglas Firs (Noir Vibraphone Ballad & Rain Mist)
-    document.getElementById("selTimeSig").value = "4/4";
-    activeScaleKey = "AEOLIAN";
-    document.getElementById("knobBpm").value = 56;
-    document.getElementById("knobWeather").value = 70;
-    document.getElementById("knobMutation").value = 15;
-
-    // A slow sub kick + rim felt more than heard -- the uneasy pulse under
-    // the score, not a groove. No auto-evolve: this one holds still.
-    document.getElementById("selDrumStyle").value = "HEARTBEAT";
-    document.getElementById("chkAutoEvolveDrums").checked = false;
-    document.getElementById("knobDrumEvolveChance").value = 10;
-    document.getElementById("knobDrumVol").value = 35;
-    document.getElementById("knobDrumPunch").value = 50;
-    document.getElementById("knobDrumDensity").value = 25;
-
-    document.getElementById("knobStrum").value = 90;
-    document.getElementById("knobDrone").value = 78;
-    document.getElementById("selDroneOctave").value = "D1";
-    document.getElementById("knobDroneFilter").value = 130;
-    document.getElementById("knobDroneDetune").value = 4.5;
-    document.getElementById("knobDroneWander").value = 35;
-    document.getElementById("knobDroneFx").value = 32;
-    document.getElementById("knobDrumFx").value = 25;
-
-    // Vibraphone & celesta acoustic chime -- long sustain, soft
-    // touch, heavily sent to the drenched delay/reverb below.
-    document.getElementById("selChordTimbre").value = "VIBES_CELESTE";
-    document.getElementById("knobChordDynamics").value = 75;
-    document.getElementById("knobChordSustain").value = 160;
-    document.getElementById("knobChordVol").value = 86;
-    document.getElementById("knobChordFx").value = 82;
-
-    // A slow rocking bell chime motif,
-    // held static and spaced out rather than evolving or busy.
-    document.getElementById("selArpPattern").value = "PENDULUM";
-    document.getElementById("chkAutoEvolveArpPattern").checked = false;
-    document.getElementById("selArpTimbre").value = "GLASS_FM";
-    document.getElementById("chkAutoEvolveArpTimbre").checked = false;
-    document.getElementById("knobArpEvolveChance").value = 10;
-    document.getElementById("knobArpGate").value = 520;
-    document.getElementById("knobArpRest").value = 45;
-    document.getElementById("knobArpOctaves").value = 2;
-    document.getElementById("knobArpVol").value = 65;
-    document.getElementById("knobArpFx").value = 75;
-
-    // Pacific Northwest rainy forest mist & vintage tape dust
-    if (document.getElementById("selNoiseProfile")) document.getElementById("selNoiseProfile").value = "RAIN";
-    if (document.getElementById("selNoiseMode")) document.getElementById("selNoiseMode").value = "GUSTS";
-    if (document.getElementById("knobNoiseColor")) document.getElementById("knobNoiseColor").value = 42;
-    if (document.getElementById("knobNoiseRate")) document.getElementById("knobNoiseRate").value = 32;
-    if (document.getElementById("knobNoiseDrift")) document.getElementById("knobNoiseDrift").value = 65;
-    if (document.getElementById("knobNoiseVol")) document.getElementById("knobNoiseVol").value = 28;
-    if (document.getElementById("knobNoiseFx")) document.getElementById("knobNoiseFx").value = 65;
-
-    document.getElementById("knobMasterCutoff").value = 54;
-    document.getElementById("knobMasterRes").value = 2.0;
-    document.getElementById("knobFilterAttack").value = 180;
-    document.getElementById("knobFilterDecay").value = 2000;
-    document.getElementById("knobFilterEnvDepth").value = 28;
-    document.getElementById("knobFilterLfoRate").value = 0.06;
-    document.getElementById("knobFilterLfoDepth").value = 18;
-
-    document.getElementById("chkDelayTempoSync").checked = false;
-    document.getElementById("knobDelayTime").value = 580;
-    document.getElementById("knobDelayFeedback").value = 42;
-    document.getElementById("knobDelayTone").value = 2200;
-    document.getElementById("knobDelayFlutter").value = 32;
-    document.getElementById("knobDelayMix").value = 44;
-
-    document.getElementById("selReverbMode").value = "CATHEDRAL";
-    document.getElementById("knobReverbMix").value = 54;
-    document.getElementById("knobReverbTone").value = 4600;
-    document.getElementById("selChorusMode").value = "ENSEMBLE";
-    document.getElementById("knobChorusRate").value = 0.28;
-    document.getElementById("knobChorusDepth").value = 45;
-    document.getElementById("knobChorusMix").value = 32;
-
-    if (document.getElementById("knobEqLow")) document.getElementById("knobEqLow").value = 2.0;
-    if (document.getElementById("knobEqHigh")) document.getElementById("knobEqHigh").value = -1.5;
-    if (document.getElementById("knobMasterDrive")) document.getElementById("knobMasterDrive").value = 22;
-  } else if (idx === 11) { // Twinning (Braindance Micro-Poly & IDM Breakbeat Pocket, DELAY -> FILTER -> SPACE at 48% feedback)
-    rewireDspChain(['DELAY', 'FILTER', 'SPACE'], false);
-    document.getElementById("selTimeSig").value = "7/8";
-    activeScaleKey = "HIRAJOSHI";
-    document.getElementById("knobBpm").value = 104;
-    document.getElementById("knobWeather").value = 62;
-    document.getElementById("knobMutation").value = 48;
-
-    document.getElementById("selDrumStyle").value = "BREAKBEAT_POCKET";
-    if (document.getElementById("selDrumKit")) document.getElementById("selDrumKit").value = "ANALOG_CRUNCH";
-    document.getElementById("chkAutoEvolveDrums").checked = true;
-    document.getElementById("knobDrumEvolveChance").value = 38;
-    document.getElementById("knobDrumVol").value = 84;
-    document.getElementById("knobDrumPunch").value = 78;
-    document.getElementById("knobDrumDensity").value = 82;
-    document.getElementById("knobDrumFx").value = 52;
-
-    document.getElementById("knobStrum").value = 35;
-    document.getElementById("selChordTimbre").value = "PURE_SINE_GLASS";
-    document.getElementById("knobChordDynamics").value = 78;
-    document.getElementById("knobChordSustain").value = 145;
-    document.getElementById("knobChordVol").value = 80;
-    document.getElementById("knobChordFx").value = 92;
-
-    document.getElementById("selDroneOctave").value = "D1";
-    document.getElementById("knobDrone").value = 68;
-    document.getElementById("knobDroneFilter").value = 175;
-    document.getElementById("knobDroneDetune").value = 5.5;
-    document.getElementById("knobDroneWander").value = 35;
-    document.getElementById("knobDroneFx").value = 45;
-
-    document.getElementById("selArpPattern").value = "SHIMMER";
-    document.getElementById("chkAutoEvolveArpPattern").checked = true;
-    document.getElementById("selArpTimbre").value = "GLASS_FM";
-    document.getElementById("chkAutoEvolveArpTimbre").checked = false;
-    document.getElementById("knobArpEvolveChance").value = 32;
-    document.getElementById("knobArpGate").value = 190;
-    document.getElementById("knobArpRest").value = 18;
-    document.getElementById("knobArpOctaves").value = 2;
-    document.getElementById("knobArpVol").value = 76;
-    document.getElementById("knobArpFx").value = 90;
-
-    if (document.getElementById("selNoiseProfile")) document.getElementById("selNoiseProfile").value = "WHITE_TAPE";
-    if (document.getElementById("selNoiseMode")) document.getElementById("selNoiseMode").value = "RHYTHMIC";
-    if (document.getElementById("knobNoiseColor")) document.getElementById("knobNoiseColor").value = 64;
-    if (document.getElementById("knobNoiseRate")) document.getElementById("knobNoiseRate").value = 68;
-    if (document.getElementById("knobNoiseDrift")) document.getElementById("knobNoiseDrift").value = 55;
-    if (document.getElementById("knobNoiseVol")) document.getElementById("knobNoiseVol").value = 28;
-    if (document.getElementById("knobNoiseFx")) document.getElementById("knobNoiseFx").value = 75;
-
-    // Delay feeds into resonant filter at 48% feedback ceiling
-    document.getElementById("chkDelayTempoSync").checked = true;
-    document.getElementById("selDelayNoteDivision").value = "0.75";
-    document.getElementById("knobDelayFeedback").value = 48;
-    document.getElementById("knobDelayTone").value = 2800;
-    document.getElementById("knobDelayFlutter").value = 38;
-    document.getElementById("knobDelayMix").value = 46;
-
-    document.getElementById("knobMasterCutoff").value = 54;
-    document.getElementById("knobMasterRes").value = 3.8;
-    document.getElementById("knobFilterAttack").value = 35;
-    document.getElementById("knobFilterDecay").value = 520;
-    document.getElementById("knobFilterEnvDepth").value = 55;
-    document.getElementById("knobFilterLfoRate").value = 0.22;
-    document.getElementById("knobFilterLfoDepth").value = 32;
-
-    document.getElementById("selReverbMode").value = "CATHEDRAL";
-    document.getElementById("knobReverbMix").value = 48;
-    document.getElementById("knobReverbTone").value = 4600;
-    document.getElementById("selChorusMode").value = "VIBRATO";
-    document.getElementById("knobChorusRate").value = 0.42;
-    document.getElementById("knobChorusDepth").value = 36;
-    document.getElementById("knobChorusMix").value = 26;
-    if (document.getElementById("knobMasterDrive")) document.getElementById("knobMasterDrive").value = 22;
-  } else if (idx === 12) { // Tangerine (Berlin School Analog Sequencer, FILTER -> DELAY -> SPACE)
-    rewireDspChain(['FILTER', 'DELAY', 'SPACE'], false);
-    document.getElementById("selTimeSig").value = "4/4";
-    activeScaleKey = "PHRYGIAN";
-    document.getElementById("knobBpm").value = 96;
-    document.getElementById("knobWeather").value = 68;
-    document.getElementById("knobMutation").value = 32;
-
-    document.getElementById("selDrumStyle").value = "HEARTBEAT";
-    if (document.getElementById("selDrumKit")) document.getElementById("selDrumKit").value = "ANALOG_CRUNCH";
-    document.getElementById("chkAutoEvolveDrums").checked = false;
-    document.getElementById("knobDrumVol").value = 58;
-    document.getElementById("knobDrumPunch").value = 65;
-    document.getElementById("knobDrumDensity").value = 40;
-    document.getElementById("knobDrumFx").value = 45;
-
-    document.getElementById("knobStrum").value = 25;
-    document.getElementById("selChordTimbre").value = "DIGITAL_STRINGS";
-    document.getElementById("knobChordDynamics").value = 88;
-    document.getElementById("knobChordSustain").value = 155;
-    document.getElementById("knobChordVol").value = 84;
-    document.getElementById("knobChordFx").value = 90;
-
-    document.getElementById("selDroneOctave").value = "D1";
-    document.getElementById("knobDrone").value = 82;
-    document.getElementById("knobDroneFilter").value = 220;
-    document.getElementById("knobDroneDetune").value = 4.2;
-    document.getElementById("knobDroneWander").value = 15;
-    document.getElementById("knobDroneFx").value = 50;
-
-    // Hypnotic Berlin School sequenced arpeggiator
-    document.getElementById("selArpPattern").value = "UP";
-    document.getElementById("chkAutoEvolveArpPattern").checked = false;
-    document.getElementById("selArpTimbre").value = "ANALOG_PULSE";
-    document.getElementById("chkAutoEvolveArpTimbre").checked = false;
-    document.getElementById("knobArpGate").value = 165;
-    document.getElementById("knobArpRest").value = 5;
-    document.getElementById("knobArpOctaves").value = 2;
-    document.getElementById("knobArpVol").value = 88;
-    document.getElementById("knobArpFx").value = 92;
-
-    if (document.getElementById("selNoiseProfile")) document.getElementById("selNoiseProfile").value = "WIND";
-    if (document.getElementById("selNoiseMode")) document.getElementById("selNoiseMode").value = "GUSTS";
-    if (document.getElementById("knobNoiseColor")) document.getElementById("knobNoiseColor").value = 48;
-    if (document.getElementById("knobNoiseRate")) document.getElementById("knobNoiseRate").value = 35;
-    if (document.getElementById("knobNoiseDrift")) document.getElementById("knobNoiseDrift").value = 68;
-    if (document.getElementById("knobNoiseVol")) document.getElementById("knobNoiseVol").value = 32;
-    if (document.getElementById("knobNoiseFx")) document.getElementById("knobNoiseFx").value = 85;
-
-    // Sweeping resonant analog filter feeding dotted-eighth delay & cathedral space
-    document.getElementById("knobMasterCutoff").value = 56;
-    document.getElementById("knobMasterRes").value = 4.5;
-    document.getElementById("knobFilterAttack").value = 40;
-    document.getElementById("knobFilterDecay").value = 780;
-    document.getElementById("knobFilterEnvDepth").value = 68;
-    document.getElementById("knobFilterLfoRate").value = 0.14;
-    document.getElementById("knobFilterLfoDepth").value = 38;
-
-    document.getElementById("chkDelayTempoSync").checked = true;
-    document.getElementById("selDelayNoteDivision").value = "0.75";
-    document.getElementById("knobDelayFeedback").value = 46;
-    document.getElementById("knobDelayTone").value = 2400;
-    document.getElementById("knobDelayFlutter").value = 24;
-    document.getElementById("knobDelayMix").value = 48;
-
-    document.getElementById("selReverbMode").value = "CATHEDRAL";
-    document.getElementById("knobReverbMix").value = 58;
-    document.getElementById("knobReverbTone").value = 5200;
-    document.getElementById("selChorusMode").value = "ENSEMBLE";
-    document.getElementById("knobChorusRate").value = 0.28;
-    document.getElementById("knobChorusDepth").value = 48;
-    document.getElementById("knobChorusMix").value = 34;
-    if (document.getElementById("knobMasterDrive")) document.getElementById("knobMasterDrive").value = 24;
-  } else if (idx === 13) { // Disintegration (Degraded Tape Loops & Muffled Repeats, SPACE -> DELAY -> FILTER)
-    rewireDspChain(['SPACE', 'DELAY', 'FILTER'], false);
-    document.getElementById("selTimeSig").value = "3/4";
-    activeScaleKey = "LYDIAN";
-    document.getElementById("knobBpm").value = 52;
-    document.getElementById("knobWeather").value = 78;
-    document.getElementById("knobMutation").value = 10;
-
-    document.getElementById("selDrumStyle").value = "MUTED";
-    document.getElementById("chkAutoEvolveDrums").checked = false;
-    document.getElementById("knobDrumVol").value = 0;
-
-    document.getElementById("knobStrum").value = 115;
-    document.getElementById("selChordTimbre").value = "CHAMBER_WOODS";
-    document.getElementById("knobChordDynamics").value = 68;
-    document.getElementById("knobChordSustain").value = 185;
-    document.getElementById("knobChordVol").value = 86;
-    document.getElementById("knobChordFx").value = 95;
-
-    document.getElementById("selDroneOctave").value = "D1";
-    document.getElementById("knobDrone").value = 76;
-    document.getElementById("knobDroneFilter").value = 125;
-    document.getElementById("knobDroneDetune").value = 6.5;
-    document.getElementById("knobDroneWander").value = 32;
-    document.getElementById("knobDroneFx").value = 80;
-
-    document.getElementById("selArpPattern").value = "PENDULUM";
-    document.getElementById("chkAutoEvolveArpPattern").checked = false;
-    document.getElementById("selArpTimbre").value = "SINE_CRYSTAL";
-    document.getElementById("chkAutoEvolveArpTimbre").checked = false;
-    document.getElementById("knobArpGate").value = 480;
-    document.getElementById("knobArpRest").value = 55;
-    document.getElementById("knobArpOctaves").value = 1;
-    document.getElementById("knobArpVol").value = 52;
-    document.getElementById("knobArpFx").value = 92;
-
-    // Oxidized magnetic tape hiss & crackle
-    if (document.getElementById("selNoiseProfile")) document.getElementById("selNoiseProfile").value = "WHITE_TAPE";
-    if (document.getElementById("selNoiseMode")) document.getElementById("selNoiseMode").value = "CONTINUOUS";
-    if (document.getElementById("knobNoiseColor")) document.getElementById("knobNoiseColor").value = 28;
-    if (document.getElementById("knobNoiseRate")) document.getElementById("knobNoiseRate").value = 45;
-    if (document.getElementById("knobNoiseDrift")) document.getElementById("knobNoiseDrift").value = 75;
-    if (document.getElementById("knobNoiseVol")) document.getElementById("knobNoiseVol").value = 38;
-    if (document.getElementById("knobNoiseFx")) document.getElementById("knobNoiseFx").value = 88;
-
-    // Reverb & worn tape delay feed INTO a dark low-pass filter to muffle repeat tails
-    document.getElementById("selReverbMode").value = "CATHEDRAL";
-    document.getElementById("knobReverbMix").value = 62;
-    document.getElementById("knobReverbTone").value = 2600;
-    document.getElementById("selChorusMode").value = "VIBRATO";
-    document.getElementById("knobChorusRate").value = 0.18;
-    document.getElementById("knobChorusDepth").value = 52;
-    document.getElementById("knobChorusMix").value = 36;
-
-    document.getElementById("chkDelayTempoSync").checked = false;
-    document.getElementById("knobDelayTime").value = 680;
-    document.getElementById("knobDelayFeedback").value = 48;
-    document.getElementById("knobDelayTone").value = 1150;
-    document.getElementById("knobDelayFlutter").value = 65;
-    document.getElementById("knobDelayMix").value = 52;
-
-    document.getElementById("knobMasterCutoff").value = 38; // ~620 Hz dark muffled tape ceiling
-    document.getElementById("knobMasterRes").value = 1.8;
-    document.getElementById("knobFilterAttack").value = 240;
-    document.getElementById("knobFilterDecay").value = 2200;
-    document.getElementById("knobFilterEnvDepth").value = 18;
-    document.getElementById("knobFilterLfoRate").value = 0.04;
-    document.getElementById("knobFilterLfoDepth").value = 22;
-
-    if (document.getElementById("knobEqLow")) document.getElementById("knobEqLow").value = 3.0;
-    if (document.getElementById("knobEqHigh")) document.getElementById("knobEqHigh").value = -4.5;
-    if (document.getElementById("knobMasterDrive")) document.getElementById("knobMasterDrive").value = 42;
-  } else if (idx === 14) { // Lo-Fi Chillhop (Boom-Bap Swing, Rhodes Chords, Rain/Vinyl Texture, FILTER -> DELAY -> SPACE)
-    rewireDspChain(['FILTER', 'DELAY', 'SPACE'], false);
-    document.getElementById("selTimeSig").value = "4/4";
-    activeScaleKey = "DORIAN";
-    document.getElementById("knobBpm").value = 76;
-    document.getElementById("knobWeather").value = 42;
-    document.getElementById("knobMutation").value = 28;
-
-    document.getElementById("selDrumStyle").value = "BREAKBEAT_POCKET";
-    if (document.getElementById("selDrumKit")) document.getElementById("selDrumKit").value = "TAPE_DUST";
-    document.getElementById("chkAutoEvolveDrums").checked = true;
-    document.getElementById("knobDrumEvolveChance").value = 22;
-    document.getElementById("knobDrumVol").value = 82;
-    document.getElementById("knobDrumPunch").value = 68;
-    document.getElementById("knobDrumDensity").value = 55;
-    document.getElementById("knobDrumFx").value = 32;
-
-    document.getElementById("knobStrum").value = 65;
-    document.getElementById("selChordTimbre").value = "RHODES";
-    document.getElementById("knobChordDynamics").value = 76;
-    document.getElementById("knobChordSustain").value = 115;
-    document.getElementById("knobChordVol").value = 85;
-    document.getElementById("knobChordFx").value = 74;
-
-    document.getElementById("selDroneOctave").value = "D1";
-    document.getElementById("knobDrone").value = 72;
-    document.getElementById("knobDroneFilter").value = 135;
-    document.getElementById("knobDroneDetune").value = 2.5;
-    document.getElementById("knobDroneWander").value = 12;
-    document.getElementById("knobDroneFx").value = 25;
-
-    document.getElementById("selArpPattern").value = "PENDULUM";
-    document.getElementById("chkAutoEvolveArpPattern").checked = false;
-    document.getElementById("selArpTimbre").value = "KALIMBA";
-    document.getElementById("chkAutoEvolveArpTimbre").checked = false;
-    document.getElementById("knobArpGate").value = 220;
-    document.getElementById("knobArpRest").value = 30;
-    document.getElementById("knobArpOctaves").value = 2;
-    document.getElementById("knobArpVol").value = 68;
-    document.getElementById("knobArpFx").value = 65;
-
-    // Cozy window rain + vinyl warmth
-    if (document.getElementById("selNoiseProfile")) document.getElementById("selNoiseProfile").value = "RAIN";
-    if (document.getElementById("selNoiseMode")) document.getElementById("selNoiseMode").value = "GUSTS";
-    if (document.getElementById("knobNoiseColor")) document.getElementById("knobNoiseColor").value = 38;
-    if (document.getElementById("knobNoiseRate")) document.getElementById("knobNoiseRate").value = 42;
-    if (document.getElementById("knobNoiseDrift")) document.getElementById("knobNoiseDrift").value = 50;
-    if (document.getElementById("knobNoiseVol")) document.getElementById("knobNoiseVol").value = 34;
-    if (document.getElementById("knobNoiseFx")) document.getElementById("knobNoiseFx").value = 55;
-
-    // Filter -> Delay -> Space for warm muffled tape saturation
-    document.getElementById("knobMasterCutoff").value = 56;
-    document.getElementById("knobMasterRes").value = 1.6;
-    document.getElementById("knobFilterAttack").value = 55;
-    document.getElementById("knobFilterDecay").value = 720;
-    document.getElementById("knobFilterEnvDepth").value = 28;
-    document.getElementById("knobFilterLfoRate").value = 0.08;
-    document.getElementById("knobFilterLfoDepth").value = 16;
-
-    document.getElementById("chkDelayTempoSync").checked = true;
-    document.getElementById("selDelayNoteDivision").value = "1";
-    document.getElementById("knobDelayFeedback").value = 36;
-    document.getElementById("knobDelayTone").value = 1650;
-    document.getElementById("knobDelayFlutter").value = 34;
-    document.getElementById("knobDelayMix").value = 32;
-
-    document.getElementById("selReverbMode").value = "PLATE";
-    document.getElementById("knobReverbMix").value = 26;
-    document.getElementById("knobReverbTone").value = 4200;
-    document.getElementById("selChorusMode").value = "CLASSIC";
-    document.getElementById("knobChorusRate").value = 0.26;
-    document.getElementById("knobChorusDepth").value = 32;
-    document.getElementById("knobChorusMix").value = 28;
-
-    if (document.getElementById("knobEqLow")) document.getElementById("knobEqLow").value = 2.0;
-    if (document.getElementById("knobEqHigh")) document.getElementById("knobEqHigh").value = -2.0;
-    if (document.getElementById("knobMasterDrive")) document.getElementById("knobMasterDrive").value = 28;
+  const p = typeof PRESET_SOUND_DESIGN_MATRIX !== "undefined" ? PRESET_SOUND_DESIGN_MATRIX[idx] : null;
+  if (p) {
+    // 1. Musical Scale & Authentic Signature Voicing Lock
+    activeScaleKey = p.scale;
+    if (document.getElementById("topScaleMode")) document.getElementById("topScaleMode").value = p.scale;
+    if (document.getElementById("selScaleMode")) document.getElementById("selScaleMode").value = p.scale;
+    if (p.signatureVoicing) currentChordVoicing = p.signatureVoicing;
+
+    // 2. Rhythmic DNA: Meter & BPM
+    if (document.getElementById("selTimeSig")) {
+      const selTs = document.getElementById("selTimeSig");
+      if ([...selTs.options].some(o => o.value === p.timeSig)) {
+        selTs.value = p.timeSig;
+      } else if (p.timeSig === "6/8" && [...selTs.options].some(o => o.value === "3/4")) {
+        selTs.value = "3/4";
+      }
+      currentTimeSig = selTs.value;
+      if (typeof updateTimeSignature === "function") updateTimeSignature();
+    }
+    if (document.getElementById("knobBpmHeader")) {
+      document.getElementById("knobBpmHeader").value = p.bpm;
+    }
+    if (document.getElementById("knobBpm")) {
+      document.getElementById("knobBpm").value = p.bpm;
+    }
+    bpm = p.bpm;
+    if (typeof updateBpm === "function") updateBpm({ value: p.bpm });
+
+    // 3. Tanpura Foundation
+    const chkTanpura = document.getElementById("chkTanpuraEnabled");
+    if (chkTanpura) {
+      chkTanpura.checked = !!p.tanpura;
+      if (p.tanpuraParams) {
+        if (document.getElementById("knobTanpura")) document.getElementById("knobTanpura").value = p.tanpuraParams.volume;
+        if (document.getElementById("knobJavari")) document.getElementById("knobJavari").value = p.tanpuraParams.javari;
+      }
+    }
+
+    // 4. Instrument Timbres, Mutes & Balance
+    if (p.synth) {
+      if (document.getElementById("selSynthPreset")) document.getElementById("selSynthPreset").value = p.synth.preset;
+      const chordTimbreMap = {
+        WARM_ANALOG: "WARM_PAD",
+        PURE_GLASS: "PURE_SINE_GLASS",
+        CELESTIAL_FLUTE: "CELESTIAL_ORGAN"
+      };
+      const mappedTimbre = chordTimbreMap[p.synth.preset] || p.synth.preset;
+      const selChord = document.getElementById("selChordTimbre");
+      if (selChord) {
+        if ([...selChord.options].some(o => o.value === mappedTimbre)) {
+          selChord.value = mappedTimbre;
+        } else if ([...selChord.options].some(o => o.value === p.synth.preset)) {
+          selChord.value = p.synth.preset;
+        }
+      }
+      if (document.getElementById("knobChordVol") && p.synth.vol !== undefined) document.getElementById("knobChordVol").value = p.synth.vol;
+      if (document.getElementById("knobChordSustain") && p.synth.sustain !== undefined) document.getElementById("knobChordSustain").value = p.synth.sustain;
+      if (document.getElementById("knobChordDynamics") && p.synth.dynamics !== undefined) document.getElementById("knobChordDynamics").value = p.synth.dynamics;
+      if (document.getElementById("knobStrum") && p.synth.strum !== undefined) document.getElementById("knobStrum").value = p.synth.strum;
+      if (document.getElementById("knobChordFx") && p.synth.fxSend !== undefined) document.getElementById("knobChordFx").value = p.synth.fxSend;
+    }
+
+    if (p.arp) {
+      if (document.getElementById("selArpTimbre")) document.getElementById("selArpTimbre").value = p.arp.timbre;
+      if (document.getElementById("selArpPattern")) document.getElementById("selArpPattern").value = p.arp.pattern;
+      if (document.getElementById("knobArpGate") && p.arp.gate !== undefined) document.getElementById("knobArpGate").value = p.arp.gate;
+      if (document.getElementById("knobArpRest") && p.arp.rest !== undefined) document.getElementById("knobArpRest").value = p.arp.rest;
+      if (document.getElementById("knobArpVol") && p.arp.vol !== undefined) document.getElementById("knobArpVol").value = p.arp.vol;
+      if (document.getElementById("knobArpFx") && p.arp.fxSend !== undefined) document.getElementById("knobArpFx").value = p.arp.fxSend;
+    }
+
+    if (p.drums) {
+      if (document.getElementById("selDrumKit")) {
+        const selDk = document.getElementById("selDrumKit");
+        if ([...selDk.options].some(o => o.value === p.drums.kit)) {
+          selDk.value = p.drums.kit;
+        }
+      }
+      if (document.getElementById("selDrumGroove")) document.getElementById("selDrumGroove").value = p.drums.groove;
+      const drumGrooveMap = {
+        TAPE_DUB: "DUB_TAPE",
+        FOUR_TET_GLITCH: "ORGANIC",
+        TABLA_RUPAK: "TABLA_GROOVE"
+      };
+      const mappedGroove = drumGrooveMap[p.drums.groove] || p.drums.groove;
+      const selDrumStyle = document.getElementById("selDrumStyle");
+      if (selDrumStyle) {
+        if ([...selDrumStyle.options].some(o => o.value === mappedGroove)) {
+          selDrumStyle.value = mappedGroove;
+        } else if ([...selDrumStyle.options].some(o => o.value === p.drums.groove)) {
+          selDrumStyle.value = p.drums.groove;
+        }
+      }
+      if (document.getElementById("knobDrumVol") && p.drums.vol !== undefined) document.getElementById("knobDrumVol").value = p.drums.vol;
+      if (document.getElementById("knobDrumPunch") && p.drums.punch !== undefined) document.getElementById("knobDrumPunch").value = p.drums.punch;
+      if (document.getElementById("knobDrumDensity") && p.drums.density !== undefined) document.getElementById("knobDrumDensity").value = p.drums.density;
+      if (document.getElementById("knobDrumFx") && p.drums.fxSend !== undefined) document.getElementById("knobDrumFx").value = p.drums.fxSend;
+
+      if (typeof channelPower !== "undefined" && typeof channelPower.drum !== "undefined") {
+        channelPower.drum = p.drums.enabled;
+      }
+      const btnPwr = document.getElementById("btnPower_drum");
+      if (btnPwr) btnPwr.classList.toggle("off", !p.drums.enabled);
+    }
+
+    if (p.noise) {
+      if (document.getElementById("selNoiseProfile")) document.getElementById("selNoiseProfile").value = p.noise.profile;
+      if (document.getElementById("selNoiseMode")) document.getElementById("selNoiseMode").value = p.noise.mode;
+      if (document.getElementById("knobNoiseVol") && p.noise.vol !== undefined) document.getElementById("knobNoiseVol").value = p.noise.vol;
+      if (document.getElementById("knobNoiseColor") && p.noise.color !== undefined) document.getElementById("knobNoiseColor").value = p.noise.color;
+      if (document.getElementById("knobNoiseDrift") && p.noise.drift !== undefined) document.getElementById("knobNoiseDrift").value = p.noise.drift;
+      if (document.getElementById("knobNoiseFx") && p.noise.fxSend !== undefined) document.getElementById("knobNoiseFx").value = p.noise.fxSend;
+    }
+
+    // 5. Automated 10-Pedal DSP Chain Wiring
+    const fxMgr = window.slambientFxRackManager || window.fxRackManager;
+    if (fxMgr && p.fxChain) {
+      fxMgr.loadChainPreset(p.fxChain);
+    } else {
+      applyPresetFxConfig(idx);
+    }
   }
 
   const scale = SCALES[activeScaleKey] || SCALES.DORIAN;
-  currentChordVoicing = pickNextVoicingIdx(-1, activeScaleKey);
+  if (!p || !p.signatureVoicing) {
+    currentChordVoicing = pickNextVoicingIdx(-1, activeScaleKey);
+  } else {
+    currentChordVoicing = p.signatureVoicing;
+  }
   currentChordRootStep = CHORD_STEP_POOL[currentChordStepIdx];
   currentChordDeg = degreeToSemitone(currentChordRootStep, scale);
 

@@ -129,7 +129,7 @@ function getActiveVoicingObject(voicingId, scaleKey) {
     if (found) return found;
 
     // Specific aliases from preset matrix
-    if (targetNorm === "DORIANSO_WHAT" || targetNorm === "DORIAN_SO_WHAT" || targetNorm === "SOWHAT") {
+    if (targetNorm === "DORIANSOWHAT" || targetNorm === "DORIANSO_WHAT" || targetNorm === "DORIAN_SO_WHAT" || targetNorm === "SOWHAT" || targetNorm === "SOWHATMODAL") {
       const d = SCALE_SIGNATURE_VOICINGS.DORIAN;
       if (d && d[0]) return d[0];
     }
