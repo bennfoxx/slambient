@@ -4674,6 +4674,9 @@ function focusOrInspectPedal(key, ev) {
       return;
     }
   }
+  if (currentLowerDeckMode === "instruments") {
+    setLowerDeckMode("fx");
+  }
   const el = document.getElementById("pedalCard_" + key);
   if (el) {
     el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });

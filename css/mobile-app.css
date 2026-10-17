@@ -172,9 +172,14 @@
   }
 
   /* Preset Selection Slider Bar: full width, never blocked on right side */
-  .preset-bar,
-  #presetBarFactory,
-  #presetBarUser {
+  #presetBarFactory[style*="display: none"],
+  #presetBarFactory[style*="display:none"],
+  #presetBarUser[style*="display: none"],
+  #presetBarUser[style*="display:none"] {
+    display: none !important;
+  }
+
+  #presetBarFactory:not([style*="display: none"]):not([style*="display:none"]) {
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
@@ -196,6 +201,21 @@
     box-sizing: border-box !important;
   }
 
+  #presetBarUser:not([style*="display: none"]):not([style*="display:none"]) {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 4px 2px !important;
+    display: grid !important;
+    grid-auto-flow: row !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(3, 28px) !important;
+    gap: 5px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
   .preset-bar::-webkit-scrollbar {
     display: none !important;
   }
@@ -205,7 +225,7 @@
     width: 100% !important;
     max-width: none !important;
     height: 28px !important;
-    padding: 0 10px !important;
+    padding: 0 8px !important;
     font-size: 11px !important;
     font-weight: 700 !important;
     white-space: nowrap !important;
@@ -568,32 +588,248 @@
   }
 
   /* ------------------------------------------------------------------------
-     8. ORDER 7: SYSTEM UTILITIES BAR
+     8. ORDER 7: SYSTEM UTILITIES BAR (Symmetrical Tactical Row)
      ------------------------------------------------------------------------ */
   .header-sec-utils {
     grid-column: 1 / -1 !important;
     order: 7 !important;
     width: 100% !important;
     height: auto !important;
-    min-height: auto !important;
+    min-height: 0 !important;
     max-height: none !important;
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    grid-template-rows: auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
     gap: 6px !important;
     padding: 6px !important;
+    box-sizing: border-box !important;
+  }
+
+  .header-sec-utils > .btn-header-util,
+  .header-sec-utils > .palette-wrap {
+    flex: 1 1 calc(25% - 6px) !important;
+    width: auto !important;
+    min-width: 66px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .header-sec-utils > .btn-header-util,
+  .header-sec-utils > .palette-wrap > .btn-header-util {
+    width: 100% !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    padding: 0 6px !important;
+    font-size: 10.5px !important;
+    font-weight: 800 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .header-sec-utils > #btnInstallApp[style*="none"] {
+    display: none !important;
+  }
+
+  .header-sec-utils > #btnInstallApp:not([style*="none"]) {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    height: 32px !important;
+    min-height: 32px !important;
   }
 
   /* ------------------------------------------------------------------------
-     9. STUDIO FX RACK VIEW: FULL MODULE NAMES & SCROLL CLEARANCE
+     9. WORKSPACE EDIT BAR & UPPER DECK ORDER / CLEAN CONTROLS
+     ------------------------------------------------------------------------ */
+  body:not(.workspace-edit-mode) #workspaceModuleDock,
+  body:not(.workspace-edit-mode) .workspace-module-dock,
+  body:not(.workspace-edit-mode) #workspacePresetBar,
+  body:not(.workspace-edit-mode) .workspace-preset-bar {
+    display: none !important;
+  }
+
+  body.workspace-edit-mode #workspaceModuleDock,
+  body.workspace-edit-mode .workspace-module-dock,
+  body.workspace-edit-mode .workspace-preset-bar {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    padding: 8px !important;
+    margin: 0 0 10px 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  body:not(.workspace-edit-mode) .upper-deck > #scopePanel {
+    order: 1 !important;
+  }
+  body:not(.workspace-edit-mode) .upper-deck > #chordInfoPanel {
+    order: 2 !important;
+  }
+  body:not(.workspace-edit-mode) .upper-deck > #keyboardPanel {
+    order: 3 !important;
+  }
+  body:not(.workspace-edit-mode) .upper-deck > #arcadePanel {
+    order: 4 !important;
+  }
+
+  /* Hide window-hide eye buttons when not in Layout Edit Mode so mobile scroll never accidentally hides a deck */
+  body:not(.workspace-edit-mode) .module-window-controls .btn-win-hide {
+    display: none !important;
+  }
+
+  /* Scope panel already has a dedicated fullscreen button in its bottom mode bar */
+  #scopePanel .module-window-controls .btn-win-focus {
+    display: none !important;
+  }
+
+  /* ------------------------------------------------------------------------
+     10. LOWER DECK HEADER, STUDIO FX RACK & SPLIT VIEW SYMMETRY
      ------------------------------------------------------------------------ */
   .studio-fx-pedalboard,
   .lower-deck {
     padding-bottom: 96px !important;
   }
 
-  .pedal-chassis .pedal-card-header {
+  .lower-deck-header {
     display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    padding: 8px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  .deck-mode-switcher {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 4px !important;
+    width: 100% !important;
+    padding: 3px !important;
+    box-sizing: border-box !important;
+  }
+
+  .deck-mode-switcher .btn-deck-mode {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 34px !important;
+    padding: 0 4px !important;
+    font-size: 9.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.2px !important;
+    white-space: nowrap !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    box-sizing: border-box !important;
+  }
+
+  .deck-mode-switcher .btn-deck-mode .mode-icon {
+    display: none !important;
+  }
+
+  .deck-mode-switcher .btn-deck-mode .mode-count {
+    font-size: 8.5px !important;
+    padding: 1px 4px !important;
+  }
+
+  .deck-header-telemetry {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .deck-routing-stream-compact {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 32px !important;
+    padding: 0 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
+  }
+
+  .deck-routing-stream-compact .stream-counter {
+    white-space: nowrap !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    flex: 1 1 auto !important;
+    text-align: center !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .deck-header-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 6px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .deck-header-actions .btn-deck-quick-action {
+    width: 100% !important;
+    height: 32px !important;
+    justify-content: center !important;
+    font-size: 10.5px !important;
+    padding: 0 8px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Studio FX Rack Routing Ribbon on Mobile */
+  .pedalboard-routing-ribbon {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    padding: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .pedalboard-routing-ribbon .routing-ribbon-left {
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  .pedalboard-routing-ribbon .routing-ribbon-actions {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 6px !important;
+  }
+
+  .pedalboard-routing-ribbon .routing-ribbon-actions .btn-pedal-action {
+    width: 100% !important;
+    height: 32px !important;
+    justify-content: center !important;
+  }
+
+  /* Studio FX Pedal Card Headers: Zero Cutoff / Zero Overlap with INSERT badge */
+  .pedal-chassis .panel-header {
+    display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
     justify-content: space-between !important;
     gap: 6px !important;
@@ -601,35 +837,150 @@
     padding: 6px 8px !important;
   }
 
-  .pedal-chassis .pedal-header-left {
+  .pedal-chassis .panel-header-left {
     flex: 1 1 auto !important;
     min-width: 0 !important;
     display: flex !important;
     align-items: center !important;
     gap: 6px !important;
-    overflow: visible !important;
+    overflow: hidden !important;
   }
 
   .pedal-chassis .pedal-card-title {
-    font-size: 12px !important;
+    font-size: 12.5px !important;
     font-weight: 800 !important;
     white-space: nowrap !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
     max-width: none !important;
     flex: 1 1 auto !important;
   }
 
   /* Hide redundant badges/handles on mobile when not in edit mode so FX names never cut off */
   body:not(.workspace-edit-mode) .pedal-chassis .pedal-drag-handle,
+  body:not(.workspace-edit-mode) .pedal-chassis .pedal-slot-badge,
   body:not(.workspace-edit-mode) .pedal-chassis .pedal-io-tag,
-  body:not(.workspace-edit-mode) .pedal-chassis .module-window-controls .btn-win-hide,
-  body:not(.workspace-edit-mode) .pedal-chassis .module-window-controls .btn-win-focus {
+  body:not(.workspace-edit-mode) .pedal-chassis .panel-header-actions .btn-win-focus,
+  body:not(.workspace-edit-mode) .pedal-chassis .module-window-controls {
+    display: none !important;
+  }
+
+  /* Mobile Split View: Birds-Eye 10-FX + Out Monitor Rail + 1-Column Full-Width Instruments */
+  .lower-deck.deck-mode-split .lower-deck-body,
+  body.split-view-active .lower-deck-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-height: auto !important;
+  }
+
+  .lower-deck.deck-mode-split .studio-fx-pedalboard,
+  body.split-view-active .studio-fx-pedalboard {
+    order: 1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 auto !important;
+    padding: 10px !important;
+    padding-bottom: 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  .lower-deck.deck-mode-split .instruments-deck,
+  body.split-view-active .instruments-deck {
+    order: 2 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  .split-fx-header {
+    height: auto !important;
+    min-height: 28px !important;
+    flex-wrap: nowrap !important;
+    gap: 6px !important;
+  }
+
+  .split-fx-title .split-fx-tag {
+    display: none !important;
+  }
+
+  .split-fx-title .split-fx-label {
+    font-size: 10.5px !important;
+    white-space: nowrap !important;
+  }
+
+  .btn-rail-expand {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    height: 24px !important;
+    padding: 0 8px !important;
+  }
+
+  /* Compact Mini-FX Cards on Mobile Split View */
+  .mini-fx-card {
+    height: auto !important;
+    min-height: 52px !important;
+    padding: 5px 6px 5px 0 !important;
+    gap: 5px !important;
+  }
+
+  .mini-fx-slider-row {
+    height: 20px !important;
+  }
+
+  .mini-fx-card input[type="range"]::-webkit-slider-thumb {
+    width: 14px !important;
+    height: 14px !important;
+    border-radius: 3px !important;
+  }
+
+  .mini-fx-card input[type="range"]::-moz-range-thumb {
+    width: 14px !important;
+    height: 14px !important;
+    border-radius: 3px !important;
+  }
+
+  .mini-fx-badge-group {
+    width: 52px !important;
+    padding-left: 2px !important;
+  }
+
+  .mini-fx-name {
+    font-size: 9.5px !important;
+  }
+
+  .mini-fx-lbl {
+    width: 24px !important;
+    font-size: 8px !important;
+  }
+
+  .mini-fx-val {
+    width: 34px !important;
+    font-size: 8.5px !important;
+  }
+
+  .btn-mini-inspect {
+    padding: 0 5px !important;
+    font-size: 8.5px !important;
+  }
+
+  /* Clean Orbital Side Panel Header Actions on Mobile */
+  .orbital-side-panel .orbital-modal-actions-slot .btn-win-action,
+  .orbital-side-panel .orbital-modal-actions-slot .btn-win-focus,
+  .orbital-side-panel .orbital-modal-actions-slot .btn-win-hide,
+  .orbital-side-panel .orbital-modal-actions-slot .btn-exit-focus,
+  .orbital-side-panel .orbital-modal-actions-slot .module-window-controls {
     display: none !important;
   }
 
   /* ------------------------------------------------------------------------
-     10. FULLSCREEN VISUALIZER & MODULE FOCUS SAFEGUARDS
+     11. FULLSCREEN VISUALIZER & MODULE FOCUS SAFEGUARDS
      ------------------------------------------------------------------------ */
   .scope-panel.is-fullscreen,
   .module-fullscreen-active {

@@ -243,7 +243,7 @@ function getOrbModuleElement(orb) {
     return document.getElementById("pedalCard_SPACE");
   }
   if (orb.id === "space") {
-    return document.getElementById("pedalCard_SPACE") || document.getElementById("masterDspChainList") || document.getElementById("masterEqOutStrip") || document.querySelector(".strip-channel.space-ch");
+    return document.getElementById("masterEqOutStrip") || document.querySelector(".strip-channel.space-ch") || document.getElementById("pedalCard_SPACE");
   }
   const pedalKey = ORBITAL_ID_TO_PEDAL_KEY[orb.id];
   if (pedalKey) {
@@ -740,9 +740,11 @@ function expandModuleOrb(orbId) {
     const header = sourceStrip.querySelector(".panel-header");
     const actionsSlot = document.getElementById("orbitalModalActions");
     if (header && actionsSlot) {
-      const titleSpan = header.querySelector(":scope > span:first-child");
+      const titleSpan = header.querySelector(":scope > span:first-child, :scope > .panel-header-left");
       [...header.children].forEach(child => {
-        if (child !== titleSpan) actionsSlot.appendChild(child);
+        if (child !== titleSpan && !child.classList.contains("module-window-controls")) {
+          actionsSlot.appendChild(child);
+        }
       });
     }
   }
