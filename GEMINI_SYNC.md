@@ -1750,3 +1750,17 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
     4. Removed stale duplicate `.orbital-modal-backdrop` declaration at `z-index: 9999`.
     - Prevents default on `dblclick` (preserving `.scope-left-viz` fullscreen toggle).
     - Prevents trackpad/mouse `wheel` pinch zoom when `e.ctrlKey` is true.
+
+## Update — 2026-10-16 (Mobile Module Inspector Header Polish & De-clutter)
+
+- **OUT Module Header Randomize Button**:
+  - Relocated OUT module's randomize action button from `grid-column: 2; grid-row: 1;` (which erroneously overlapped the center column, blocking the module title and `‹` left switcher) to Row 2 (`grid-column: 1 / -1; grid-row: 2;`).
+  - Styled with full-width centered layout, 36px touch height, and cyber-hardware `RANDOMIZE OUT` label, consistent with the action rows of all other modules.
+  - Leaves Row 1 completely unblocked and clean: `< RACK` (left), `‹ 10. OUT ›` (center), and `✕` (right).
+- **Field Module Header De-clutter**:
+  - Hid `[data-field-status]` notice (`READY / EMPTY`) from `#orbitalSidePanel .orbital-modal-actions-slot` and `#orbitalModalActions` (`display: none !important;`).
+  - Keeps the header bar focused strictly on the standard action controls (`PWR`, `M`, `S`, `⟲`), eliminating text clutter between the title and buttons.
+- **Center Nav Switcher Spacing & De-cramping**:
+  - Expanded the gap between `‹` / `›` switcher buttons and the module title from 6px to `clamp(14px, 4.5vw, 22px)` on mobile and from 8px to 16px on desktop.
+  - Added horizontal padding on `.orbital-modal-title` (`padding: 0 4px;`) and enlarged nav buttons to 32x32px with 5px border-radius.
+  - Gives the center title and switchers ample breathing room across all screen widths.
