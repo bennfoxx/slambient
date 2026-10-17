@@ -1419,80 +1419,80 @@ function degreeToSemitone(deg, scaleArr) {
 }
 
 const CHORD_LIBRARY = [
-  { name: "WARM_9TH",       degrees: [0, 2, 4, 8]  },
-  { name: "DREAM_11TH",     degrees: [0, 4, 6, 9]  },
-  { name: "FLOATING_69",    degrees: [0, 2, 5, 8]  },
-  { name: "SUS2_SPREAD",    degrees: [0, 1, 4, 7]  },
-  { name: "LYDIAN_ETHER",   degrees: [0, 4, 6, 8]  },
-  { name: "FIFTH_STACK",    degrees: [0, 4, 7, 11] },
-  { name: "QUARTAL_STACK",  degrees: [0, 3, 6, 9]  }, // Fourth-stack open ambient harmony
-  { name: "PRISM_MAJ9",     degrees: [0, 2, 4, 8]  }, // Open major/minor 9th prism
-  { name: "OCTAVE_BLOOM",   degrees: [0, 4, 7, 9]  }, // Wide-spaced breathy overtone bloom
-  { name: "VELVET_ADD9",    degrees: [0, 2, 4, 9]  }, // Warm open add9 voicing (replaces tight cluster)
-  { name: "DEEP_MINOR11",   degrees: [0, 2, 4, 10] }, // Expansive nocturnal 11th
-  { name: "GHOST_DYAD",     degrees: [0, 4, 8]     }  // Minimalist hollow fifth with soft 9th
+  { name: "WARM_9TH",       degrees: [0, 2, 4, 8],  mainLabel: "Warm 9th",       subLabel: "Velvet Voicing",     westernQuality: "9",        label: "Warm 9th (Velvet Voicing)" },
+  { name: "DREAM_11TH",     degrees: [0, 4, 6, 9],  mainLabel: "Dream 11th",     subLabel: "Suspended Cloud",    westernQuality: "11",       label: "Dream 11th (Suspended Cloud)" },
+  { name: "FLOATING_69",    degrees: [0, 2, 5, 8],  mainLabel: "Floating 6/9",   subLabel: "Pastoral Air",       westernQuality: "6/9",      label: "Floating 6/9 (Pastoral Air)" },
+  { name: "SUS2_SPREAD",    degrees: [0, 1, 4, 7],  mainLabel: "Sus2 Spread",    subLabel: "Open Fifths",        westernQuality: "sus2",     label: "Sus2 Spread (Open Fifths)" },
+  { name: "LYDIAN_ETHER",   degrees: [0, 4, 6, 8],  mainLabel: "Lydian Ether",   subLabel: "Raised #11",         westernQuality: "maj7#11",  label: "Lydian Ether (Raised #11)" },
+  { name: "FIFTH_STACK",    degrees: [0, 4, 7, 11], mainLabel: "Fifth Stack",    subLabel: "Quintal Pillar",     westernQuality: "5",        label: "Fifth Stack (Quintal Pillar)" },
+  { name: "QUARTAL_STACK",  degrees: [0, 3, 6, 9],  mainLabel: "Quartal Stack",  subLabel: "Modal Fourths",      westernQuality: "sus4",     label: "Quartal Stack (Modal Fourths)" },
+  { name: "PRISM_MAJ9",     degrees: [0, 2, 4, 8],  mainLabel: "Prism Maj9",     subLabel: "Glass Voicing",      westernQuality: "maj9",     label: "Prism Maj9 (Glass Voicing)" },
+  { name: "OCTAVE_BLOOM",   degrees: [0, 4, 7, 9],  mainLabel: "Octave Bloom",   subLabel: "Wide Overtone",      westernQuality: "add9",     label: "Octave Bloom (Wide Overtone)" },
+  { name: "VELVET_ADD9",    degrees: [0, 2, 4, 9],  mainLabel: "Velvet Add9",    subLabel: "Warm Cluster",       westernQuality: "add9",     label: "Velvet Add9 (Warm Cluster)" },
+  { name: "DEEP_MINOR11",   degrees: [0, 2, 4, 10], mainLabel: "Deep Minor 11",  subLabel: "Nocturnal",          westernQuality: "m11",      label: "Deep Minor 11 (Nocturnal)" },
+  { name: "GHOST_DYAD",     degrees: [0, 4, 8],     mainLabel: "Ghost Dyad",     subLabel: "Hollow Fifth",       westernQuality: "5",        label: "Ghost Dyad (Hollow Fifth)" }
 ];
 
 // Scale-Tied Modal Signature Voicings: Authentic harmonic morphologies tailored to each mode's character
 const SCALE_SIGNATURE_VOICINGS = {
   LYDIAN: [
-    { name: "LYDIAN_QUARTAL_11", degrees: [0, 4, 6, 10], label: "Lydian Quartal (#11)", allowTritone: true },
-    { name: "LYDIAN_MAJ7_SHARP11", degrees: [0, 4, 6, 10], label: "Lydian Maj7 (#11)", allowTritone: true },
-    { name: "ETHER_DROP2", degrees: [0, 3, 6, 8], label: "Ether Drop-2 (#11/9)", allowTritone: true }
+    { name: "LYDIAN_QUARTAL_11",   degrees: [0, 4, 6, 10], mainLabel: "Lydian Quartal",   subLabel: "#11 Cloud",                westernQuality: "maj7#11", label: "Lydian Quartal (#11)", allowTritone: true },
+    { name: "LYDIAN_MAJ7_SHARP11", degrees: [0, 4, 6, 10], mainLabel: "Lydian Maj7",      subLabel: "Bright Cinematic #11",     westernQuality: "maj9#11", label: "Lydian Maj7 (#11)", allowTritone: true },
+    { name: "ETHER_DROP2",         degrees: [0, 3, 6, 8],  mainLabel: "Ether Drop-2",     subLabel: "#11 / 9 Open Spread",      westernQuality: "maj7#11", label: "Ether Drop-2 (#11/9)", allowTritone: true }
   ],
   LYDIAN_DOM: [
-    { name: "OVERTONE_ACOUSTIC", degrees: [0, 2, 3, 6, 8], label: "Overtone Acoustic (#11/b7)", allowTritone: true },
-    { name: "LYDIAN_DOM_SPREAD", degrees: [0, 4, 6, 10], label: "Lydian Dominant 9(#11)", allowTritone: true }
+    { name: "OVERTONE_ACOUSTIC",   degrees: [0, 2, 3, 6, 8], mainLabel: "Overtone Acoustic", subLabel: "#11 / b7 Acoustic Scale", westernQuality: "9#11",    label: "Overtone Acoustic (#11/b7)", allowTritone: true },
+    { name: "LYDIAN_DOM_SPREAD",   degrees: [0, 4, 6, 10],   mainLabel: "Lydian Dominant",   subLabel: "Dominant 9(#11) Spread", westernQuality: "7#11",    label: "Lydian Dominant 9(#11)", allowTritone: true }
   ],
   DORIAN: [
-    { name: "SO_WHAT_MODAL", degrees: [0, 3, 6, 9, 11], label: "So What Modal Fourths" },
-    { name: "DORIAN_NAT6_NINTH", degrees: [0, 2, 5, 8], label: "Dorian 6/9 Drop-2" },
-    { name: "DEEP_DORIAN_11", degrees: [0, 2, 4, 10], label: "Deep Dorian 11th" }
+    { name: "SO_WHAT_MODAL",       degrees: [0, 3, 6, 9, 11], mainLabel: "So What Modal", subLabel: "Bill Evans Fourths",      westernQuality: "m11",     label: "So What Modal Fourths" },
+    { name: "DORIAN_NAT6_NINTH",   degrees: [0, 2, 5, 8],     mainLabel: "Dorian 6/9",    subLabel: "Natural 6th Drop-2",       westernQuality: "m6/9",    label: "Dorian 6/9 Drop-2" },
+    { name: "DEEP_DORIAN_11",      degrees: [0, 2, 4, 10],    mainLabel: "Deep Dorian",   subLabel: "Nocturnal 11th",           westernQuality: "m11",     label: "Deep Dorian 11th" }
   ],
   PHRYGIAN: [
-    { name: "PHRYGIAN_DARK_HALO", degrees: [0, 4, 7, 8], label: "Phrygian Dark Halo", allowFlatTwo: true },
-    { name: "PHRYGIAN_SUS_CLUSTER", degrees: [0, 4, 8, 10], label: "Phrygian Sus b2/b6", allowFlatTwo: true },
-    { name: "MYSTIC_FIFTH_B9", degrees: [0, 4, 7, 8], label: "Mystic 5th (b9 Hover)", allowFlatTwo: true }
+    { name: "PHRYGIAN_DARK_HALO",   degrees: [0, 4, 7, 8],  mainLabel: "Phrygian Halo",   subLabel: "b2 / b6 Dark Drone",       westernQuality: "m(b9)",   label: "Phrygian Dark Halo", allowFlatTwo: true },
+    { name: "PHRYGIAN_SUS_CLUSTER", degrees: [0, 4, 8, 10], mainLabel: "Phrygian Sus",    subLabel: "Mystic Modal Cluster",     westernQuality: "sus4b9",  label: "Phrygian Sus b2/b6", allowFlatTwo: true },
+    { name: "MYSTIC_FIFTH_B9",      degrees: [0, 4, 7, 8],  mainLabel: "Mystic 5th",      subLabel: "b9 Drone Hover",           westernQuality: "5b9",     label: "Mystic 5th (b9 Hover)", allowFlatTwo: true }
   ],
   MIXOLYDIAN: [
-    { name: "MIXO_SUS4_SPREAD", degrees: [0, 3, 6, 8], label: "Mixolydian Sus4 (Dominant)" },
-    { name: "FLOATING_DOM9", degrees: [0, 2, 4, 6, 8], label: "Floating 9th (Modal 7th)" }
+    { name: "MIXO_SUS4_SPREAD",    degrees: [0, 3, 6, 8], mainLabel: "Mixolydian Sus4", subLabel: "Pastoral Unresolved 4th",   westernQuality: "7sus4",   label: "Mixolydian Sus4 (Dominant)" },
+    { name: "FLOATING_DOM9",       degrees: [0, 2, 4, 6, 8], mainLabel: "Floating 9th", subLabel: "Modal 7th Solina",          westernQuality: "9",       label: "Floating 9th (Modal 7th)" }
   ],
   AEOLIAN: [
-    { name: "DEEP_AEOLIAN_9TH", degrees: [0, 2, 4, 8], label: "Deep Aeolian 9th" },
-    { name: "NORDIC_SUS2_B6", degrees: [0, 1, 4, 5], label: "Nordic Sus2 (b6 Cloud)" }
+    { name: "DEEP_AEOLIAN_9TH",    degrees: [0, 2, 4, 8], mainLabel: "Deep Aeolian",   subLabel: "Nordic Melancholy",        westernQuality: "m9",      label: "Deep Aeolian 9th" },
+    { name: "NORDIC_SUS2_B6",      degrees: [0, 1, 4, 5], mainLabel: "Nordic Sus2",    subLabel: "b6 Cloud Ambient",         westernQuality: "sus2b6",  label: "Nordic Sus2 (b6 Cloud)" }
   ],
   MAJOR9: [
-    { name: "PRISM_MAJ9_WIDE", degrees: [0, 2, 4, 5], label: "Prism Maj9 Spread" },
-    { name: "LYRIC_OCTAVE_ADD9", degrees: [0, 2, 4, 7], label: "Lyric Octave Add9" }
+    { name: "PRISM_MAJ9_WIDE",     degrees: [0, 2, 4, 5], mainLabel: "Prism Maj9",     subLabel: "Crystalline Spread",       westernQuality: "maj9",    label: "Prism Maj9 Spread" },
+    { name: "LYRIC_OCTAVE_ADD9",   degrees: [0, 2, 4, 7], mainLabel: "Lyric Octave",   subLabel: "Add9 Overtone Bloom",      westernQuality: "add9",    label: "Lyric Octave Add9" }
   ],
   PENTATONIC: [
-    { name: "OPEN_QUINTAL_PENT", degrees: [0, 2, 3, 5], label: "Open Quintal Pentatonic" },
-    { name: "SUS_PENTATONIC_ARK", degrees: [0, 1, 3, 6], label: "Suspended Pentatonic Ark" }
+    { name: "OPEN_QUINTAL_PENT",   degrees: [0, 2, 3, 5], mainLabel: "Open Quintal",   subLabel: "Deep Space Pentatonic",    westernQuality: "m7sus4",  label: "Open Quintal Pentatonic" },
+    { name: "SUS_PENTATONIC_ARK",  degrees: [0, 1, 3, 6], mainLabel: "Suspended Ark",  subLabel: "Open Fifth Space",         westernQuality: "sus4",    label: "Suspended Pentatonic Ark" }
   ],
   MAJ_PENTATONIC: [
-    { name: "PASTORAL_69_SPREAD", degrees: [0, 2, 4, 6], label: "Pastoral 6/9 Spread" },
-    { name: "GOLDEN_FIFTH_STACK", degrees: [0, 2, 4, 7], label: "Golden Fifth Stack" }
+    { name: "PASTORAL_69_SPREAD",  degrees: [0, 2, 4, 6], mainLabel: "Pastoral 6/9",   subLabel: "Sunbreak Spread",          westernQuality: "6/9",     label: "Pastoral 6/9 Spread" },
+    { name: "GOLDEN_FIFTH_STACK",  degrees: [0, 2, 4, 7], mainLabel: "Golden 5th",     subLabel: "Quintal Stack",            westernQuality: "5",       label: "Golden Fifth Stack" }
   ],
   HIRAJOSHI: [
-    { name: "HIRAJOSHI_QUINTAL", degrees: [0, 3, 5, 8], label: "Hirajoshi Quintal Stack" },
-    { name: "KOTO_REFLECTION", degrees: [0, 2, 4, 7], label: "Koto Reflection (Cherry Blossom)" }
+    { name: "HIRAJOSHI_QUINTAL",   degrees: [0, 3, 5, 8], mainLabel: "Hirajoshi",      subLabel: "Japanese Kankyō Quintal",  westernQuality: "mb6",     label: "Hirajoshi Quintal Stack" },
+    { name: "KOTO_REFLECTION",     degrees: [0, 2, 4, 7], mainLabel: "Koto Sakura",    subLabel: "Cherry Blossom Reflection", westernQuality: "m(add4)", label: "Koto Reflection (Cherry Blossom)" }
   ],
   INSEN: [
-    { name: "INSEN_TEMPLE_BELL", degrees: [0, 2, 4, 7], label: "Insen Temple Bell (Shakuhachi)" },
-    { name: "ZEN_QUARTAL", degrees: [0, 2, 5, 8], label: "Zen Quartal (Floating Stone)" }
+    { name: "INSEN_TEMPLE_BELL",   degrees: [0, 2, 4, 7], mainLabel: "Insen Bell",     subLabel: "Shakuhachi Temple Tone",   westernQuality: "sus4b9",  label: "Insen Temple Bell (Shakuhachi)" },
+    { name: "ZEN_QUARTAL",         degrees: [0, 2, 5, 8], mainLabel: "Zen Quartal",    subLabel: "Floating Stone Fourths",   westernQuality: "sus4",    label: "Zen Quartal (Floating Stone)" }
   ],
   WHOLE_TONE: [
-    { name: "IMPRESSIONIST_AUG", degrees: [0, 2, 4, 7], label: "Impressionist Augmented Prism", allowTritone: true },
-    { name: "FLOATING_MYSTIC_STACK", degrees: [0, 3, 5, 8], label: "Floating Mystic Stack", allowTritone: true }
+    { name: "IMPRESSIONIST_AUG",   degrees: [0, 2, 4, 7], mainLabel: "Impressionist",  subLabel: "Debussy Augmented Prism",  westernQuality: "aug",     label: "Impressionist Augmented Prism", allowTritone: true },
+    { name: "FLOATING_MYSTIC_STACK", degrees: [0, 3, 5, 8], mainLabel: "Mystic Stack", subLabel: "Floating Whole-Tone",     westernQuality: "7b5",     label: "Floating Mystic Stack", allowTritone: true }
   ],
   BHAIRAV: [
-    { name: "MAIHAR_RESONANCE", degrees: [0, 3, 5, 8], label: "Maihar Morning Resonance", allowFlatTwo: true },
-    { name: "SENIA_RAGA_PILLAR", degrees: [0, 4, 7, 8], label: "Senia Raga Pillar", allowFlatTwo: true }
+    { name: "MAIHAR_RESONANCE",    degrees: [0, 3, 5, 8], mainLabel: "Maihar Raga",    subLabel: "Morning Raga Resonance",   westernQuality: "5(b2)",   label: "Maihar Morning Resonance", allowFlatTwo: true },
+    { name: "SENIA_RAGA_PILLAR",   degrees: [0, 4, 7, 8], mainLabel: "Senia Gharana",  subLabel: "Classical Maihar Pillar",  westernQuality: "5(b2)",   label: "Senia Raga Pillar", allowFlatTwo: true }
   ],
   BILAWAL: [
-    { name: "BILAWAL_SHUDDHA", degrees: [0, 2, 4, 7], label: "Bilawal Shuddha Swaras" },
-    { name: "HINDUSTANI_PRISM", degrees: [0, 3, 5, 8], label: "Hindustani Consonant Prism" }
+    { name: "BILAWAL_SHUDDHA",     degrees: [0, 2, 4, 7], mainLabel: "Bilawal Thaat",  subLabel: "Shuddha Swara Harmony",    westernQuality: "maj",     label: "Bilawal Shuddha Swaras" },
+    { name: "HINDUSTANI_PRISM",    degrees: [0, 3, 5, 8], mainLabel: "Hindustani",     subLabel: "Classical Consonant Prism", westernQuality: "maj7",    label: "Hindustani Consonant Prism" }
   ]
 };
 
@@ -1511,9 +1511,191 @@ function getActiveVoicingObject(voicingId, scaleKey) {
 }
 
 function getVoicingDisplayName(voicing) {
-  if (!voicing) return "Warm 9th";
+  if (!voicing) return "Warm 9th (Velvet Voicing)";
   if (voicing.label) return voicing.label;
   return voicing.name.replace(/_/g, " ");
+}
+
+// Derives a concise, standard Western music chord quality suffix (max ~7 chars, e.g.
+// "m7", "maj7", "dim9", "maj7#11", "m9", "6/9", "7sus4", "5") from semitone intervals
+// so Root + Quality always fits on a single non-wrapping primary line.
+function getWesternChordQuality(intervals) {
+  if (!intervals || intervals.length === 0) return "";
+  const pcs = new Set(intervals.map(iv => ((iv % 12) + 12) % 12));
+  if (pcs.size <= 1) return "";
+
+  const b2 = pcs.has(1);
+  const M2 = pcs.has(2);
+  const m3 = pcs.has(3);
+  const M3 = pcs.has(4);
+  const P4 = pcs.has(5);
+  const tt = pcs.has(6);
+  const P5 = pcs.has(7);
+  const m6 = pcs.has(8);
+  const M6 = pcs.has(9);
+  const m7 = pcs.has(10);
+  const M7 = pcs.has(11);
+
+  if (pcs.size === 2) {
+    if (P5) return "5";
+    if (M3) return "maj";
+    if (m3) return "m";
+    if (P4) return "sus4";
+    if (M2) return "sus2";
+    if (tt) return "dim5";
+    if (m6) return "b6";
+    if (M6) return "6";
+    if (m7) return "7";
+    if (M7) return "maj7";
+    if (b2) return "b9";
+  }
+
+  if (M3) {
+    if (m6 && !P5) {
+      if (M7) return "augMaj7";
+      if (m7) return M2 ? "9#5" : "7#5";
+      if (M2) return "aug9";
+      return "aug";
+    }
+    if (M7) {
+      if (tt) return M2 ? "maj9#11" : "maj7#11";
+      if (M6) return "maj13";
+      if (M2) return "maj9";
+      return "maj7";
+    }
+    if (m7) {
+      if (tt) return M2 ? "9#11" : "7#11";
+      if (b2) return "7b9";
+      if (M6) return "13";
+      if (M2) return "9";
+      return "7";
+    }
+    if (M6) return M2 ? "6/9" : "6";
+    if (tt) return "add#11";
+    if (P4) return "add11";
+    if (M2) return "add9";
+    return "maj";
+  }
+
+  if (m3) {
+    if (tt && !P5) {
+      if (M6) return M2 ? "dim9" : "dim7";
+      if (m7) return M2 ? "m9b5" : "m7b5";
+      if (M2) return "dim9";
+      return "dim";
+    }
+    if (M7) return M2 ? "mMaj9" : "mMaj7";
+    if (m7) {
+      if (P4) return "m11";
+      if (M2) return "m9";
+      if (M6) return "m13";
+      return "m7";
+    }
+    if (M6) return M2 ? "m6/9" : "m6";
+    if (m6) return M2 ? "m9b6" : "mb6";
+    if (P4) return "m11";
+    if (M2) return "madd9";
+    return "m";
+  }
+
+  // Suspended, quartal, quintal, and modal shells without 3rd
+  if (M7) {
+    if (tt) return M2 ? "maj9#11" : "maj7#11";
+    if (M2) return "maj9";
+    return "maj7";
+  }
+  if (m7) {
+    if (tt) return M2 ? "9#11" : "7#11";
+    if (P4 && M2) return "9sus4";
+    if (P4) return "7sus4";
+    if (M2) return "7sus2";
+    return "7sus";
+  }
+  if (M6) {
+    if (M2 && P4) return "6/9sus";
+    if (M2) return "6/9";
+    if (P4) return "6sus4";
+    return "6";
+  }
+  if (b2) {
+    if (P4) return "sus4b9";
+    if (P5) return "5b9";
+    return "b9";
+  }
+  if (P4) {
+    if (m6) return "sus4b6";
+    if (M2) return "sus2/4";
+    return "sus4";
+  }
+  if (M2) {
+    if (m6) return "sus2b6";
+    return "sus2";
+  }
+  if (tt) return "sus#4";
+  if (P5) return "5";
+  return "sus";
+}
+
+const SCALE_BADGE_LABELS = {
+  DORIAN: "DORIAN",
+  LYDIAN: "LYDIAN",
+  AEOLIAN: "AEOLIAN",
+  MIXOLYDIAN: "MIXOLYDIAN",
+  PENTATONIC: "MIN PENT",
+  MAJOR9: "MAJOR 9",
+  HIRAJOSHI: "HIRAJOSHI",
+  INSEN: "INSEN",
+  LYDIAN_DOM: "LYD DOM",
+  PHRYGIAN: "PHRYGIAN",
+  PHRYGIAN_AMB: "PHRYGIAN",
+  WHOLE_TONE: "WHOLE TONE",
+  MAJ_PENTATONIC: "MAJ PENT",
+  BILAWAL: "BILAWAL",
+  BHAIRAV: "BHAIRAV"
+};
+
+function getScaleDisplayBadge(scaleKey, isLive) {
+  if (isLive) return "LIVE KEYS";
+  return SCALE_BADGE_LABELS[scaleKey] || String(scaleKey || "MODAL");
+}
+
+function formatChordVoicingSubtitleHTML(voicingOrName) {
+  const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  if (voicingOrName && typeof voicingOrName === "object" && voicingOrName.mainLabel) {
+    const main = esc(voicingOrName.mainLabel);
+    const sub = esc(voicingOrName.subLabel || "");
+    if (sub) {
+      return `<span class="voicing-main">${main}</span><span class="voicing-sep">·</span><span class="voicing-sub">${sub}</span>`;
+    }
+    return `<span class="voicing-main">${main}</span>`;
+  }
+
+  const clean = String(voicingOrName || "Warm 9th").trim();
+  const parenMatch = clean.match(/^(.+?)\s*\((.+?)\)\s*$/);
+  let mainPart = clean;
+  let subPart = "";
+  if (parenMatch) {
+    mainPart = parenMatch[1].trim();
+    subPart = parenMatch[2].trim();
+  } else {
+    const prefixes = [
+      "So What", "Senia Raga", "Deep Dorian", "Dorian 6/9", "Deep Aeolian",
+      "Open Quintal", "Prism Maj9", "Lyric Octave", "Phrygian Sus",
+      "Hirajoshi", "Maihar", "Bilawal", "Hindustani", "Impressionist",
+      "Pastoral", "Golden", "Suspended", "Phrygian", "Floating"
+    ];
+    for (const p of prefixes) {
+      if (clean.toLowerCase().startsWith(p.toLowerCase() + " ")) {
+        mainPart = clean.slice(0, p.length).trim();
+        subPart = clean.slice(p.length).trim();
+        break;
+      }
+    }
+  }
+  if (subPart) {
+    return `<span class="voicing-main">${esc(mainPart)}</span><span class="voicing-sep">·</span><span class="voicing-sub">${esc(subPart)}</span>`;
+  }
+  return `<span class="voicing-main">${esc(mainPart)}</span>`;
 }
 
 function getVoicingIntervals(voicing, scaleArr, rootStep, options = {}) {
@@ -1914,11 +2096,16 @@ function detectChordFromNotes(notes) {
     else chordQuality = "POLY-CHORD";
   }
 
+  const westernQuality = getWesternChordQuality(intervals);
+  const liveSubtitle = chordQuality === "ROOT" ? "Live Keyboard (Single Root)" : `Live Keyboard (${chordQuality})`;
+
   return {
     rootMidi,
     rootName,
     chordQuality,
-    displayName: `${rootName} ${chordQuality}`,
+    westernQuality,
+    voicingLabel: liveSubtitle,
+    displayName: `${rootName}${westernQuality} · ${chordQuality}`,
     intervals,
     pcs,
     sortedNotes: sorted
@@ -1929,17 +2116,30 @@ function updateLiveVisualizer(chordInfo) {
   if (document.getElementById("cardChordRoot")) {
     document.getElementById("cardChordRoot").textContent = chordInfo.rootName;
   }
+  if (document.getElementById("cardChordQuality")) {
+    document.getElementById("cardChordQuality").textContent = chordInfo.westernQuality !== undefined
+      ? chordInfo.westernQuality
+      : getWesternChordQuality(chordInfo.intervals);
+  }
+  if (document.getElementById("cardChordMode")) {
+    document.getElementById("cardChordMode").textContent = getScaleDisplayBadge(activeScaleKey, true);
+  }
   if (document.getElementById("cardChordVoicing")) {
-    document.getElementById("cardChordVoicing").textContent = chordInfo.chordQuality;
+    document.getElementById("cardChordVoicing").innerHTML = formatChordVoicingSubtitleHTML(
+      chordInfo.voicingLabel || `Live Keyboard (${chordInfo.chordQuality})`
+    );
   }
   const hudChordEl = document.getElementById("hudChord");
   if (hudChordEl) {
     hudChordEl.textContent = chordInfo.displayName;
   }
   if (document.getElementById("telemTones")) {
-    document.getElementById("telemTones").textContent = chordInfo.sortedNotes
-      .map(m => `${NOTE_NAMES[m % 12]}${Math.floor(m / 12) - 1}`)
-      .join(" · ");
+    document.getElementById("telemTones").innerHTML = chordInfo.sortedNotes
+      .map((m, idx) => {
+        const lbl = `${NOTE_NAMES[m % 12]}${Math.floor(m / 12) - 1}`;
+        return idx === 0 ? `<span class="tone-root">${lbl}</span>` : lbl;
+      })
+      .join('<span class="tone-dot"> · </span>');
   }
   if (document.getElementById("telemIntervals")) {
     document.getElementById("telemIntervals").textContent = chordInfo.intervals
@@ -2081,7 +2281,11 @@ function syncScaleMode(val) {
 
 function updateChordHud() {
   const voicing = getActiveVoicingObject(currentChordVoicing, activeScaleKey);
-  const name = NOTE_NAMES[(rootNote + currentChordDeg) % 12] + " " + getVoicingDisplayName(voicing);
+  const scale = SCALES[activeScaleKey] || SCALES.DORIAN;
+  const ivs = getVoicingIntervals(voicing, scale, currentChordRootStep);
+  const rootStr = NOTE_NAMES[(rootNote + currentChordDeg) % 12];
+  const qualStr = getWesternChordQuality(ivs);
+  const name = `${rootStr}${qualStr} · ${getVoicingDisplayName(voicing)}`;
   const hudChordEl = document.getElementById("hudChord");
   if (hudChordEl) hudChordEl.textContent = name;
 }
@@ -8303,15 +8507,15 @@ function drawChordWheelCard() {
   const manualSig = (isManualChordActive && liveActiveChord)
     ? `${liveActiveChord.rootMidi}:${liveActiveChord.chordQuality}:${liveActiveChord.sortedNotes.join(",")}`
     : "auto";
-  const themeSig = (typeof activeTheme !== "undefined" && activeTheme) ? `${activeTheme.id}:${themeHex("chord")}` : "";
+  const themeSig = (typeof activeTheme !== "undefined" && activeTheme) ? `${activeTheme.id}:${themeHex("chord")}:${themeHex("arp")}:${themeHex("drone")}:${themeHex("field")}` : "";
   const sig = `${rootNote}|${activeScaleKey}|${currentChordVoicing}|${currentChordRootStep}|${currentChordDeg}|${manualSig}|${themeSig}|${isPhone ? 1 : 0}`;
   if (sig === lastChordWheelSignature) return;
   lastChordWheelSignature = sig;
 
   const dpr = Math.min(2, window.devicePixelRatio || 1);
-  // Phones draw the wheel 1.55x so its 6.5px note names reach 10px.
-  const wheelK = isPhone ? 1.55 : 1;
-  const size = 124; const cssSize = Math.round(size * wheelK); const targetBuffer = Math.round(cssSize * dpr);
+  // Phones draw the wheel 1.44x (196px) so its note names and geometry are large and crisp.
+  const wheelK = isPhone ? 1.44 : 1;
+  const size = 136; const cssSize = Math.round(size * wheelK); const targetBuffer = Math.round(cssSize * dpr);
   if (chordWheelCanvas.width !== targetBuffer || chordWheelCanvas.height !== targetBuffer) {
     chordWheelCanvas.width = targetBuffer; chordWheelCanvas.height = targetBuffer;
     chordWheelCanvas.style.width = cssSize + "px"; chordWheelCanvas.style.height = cssSize + "px";
@@ -8321,12 +8525,17 @@ function drawChordWheelCard() {
   const w = size; const h = size; const cx = w / 2; const cy = h / 2;
   chordWheelCtx.clearRect(0, 0, w, h);
 
-  let activeIntervals, chordRootName, chordVoicingName, activePitchClasses = [], rootPitchClass = 0;
-  
-  if (isManualChordActive && liveActiveChord) {
+  let activeIntervals, rawIntervals, chordRootName, chordWesternQuality, chordVoicingName, activePitchClasses = [], rootPitchClass = 0;
+  const isLive = isManualChordActive && !!liveActiveChord;
+
+  if (isLive) {
+    rawIntervals = liveActiveChord.intervals;
     activeIntervals = liveActiveChord.intervals;
     chordRootName = liveActiveChord.rootName;
-    chordVoicingName = liveActiveChord.chordQuality;
+    chordWesternQuality = liveActiveChord.westernQuality !== undefined
+      ? liveActiveChord.westernQuality
+      : getWesternChordQuality(liveActiveChord.intervals);
+    chordVoicingName = liveActiveChord.voicingLabel || `Live Keyboard (${liveActiveChord.chordQuality})`;
     rootPitchClass = liveActiveChord.rootMidi % 12;
     activePitchClasses = Array.from(new Set(liveActiveChord.sortedNotes.map(m => m % 12)));
   } else {
@@ -8334,7 +8543,9 @@ function drawChordWheelCard() {
     const scale = SCALES[activeScaleKey] || [0, 2, 4, 5, 7, 9, 11];
     const voicingIntervals = getVoicingIntervals(voicing, scale, currentChordRootStep);
     const activeRootMidi = (rootNote + currentChordDeg) % 12;
+    rawIntervals = voicingIntervals;
     chordRootName = NOTE_NAMES[activeRootMidi];
+    chordWesternQuality = getWesternChordQuality(voicingIntervals);
     chordVoicingName = getVoicingDisplayName(voicing);
     activeIntervals = voicingIntervals.map(semi => (semi % 12));
     rootPitchClass = activeRootMidi % 12;
@@ -8345,14 +8556,47 @@ function drawChordWheelCard() {
   const activeCofIndices = Array.from(new Set(activePitchClasses.map(pc => (pc * 7) % 12))).sort((a, b) => a - b);
   const activeCofSet = new Set(activeCofIndices);
 
-  const rimR = 54;
-  chordWheelCtx.beginPath(); chordWheelCtx.arc(cx, cy, rimR, 0, Math.PI * 2);
-  chordWheelCtx.strokeStyle = `rgba(${themeRgb("chord")}, 0.18)`; chordWheelCtx.lineWidth = 1; chordWheelCtx.stroke();
+  const rimR = 62;
+  const dotR = 39;
+  const labelR = 51.5;
 
-  const dotR = 34;
-  const labelR = 45;
+  // Subtle ambient radial halo inside the Circle of Fifths
+  const bgGrad = chordWheelCtx.createRadialGradient(cx, cy, 2, cx, cy, rimR);
+  bgGrad.addColorStop(0, `rgba(${themeRgb("chord")}, 0.11)`);
+  bgGrad.addColorStop(0.58, `rgba(${themeRgb("arp")}, 0.045)`);
+  bgGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+  chordWheelCtx.beginPath(); chordWheelCtx.arc(cx, cy, rimR, 0, Math.PI * 2);
+  chordWheelCtx.fillStyle = bgGrad; chordWheelCtx.fill();
+
+  // Outer compass ring
+  chordWheelCtx.beginPath(); chordWheelCtx.arc(cx, cy, rimR, 0, Math.PI * 2);
+  chordWheelCtx.strokeStyle = `rgba(${themeRgb("chord")}, 0.28)`; chordWheelCtx.lineWidth = 1.1; chordWheelCtx.stroke();
+
+  // Inner harmonic orbit ring
   chordWheelCtx.beginPath(); chordWheelCtx.arc(cx, cy, dotR, 0, Math.PI * 2);
-  chordWheelCtx.strokeStyle = "rgba(255, 255, 255, 0.06)"; chordWheelCtx.lineWidth = 0.75; chordWheelCtx.stroke();
+  chordWheelCtx.strokeStyle = `rgba(${themeRgb("drone")}, 0.14)`; chordWheelCtx.lineWidth = 0.85; chordWheelCtx.stroke();
+
+  // Center harmonic reticle
+  chordWheelCtx.beginPath();
+  chordWheelCtx.moveTo(cx - 3.5, cy); chordWheelCtx.lineTo(cx + 3.5, cy);
+  chordWheelCtx.moveTo(cx, cy - 3.5); chordWheelCtx.lineTo(cx, cy + 3.5);
+  chordWheelCtx.strokeStyle = `rgba(${themeRgb("drone")}, 0.28)`; chordWheelCtx.lineWidth = 0.75; chordWheelCtx.stroke();
+  chordWheelCtx.beginPath(); chordWheelCtx.arc(cx, cy, 1.5, 0, Math.PI * 2);
+  chordWheelCtx.fillStyle = `rgba(${themeRgb("drone")}, 0.55)`; chordWheelCtx.fill();
+
+  // Radial spokes from center to active chord tones
+  activeCofIndices.forEach((cofIdx) => {
+    const angle = -Math.PI / 2 + (cofIdx / 12) * Math.PI * 2;
+    const px = cx + Math.cos(angle) * dotR;
+    const py = cy + Math.sin(angle) * dotR;
+    const isRoot = cofIdx === rootCofIdx;
+    chordWheelCtx.beginPath();
+    chordWheelCtx.moveTo(cx, cy);
+    chordWheelCtx.lineTo(px, py);
+    chordWheelCtx.strokeStyle = isRoot ? `rgba(${themeRgb("chord")}, 0.32)` : `rgba(${themeRgb("arp")}, 0.18)`;
+    chordWheelCtx.lineWidth = isRoot ? 1.0 : 0.75;
+    chordWheelCtx.stroke();
+  });
 
   if (activeCofIndices.length >= 2) {
     chordWheelCtx.beginPath();
@@ -8364,8 +8608,11 @@ function drawChordWheelCard() {
       else chordWheelCtx.lineTo(px, py);
     });
     chordWheelCtx.closePath();
-    chordWheelCtx.fillStyle = `rgba(${themeRgb("chord")}, 0.14)`; chordWheelCtx.fill();
-    chordWheelCtx.strokeStyle = themeHex("chord"); chordWheelCtx.lineWidth = 1.3; chordWheelCtx.stroke();
+    const polyGrad = chordWheelCtx.createLinearGradient(cx - dotR, cy - dotR, cx + dotR, cy + dotR);
+    polyGrad.addColorStop(0, `rgba(${themeRgb("chord")}, 0.22)`);
+    polyGrad.addColorStop(1, `rgba(${themeRgb("arp")}, 0.14)`);
+    chordWheelCtx.fillStyle = polyGrad; chordWheelCtx.fill();
+    chordWheelCtx.strokeStyle = themeHex("chord"); chordWheelCtx.lineWidth = 1.5; chordWheelCtx.stroke();
   }
 
   chordWheelCtx.textAlign = "center";
@@ -8382,59 +8629,80 @@ function drawChordWheelCard() {
     const isChordTone = activeCofSet.has(k);
     const isRootTone = (k === rootCofIdx);
 
-    const tickIn = dotR - 2;
-    const tickOut = dotR + (isRootTone ? 6 : (isChordTone ? 4 : 2));
+    // Outer compass rim tick
+    chordWheelCtx.beginPath();
+    chordWheelCtx.moveTo(cx + cosA * (rimR - 2.2), cy + sinA * (rimR - 2.2));
+    chordWheelCtx.lineTo(cx + cosA * rimR, cy + sinA * rimR);
+    chordWheelCtx.strokeStyle = isRootTone ? "#ffffff" : (isChordTone ? `rgba(${themeRgb("chord")}, 0.55)` : "rgba(255, 255, 255, 0.12)");
+    chordWheelCtx.lineWidth = isRootTone ? 1.3 : 0.8;
+    chordWheelCtx.stroke();
+
+    const tickIn = dotR - 2.2;
+    const tickOut = dotR + (isRootTone ? 6.5 : (isChordTone ? 4.2 : 2.0));
     chordWheelCtx.beginPath();
     chordWheelCtx.moveTo(cx + cosA * tickIn, cy + sinA * tickIn);
     chordWheelCtx.lineTo(cx + cosA * tickOut, cy + sinA * tickOut);
-    chordWheelCtx.strokeStyle = isRootTone ? "#ffffff" : (isChordTone ? themeHex("chord") : "rgba(255, 255, 255, 0.10)");
-    chordWheelCtx.lineWidth = isRootTone ? 1.5 : (isChordTone ? 1.1 : 0.6);
+    chordWheelCtx.strokeStyle = isRootTone ? "#ffffff" : (isChordTone ? themeHex("chord") : "rgba(255, 255, 255, 0.11)");
+    chordWheelCtx.lineWidth = isRootTone ? 1.6 : (isChordTone ? 1.2 : 0.65);
     chordWheelCtx.stroke();
 
     chordWheelCtx.beginPath();
     if (isRootTone) {
-      chordWheelCtx.arc(px, py, 5.5, 0, Math.PI * 2);
-      chordWheelCtx.strokeStyle = `rgba(${themeRgb("chord")}, 0.6)`;
-      chordWheelCtx.lineWidth = 1.2;
+      chordWheelCtx.arc(px, py, 6.0, 0, Math.PI * 2);
+      chordWheelCtx.strokeStyle = `rgba(${themeRgb("chord")}, 0.72)`;
+      chordWheelCtx.lineWidth = 1.3;
       chordWheelCtx.stroke();
 
       chordWheelCtx.beginPath();
-      chordWheelCtx.arc(px, py, 3.2, 0, Math.PI * 2);
+      chordWheelCtx.arc(px, py, 3.4, 0, Math.PI * 2);
       chordWheelCtx.fillStyle = "#ffffff";
       chordWheelCtx.fill();
     } else if (isChordTone) {
-      chordWheelCtx.arc(px, py, 2.4, 0, Math.PI * 2);
+      chordWheelCtx.arc(px, py, 4.2, 0, Math.PI * 2);
+      chordWheelCtx.fillStyle = `rgba(${themeRgb("chord")}, 0.22)`;
+      chordWheelCtx.fill();
+
+      chordWheelCtx.beginPath();
+      chordWheelCtx.arc(px, py, 2.5, 0, Math.PI * 2);
       chordWheelCtx.fillStyle = themeHex("chord");
       chordWheelCtx.fill();
     } else {
-      chordWheelCtx.arc(px, py, 1.0, 0, Math.PI * 2);
-      chordWheelCtx.fillStyle = "rgba(255, 255, 255, 0.16)";
+      chordWheelCtx.arc(px, py, 1.15, 0, Math.PI * 2);
+      chordWheelCtx.fillStyle = "rgba(255, 255, 255, 0.18)";
       chordWheelCtx.fill();
     }
 
-    chordWheelCtx.font = isRootTone ? "bold 10.5px \"JetBrains Mono\", ui-monospace, monospace" : (isChordTone ? "bold 9.5px \"JetBrains Mono\", ui-monospace, monospace" : "8.5px \"JetBrains Mono\", ui-monospace, monospace");
-    chordWheelCtx.fillStyle = isRootTone ? "#ffffff" : (isChordTone ? themeHex("chord") : "rgba(255, 255, 255, 0.28)");
+    chordWheelCtx.font = isRootTone ? "800 11px \"JetBrains Mono\", ui-monospace, monospace" : (isChordTone ? "700 10px \"JetBrains Mono\", ui-monospace, monospace" : "500 8.5px \"JetBrains Mono\", ui-monospace, monospace");
+    chordWheelCtx.fillStyle = isRootTone ? "#ffffff" : (isChordTone ? themeHex("chord") : "rgba(255, 255, 255, 0.30)");
     chordWheelCtx.fillText(CIRCLE_OF_FIFTHS[k], lx, ly);
   }
 
   if (document.getElementById("cardChordRoot")) document.getElementById("cardChordRoot").textContent = chordRootName;
-  if (document.getElementById("cardChordVoicing")) document.getElementById("cardChordVoicing").textContent = chordVoicingName;
+  if (document.getElementById("cardChordQuality")) document.getElementById("cardChordQuality").textContent = chordWesternQuality;
+  if (document.getElementById("cardChordMode")) document.getElementById("cardChordMode").textContent = getScaleDisplayBadge(activeScaleKey, isLive);
+  if (document.getElementById("cardChordVoicing")) {
+    const vObj = !isLive ? getActiveVoicingObject(currentChordVoicing, activeScaleKey) : null;
+    document.getElementById("cardChordVoicing").innerHTML = formatChordVoicingSubtitleHTML(vObj || chordVoicingName);
+  }
 
-  let toneNames, intervalLabels;
-  if (isManualChordActive && liveActiveChord) {
-    toneNames = liveActiveChord.sortedNotes.map(m => `${NOTE_NAMES[m % 12]}${Math.floor(m / 12) - 1}`).join(" · ");
+  let toneHtml, intervalLabels;
+  if (isLive) {
+    toneHtml = liveActiveChord.sortedNotes.map((m, idx) => {
+      const lbl = `${NOTE_NAMES[m % 12]}${Math.floor(m / 12) - 1}`;
+      return idx === 0 ? `<span class="tone-root">${lbl}</span>` : lbl;
+    }).join('<span class="tone-dot"> · </span>');
     intervalLabels = liveActiveChord.intervals.map(iv => getIntervalLabel(iv)).join(" · ");
   } else {
     const rootMidi = 48 + rootNote + currentChordDeg;
-    toneNames = activeIntervals.map(iv => {
+    toneHtml = rawIntervals.map((iv, idx) => {
       const m = rootMidi + iv; const oct = Math.floor(m / 12) - 1;
-      return `${NOTE_NAMES[m % 12]}${oct}`;
-    }).join(" · ");
-    const voicing = getActiveVoicingObject(currentChordVoicing, activeScaleKey);
-    intervalLabels = activeIntervals.map(iv => getIntervalLabel(iv)).join(" · ");
+      const lbl = `${NOTE_NAMES[m % 12]}${oct}`;
+      return idx === 0 ? `<span class="tone-root">${lbl}</span>` : lbl;
+    }).join('<span class="tone-dot"> · </span>');
+    intervalLabels = rawIntervals.map(iv => getIntervalLabel(iv)).join(" · ");
   }
 
-  if (document.getElementById("telemTones")) document.getElementById("telemTones").textContent = toneNames;
+  if (document.getElementById("telemTones")) document.getElementById("telemTones").innerHTML = toneHtml;
   if (document.getElementById("telemIntervals")) document.getElementById("telemIntervals").textContent = intervalLabels;
 }
 
