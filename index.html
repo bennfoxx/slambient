@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Slambient — Generative Ambient Instrument</title>
 <meta name="description" content="Generative ambient music synthesizer, tape drone, and polyrhythmic instrument">
 <meta name="robots" content="noindex, nofollow">
@@ -85,9 +85,11 @@
     cursor: var(--cursor-default);
     overscroll-behavior-y: none;
     -webkit-tap-highlight-color: transparent;
+    touch-action: pan-y;
   }
 
   body {
+    touch-action: pan-y;
     background-color: var(--bg);
     background-image:
       linear-gradient(rgba(var(--rgb-drone), 0.025) 1px, transparent 1px),
@@ -125,6 +127,7 @@
   .btn-meter-cycle, .eno-standalone-pod, [onclick], .toggle-switch, .master-vol-mute,
   .badge-tag, .btn-mute, .btn-solo, .btn-power, .btn-telemetry-action {
     cursor: var(--cursor-pointer) !important;
+    touch-action: manipulation;
   }
 
   /* Sliders: enforce custom cursor across track and thumb on hover and active drag */
@@ -5635,7 +5638,16 @@
        viewport meta stops the zoom-out; clipping both roots means nothing can
        pan the page sideways either (hidden first, as the fallback for
        browsers without overflow: clip). */
-    html, body { max-width: 100%; overflow-x: hidden; overflow-x: clip; }
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+      overflow-x: clip;
+      touch-action: pan-y;
+      -webkit-user-select: none;
+    }
+    .preset-bar, .orbital-signal-ribbon {
+      touch-action: pan-x;
+    }
     body {
       min-height: 100vh;
       min-height: 100dvh;
@@ -22051,6 +22063,57 @@ window.addEventListener("keydown", (e) => {
 })();
 </script>
 <script>
+/* ==========================================================================
+   Mobile & Touch Zoom Lockdown
+   Completely removes manual touch-zoom capability (pinch-to-zoom and double-tap zoom)
+   on mobile devices and touch screens.
+   ========================================================================== */
+(function lockMobileZoom() {
+  // 1. WebKit gesture events (Safari iOS pinch zoom prevention)
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach((eventName) => {
+    document.addEventListener(eventName, (e) => {
+      e.preventDefault();
+    }, { passive: false });
+  });
+
+  // 2. Multi-touch touchmove pinch zoom prevention
+  document.addEventListener('touchmove', (e) => {
+    if ((e.scale !== undefined && e.scale !== 1) || (e.touches && e.touches.length > 1)) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  // 3. Prevent double-tap to zoom while preserving responsive clicks on buttons, keys, and controls
+  let lastTouchEndTime = 0;
+  document.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if (now - lastTouchEndTime <= 320) {
+      const isInteractive = e.target && e.target.closest && e.target.closest(
+        'button, [role="button"], input, select, a, .piano-key, .black-key, .white-key, .mobile-macro-tile, .custom-select-trigger, .btn-preset-chip, .btn-oct, .btn-kb-view, .vert-mode-btn, .arcade-btn, .arcade-pad-thumb, .master-vol-mute, .toggle-switch, .badge-tag'
+      );
+      if (!isInteractive) {
+        e.preventDefault();
+      }
+    }
+    lastTouchEndTime = now;
+  }, { passive: false });
+
+  // 4. Double-click prevention (preserves scope fullscreen toggle)
+  document.addEventListener('dblclick', (e) => {
+    if (e.target && e.target.closest && e.target.closest('.scope-left-viz')) {
+      return;
+    }
+    e.preventDefault();
+  }, { passive: false });
+
+  // 5. Trackpad / mouse ctrl-wheel pinch zoom prevention
+  window.addEventListener('wheel', (e) => {
+    if (e.ctrlKey) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+})();
+
 /* ===== Phone layout helpers ===== */
 /* --- Header (phone): fullscreen-API flag, preset strip fades, mini transport bar --- */
 (function initPhoneHeader() {

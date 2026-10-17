@@ -1730,3 +1730,13 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Replaced `flex-wrap: wrap` in `#orbitalSidePanel .control-label` with `display: flex; flex-wrap: nowrap !important; justify-content: space-between; align-items: center; width: 100%; min-height: 22px; white-space: nowrap;`.
   - Added `flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap !important;` to label text, and `flex: 0 0 auto; margin-left: 8px; white-space: nowrap !important; font-variant-numeric: tabular-nums;` to `.control-val`.
   - Adjusted `.orbital-signal-ribbon` on desktop so all 10 module nodes fit across the 580px popup without horizontal scroll clipping.
+- **Mobile Touch-Zoom Lockdown (Pinch & Double-Tap Removal)**:
+  - Updated `<meta name="viewport">` with `maximum-scale=1.0, user-scalable=no, viewport-fit=cover`.
+  - Applied CSS `touch-action: pan-y;` on `html, body` (globally and under mobile media query) and `touch-action: pan-x;` on `.preset-bar` / `.orbital-signal-ribbon`.
+  - Added CSS `touch-action: manipulation;` on interactive controls (buttons, chips, select, tags).
+  - Implemented `lockMobileZoom()` JavaScript module:
+    - Traps and prevents WebKit gesture events (`gesturestart`, `gesturechange`, `gestureend`) to block iOS Safari pinch-to-zoom.
+    - Traps and prevents multi-touch scaling on `touchmove` (`e.scale !== 1 || e.touches.length > 1`).
+    - Intercepts rapid `touchend` events (within 320ms) on non-interactive containers to block iOS Safari double-tap zoom while keeping button, pad, and piano key multi-taps 100% responsive.
+    - Prevents default on `dblclick` (preserving `.scope-left-viz` fullscreen toggle).
+    - Prevents trackpad/mouse `wheel` pinch zoom when `e.ctrlKey` is true.
