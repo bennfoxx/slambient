@@ -1795,3 +1795,25 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
 - **Touch View-Switcher Ghost-Click Prevention & Multi-Touch Piano/Arcade Pass-Through**:
   - Added a 450ms capture-phase `click` guard after `pointerup` in `initTouchViewSwitchers()` to prevent synthetic ghost clicks from double-firing view/module transitions.
   - Exempted `.piano-keys-wrapper, .arcade-controls, .arcade-pad, .arcade-btn` from multi-touch `touchmove` prevention in `lockMobileZoom()` and added `.custom-dropdown-*` selectors to `isInteractive` in `touchend`.
+
+## Update — 2026-10-16 (Scale-Tied Modal Chord Voicing Engine on `experiment/scale-tied-voicings`)
+
+- **Scale-Tied Signature Harmonic Profiles (`SCALE_SIGNATURE_VOICINGS`)**:
+  - Added dedicated, mode-authentic chord voicing profiles across all 14 ambient scales:
+    - **Lydian**: Quartal (#11) `[0, 4, 6, 10]`, Lydian Maj7 (#11), Ether Drop-2.
+    - **Lydian Dominant**: Overtone Acoustic (#11/b7), Lydian Dom 9(#11) Spread.
+    - **Dorian**: So What Modal Fourths `[0, 3, 6, 9, 11]`, Dorian 6/9 Drop-2, Deep Dorian 11th.
+    - **Phrygian**: Dark Halo (b2/b6) `[0, 4, 7, 8]`, Sus Cluster, Mystic 5th (b9 Hover).
+    - **Mixolydian**: Sus4 Dominant Spread, Floating 9th (Modal 7th).
+    - **Aeolian**: Deep 9th, Nordic Sus2 (b6 Cloud).
+    - **Hirajoshi & Insen**: Quintal Stacks, Koto Reflection, Temple Bell (Shakuhachi), Zen Quartal.
+    - **Bhairav & Bilawal**: Maihar Morning Resonance, Senia Raga Pillar, Bilawal Shuddha, Hindustani Consonant Prism.
+    - **Whole Tone & Major9**: Impressionist Augmented Prism, Floating Mystic Stack, Prism Maj9 Spread, Lyric Octave Add9.
+- **Harmonic Color & Anti-Clash Preservation Engine (`getVoicingIntervals`)**:
+  - Replaced indiscriminate semitone smoothing with scale-aware color preservation:
+    - In Lydian and Whole Tone modes, true `#11` (tritone, 6 semitones) is strictly preserved and exempt from 5th flattening.
+    - In Phrygian and Bhairav modes, authentic `b2`/`b9` halo tension (1 semitone above root/octave) is preserved without forced flattening to major 2nd.
+- **Dynamic UI Select & HUD Synchronization**:
+  - Added `updateChordVoicingSelectOptions()` which dynamically injects mode signature voicings (labeled with `★`) under an optgroup whenever the scale shifts, while retaining the full universal library.
+  - `updateChordHud()` and `renderChordWheel()` now use `getActiveVoicingObject()` and `getVoicingDisplayName()` to accurately display signature names (e.g., `D Lydian Quartal (#11)`, `D So What Modal Fourths`) and their exact harmonic intervals on the wheel and HUD telemetry.
+  - Generative downbeat advance and randomizers pick scale signature voicings with a 60% weighting while preserving full backward compatibility with stored user patches and numeric indices.
