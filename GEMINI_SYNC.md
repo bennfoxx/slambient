@@ -1778,3 +1778,20 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
     - Added `pointer-events: none` and `will-change: width` on the meter elements to guarantee zero impact on tile tapping, scrolling, and inspector interactions.
     - Added DOM meter cache invalidation in `renderMobileMacroGrid()` to ensure instant meter response upon theme shifts or pedal reordering.
     - Updated `ORBITAL_MODULES` sphere pulse physics in `loopOrbitalPhysics()` to also use full waveform RMS + frequency energy.
+
+## Update — 2026-10-16 (Secondary & Tertiary Dev Sync: Full-Width Mobile Header, 88-Key Radar Strip, Dropdown Modal Bounds, Live Macro Sync & Multi-Touch Guards)
+
+- **Mobile Header Brand & Preset-Bank 100% Width (`9446f55`)**:
+  - Updated mobile header `.brand-row` and `.preset-bank-bar` rows so brand, Eno/Volume pods, and preset bank controls fill 100% of the container width cleanly across all zoom modes.
+- **88-Key Radar Top Header Strip & Octave Markers**:
+  - Added a dedicated top header bar (`.piano-keys-wrapper.mode-radar::before`, 16px desktop / 14px mobile) above the 88-key radar keys.
+  - Positioned `.key-label.octave-marker` (`C1`–`C8`) inside the top header strip (`top: -15px`, `z-index: 6`) with active white glow so octave labels are never obscured by black keys.
+- **Custom Dropdown Menu Scrolling & Modal Collision Detection**:
+  - Added `max-height: min(320px, 55vh); overflow-y: auto; overscroll-behavior: contain;` on `.custom-dropdown-menu`.
+  - Updated `initSmartDropdowns()` to check `#orbitalModalBody` container bounds when inside the module inspector sheet and flip upward (`drop-up`) only when `roomAbove > roomBelow`.
+- **Live Mobile Macro Grid & Signal Ribbon Synchronization**:
+  - Added `renderMobileMacroGrid()` and `renderSignalRibbon()` sync calls inside `updatePedalsOrderUI()`, `togglePedalBypass()`, `updateAudioParams()`, and `updateMuteSoloUI()`, plus removed duplicate inline `onclick` on `#fieldModule` header.
+  - Ensured `setModuleView()` cleans up `#orbitalModalBackdrop.active` and `body.orbital-panel-open`.
+- **Touch View-Switcher Ghost-Click Prevention & Multi-Touch Piano/Arcade Pass-Through**:
+  - Added a 450ms capture-phase `click` guard after `pointerup` in `initTouchViewSwitchers()` to prevent synthetic ghost clicks from double-firing view/module transitions.
+  - Exempted `.piano-keys-wrapper, .arcade-controls, .arcade-pad, .arcade-btn` from multi-touch `touchmove` prevention in `lockMobileZoom()` and added `.custom-dropdown-*` selectors to `isInteractive` in `touchend`.
