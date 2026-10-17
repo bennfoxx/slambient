@@ -1389,10 +1389,10 @@
     overflow: hidden;
   }
   .chord-info-panel {
-    flex: 0 0 270px;
-    width: 270px;
-    min-width: 270px;
-    max-width: 270px;
+    flex: 0 0 clamp(285px, 20vw, 320px);
+    width: clamp(285px, 20vw, 320px);
+    min-width: 280px;
+    max-width: 330px;
     background: var(--panel);
     border: 1px solid var(--eno-glow-border, var(--border));
     border-radius: 6px;
@@ -1428,7 +1428,7 @@
       flex: 1 1 480px;
     }
     .chord-info-panel {
-      flex: 0 0 270px;
+      flex: 0 0 clamp(275px, 24vw, 305px);
     }
   }
   @media (max-width: 780px) {
@@ -1758,10 +1758,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: radial-gradient(circle at 50% 64%, rgba(var(--rgb-chord), 0.07) 0%, rgba(var(--rgb-arp), 0.025) 48%, #07080c 78%);
+    background: radial-gradient(circle at 50% 60%, rgba(var(--rgb-chord), 0.09) 0%, rgba(var(--rgb-arp), 0.035) 48%, #07080c 80%);
     border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 7px 9px 6px 9px;
+    border-radius: 6px;
+    padding: 8px 10px 6px 10px;
     position: relative;
     gap: 4px;
     flex: 1 1 auto;
@@ -1779,80 +1779,98 @@
   }
   .chord-wheel-primary-row {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     justify-content: space-between;
     width: 100%;
-    gap: 6px;
+    gap: 8px;
     min-width: 0;
   }
   .chord-wheel-symbol-group {
     display: inline-flex;
     align-items: baseline;
-    gap: 2px;
+    gap: 3px;
     white-space: nowrap;
     flex-shrink: 0;
+    min-width: 0;
   }
   .chord-wheel-root {
-    font-size: 1.375rem;
-    font-weight: 800;
+    font-size: 1.45rem;
+    font-weight: 850;
     color: #ffffff;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.35px;
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     line-height: 1;
-    text-shadow: 0 0 12px rgba(var(--rgb-chord), 0.65);
+    text-shadow: 0 0 14px rgba(var(--rgb-chord), 0.72);
   }
   .chord-wheel-quality {
-    font-size: 1rem;
+    font-size: 1.05rem;
     font-weight: 800;
     color: var(--color-chord);
-    letter-spacing: 0.25px;
+    letter-spacing: 0.2px;
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     line-height: 1;
-    text-shadow: 0 0 10px rgba(var(--rgb-chord), 0.42);
+    text-shadow: 0 0 10px rgba(var(--rgb-chord), 0.48);
     white-space: nowrap;
   }
   .chord-wheel-mode-pill {
-    font-size: 0.575rem;
+    font-size: 0.58rem;
     font-weight: 800;
-    letter-spacing: 0.65px;
+    letter-spacing: 0.7px;
     text-transform: uppercase;
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     line-height: 1;
     color: var(--color-drone);
-    background: rgba(var(--rgb-drone), 0.10);
-    border: 1px solid rgba(var(--rgb-drone), 0.30);
+    background: rgba(var(--rgb-drone), 0.12);
+    border: 1px solid rgba(var(--rgb-drone), 0.35);
     border-radius: 3px;
-    padding: 3px 5px;
+    padding: 3px 6px;
     white-space: nowrap;
     flex-shrink: 0;
-    text-shadow: 0 0 8px rgba(var(--rgb-drone), 0.35);
+    margin-left: auto;
+    text-shadow: 0 0 8px rgba(var(--rgb-drone), 0.40);
   }
   .chord-wheel-voicing {
-    font-size: 0.64rem;
-    font-weight: 700;
-    color: color-mix(in srgb, var(--color-arp) 42%, #eef2ff);
-    letter-spacing: 0.25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    width: 100%;
+    text-align: center;
+    min-height: 28px;
+    padding-top: 1px;
+    box-sizing: border-box;
+  }
+  .chord-wheel-voicing .voicing-main {
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: color-mix(in srgb, var(--color-arp) 65%, #f5f7ff);
+    letter-spacing: 0.5px;
+    line-height: 1.15;
     text-transform: uppercase;
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-    line-height: 1.25;
-    width: 100%;
-    min-height: 13px;
+    text-shadow: 0 0 8px rgba(var(--rgb-arp), 0.35);
     white-space: nowrap;
+    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .chord-wheel-voicing .voicing-main {
-    color: color-mix(in srgb, var(--color-arp) 45%, #f0f4ff);
-    text-shadow: 0 0 8px rgba(var(--rgb-arp), 0.28);
-  }
   .chord-wheel-voicing .voicing-sep {
-    color: rgba(var(--rgb-chord), 0.6);
-    margin: 0 4px;
-    font-weight: 800;
+    display: none;
   }
   .chord-wheel-voicing .voicing-sub {
+    font-size: 0.58rem;
+    font-weight: 700;
     color: var(--color-field);
-    text-shadow: 0 0 8px rgba(var(--rgb-field), 0.32);
+    letter-spacing: 0.4px;
+    line-height: 1.15;
+    text-transform: uppercase;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    text-shadow: 0 0 8px rgba(var(--rgb-field), 0.35);
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .chord-wheel-stage {
     display: flex;
@@ -1860,11 +1878,11 @@
     justify-content: center;
     width: 100%;
     flex: 1 1 auto;
-    padding: 1px 0;
+    padding: 0;
   }
   #chordWheelCanvas {
-    width: 136px;
-    height: 136px;
+    width: 144px;
+    height: 144px;
     display: block;
     image-rendering: -webkit-optimize-contrast;
   }
@@ -5513,7 +5531,7 @@
       overflow: hidden !important;
     }
     .chord-info-panel {
-      flex: 0 0 clamp(210px, 28vw, 260px) !important;
+      flex: 0 0 clamp(235px, 32vw, 290px) !important;
       min-width: 0 !important;
       max-width: none !important;
       width: auto !important;

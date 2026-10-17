@@ -24,9 +24,9 @@ function drawChordWheelCard() {
   lastChordWheelSignature = sig;
 
   const dpr = Math.min(2, window.devicePixelRatio || 1);
-  // Phones draw the wheel 1.44x (196px) so its note names and geometry are large and crisp.
+  // Phones draw the wheel 1.44x (207px) so its note names and geometry are large and crisp.
   const wheelK = isPhone ? 1.44 : 1;
-  const size = 136; const cssSize = Math.round(size * wheelK); const targetBuffer = Math.round(cssSize * dpr);
+  const size = 144; const cssSize = Math.round(size * wheelK); const targetBuffer = Math.round(cssSize * dpr);
   if (chordWheelCanvas.width !== targetBuffer || chordWheelCanvas.height !== targetBuffer) {
     chordWheelCanvas.width = targetBuffer; chordWheelCanvas.height = targetBuffer;
     chordWheelCanvas.style.width = cssSize + "px"; chordWheelCanvas.style.height = cssSize + "px";
@@ -67,33 +67,33 @@ function drawChordWheelCard() {
   const activeCofIndices = Array.from(new Set(activePitchClasses.map(pc => (pc * 7) % 12))).sort((a, b) => a - b);
   const activeCofSet = new Set(activeCofIndices);
 
-  const rimR = 62;
-  const dotR = 39;
-  const labelR = 51.5;
+  const rimR = 65;
+  const dotR = 42;
+  const labelR = 54.5;
 
   // Subtle ambient radial halo inside the Circle of Fifths
   const bgGrad = chordWheelCtx.createRadialGradient(cx, cy, 2, cx, cy, rimR);
-  bgGrad.addColorStop(0, `rgba(${themeRgb("chord")}, 0.11)`);
-  bgGrad.addColorStop(0.58, `rgba(${themeRgb("arp")}, 0.045)`);
+  bgGrad.addColorStop(0, `rgba(${themeRgb("chord")}, 0.13)`);
+  bgGrad.addColorStop(0.58, `rgba(${themeRgb("arp")}, 0.05)`);
   bgGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
   chordWheelCtx.beginPath(); chordWheelCtx.arc(cx, cy, rimR, 0, Math.PI * 2);
   chordWheelCtx.fillStyle = bgGrad; chordWheelCtx.fill();
 
   // Outer compass ring
   chordWheelCtx.beginPath(); chordWheelCtx.arc(cx, cy, rimR, 0, Math.PI * 2);
-  chordWheelCtx.strokeStyle = `rgba(${themeRgb("chord")}, 0.28)`; chordWheelCtx.lineWidth = 1.1; chordWheelCtx.stroke();
+  chordWheelCtx.strokeStyle = `rgba(${themeRgb("chord")}, 0.32)`; chordWheelCtx.lineWidth = 1.1; chordWheelCtx.stroke();
 
   // Inner harmonic orbit ring
   chordWheelCtx.beginPath(); chordWheelCtx.arc(cx, cy, dotR, 0, Math.PI * 2);
-  chordWheelCtx.strokeStyle = `rgba(${themeRgb("drone")}, 0.14)`; chordWheelCtx.lineWidth = 0.85; chordWheelCtx.stroke();
+  chordWheelCtx.strokeStyle = `rgba(${themeRgb("drone")}, 0.16)`; chordWheelCtx.lineWidth = 0.85; chordWheelCtx.stroke();
 
   // Center harmonic reticle
   chordWheelCtx.beginPath();
-  chordWheelCtx.moveTo(cx - 3.5, cy); chordWheelCtx.lineTo(cx + 3.5, cy);
-  chordWheelCtx.moveTo(cx, cy - 3.5); chordWheelCtx.lineTo(cx, cy + 3.5);
-  chordWheelCtx.strokeStyle = `rgba(${themeRgb("drone")}, 0.28)`; chordWheelCtx.lineWidth = 0.75; chordWheelCtx.stroke();
-  chordWheelCtx.beginPath(); chordWheelCtx.arc(cx, cy, 1.5, 0, Math.PI * 2);
-  chordWheelCtx.fillStyle = `rgba(${themeRgb("drone")}, 0.55)`; chordWheelCtx.fill();
+  chordWheelCtx.moveTo(cx - 4, cy); chordWheelCtx.lineTo(cx + 4, cy);
+  chordWheelCtx.moveTo(cx, cy - 4); chordWheelCtx.lineTo(cx, cy + 4);
+  chordWheelCtx.strokeStyle = `rgba(${themeRgb("drone")}, 0.32)`; chordWheelCtx.lineWidth = 0.8; chordWheelCtx.stroke();
+  chordWheelCtx.beginPath(); chordWheelCtx.arc(cx, cy, 1.6, 0, Math.PI * 2);
+  chordWheelCtx.fillStyle = `rgba(${themeRgb("drone")}, 0.65)`; chordWheelCtx.fill();
 
   // Radial spokes from center to active chord tones
   activeCofIndices.forEach((cofIdx) => {
@@ -104,8 +104,8 @@ function drawChordWheelCard() {
     chordWheelCtx.beginPath();
     chordWheelCtx.moveTo(cx, cy);
     chordWheelCtx.lineTo(px, py);
-    chordWheelCtx.strokeStyle = isRoot ? `rgba(${themeRgb("chord")}, 0.32)` : `rgba(${themeRgb("arp")}, 0.18)`;
-    chordWheelCtx.lineWidth = isRoot ? 1.0 : 0.75;
+    chordWheelCtx.strokeStyle = isRoot ? `rgba(${themeRgb("chord")}, 0.38)` : `rgba(${themeRgb("arp")}, 0.22)`;
+    chordWheelCtx.lineWidth = isRoot ? 1.15 : 0.8;
     chordWheelCtx.stroke();
   });
 
@@ -120,10 +120,10 @@ function drawChordWheelCard() {
     });
     chordWheelCtx.closePath();
     const polyGrad = chordWheelCtx.createLinearGradient(cx - dotR, cy - dotR, cx + dotR, cy + dotR);
-    polyGrad.addColorStop(0, `rgba(${themeRgb("chord")}, 0.22)`);
-    polyGrad.addColorStop(1, `rgba(${themeRgb("arp")}, 0.14)`);
+    polyGrad.addColorStop(0, `rgba(${themeRgb("chord")}, 0.24)`);
+    polyGrad.addColorStop(1, `rgba(${themeRgb("arp")}, 0.15)`);
     chordWheelCtx.fillStyle = polyGrad; chordWheelCtx.fill();
-    chordWheelCtx.strokeStyle = themeHex("chord"); chordWheelCtx.lineWidth = 1.5; chordWheelCtx.stroke();
+    chordWheelCtx.strokeStyle = themeHex("chord"); chordWheelCtx.lineWidth = 1.6; chordWheelCtx.stroke();
   }
 
   chordWheelCtx.textAlign = "center";
@@ -142,49 +142,49 @@ function drawChordWheelCard() {
 
     // Outer compass rim tick
     chordWheelCtx.beginPath();
-    chordWheelCtx.moveTo(cx + cosA * (rimR - 2.2), cy + sinA * (rimR - 2.2));
+    chordWheelCtx.moveTo(cx + cosA * (rimR - 2.5), cy + sinA * (rimR - 2.5));
     chordWheelCtx.lineTo(cx + cosA * rimR, cy + sinA * rimR);
-    chordWheelCtx.strokeStyle = isRootTone ? "#ffffff" : (isChordTone ? `rgba(${themeRgb("chord")}, 0.55)` : "rgba(255, 255, 255, 0.12)");
-    chordWheelCtx.lineWidth = isRootTone ? 1.3 : 0.8;
+    chordWheelCtx.strokeStyle = isRootTone ? "#ffffff" : (isChordTone ? `rgba(${themeRgb("chord")}, 0.60)` : "rgba(255, 255, 255, 0.13)");
+    chordWheelCtx.lineWidth = isRootTone ? 1.4 : 0.8;
     chordWheelCtx.stroke();
 
-    const tickIn = dotR - 2.2;
-    const tickOut = dotR + (isRootTone ? 6.5 : (isChordTone ? 4.2 : 2.0));
+    const tickIn = dotR - 2.5;
+    const tickOut = dotR + (isRootTone ? 7.0 : (isChordTone ? 4.5 : 2.0));
     chordWheelCtx.beginPath();
     chordWheelCtx.moveTo(cx + cosA * tickIn, cy + sinA * tickIn);
     chordWheelCtx.lineTo(cx + cosA * tickOut, cy + sinA * tickOut);
-    chordWheelCtx.strokeStyle = isRootTone ? "#ffffff" : (isChordTone ? themeHex("chord") : "rgba(255, 255, 255, 0.11)");
-    chordWheelCtx.lineWidth = isRootTone ? 1.6 : (isChordTone ? 1.2 : 0.65);
+    chordWheelCtx.strokeStyle = isRootTone ? "#ffffff" : (isChordTone ? themeHex("chord") : "rgba(255, 255, 255, 0.12)");
+    chordWheelCtx.lineWidth = isRootTone ? 1.6 : (isChordTone ? 1.25 : 0.65);
     chordWheelCtx.stroke();
 
     chordWheelCtx.beginPath();
     if (isRootTone) {
-      chordWheelCtx.arc(px, py, 6.0, 0, Math.PI * 2);
-      chordWheelCtx.strokeStyle = `rgba(${themeRgb("chord")}, 0.72)`;
-      chordWheelCtx.lineWidth = 1.3;
+      chordWheelCtx.arc(px, py, 6.5, 0, Math.PI * 2);
+      chordWheelCtx.strokeStyle = `rgba(${themeRgb("chord")}, 0.75)`;
+      chordWheelCtx.lineWidth = 1.35;
       chordWheelCtx.stroke();
 
       chordWheelCtx.beginPath();
-      chordWheelCtx.arc(px, py, 3.4, 0, Math.PI * 2);
+      chordWheelCtx.arc(px, py, 3.6, 0, Math.PI * 2);
       chordWheelCtx.fillStyle = "#ffffff";
       chordWheelCtx.fill();
     } else if (isChordTone) {
-      chordWheelCtx.arc(px, py, 4.2, 0, Math.PI * 2);
-      chordWheelCtx.fillStyle = `rgba(${themeRgb("chord")}, 0.22)`;
+      chordWheelCtx.arc(px, py, 4.5, 0, Math.PI * 2);
+      chordWheelCtx.fillStyle = `rgba(${themeRgb("chord")}, 0.24)`;
       chordWheelCtx.fill();
 
       chordWheelCtx.beginPath();
-      chordWheelCtx.arc(px, py, 2.5, 0, Math.PI * 2);
+      chordWheelCtx.arc(px, py, 2.6, 0, Math.PI * 2);
       chordWheelCtx.fillStyle = themeHex("chord");
       chordWheelCtx.fill();
     } else {
-      chordWheelCtx.arc(px, py, 1.15, 0, Math.PI * 2);
+      chordWheelCtx.arc(px, py, 1.2, 0, Math.PI * 2);
       chordWheelCtx.fillStyle = "rgba(255, 255, 255, 0.18)";
       chordWheelCtx.fill();
     }
 
-    chordWheelCtx.font = isRootTone ? "800 11px \"JetBrains Mono\", ui-monospace, monospace" : (isChordTone ? "700 10px \"JetBrains Mono\", ui-monospace, monospace" : "500 8.5px \"JetBrains Mono\", ui-monospace, monospace");
-    chordWheelCtx.fillStyle = isRootTone ? "#ffffff" : (isChordTone ? themeHex("chord") : "rgba(255, 255, 255, 0.30)");
+    chordWheelCtx.font = isRootTone ? "800 11.5px \"JetBrains Mono\", ui-monospace, monospace" : (isChordTone ? "700 10px \"JetBrains Mono\", ui-monospace, monospace" : "500 8.5px \"JetBrains Mono\", ui-monospace, monospace");
+    chordWheelCtx.fillStyle = isRootTone ? "#ffffff" : (isChordTone ? themeHex("chord") : "rgba(255, 255, 255, 0.32)");
     chordWheelCtx.fillText(CIRCLE_OF_FIFTHS[k], lx, ly);
   }
 
