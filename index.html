@@ -36,10 +36,10 @@
   <div class="header-bar-wrapper">
     <header class="top-bar">
       <div class="top-bar-row brand-row">
-        <div class="brand-group" title="Meander Engine · Modular Generative Console">
+        <div class="brand-group" data-header-slot="brand" title="Meander Engine · Modular Generative Console">
           <div class="app-title">
             <svg class="brand-jack-glyph" viewBox="0 0 28 28" width="22" height="22" fill="none" aria-hidden="true">
-              <polygon points="14,1 23,5 27,14 23,23 14,27 5,23 1,14 5,5" fill="#121624" stroke="#fed330" stroke-width="1.6"/>
+              <polygon points="14,1 23,5 27,14 23,23 14,27 5,23 14,27 5,23 1,14 5,5" fill="#121624" stroke="#fed330" stroke-width="1.6"/>
               <circle cx="14" cy="14" r="7.5" fill="#070911" stroke="#374362" stroke-width="1.4"/>
               <circle cx="14" cy="14" r="3.5" fill="#fed330"/>
               <line x1="14" y1="1" x2="14" y2="4" stroke="#fed330" stroke-width="1.6" stroke-linecap="round"/>
@@ -60,7 +60,7 @@
           </div>
         </div>
 
-        <div class="preset-group">
+        <div class="preset-group" data-header-slot="presets">
           <div class="preset-bank-header">
             <div class="preset-bank-tabs">
               <button class="btn-bank-tab active" id="tabBankFactory" onclick="switchPresetBank('factory')" title="Factory curated presets">PRESETS</button>
@@ -114,61 +114,61 @@
 
       <div class="top-bar-row transport-row">
         <!-- SECTION 1: Transport & Audio (play/pause, record, sample, MIDI) -->
-        <div class="header-section header-sec-transport">
-          <button class="btn-main-play" id="btnPlay" onclick="togglePlay()">
-            <span class="play-icon-wrap" id="btnPlayIcon">
-              <svg class="icon-play" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M4.5 2.5L13 8L4.5 13.5V2.5Z" />
-              </svg>
-              <svg class="icon-pause" viewBox="0 0 16 16" fill="currentColor">
-                <rect x="3.5" y="2.5" width="3.2" height="11" rx="0.8" />
-                <rect x="9.3" y="2.5" width="3.2" height="11" rx="0.8" />
-              </svg>
-            </span>
-            <span id="btnPlayLabel">Start</span>
-          </button>
-
-          <div class="rec-ctrl-wrap">
-            <button class="btn-record" id="btnRecord" onclick="toggleRecord()" title="Record master output or multi-track stems">
-              <div class="rec-dot"></div>
-              <span id="btnRecordLabel">Record</span>
+        <div class="header-section header-sec-transport" data-header-slot="transport">
+          <div class="transport-row-top">
+            <button class="btn-main-play" id="btnPlay" onclick="togglePlay()">
+              <span class="play-icon-wrap" id="btnPlayIcon">
+                <svg class="icon-play" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M4.5 2.5L13 8L4.5 13.5V2.5Z" />
+                </svg>
+                <svg class="icon-pause" viewBox="0 0 16 16" fill="currentColor">
+                  <rect x="3.5" y="2.5" width="3.2" height="11" rx="0.8" />
+                  <rect x="9.3" y="2.5" width="3.2" height="11" rx="0.8" />
+                </svg>
+              </span>
+              <span id="btnPlayLabel">Start</span>
             </button>
-            <select id="selRecordFormat" class="record-format-select" title="Output format: 320k MP3, Lossless WAV, 5-Track Stems ZIP, Video (MP4/WebM), or MIDI">
-              <option value="MP3">MP3</option>
-              <option value="WAV">WAV</option>
-              <option value="STEMS">STEMS</option>
-              <option value="VIDEO">VIDEO (MP4/WebM)</option>
-              <option value="MIDI">MIDI (.mid)</option>
-              <option value="MIDI_STEMS">MIDI Stems</option>
-            </select>
+
+            <div class="rec-ctrl-wrap">
+              <button class="btn-record" id="btnRecord" onclick="toggleRecord()" title="Record master output or multi-track stems">
+                <div class="rec-dot"></div>
+                <span id="btnRecordLabel">Record</span>
+              </button>
+              <select id="selRecordFormat" class="record-format-select" title="Output format: 320k MP3, Lossless WAV, 5-Track Stems ZIP, Video (MP4/WebM), or MIDI">
+                <option value="MP3">MP3</option>
+                <option value="WAV">WAV</option>
+                <option value="STEMS">STEMS</option>
+                <option value="VIDEO">VIDEO (MP4/WebM)</option>
+                <option value="MIDI">MIDI (.mid)</option>
+                <option value="MIDI_STEMS">MIDI Stems</option>
+              </select>
+            </div>
           </div>
 
-          <span class="transport-sep" aria-hidden="true">|</span>
+          <div class="transport-row-bottom">
+            <div class="sample-ctrl field-badge" id="fieldBadge" title="Pocket Field Recorder: hold MIC to sample (tap records 5 s), or DROP audio file. Woven into Noise module.">
+              <span class="tag">SAMPLE</span>
+              <button type="button" class="btn-field btn-field-mic" data-field-hold aria-label="Hold to record from the microphone">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+                <span>MIC</span>
+              </button>
+              <button type="button" class="btn-field btn-field-drop" data-field-load aria-label="Load or drop an audio file">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><path d="M9 16h6"/></svg>
+                <span>DROP</span>
+              </button>
+              <canvas class="field-wave" data-field-wave width="84" height="20"></canvas>
+              <button type="button" class="btn-field-eject" data-field-eject title="Eject sample" aria-label="Eject sample">&times;</button>
+            </div>
 
-          <div class="sample-ctrl field-badge" id="fieldBadge" title="Pocket Field Recorder: hold MIC to sample (tap records 5 s), or DROP audio file. Woven into Noise module.">
-            <span class="tag">SAMPLE</span>
-            <button type="button" class="btn-field btn-field-mic" data-field-hold aria-label="Hold to record from the microphone">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
-              <span>MIC</span>
+            <button class="btn-header-util btn-header-midi" id="btnHeaderMidi" onclick="toggleMidiConnectionPrompt()" title="Web MIDI hardware connection">
+              <span class="midi-status-dot" id="midiStatusDot"></span>
+              <span id="midiHeaderLabel">MIDI</span>
             </button>
-            <button type="button" class="btn-field btn-field-drop" data-field-load aria-label="Load or drop an audio file">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><path d="M9 16h6"/></svg>
-              <span>DROP</span>
-            </button>
-            <canvas class="field-wave" data-field-wave width="84" height="20"></canvas>
-            <button type="button" class="btn-field-eject" data-field-eject title="Eject sample" aria-label="Eject sample">&times;</button>
           </div>
-
-          <span class="transport-sep" aria-hidden="true">|</span>
-
-          <button class="btn-header-util btn-header-midi" id="btnHeaderMidi" onclick="toggleMidiConnectionPrompt()" title="Web MIDI hardware connection">
-            <span class="midi-status-dot" id="midiStatusDot"></span>
-            <span id="midiHeaderLabel">MIDI</span>
-          </button>
         </div>
 
         <!-- SECTION 2: Harmony & Master Clock (Key, scale, meter, tempo) -->
-        <div class="header-section header-sec-harmony">
+        <div class="header-section header-sec-harmony" data-header-slot="harmony">
           <div class="harmony-row-top">
             <div class="root-scale-ctrl">
               <span class="tag">KEY</span>
@@ -231,16 +231,27 @@
       </div>
 
       <div class="top-bar-row readout-row">
-        <div class="sys-readout">
+        <div class="sys-readout" data-header-slot="readout">
           <div class="telemetry-pill"><span class="dot-live"></span><span class="pill-k">TIME</span><span class="val" id="hudTimer">00:00</span></div>
           <div class="telemetry-pill"><span class="pill-k">METER</span><span class="val" id="hudMeter">7/4 [1/7]</span></div>
           <div class="telemetry-pill"><span class="pill-k">ROOT / SCALE</span><span class="val" id="hudScale">D DORIAN</span></div>
           <div class="telemetry-pill"><span class="pill-k">SEED</span><span class="val" id="hudSeed">#534C-414D</span></div>
         </div>
 
+        <div class="header-section master-vol-pod" data-header-slot="masterVol" title="Master Output Volume">
+          <div class="master-vol-row-top">
+            <span class="tag">LEVEL</span>
+            <span class="master-vol-val" id="lblMasterVolume">85%</span>
+            <button type="button" class="master-vol-mute" id="btnMasterMute" onclick="toggleMasterMute()" title="Mute Master Output">MUTE</button>
+          </div>
+          <div class="master-vol-row-bottom">
+            <input type="range" id="knobMasterVolume" min="0" max="100" value="85" oninput="updateMasterVolume(this.value)" title="Master Output Volume">
+          </div>
+        </div>
+
         <div class="header-util-gen-cluster">
           <!-- SECTION 3: Workspace & System Utilities (full screen, palette, ?) -->
-          <div class="header-section header-sec-utils">
+          <div class="header-section header-sec-utils" data-header-slot="utilities">
             <button class="btn-header-util" id="btnAppFullscreen" onclick="toggleAppFullscreen()" title="Full screen">
               <svg class="icon-enter-fs" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
               <svg class="icon-exit-fs" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -265,7 +276,7 @@
           </div>
 
           <!-- SECTION 4: Generative Engine & History (Randomize All, Re-Seed, Panic, Undo) -->
-          <div class="header-section header-sec-gen">
+          <div class="header-section header-sec-gen" data-header-slot="generative">
             <button class="btn-preset-chip btn-randomize-all" id="btnRandomizeAll" onclick="randomizeEverything()" title="Randomize every module"><svg class="rand-all-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20.5 3.5v5h-5"/></svg><span>Randomize All</span></button>
             <button class="btn-header-util btn-reseed-patch" id="btnHeaderReseed" onclick="newSeed()" title="Reroll Deterministic PRNG Seed">⤾ Re-Seed</button>
             <button class="btn-header-util btn-panic-audio" id="btnHeaderPanic" onclick="panicMute()" title="Instantly silence all voices">Panic</button>
@@ -278,22 +289,17 @@
       </div>
     </header>
 
-    <div class="master-vol-pod" title="Master Output Volume">
-      <div class="master-vol-title">Master</div>
-      <div class="master-vol-slider-wrap">
-        <input type="range" id="knobMasterVolume" min="0" max="100" value="85" oninput="updateMasterVolume(this.value)" title="Master Output Volume">
-      </div>
-      <div class="master-vol-val" id="lblMasterVolume">85%</div>
-      <button class="master-vol-mute" id="btnMasterMute" onclick="toggleMasterMute()" title="Mute Master Output">M</button>
-    </div>
-
     <div class="eno-standalone-pod" onclick="toggleEnoPhosphor()" title="S.L.A.M. 6000 // CORE MESH (Click to cycle primary phosphor)">
-      <div class="eno-crt-screen">
+      <div class="eno-pod-header">
         <span class="eno-bio-scan-label">Bio-Scan</span>
-        <canvas id="enoWidgetCanvas" width="96" height="96"></canvas>
+        <span class="eno-status-pill"><i class="eno-status-pulse"></i>LIVE</span>
+      </div>
+      <div class="eno-crt-screen">
+        <canvas id="enoWidgetCanvas" width="140" height="140"></canvas>
       </div>
       <div class="eno-crt-meta">
         <span class="eno-sub" id="lblEnoPhos">SLAM · Y</span>
+        <span class="eno-meta-cycle">CYCLE ⤾</span>
       </div>
     </div>
   </div>

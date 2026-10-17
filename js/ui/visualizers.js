@@ -558,10 +558,8 @@ window.addEventListener("load", syncEnoPodSquare);
 window.addEventListener("resize", syncEnoPodSquare);
 if (typeof ResizeObserver !== "undefined") {
   const topBarEl = document.querySelector("header.top-bar");
-  const masterVolEl = document.querySelector(".master-vol-pod");
   const ro = new ResizeObserver(() => syncEnoPodSquare());
   if (topBarEl) ro.observe(topBarEl);
-  if (masterVolEl) ro.observe(masterVolEl);
 }
 if (document.readyState === "loading") {
   window.addEventListener("DOMContentLoaded", syncEnoPodSquare);

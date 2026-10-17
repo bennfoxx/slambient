@@ -19,7 +19,7 @@
   const DEFAULT_STATE = {
     editMode: false,
     activeTemplate: "FULL_STUDIO",
-    headerOrder: ["brand", "presets", "transport", "harmony", "readout", "utilities", "generative"],
+    headerOrder: ["brand", "presets", "transport", "harmony", "readout", "masterVol", "utilities", "generative"],
     upperDeckOrder: ["chordWheel", "scope", "keyboard"],
     rackOrder: ["drone", "chords", "noise", "drums", "arp", "field", "fxChain"],
     hiddenModules: [],
@@ -107,7 +107,18 @@
           return {
             editMode: !!parsed.editMode,
             activeTemplate: parsed.activeTemplate || "FULL_STUDIO",
-            headerOrder: Array.isArray(parsed.headerOrder) && parsed.headerOrder.length ? parsed.headerOrder : [...DEFAULT_STATE.headerOrder],
+            headerOrder: (() => {
+              if (Array.isArray(parsed.headerOrder) && parsed.headerOrder.length) {
+                const list = [...parsed.headerOrder];
+                if (!list.includes("masterVol")) {
+                  const readIdx = list.indexOf("readout");
+                  if (readIdx !== -1) list.splice(readIdx + 1, 0, "masterVol");
+                  else list.push("masterVol");
+                }
+                return list;
+              }
+              return [...DEFAULT_STATE.headerOrder];
+            })(),
             upperDeckOrder: Array.isArray(parsed.upperDeckOrder) && parsed.upperDeckOrder.length ? parsed.upperDeckOrder : [...DEFAULT_STATE.upperDeckOrder],
             rackOrder: Array.isArray(parsed.rackOrder) && parsed.rackOrder.length ? parsed.rackOrder : [...DEFAULT_STATE.rackOrder],
             hiddenModules: Array.isArray(parsed.hiddenModules) ? parsed.hiddenModules : [],
@@ -162,6 +173,7 @@
         { slot: "transport", selector: ".header-sec-transport" },
         { slot: "harmony", selector: ".header-sec-harmony" },
         { slot: "readout", selector: ".sys-readout" },
+        { slot: "masterVol", selector: ".master-vol-pod" },
         { slot: "utilities", selector: ".header-sec-utils" },
         { slot: "generative", selector: ".header-sec-gen" }
       ];
@@ -416,26 +428,59 @@
         const getSlot = (key) => document.querySelector(`[data-header-slot="${key}"]`);
 
         if (brandRow && transportRow && readoutRow) {
-          const el0 = getSlot(this.state.headerOrder[0]);
-          const el1 = getSlot(this.state.headerOrder[1]);
-          const el2 = getSlot(this.state.headerOrder[2]);
-          const el3 = getSlot(this.state.headerOrder[3]);
-          const el4 = getSlot(this.state.headerOrder[4]);
-          const el5 = getSlot(this.state.headerOrder[5]);
-          const el6 = getSlot(this.state.headerOrder[6]);
+          const slots = this.state.headerOrder.map(key => getSlot(key)).filter(Boolean);
 
-          if (el0) brandRow.appendChild(el0);
-          if (el1) brandRow.appendChild(el1);
+          // Canonical 3-row layout:
+          // Row 1: 2 items (brand, presets)
+          // Row 2: 2 items (transport, harmony)
+          // Row 3: remaining items (readout, masterVol, cluster [utilities, generative])
+          if (slots.length >= 8) {
+            if (slots[0]) brandRow.appendChild(slots[0]);
+            if (slots[1]) brandRow.appendChild(slots[1]);
 
-          if (el2) transportRow.appendChild(el2);
-          if (el3) transportRow.appendChild(el3);
+            if (slots[2]) transportRow.appendChild(slots[2]);
+            if (slots[3]) transportRow.appendChild(slots[3]);
 
-          if (el4 && cluster) readoutRow.insertBefore(el4, cluster);
-          else if (el4) readoutRow.appendChild(el4);
+            // Append row 3 items before the cluster if they aren't utilities/generative
+            for (let i = 4; i < slots.length; i++) {
+              const el = slots[i];
+              const slotName = el.getAttribute("data-header-slot");
+              if (slotName === "utilities" || slotName === "generative") {
+                if (cluster) cluster.appendChild(el);
+              } else {
+                if (cluster && cluster.parentNode === readoutRow) {
+                  readoutRow.insertBefore(el, cluster);
+                } else {
+                  readoutRow.appendChild(el);
+                }
+              }
+            }
+            if (cluster && cluster.parentNode !== readoutRow) {
+              readoutRow.appendChild(cluster);
+            }
+          } else if (slots.length === 7) {
+            // Legacy 7-slot fallback
+            const el0 = getSlot(this.state.headerOrder[0]);
+            const el1 = getSlot(this.state.headerOrder[1]);
+            const el2 = getSlot(this.state.headerOrder[2]);
+            const el3 = getSlot(this.state.headerOrder[3]);
+            const el4 = getSlot(this.state.headerOrder[4]);
+            const el5 = getSlot(this.state.headerOrder[5]);
+            const el6 = getSlot(this.state.headerOrder[6]);
 
-          if (cluster) {
-            if (el5) cluster.appendChild(el5);
-            if (el6) cluster.appendChild(el6);
+            if (el0) brandRow.appendChild(el0);
+            if (el1) brandRow.appendChild(el1);
+
+            if (el2) transportRow.appendChild(el2);
+            if (el3) transportRow.appendChild(el3);
+
+            if (el4 && cluster) readoutRow.insertBefore(el4, cluster);
+            else if (el4) readoutRow.appendChild(el4);
+
+            if (cluster) {
+              if (el5) cluster.appendChild(el5);
+              if (el6) cluster.appendChild(el6);
+            }
           }
         }
       }
