@@ -105,11 +105,34 @@ const SCALE_SIGNATURE_VOICINGS = {
 };
 
 function getActiveVoicingObject(voicingId, scaleKey) {
-  const sk = scaleKey || activeScaleKey;
-  if (typeof voicingId === "string" && voicingId.startsWith("SIG_")) {
+  const sk = scaleKey || (typeof activeScaleKey !== "undefined" ? activeScaleKey : "DORIAN");
+  if (typeof voicingId === "string") {
     const sigList = SCALE_SIGNATURE_VOICINGS[sk] || [];
-    const idx = parseInt(voicingId.replace("SIG_", ""), 10);
-    if (!isNaN(idx) && sigList[idx]) return sigList[idx];
+    if (voicingId.startsWith("SIG_")) {
+      const idx = parseInt(voicingId.replace("SIG_", ""), 10);
+      if (!isNaN(idx) && sigList[idx]) return sigList[idx];
+    }
+    // Check scale signature voicings by exact name or alias
+    const norm = s => String(s).toUpperCase().replace(/[^A-Z0-9]/g, "");
+    const targetNorm = norm(voicingId);
+    let found = sigList.find(v => norm(v.name) === targetNorm || norm(v.mainLabel) === targetNorm || norm(v.label) === targetNorm);
+    if (found) return found;
+
+    // Check cross-scale signature voicings
+    for (const key of Object.keys(SCALE_SIGNATURE_VOICINGS)) {
+      found = SCALE_SIGNATURE_VOICINGS[key].find(v => norm(v.name) === targetNorm || norm(v.mainLabel) === targetNorm || norm(v.label) === targetNorm);
+      if (found) return found;
+    }
+
+    // Check general chord library
+    found = CHORD_LIBRARY.find(v => norm(v.name) === targetNorm || norm(v.label) === targetNorm);
+    if (found) return found;
+
+    // Specific aliases from preset matrix
+    if (targetNorm === "DORIANSO_WHAT" || targetNorm === "DORIAN_SO_WHAT" || targetNorm === "SOWHAT") {
+      const d = SCALE_SIGNATURE_VOICINGS.DORIAN;
+      if (d && d[0]) return d[0];
+    }
   }
   const numIdx = typeof voicingId === "number" ? voicingId : parseInt(voicingId, 10);
   if (!isNaN(numIdx) && numIdx >= 0 && numIdx < CHORD_LIBRARY.length) {

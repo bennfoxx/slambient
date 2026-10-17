@@ -2344,7 +2344,9 @@ let filterLFO, filterLFODepthGain;
 
 const FILTER_CUTOFF_MIN_HZ = 60, FILTER_CUTOFF_MAX_HZ = 16000;
 function hzFromCutoffPos(pos) {
-  return FILTER_CUTOFF_MIN_HZ * Math.pow(FILTER_CUTOFF_MAX_HZ / FILTER_CUTOFF_MIN_HZ, pos / 100);
+  const p = parseFloat(pos) || 0;
+  if (p > 100) return Math.min(FILTER_CUTOFF_MAX_HZ, Math.max(FILTER_CUTOFF_MIN_HZ, p));
+  return FILTER_CUTOFF_MIN_HZ * Math.pow(FILTER_CUTOFF_MAX_HZ / FILTER_CUTOFF_MIN_HZ, Math.max(0, Math.min(100, p)) / 100);
 }
 
 let delayTimeSec = 0.36;

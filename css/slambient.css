@@ -3721,14 +3721,16 @@
     justify-content: space-between;
     padding-bottom: 6px;
     border-bottom: 1px solid rgba(var(--pedal-color-rgb, 0, 229, 255), 0.25);
-    gap: 8px;
+    gap: 6px;
   }
 
   .studio-fx-grid .pedal-chassis .panel-header-left {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
     min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
   }
 
   .studio-fx-grid .pedal-drag-handle {
@@ -3736,9 +3738,10 @@
     cursor: grab;
     display: inline-flex;
     align-items: center;
-    padding: 2px;
+    padding: 1px;
     border-radius: 3px;
     transition: color 0.12s ease;
+    flex-shrink: 0;
   }
 
   .studio-fx-grid .pedal-drag-handle:hover {
@@ -3747,41 +3750,51 @@
 
   .studio-fx-grid .pedal-slot-index {
     font-family: var(--font-mono, monospace);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
     color: var(--pedal-color, #00e5ff);
     background: rgba(var(--pedal-color-rgb, 0, 229, 255), 0.12);
-    padding: 2px 5px;
+    padding: 1px 4px;
     border-radius: 3px;
     border: 1px solid rgba(var(--pedal-color-rgb, 0, 229, 255), 0.35);
     letter-spacing: 0.5px;
+    flex-shrink: 0;
   }
 
   .studio-fx-grid .pedal-card-title {
-    font-size: 12.5px;
-    font-weight: 700;
-    letter-spacing: 0.6px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
     color: var(--text-bright);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    min-width: 0;
   }
 
   .studio-fx-grid .pedal-slot-badge {
     font-family: var(--font-mono, monospace);
-    font-size: 8.5px;
+    font-size: 8px;
     font-weight: 800;
     letter-spacing: 0.5px;
-    padding: 1px 5px;
+    padding: 1px 4px;
     border-radius: 3px;
     background: #090c14;
     border: 1px solid var(--border-light);
     color: var(--text-dim);
+    flex-shrink: 0;
+  }
+
+  .studio-fx-grid .panel-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    flex-shrink: 0;
   }
 
   .studio-fx-grid .btn-pedal-shift {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -3792,6 +3805,7 @@
     cursor: pointer;
     transition: all 0.12s ease;
     padding: 0;
+    flex-shrink: 0;
   }
 
   .studio-fx-grid .btn-pedal-shift:hover:not(:disabled) {
@@ -3806,8 +3820,8 @@
   }
 
   .studio-fx-grid .btn-pedal-rand {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -3818,6 +3832,7 @@
     cursor: pointer;
     transition: all 0.12s ease;
     padding: 0;
+    flex-shrink: 0;
   }
 
   .studio-fx-grid .btn-pedal-rand:hover {

@@ -704,6 +704,13 @@
      * - Smoothly updates parameter values (with anti-click ramping)
      * - Crossfades the master bus seamlessly without clicks
      */
+    /**
+     * Loads a complete signature preset configuration into the FX rack:
+     * - Reorders the DSP chain (accepts config.order or config.chain)
+     * - Configures pedal bypass flags (with key normalization)
+     * - Smoothly updates parameter values (with anti-click ramping and parameter adaptation)
+     * - Crossfades the master bus seamlessly without clicks
+     */
     loadChainPreset(config) {
       if (!config || typeof config !== "object") return;
 
@@ -712,9 +719,19 @@
         "DELAY", "DIGITAL_DELAY", "SPACE_DELAY", "TAPE_ECHO", "SPACE"
       ];
 
+      const KEY_ALIASES = {
+        TUBE_DRIVE: "OVERDRIVE",
+        OPTICAL_TREMOLO: "TREMOLO",
+        ECHO: "TAPE_ECHO"
+      };
+
+      const normKey = k => KEY_ALIASES[k] || k;
+
       // 1. Reorder chain
-      if (Array.isArray(config.chain) && config.chain.length > 0) {
-        const newChain = [...config.chain.filter(k => ALL_KEYS.includes(k))];
+      const rawChain = Array.isArray(config.order) ? config.order : (Array.isArray(config.chain) ? config.chain : null);
+      if (rawChain && rawChain.length > 0) {
+        const mapped = rawChain.map(normKey).filter(k => ALL_KEYS.includes(k));
+        const newChain = [...mapped];
         ALL_KEYS.forEach(k => {
           if (!newChain.includes(k)) newChain.push(k);
         });
@@ -727,8 +744,20 @@
 
       // 2. Bypass flags
       if (config.bypass && typeof config.bypass === "object") {
-        Object.keys(config.bypass).forEach(k => {
-          const isBypassed = !!config.bypass[k];
+        // If order was provided, pedals in order default to active unless explicitly bypassed
+        if (rawChain) {
+          rawChain.forEach(k => {
+            const nk = normKey(k);
+            if (config.bypass[k] === undefined && config.bypass[nk] === undefined) {
+              this.bypassMap.set(nk, false);
+              if (typeof pedalBypassState !== "undefined") pedalBypassState[nk] = false;
+            }
+          });
+        }
+
+        Object.keys(config.bypass).forEach(rawK => {
+          const k = normKey(rawK);
+          const isBypassed = !!config.bypass[rawK];
           this.bypassMap.set(k, isBypassed);
           if (typeof pedalBypassState !== "undefined") {
             pedalBypassState[k] = isBypassed;
@@ -766,11 +795,45 @@
 
       // 3. DSP parameters and UI sync
       if (config.params && typeof config.params === "object") {
-        Object.keys(config.params).forEach(key => {
-          const paramsObj = config.params[key];
+        const currentBpm = (typeof bpm === "number" && bpm > 0) ? bpm : 72;
+        Object.keys(config.params).forEach(rawKey => {
+          const key = normKey(rawKey);
+          const paramsObj = config.params[rawKey];
           if (!paramsObj || typeof paramsObj !== "object") return;
-          Object.keys(paramsObj).forEach(paramId => {
-            const val = paramsObj[paramId];
+
+          Object.keys(paramsObj).forEach(rawParamId => {
+            let paramId = rawParamId;
+            let val = paramsObj[rawParamId];
+
+            // Parameter adaptations for matrix specs
+            if (key === "OVERDRIVE") {
+              if (paramId === "drive" && typeof val === "number" && val > 8.0) {
+                val = parseFloat((0.2 + (val / 100) * 7.8).toFixed(1));
+              } else if (paramId === "tone" && typeof val === "number" && val <= 100) {
+                val = Math.round(400 + (val / 100) * 9600);
+              }
+            } else if (key === "SPACE") {
+              if (paramId === "size") paramId = "decay";
+              if (paramId === "damp") paramId = "chorus";
+            } else if (key === "SPACE_DELAY") {
+              if (paramId === "time" && typeof val === "number" && val > 10) {
+                val = parseFloat((val / 1000).toFixed(2));
+              }
+            } else if (key === "DIGITAL_DELAY") {
+              if (paramId === "time") {
+                if (val === "3/16" || val === "dotted-8th") {
+                  val = parseFloat(((60 / currentBpm) * 0.75).toFixed(3));
+                } else if (typeof val === "number" && val > 10) {
+                  val = parseFloat((val / 1000).toFixed(2));
+                }
+              }
+            } else if (key === "TAPE_ECHO") {
+              if (paramId === "time" && typeof val === "number" && val > 10) {
+                paramId = "speed";
+                val = parseFloat((0.28 / (val / 1000)).toFixed(2));
+              }
+            }
+
             if (typeof updateFxParam === "function") {
               updateFxParam(key, paramId, val);
             }
