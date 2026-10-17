@@ -36,9 +36,28 @@
   <div class="header-bar-wrapper">
     <header class="top-bar">
       <div class="top-bar-row brand-row">
-        <div class="brand-group">
-          <div class="app-title"><span>S</span><span>L</span><span>A</span><span>M</span><span>B</span><span>I</span><span>E</span><span>N</span><span>T</span></div>
-          <div class="app-sub"><span>m</span><span>e</span><span>a</span><span>n</span><span>d</span><span>e</span><span>r</span><span>&nbsp;</span><span>e</span><span>n</span><span>g</span><span>i</span><span>n</span><span>e</span></div>
+        <div class="brand-group" title="Slambient · Modular Ambient Console">
+          <div class="app-title">
+            <svg class="brand-jack-glyph" viewBox="0 0 28 28" width="22" height="22" fill="none" aria-hidden="true">
+              <polygon points="14,1 23,5 27,14 23,23 14,27 5,23 1,14 5,5" fill="#121624" stroke="#fed330" stroke-width="1.6"/>
+              <circle cx="14" cy="14" r="7.5" fill="#070911" stroke="#374362" stroke-width="1.4"/>
+              <circle cx="14" cy="14" r="3.5" fill="#fed330"/>
+              <line x1="14" y1="1" x2="14" y2="4" stroke="#fed330" stroke-width="1.6" stroke-linecap="round"/>
+              <line x1="14" y1="24" x2="14" y2="27" stroke="#fed330" stroke-width="1.6" stroke-linecap="round"/>
+              <line x1="1" y1="14" x2="4" y2="14" stroke="#fed330" stroke-width="1.6" stroke-linecap="round"/>
+              <line x1="24" y1="14" x2="27" y2="14" stroke="#fed330" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            <span class="app-title-letters"><span>S</span><span>L</span><span>A</span><span>M</span><span>B</span><span>I</span><span>E</span><span>N</span><span>T</span></span>
+          </div>
+          <div class="app-sub">
+            <svg class="brand-stepper-glyph" viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true">
+              <circle cx="8" cy="8" r="6.8" stroke="#fed330" stroke-width="1.2" stroke-dasharray="3.2 2"/>
+              <circle cx="8" cy="8" r="2.2" fill="#00e5ff"/>
+              <line x1="8" y1="1" x2="8" y2="3.2" stroke="#fed330" stroke-width="1.2" stroke-linecap="round"/>
+              <line x1="15" y1="8" x2="12.8" y2="8" stroke="#fed330" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+            <span class="app-sub-letters"><span>m</span><span>e</span><span>a</span><span>n</span><span>d</span><span>e</span><span>r</span><span>&nbsp;</span><span>e</span><span>n</span><span>g</span><span>i</span><span>n</span><span>e</span></span>
+          </div>
         </div>
 
         <div class="preset-group">
@@ -978,16 +997,16 @@
       <div class="panel-header">
         <span onclick="openModuleInOrbital(this.closest('.strip-channel'))" style="cursor: pointer;" title="DSP FX CHAIN — Click to open modular inspector">DSP FX CHAIN</span>
         <div class="panel-header-actions">
-          <button type="button" class="btn-pedal-action btn-pedal-shuffle" onclick="randomizeDspChain(event)" title="Shuffle DSP insert chain order">
+          <button type="button" class="btn-pedal-action btn-pedal-shuffle" onclick="randomizeDspChain(event)" title="Randomize FX Chain (intelligent safe staging)">
             <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/>
               <polyline points="21 3 21 8 16 8"/>
               <path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/>
               <polyline points="3 21 3 16 8 16"/>
             </svg>
-            <span>SHUFFLE</span>
+            <span>⚄ RANDOMIZE</span>
           </button>
-          <button type="button" class="btn-pedal-action btn-pedal-reset" onclick="resetDspChain(event)" title="Reset order to Filter ➔ Delay ➔ Space">
+          <button type="button" class="btn-pedal-action btn-pedal-reset" onclick="resetDspChain(event)" title="Reset FX chain order to default">
             <span>RESET</span>
           </button>
         </div>
@@ -1032,16 +1051,16 @@
         <span class="routing-node-badge" style="color: var(--color-space); border-color: rgba(75, 123, 236, 0.4);">OUT</span>
       </div>
       <div class="pedals-header-actions">
-        <button type="button" class="btn-pedal-action btn-pedal-shuffle" onclick="randomizeDspChain(event)" title="Randomly shuffle pedal insert order">
+        <button type="button" class="btn-pedal-action btn-pedal-shuffle" onclick="randomizeDspChain(event)" title="Randomize FX Chain (intelligent safe staging)">
           <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/>
             <polyline points="21 3 21 8 16 8"/>
             <path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/>
             <polyline points="3 21 3 16 8 16"/>
           </svg>
-          <span>SHUFFLE</span>
+          <span>⚄ RANDOMIZE</span>
         </button>
-        <button type="button" class="btn-pedal-action btn-pedal-reset" onclick="resetDspChain(event)" title="Reset order to Filter ➔ Delay ➔ Space">
+        <button type="button" class="btn-pedal-action btn-pedal-reset" onclick="resetDspChain(event)" title="Reset FX chain order to default">
           <span>RESET</span>
         </button>
       </div>
@@ -1297,7 +1316,7 @@
           <div class="master-dsp-chain-header">
             <span class="master-dsp-chain-title">DSP INSERT CHAIN REORDERING</span>
             <div class="master-dsp-chain-actions">
-              <button type="button" class="btn-pedal-action btn-pedal-shuffle" onclick="randomizeDspChain(event)" title="Shuffle insert order">
+              <button type="button" class="btn-pedal-action btn-pedal-shuffle" onclick="randomizeDspChain(event)" title="Randomize FX Chain (intelligent safe staging)">
                 <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/>
                   <polyline points="21 3 21 8 16 8"/>
@@ -1305,7 +1324,7 @@
                   <polyline points="3 21 3 16 8 16"/>
                 </svg>
               </button>
-              <button type="button" class="btn-pedal-action btn-pedal-reset" onclick="resetDspChain(event)" title="Reset order">
+              <button type="button" class="btn-pedal-action btn-pedal-reset" onclick="resetDspChain(event)" title="Reset FX chain order to default">
                 <span>RESET</span>
               </button>
             </div>
@@ -1994,12 +2013,18 @@ let masterFilter1, masterFilter2, masterFilterCompGain;
 let analogDelayNode, delayFeedbackGain, delayDampingFilter, delaySaturationNode;
 let delayDryGain, delayWetGain, delayLFO, delayLFOGain;
 
-// Dynamic DSP routing nodes
+// Dynamic DSP routing nodes & Expanded Multi-FX Studio Rack
 let filterModuleInput, filterModuleOutput;
 let delayModuleInput, delayModuleOutput;
 let spaceModuleInput, spaceModuleOutput;
 let spaceDryGain;
-let dspChainOrder = ['FILTER', 'DELAY', 'SPACE'];
+let dspChainOrder = [
+  'OVERDRIVE', 'FILTER', 'TREMOLO', 'PHASER', 'FLANGER',
+  'DELAY', 'DIGITAL_DELAY', 'SPACE_DELAY', 'TAPE_ECHO', 'SPACE'
+];
+let fxRackManager = null;
+let fxTubeDrive = null, fxTremolo = null, fxPhaser = null, fxFlanger = null;
+let fxDigitalDelay = null, fxSpaceDelay = null, fxTapeEcho = null;
 
 // Asymmetric warm analog tape saturation curve (even + odd harmonic enrichment)
 // Delay feedback loop. The repeat loop is delay -> tone lowpass -> tape
@@ -3011,6 +3036,64 @@ function initAudio() {
   chorusWetGain.connect(spaceAnalyser);
   applyChorusModeParams();
 
+  // Initialize Modular Studio FX Rack & Register DSP Engines
+  if (typeof SlambientFxRackManager !== "undefined") {
+    window.fxRackManager = new SlambientFxRackManager(audioCtx, masterBusPre, masterBusPost);
+
+    // Register legacy built-in modules
+    window.fxRackManager.registerModule("FILTER", { input: filterModuleInput, output: filterModuleOutput });
+    window.fxRackManager.registerModule("DELAY", { input: delayModuleInput, output: delayModuleOutput });
+    window.fxRackManager.registerModule("SPACE", { input: spaceModuleInput, output: spaceModuleOutput });
+
+    // Register expanded studio DSP processors
+    if (typeof SlambientTubeDrive !== "undefined") {
+      window.fxTubeDrive = new SlambientTubeDrive(audioCtx);
+      window.fxRackManager.registerModule("OVERDRIVE", window.fxTubeDrive);
+    }
+    if (typeof SlambientOpticalTremolo !== "undefined") {
+      window.fxTremolo = new SlambientOpticalTremolo(audioCtx);
+      window.fxRackManager.registerModule("TREMOLO", window.fxTremolo);
+    }
+    if (typeof SlambientPhaser !== "undefined") {
+      window.fxPhaser = new SlambientPhaser(audioCtx);
+      window.fxRackManager.registerModule("PHASER", window.fxPhaser);
+    }
+    if (typeof SlambientFlanger !== "undefined") {
+      window.fxFlanger = new SlambientFlanger(audioCtx);
+      window.fxRackManager.registerModule("FLANGER", window.fxFlanger);
+    }
+    if (typeof SlambientDigitalDelay !== "undefined") {
+      window.fxDigitalDelay = new SlambientDigitalDelay(audioCtx);
+      window.fxRackManager.registerModule("DIGITAL_DELAY", window.fxDigitalDelay);
+    }
+    if (typeof SlambientSpaceDelay !== "undefined") {
+      window.fxSpaceDelay = new SlambientSpaceDelay(audioCtx);
+      window.fxRackManager.registerModule("SPACE_DELAY", window.fxSpaceDelay);
+    }
+    if (typeof SlambientTapeEcho !== "undefined") {
+      window.fxTapeEcho = new SlambientTapeEcho(audioCtx);
+      window.fxRackManager.registerModule("TAPE_ECHO", window.fxTapeEcho);
+    }
+
+    // Sync bypass states to rack manager
+    if (typeof pedalBypassState !== "undefined") {
+      Object.keys(pedalBypassState).forEach(k => {
+        window.fxRackManager.setBypass(k, pedalBypassState[k]);
+      });
+    }
+
+    // Sync initial param state values to DSP nodes
+    if (typeof fxParamsState !== "undefined") {
+      Object.keys(fxParamsState).forEach(k => {
+        Object.keys(fxParamsState[k]).forEach(pId => {
+          if (typeof updateFxParam === "function") {
+            updateFxParam(k, pId, fxParamsState[k][pId]);
+          }
+        });
+      });
+    }
+  }
+
   // Connect initial serial topology via Live Web Audio API rewire manager
   rewireDspChain(dspChainOrder, true);
 
@@ -3064,10 +3147,14 @@ function initAudio() {
 
 // Dynamic Web Audio API live node rewire manager for PEDALS & routing matrix
 function rewireDspChain(newOrder, immediate = false) {
-  if (newOrder && Array.isArray(newOrder) && newOrder.length === 3) {
+  if (newOrder && Array.isArray(newOrder) && newOrder.length > 0) {
     dspChainOrder = [...newOrder];
   }
   if (typeof updatePedalsOrderUI === 'function') updatePedalsOrderUI();
+  if (window.fxRackManager) {
+    window.fxRackManager.setChainOrder(dspChainOrder, immediate);
+    return;
+  }
   if (!audioCtx || !masterBusPre || !masterBusPost) {
     return;
   }
@@ -3121,24 +3208,306 @@ function rewireDspChain(newOrder, immediate = false) {
 }
 
 /* ==========================================================================
-   PEDALBOARD LOGIC, DRAG-AND-DROP REWIRING & CROSS-VIEW SYNCHRONIZATION
+   EXPANDED PEDALBOARD LOGIC, DSP REGISTRY & MODULAR SIGNAL CHAIN
    ========================================================================== */
 const pedalBypassState = {
+  OVERDRIVE: true,
   FILTER: false,
+  TREMOLO: true,
+  PHASER: true,
+  FLANGER: true,
   DELAY: false,
+  DIGITAL_DELAY: true,
+  SPACE_DELAY: true,
+  TAPE_ECHO: true,
   SPACE: false
 };
 
 const PEDAL_BASE_NAMES = {
+  OVERDRIVE: "TUBE DRIVE",
   FILTER: "FILTER",
-  DELAY:  "DELAY",
-  SPACE:  "SPACE"
+  TREMOLO: "OPTO TREMOLO",
+  PHASER: "12-POLE PHASER",
+  FLANGER: "ANALOG FLANGER",
+  DELAY: "TAPE DELAY",
+  DIGITAL_DELAY: "DIGITAL DELAY",
+  SPACE_DELAY: "SPACE DELAY",
+  TAPE_ECHO: "TAPE ECHO",
+  SPACE: "SPACE REVERB"
 };
+
+const PEDAL_REGISTRY = {
+  OVERDRIVE: {
+    key: "OVERDRIVE",
+    name: "TUBE DRIVE",
+    shortName: "DRIVE",
+    orbId: "filter",
+    class: "mini-card-drive",
+    color: "#ff5252",
+    desc: "Tube Saturation & Warmth",
+    params: [
+      { id: "drive", label: "DRIVE", min: 0.2, max: 8.0, step: 0.1, default: 2.0, unit: "x" },
+      { id: "tone", label: "TONE", min: 400, max: 10000, step: 100, default: 3200, unit: "Hz" },
+      { id: "mix", label: "MIX", min: 0, max: 100, step: 1, default: 50, unit: "%" }
+    ]
+  },
+  FILTER: {
+    key: "FILTER",
+    name: "FILTER",
+    shortName: "SVF",
+    orbId: "filter",
+    class: "mini-card-filter",
+    color: "#2ed573",
+    desc: "SVF Filter & Envelope",
+    params: [
+      { id: "cutoff", label: "CUTOFF", min: 60, max: 12000, step: 20, default: 2200, unit: "Hz" },
+      { id: "res", label: "RES", min: 0.1, max: 12.0, step: 0.1, default: 2.4, unit: "Q" },
+      { id: "lfo", label: "LFO", min: 0, max: 100, step: 1, default: 35, unit: "%" }
+    ]
+  },
+  TREMOLO: {
+    key: "TREMOLO",
+    name: "OPTO TREMOLO",
+    shortName: "TREM",
+    orbId: "filter",
+    class: "mini-card-tremolo",
+    color: "#00d2d3",
+    desc: "Optical Tremolo & Pan",
+    params: [
+      { id: "rate", label: "RATE", min: 0.2, max: 12.0, step: 0.1, default: 3.5, unit: "Hz" },
+      { id: "depth", label: "DEPTH", min: 0, max: 100, step: 1, default: 60, unit: "%" },
+      { id: "pan", label: "PAN", min: 0, max: 100, step: 1, default: 40, unit: "%" }
+    ]
+  },
+  PHASER: {
+    key: "PHASER",
+    name: "12-POLE PHASER",
+    shortName: "PHASE",
+    orbId: "filter",
+    class: "mini-card-phaser",
+    color: "#e056fd",
+    desc: "12-Pole All-Pass Sweep",
+    params: [
+      { id: "rate", label: "RATE", min: 0.05, max: 6.0, step: 0.05, default: 0.35, unit: "Hz" },
+      { id: "depth", label: "DEPTH", min: 0, max: 100, step: 1, default: 65, unit: "%" },
+      { id: "feedback", label: "FDBK", min: 0, max: 90, step: 1, default: 45, unit: "%" }
+    ]
+  },
+  FLANGER: {
+    key: "FLANGER",
+    name: "ANALOG FLANGER",
+    shortName: "FLANGE",
+    orbId: "filter",
+    class: "mini-card-flanger",
+    color: "#54a0ff",
+    desc: "Comb-Filter Micro-Delay",
+    params: [
+      { id: "rate", label: "RATE", min: 0.05, max: 5.0, step: 0.05, default: 0.25, unit: "Hz" },
+      { id: "depth", label: "DEPTH", min: 0, max: 100, step: 1, default: 70, unit: "%" },
+      { id: "feedback", label: "FDBK", min: -85, max: 85, step: 1, default: 50, unit: "%" }
+    ]
+  },
+  DELAY: {
+    key: "DELAY",
+    name: "TAPE DELAY",
+    shortName: "DELAY",
+    orbId: "delay",
+    class: "mini-card-delay",
+    color: "#ff793f",
+    desc: "Analog Tape Delay",
+    params: [
+      { id: "time", label: "TIME", min: 0.05, max: 1.5, step: 0.025, default: 0.38, unit: "s" },
+      { id: "feedback", label: "FDBK", min: 0, max: 48, step: 1, default: 28, unit: "%" },
+      { id: "mix", label: "MIX", min: 0, max: 100, step: 1, default: 42, unit: "%" }
+    ]
+  },
+  DIGITAL_DELAY: {
+    key: "DIGITAL_DELAY",
+    name: "DIGITAL DELAY",
+    shortName: "D-DLY",
+    orbId: "delay",
+    class: "mini-card-digital-delay",
+    color: "#48dbfb",
+    desc: "Ping-Pong Delay",
+    params: [
+      { id: "time", label: "TIME", min: 0.05, max: 2.0, step: 0.025, default: 0.375, unit: "s" },
+      { id: "feedback", label: "FDBK", min: 0, max: 85, step: 1, default: 45, unit: "%" },
+      { id: "mix", label: "MIX", min: 0, max: 100, step: 1, default: 40, unit: "%" }
+    ]
+  },
+  SPACE_DELAY: {
+    key: "SPACE_DELAY",
+    name: "SPACE DELAY",
+    shortName: "S-DLY",
+    orbId: "delay",
+    class: "mini-card-space-delay",
+    color: "#ff9f43",
+    desc: "Flutter Delay Diffusion",
+    params: [
+      { id: "time", label: "TIME", min: 0.1, max: 2.5, step: 0.025, default: 0.52, unit: "s" },
+      { id: "flutter", label: "FLUTTER", min: 0, max: 100, step: 1, default: 40, unit: "%" },
+      { id: "mix", label: "MIX", min: 0, max: 100, step: 1, default: 45, unit: "%" }
+    ]
+  },
+  TAPE_ECHO: {
+    key: "TAPE_ECHO",
+    name: "TAPE ECHO",
+    shortName: "ECHO",
+    orbId: "delay",
+    class: "mini-card-tape-echo",
+    color: "#feca57",
+    desc: "3-Head Multi-Tap Inertia",
+    params: [
+      { id: "speed", label: "SPEED", min: 0.2, max: 2.5, step: 0.05, default: 1.0, unit: "x" },
+      { id: "inertia", label: "INERTIA", min: 0.01, max: 0.5, step: 0.01, default: 0.12, unit: "s" },
+      { id: "mix", label: "MIX", min: 0, max: 100, step: 1, default: 45, unit: "%" }
+    ]
+  },
+  SPACE: {
+    key: "SPACE",
+    name: "SPACE REVERB",
+    shortName: "SPACE",
+    orbId: "reverb",
+    class: "mini-card-space",
+    color: "#ff5fc4",
+    desc: "Shimmer Reverb & Chorus",
+    params: [
+      { id: "decay", label: "DECAY", min: 0, max: 100, step: 1, default: 72, unit: "%" },
+      { id: "chorus", label: "CHORUS", min: 0, max: 100, step: 1, default: 35, unit: "%" },
+      { id: "mix", label: "MIX", min: 0, max: 100, step: 1, default: 55, unit: "%" }
+    ]
+  }
+};
+
+const fxParamsState = {};
+Object.keys(PEDAL_REGISTRY).forEach(k => {
+  fxParamsState[k] = {};
+  PEDAL_REGISTRY[k].params.forEach(p => {
+    fxParamsState[k][p.id] = p.default;
+  });
+});
+
+function formatFxParamValue(paramMeta, val) {
+  if (!paramMeta) return String(val);
+  if (paramMeta.unit === "Hz") {
+    return val >= 1000 ? (val / 1000).toFixed(1) + "k" : Math.round(val) + "Hz";
+  }
+  if (paramMeta.unit === "s") {
+    return val.toFixed(2) + "s";
+  }
+  if (paramMeta.unit === "x") {
+    return val.toFixed(1) + "x";
+  }
+  if (paramMeta.unit === "%") {
+    return Math.round(val) + "%";
+  }
+  if (paramMeta.unit === "Q") {
+    return val.toFixed(1);
+  }
+  return String(val);
+}
+
+function updateFxParam(key, paramId, value, ev) {
+  if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
+  const val = parseFloat(value);
+  if (!fxParamsState[key]) fxParamsState[key] = {};
+  fxParamsState[key][paramId] = val;
+
+  // Format label in UI
+  const reg = PEDAL_REGISTRY[key];
+  const pMeta = reg && reg.params.find(p => p.id === paramId);
+  const lbl = document.getElementById(`lbl_${key}_${paramId}`);
+  if (lbl && pMeta) {
+    lbl.textContent = formatFxParamValue(pMeta, val);
+  }
+
+  // Audio dispatch
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+  try {
+    if (key === "OVERDRIVE" && window.fxTubeDrive) {
+      if (paramId === "drive") window.fxTubeDrive.setDrive(val);
+      else if (paramId === "tone" && window.fxTubeDrive.toneFilter) window.fxTubeDrive.toneFilter.frequency.setTargetAtTime(val, now, 0.02);
+      else if (paramId === "mix") window.fxTubeDrive.setMix(val / 100);
+    } else if (key === "TREMOLO" && window.fxTremolo) {
+      if (paramId === "rate" && window.fxTremolo.lfo) window.fxTremolo.lfo.frequency.setTargetAtTime(val, now, 0.02);
+      else if (paramId === "depth" && window.fxTremolo.depthGain) window.fxTremolo.depthGain.gain.setTargetAtTime(val / 100, now, 0.02);
+      else if (paramId === "pan" && window.fxTremolo.panDepthGain) window.fxTremolo.panDepthGain.gain.setTargetAtTime(val / 100, now, 0.02);
+    } else if (key === "PHASER" && window.fxPhaser) {
+      if (paramId === "rate" && window.fxPhaser.lfo) window.fxPhaser.lfo.frequency.setTargetAtTime(val, now, 0.02);
+      else if (paramId === "depth" && window.fxPhaser.lfoGain) window.fxPhaser.lfoGain.gain.setTargetAtTime(val * 18, now, 0.02);
+      else if (paramId === "feedback" && window.fxPhaser.feedbackGain) window.fxPhaser.feedbackGain.gain.setTargetAtTime(val / 100, now, 0.02);
+    } else if (key === "FLANGER" && window.fxFlanger) {
+      if (paramId === "rate" && window.fxFlanger.lfo) window.fxFlanger.lfo.frequency.setTargetAtTime(val, now, 0.02);
+      else if (paramId === "depth" && window.fxFlanger.lfoGain) window.fxFlanger.lfoGain.gain.setTargetAtTime((val / 100) * 0.003, now, 0.02);
+      else if (paramId === "feedback" && window.fxFlanger.feedbackGain) window.fxFlanger.feedbackGain.gain.setTargetAtTime(val / 100, now, 0.02);
+    } else if (key === "DIGITAL_DELAY" && window.fxDigitalDelay) {
+      if (paramId === "time") window.fxDigitalDelay.setTime(val);
+      else if (paramId === "feedback") window.fxDigitalDelay.setFeedback(val / 100);
+      else if (paramId === "mix") window.fxDigitalDelay.setMix(val / 100);
+    } else if (key === "SPACE_DELAY" && window.fxSpaceDelay) {
+      if (paramId === "time") window.fxSpaceDelay.setTime(val);
+      else if (paramId === "flutter") window.fxSpaceDelay.setFlutter(val / 100);
+      else if (paramId === "mix") window.fxSpaceDelay.setMix(val / 100);
+    } else if (key === "TAPE_ECHO" && window.fxTapeEcho) {
+      if (paramId === "speed") window.fxTapeEcho.setSpeed(val);
+      else if (paramId === "inertia") window.fxTapeEcho.setInertia(val);
+      else if (paramId === "mix") window.fxTapeEcho.setMix(val / 100);
+    } else if (key === "FILTER") {
+      if (paramId === "cutoff") {
+        masterBaseCutoff = val;
+        if (masterFilter1 && masterFilter2) {
+          masterFilter1.frequency.setTargetAtTime(masterBaseCutoff, now, 0.02);
+          masterFilter2.frequency.setTargetAtTime(masterBaseCutoff, now, 0.02);
+        }
+      } else if (paramId === "res") {
+        masterResonance = val;
+        if (masterFilter1 && masterFilter2) {
+          masterFilter1.Q.setTargetAtTime(masterResonance, now, 0.02);
+          masterFilter2.Q.setTargetAtTime(masterResonance, now, 0.02);
+        }
+      } else if (paramId === "lfo") {
+        filterLfoDepth = val / 100;
+        if (filterLFODepthGain) filterLFODepthGain.gain.setTargetAtTime(masterBaseCutoff * filterLfoDepth * 0.68, now, 0.02);
+      }
+    } else if (key === "DELAY") {
+      if (paramId === "time") {
+        delayTimeSec = val;
+        if (analogDelayNode) analogDelayNode.delayTime.setTargetAtTime(delayTimeSec, now, 0.02);
+      } else if (paramId === "feedback") {
+        delayFeedbackVal = val / 100;
+        if (delayFeedbackGain) delayFeedbackGain.gain.setTargetAtTime(delayLoopGain(), now, 0.02);
+      } else if (paramId === "mix") {
+        delayMixVal = val / 100;
+        if (delayWetGain && delayDryGain) {
+          delayWetGain.gain.setTargetAtTime(delayMixVal * 0.85, now, 0.02);
+          delayDryGain.gain.setTargetAtTime(1.0 - (delayMixVal * 0.45), now, 0.02);
+        }
+      }
+    } else if (key === "SPACE") {
+      if (paramId === "decay") {
+        weatherVal = val / 100;
+        if (reverbSend) reverbSend.gain.setTargetAtTime(weatherVal * reverbMixVal, now, 0.02);
+      } else if (paramId === "chorus") {
+        chorusMixVal = val / 100;
+        if (chorusWetGain) chorusWetGain.gain.setTargetAtTime(chorusMixVal, now, 0.02);
+      } else if (paramId === "mix") {
+        reverbMixVal = val / 100;
+        if (reverbSend) reverbSend.gain.setTargetAtTime(weatherVal * reverbMixVal, now, 0.02);
+      }
+    }
+  } catch (err) {
+    console.error("updateFxParam error:", err);
+  }
+}
 
 function swapPedalOrbPositions(keyA, keyB) {
   if (typeof PEDAL_KEY_TO_ORBITAL_ID === "undefined" || typeof ORBITAL_MODULES === "undefined") return;
-  const orbA = ORBITAL_MODULES.find(o => o.id === PEDAL_KEY_TO_ORBITAL_ID[keyA]);
-  const orbB = ORBITAL_MODULES.find(o => o.id === PEDAL_KEY_TO_ORBITAL_ID[keyB]);
+  const orbAId = PEDAL_KEY_TO_ORBITAL_ID[keyA];
+  const orbBId = PEDAL_KEY_TO_ORBITAL_ID[keyB];
+  if (!orbAId || !orbBId || orbAId === orbBId) return;
+  const orbA = ORBITAL_MODULES.find(o => o.id === orbAId);
+  const orbB = ORBITAL_MODULES.find(o => o.id === orbBId);
   if (!orbA || !orbB) return;
   const tx = orbA.x, ty = orbA.y, tvx = orbA.vx, tvy = orbA.vy, th = orbA.heading;
   orbA.x = orbB.x; orbA.y = orbB.y; orbA.vx = orbB.vx; orbA.vy = orbB.vy; orbA.heading = orbB.heading;
@@ -3149,25 +3518,21 @@ function swapPedalOrbPositions(keyA, keyB) {
 
 function updatePedalsOrderUI() {
   const container = document.getElementById("masterDeckUnified") || document.getElementById("pedalsGrid");
-  if (!container) return;
 
-  // Append each pedal in current dspChainOrder, updating dynamic numbers (7, 8, 9 after 6. Field Recorder)
+  // Synchronize backing-store card headers and slot badges if they exist
   dspChainOrder.forEach((key, idx) => {
     const el = document.getElementById("pedalCard_" + key);
-    if (el && !el.closest("#orbitalModalBody")) container.appendChild(el);
+    if (el && container && !el.closest("#orbitalModalBody")) container.appendChild(el);
 
-    const chainNum = 7 + idx; // Slot 0 -> 7, Slot 1 -> 8, Slot 2 -> 9
-
-    // Update pedal card header title
+    const chainNum = 7 + idx;
     const titleEl = document.getElementById("pedalTitle_" + key) || (el ? el.querySelector(".panel-header > span:first-child") : null);
     if (titleEl) {
       titleEl.textContent = `${chainNum}. ${PEDAL_BASE_NAMES[key] || key}`;
     }
 
-    // Synchronize corresponding orb number in ORBITAL_MODULES & active orbital modal/sheet header
     if (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && typeof ORBITAL_MODULES !== "undefined") {
       const orbId = PEDAL_KEY_TO_ORBITAL_ID[key];
-      const orb = ORBITAL_MODULES.find(o => o.id === orbId);
+      const orb = orbId ? ORBITAL_MODULES.find(o => o.id === orbId) : null;
       if (orb) {
         orb.num = String(chainNum);
         if (typeof expandedOrbId !== "undefined" && expandedOrbId === orbId) {
@@ -3180,8 +3545,8 @@ function updatePedalsOrderUI() {
     const slotBadge = document.getElementById("slotBadge_" + key);
     if (slotBadge) {
       if (idx === 0) slotBadge.textContent = "IN";
-      else if (idx === 1) slotBadge.textContent = "INSERT";
-      else slotBadge.textContent = "OUT";
+      else if (idx === dspChainOrder.length - 1) slotBadge.textContent = "OUT";
+      else slotBadge.textContent = "INSERT";
     }
 
     const shiftL = document.getElementById("shiftLeft_" + key);
@@ -3192,7 +3557,6 @@ function updatePedalsOrderUI() {
     const routeBadge = document.getElementById("routeBadge" + (idx + 1));
     if (routeBadge) {
       routeBadge.textContent = (idx + 1) + ": " + key;
-      routeBadge.className = "routing-pill pill-mod" + (key === "FILTER" ? "1" : key === "DELAY" ? "2" : "3");
     }
   });
 
@@ -3219,35 +3583,59 @@ function renderBirdsEyePedalRack() {
   const rack = document.getElementById("pedalBirdsEyeRack");
   if (!rack) return;
 
-  const pedalsMeta = {
-    FILTER: { name: "FILTER", orbId: "filter", class: "mini-card-filter", desc: "SVF Filter & Env" },
-    DELAY: { name: "DELAY", orbId: "delay", class: "mini-card-delay", desc: "Stereo Tape Delay" },
-    SPACE: { name: "SPACE", orbId: "reverb", class: "mini-card-space", desc: "Reverb & Chorus" }
-  };
-
-  const order = Array.isArray(dspChainOrder) ? dspChainOrder : ["FILTER", "DELAY", "SPACE"];
-  
+  const order = Array.isArray(dspChainOrder) ? dspChainOrder : Object.keys(PEDAL_REGISTRY);
   let html = "";
+
   order.forEach((key, idx) => {
-    const meta = pedalsMeta[key];
+    const meta = PEDAL_REGISTRY[key];
     if (!meta) return;
     const isBypassed = !!(typeof pedalBypassState !== "undefined" && pedalBypassState[key]);
     const slotLabel = idx === 0 ? "IN" : (idx === order.length - 1 ? "OUT" : "INSERT");
     const num = 7 + idx;
-    const canShiftUp = idx > 0;
-    const canShiftDown = idx < order.length - 1;
+
+    // Render micro parameter sliders
+    let controlsHtml = "";
+    if (Array.isArray(meta.params)) {
+      meta.params.forEach(p => {
+        const currentVal = (fxParamsState[key] && fxParamsState[key][p.id] !== undefined)
+          ? fxParamsState[key][p.id]
+          : p.default;
+        const formatted = formatFxParamValue(p, currentVal);
+
+        controlsHtml += `
+          <div class="mini-pedal-param" title="${p.label}: ${formatted}">
+            <div class="mini-pedal-param-label">
+              <span>${p.label}</span>
+              <span id="lbl_${key}_${p.id}">${formatted}</span>
+            </div>
+            <input type="range" class="mini-pedal-slider"
+              id="slider_${key}_${p.id}"
+              min="${p.min}" max="${p.max}" step="${p.step}" value="${currentVal}"
+              oninput="updateFxParam('${key}', '${p.id}', this.value, event)"
+              onchange="updateFxParam('${key}', '${p.id}', this.value, event)"
+              onclick="event.stopPropagation()"
+              onpointerdown="event.stopPropagation()"
+              onmousedown="event.stopPropagation()"
+            >
+          </div>
+        `;
+      });
+    }
 
     html += `
-      <div class="mini-pedal-card ${meta.class} ${isBypassed ? 'bypassed' : 'active'}" data-pedal="${key}" draggable="true" title="Drag to reorder • Click EDIT to inspect">
+      <div class="mini-pedal-card ${meta.class} ${isBypassed ? 'bypassed' : 'active'}" data-pedal="${key}" draggable="true" title="Drag to reorder • Double-click or click EDIT to inspect">
         <div class="mini-pedal-left">
           <span class="mini-pedal-drag-handle" title="Click and drag to reorder effects in DSP chain">
             <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg>
           </span>
           <span class="mini-pedal-badge">${num}</span>
           <div class="mini-pedal-info">
-            <span class="mini-pedal-name">${meta.name}</span>
+            <span class="mini-pedal-name">${meta.shortName || meta.name}</span>
             <span class="mini-pedal-slot">${slotLabel}</span>
           </div>
+        </div>
+        <div class="mini-pedal-controls" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()" onmousedown="event.stopPropagation()">
+          ${controlsHtml}
         </div>
         <div class="mini-pedal-actions" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()" onmousedown="event.stopPropagation()">
           <button type="button" draggable="false" class="btn-mini-power btn-power ${isBypassed ? '' : 'active'}" onclick="togglePedalBypass('${key}', event)" title="${isBypassed ? 'Turn ON ' + meta.name : 'Turn OFF ' + meta.name}">
@@ -3256,17 +3644,17 @@ function renderBirdsEyePedalRack() {
           <button type="button" draggable="false" class="badge-tag btn-mini-randomize" onclick="randomizePedalModule('${key}', event)" title="Randomize ${meta.name} parameters">
             <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><polyline points="21 3 21 8 16 8"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><polyline points="3 21 3 16 8 16"/></svg>
           </button>
-          <button type="button" draggable="false" class="btn-mini-inspect" onclick="openMiniPedalInspector('${meta.orbId}', event)" title="Inspect full controls">EDIT ↗</button>
+          <button type="button" draggable="false" class="btn-mini-inspect" onclick="openMiniPedalInspector('${meta.orbId || 'filter'}', event)" title="Inspect full controls">EDIT ↗</button>
         </div>
       </div>
     `;
   });
 
-  // Terminal Master EQ & Out Node (Node 10)
+  // Terminal Master EQ & Out Node (Node OUT)
   html += `
-    <div class="mini-pedal-card mini-card-master active" data-pedal="MASTER" onclick="if (!event.target.closest('button')) openMiniPedalInspector('space', event)" title="Terminal Master Node • Click to inspect">
+    <div class="mini-pedal-card mini-card-master active" data-pedal="MASTER" onclick="if (!event.target.closest('button, input')) openMiniPedalInspector('space', event)" title="Terminal Master Node • Click to inspect">
       <div class="mini-pedal-left">
-        <span class="mini-pedal-badge">10</span>
+        <span class="mini-pedal-badge">OUT</span>
         <div class="mini-pedal-info">
           <span class="mini-pedal-name">MASTER OUT</span>
           <span class="mini-pedal-slot">BUS TERM</span>
@@ -3288,55 +3676,45 @@ function renderBirdsEyePedalRack() {
 }
 
 function shiftPedalLeft(key, ev) {
-  if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
-  const idx = dspChainOrder.indexOf(key);
-  if (idx > 0) {
-    const otherKey = dspChainOrder[idx - 1];
-    dspChainOrder[idx - 1] = dspChainOrder[idx];
-    dspChainOrder[idx] = otherKey;
-    swapPedalOrbPositions(key, otherKey);
-    rewireDspChain(dspChainOrder, false);
-  }
+  shiftMasterDspChain(key, -1, ev);
 }
 
 function shiftPedalRight(key, ev) {
-  if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
-  const idx = dspChainOrder.indexOf(key);
-  if (idx >= 0 && idx < dspChainOrder.length - 1) {
-    const otherKey = dspChainOrder[idx + 1];
-    dspChainOrder[idx + 1] = dspChainOrder[idx];
-    dspChainOrder[idx] = otherKey;
-    swapPedalOrbPositions(key, otherKey);
-    rewireDspChain(dspChainOrder, false);
-  }
+  shiftMasterDspChain(key, 1, ev);
 }
 
 function randomizeDspChain(ev) {
   if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
-  const shuffled = ['FILTER', 'DELAY', 'SPACE'].sort(() => Math.random() - 0.5);
-  rewireDspChain(shuffled, false);
+  if (window.fxRackManager) {
+    dspChainOrder = window.fxRackManager.randomizeChain("SAFE");
+  } else {
+    dspChainOrder = [...dspChainOrder].sort(() => Math.random() - 0.5);
+  }
+  rewireDspChain(dspChainOrder, false);
 }
 
 function resetDspChain(ev) {
   if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
-  rewireDspChain(['FILTER', 'DELAY', 'SPACE'], false);
+  const defaultOrder = [
+    'OVERDRIVE', 'FILTER', 'TREMOLO', 'PHASER', 'FLANGER',
+    'DELAY', 'DIGITAL_DELAY', 'SPACE_DELAY', 'TAPE_ECHO', 'SPACE'
+  ];
+  dspChainOrder = [...defaultOrder];
+  if (window.fxRackManager) {
+    window.fxRackManager.setChainOrder(dspChainOrder, false);
+  }
+  rewireDspChain(dspChainOrder, false);
 }
 
 function renderMasterDspChainList() {
   const container = document.getElementById("masterDspChainList");
   if (!container) return;
 
-  const pedalsMeta = {
-    FILTER: { name: "FILTER", orbId: "filter", color: "#2ed573", desc: "SVF Filter & Env" },
-    DELAY: { name: "DELAY", orbId: "delay", color: "#ff793f", desc: "Tape Delay" },
-    SPACE: { name: "SPACE", orbId: "reverb", color: "#ff5fc4", desc: "Reverb & Chorus" }
-  };
-
-  const order = Array.isArray(dspChainOrder) ? dspChainOrder : ["FILTER", "DELAY", "SPACE"];
+  const order = Array.isArray(dspChainOrder) ? dspChainOrder : Object.keys(PEDAL_REGISTRY);
   let html = "";
 
   order.forEach((key, idx) => {
-    const meta = pedalsMeta[key];
+    const meta = PEDAL_REGISTRY[key];
     if (!meta) return;
     const isBypassed = !!(typeof pedalBypassState !== "undefined" && pedalBypassState[key]);
     const num = 7 + idx;
@@ -3344,13 +3722,16 @@ function renderMasterDspChainList() {
     const isLast = idx === order.length - 1;
 
     html += `
-      <div class="master-dsp-chain-item ${isBypassed ? 'bypassed' : ''}" style="--item-color: ${meta.color};">
+      <div class="master-dsp-chain-item ${isBypassed ? 'bypassed' : ''}" style="--item-color: ${meta.color};" data-chain-pedal="${key}">
         <div class="master-dsp-item-left">
           <span class="master-dsp-item-badge">${num}</span>
           <span class="master-dsp-item-name">${meta.name}</span>
           <span class="master-dsp-item-role">${meta.desc}</span>
         </div>
-        <div class="master-dsp-item-actions">
+        <div class="master-dsp-item-actions" onclick="event.stopPropagation()">
+          <button type="button" class="btn-mini-power btn-power ${isBypassed ? '' : 'active'}" onclick="togglePedalBypass('${key}', event)" title="${isBypassed ? 'Enable ' + meta.name : 'Bypass ' + meta.name}">
+            PWR
+          </button>
           <button type="button" class="master-dsp-nudge-btn" onclick="shiftMasterDspChain('${key}', -1, event)" ${isFirst ? 'disabled' : ''} title="Nudge Up in Signal Chain">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
           </button>
@@ -3367,20 +3748,19 @@ function renderMasterDspChainList() {
 
 function shiftMasterDspChain(key, direction, ev) {
   if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
-  if (audioCtx && typeof audioCtx.suspend === "function") {
-    audioCtx.suspend().catch(() => {});
-  }
-  if (direction < 0) {
-    shiftPedalLeft(key, ev);
+  if (window.fxRackManager) {
+    dspChainOrder = window.fxRackManager.shiftModule(key, direction);
   } else {
-    shiftPedalRight(key, ev);
+    const idx = dspChainOrder.indexOf(key);
+    if (idx !== -1) {
+      const targetIdx = idx + direction;
+      if (targetIdx >= 0 && targetIdx < dspChainOrder.length) {
+        const item = dspChainOrder.splice(idx, 1)[0];
+        dspChainOrder.splice(targetIdx, 0, item);
+      }
+    }
   }
-  if (audioCtx && typeof audioCtx.resume === "function") {
-    setTimeout(() => {
-      audioCtx.resume().catch(() => {});
-    }, 15);
-  }
-  renderMasterDspChainList();
+  rewireDspChain(dspChainOrder, false);
 }
 
 function togglePedalBypass(key, ev) {
@@ -3390,6 +3770,10 @@ function togglePedalBypass(key, ev) {
   }
   pedalBypassState[key] = !pedalBypassState[key];
   const isBypassed = !!pedalBypassState[key];
+
+  if (window.fxRackManager) {
+    window.fxRackManager.setBypass(key, isBypassed);
+  }
 
   // 1. Update backing store elements
   const card = document.getElementById("pedalCard_" + key);
@@ -3409,7 +3793,18 @@ function togglePedalBypass(key, ev) {
     }
   }
 
-  // 3. Update modal header PWR button if modal is currently open for this pedal
+  // 3. Update master DSP chain item in Master panel
+  const chainItem = document.querySelector(`.master-dsp-chain-item[data-chain-pedal="${key}"]`);
+  if (chainItem) {
+    chainItem.classList.toggle("bypassed", isBypassed);
+    const itemPwr = chainItem.querySelector(".btn-mini-power");
+    if (itemPwr) {
+      itemPwr.classList.toggle("active", !isBypassed);
+      itemPwr.title = isBypassed ? ("Enable " + key) : ("Bypass " + key);
+    }
+  }
+
+  // 4. Update modal header PWR button if modal is currently open for this pedal
   const modalPwr = document.querySelector("#orbitalModalActions .btn-power");
   const currentOrbId = (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && PEDAL_KEY_TO_ORBITAL_ID[key]) ? PEDAL_KEY_TO_ORBITAL_ID[key] : key.toLowerCase();
   if (modalPwr && expandedOrbId === currentOrbId) {
@@ -3423,17 +3818,15 @@ function togglePedalBypass(key, ev) {
     renderMobileMacroGrid();
   }
 
-  // 4. Update audio DSP if audioCtx exists
+  // 5. Update audio DSP if audioCtx exists
   if (audioCtx) {
     const now = audioCtx.currentTime;
     if (key === 'FILTER') {
-      if (filterModuleInput && filterModuleOutput) {
-        if (masterFilter1 && masterFilter2) {
-          masterFilter1.frequency.setTargetAtTime(isBypassed ? 20000 : masterBaseCutoff, now, 0.05);
-          masterFilter2.frequency.setTargetAtTime(isBypassed ? 20000 : masterBaseCutoff, now, 0.05);
-          masterFilter1.Q.setTargetAtTime(isBypassed ? 0.5 : masterResonance, now, 0.05);
-          masterFilter2.Q.setTargetAtTime(isBypassed ? 0.5 : masterResonance, now, 0.05);
-        }
+      if (filterModuleInput && filterModuleOutput && masterFilter1 && masterFilter2) {
+        masterFilter1.frequency.setTargetAtTime(isBypassed ? 20000 : masterBaseCutoff, now, 0.05);
+        masterFilter2.frequency.setTargetAtTime(isBypassed ? 20000 : masterBaseCutoff, now, 0.05);
+        masterFilter1.Q.setTargetAtTime(isBypassed ? 0.5 : masterResonance, now, 0.05);
+        masterFilter2.Q.setTargetAtTime(isBypassed ? 0.5 : masterResonance, now, 0.05);
       }
     } else if (key === 'DELAY') {
       if (delayWetGain && delayDryGain) {
@@ -3463,6 +3856,19 @@ function randomizePedalModule(key, ev) {
     if (typeof randomizeReverbChorus === "function") randomizeReverbChorus();
   } else if (key === 'MASTER') {
     if (typeof randomizeSpace === "function") randomizeSpace();
+  } else if (PEDAL_REGISTRY[key]) {
+    const meta = PEDAL_REGISTRY[key];
+    if (Array.isArray(meta.params)) {
+      meta.params.forEach(p => {
+        let randVal = p.min + Math.random() * (p.max - p.min);
+        if (p.step >= 1) randVal = Math.round(randVal);
+        else if (p.step >= 0.1) randVal = parseFloat(randVal.toFixed(1));
+        else randVal = parseFloat(randVal.toFixed(3));
+        updateFxParam(key, p.id, randVal);
+        const slider = document.getElementById(`slider_${key}_${p.id}`);
+        if (slider) slider.value = randVal;
+      });
+    }
   }
 }
 
@@ -3626,14 +4032,18 @@ function bindPointerReorder({ cards, handles, cardSelector, keyAttr, bodyClass, 
 
 function reorderDspChainModules(sourceKey, targetKey) {
   if (!sourceKey || !targetKey || sourceKey === targetKey) return;
-  const fromIdx = dspChainOrder.indexOf(sourceKey);
-  const toIdx = dspChainOrder.indexOf(targetKey);
-  if (fromIdx !== -1 && toIdx !== -1) {
-    dspChainOrder.splice(fromIdx, 1);
-    dspChainOrder.splice(toIdx, 0, sourceKey);
-    swapPedalOrbPositions(sourceKey, targetKey);
-    rewireDspChain(dspChainOrder, false);
+  if (window.fxRackManager) {
+    dspChainOrder = window.fxRackManager.reorderChain(sourceKey, targetKey);
+  } else {
+    const fromIdx = dspChainOrder.indexOf(sourceKey);
+    const toIdx = dspChainOrder.indexOf(targetKey);
+    if (fromIdx !== -1 && toIdx !== -1) {
+      dspChainOrder.splice(fromIdx, 1);
+      dspChainOrder.splice(toIdx, 0, sourceKey);
+    }
   }
+  swapPedalOrbPositions(sourceKey, targetKey);
+  rewireDspChain(dspChainOrder, false);
 }
 
 

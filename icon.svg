@@ -1,73 +1,123 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
-    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#141a2e" stop-opacity="0.8"/>
-      <stop offset="60%" stop-color="#090c14" stop-opacity="0.95"/>
-      <stop offset="100%" stop-color="#040507" stop-opacity="1"/>
+    <radialGradient id="slateGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#151a28"/>
+      <stop offset="65%" stop-color="#0c0e17"/>
+      <stop offset="100%" stop-color="#05060a"/>
     </radialGradient>
-    <radialGradient id="coreGlow" cx="50%" cy="50%" r="45%">
+    <radialGradient id="amberCoreGlow" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="25%" stop-color="#00e5ff"/>
-      <stop offset="70%" stop-color="#7d5fff" stop-opacity="0.5"/>
-      <stop offset="100%" stop-color="#07080c" stop-opacity="0"/>
+      <stop offset="30%" stop-color="#fed330"/>
+      <stop offset="70%" stop-color="#d97706" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#05060a" stop-opacity="0"/>
     </radialGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="6" result="blur" />
+    <radialGradient id="jackWell" cx="45%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#2a334a"/>
+      <stop offset="70%" stop-color="#0d101a"/>
+      <stop offset="100%" stop-color="#040508"/>
+    </radialGradient>
+    <linearGradient id="anodizedBezel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fed330"/>
+      <stop offset="50%" stop-color="#b45309"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <filter id="amberGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
       <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
   </defs>
 
-  <!-- Background base -->
-  <rect width="512" height="512" rx="112" fill="#07080c"/>
-  <rect width="512" height="512" rx="112" fill="url(#bgGlow)"/>
-  
-  <!-- Subtle tech border -->
-  <rect x="8" y="8" width="496" height="496" rx="104" fill="none" stroke="#1f273d" stroke-width="2.5" opacity="0.6"/>
+  <!-- Eurorack Brushed Slate Chassis -->
+  <rect width="512" height="512" rx="116" fill="#05060a"/>
+  <rect width="512" height="512" rx="116" fill="url(#slateGrad)"/>
+  <rect x="6" y="6" width="500" height="500" rx="110" fill="none" stroke="#252e46" stroke-width="2.5" opacity="0.85"/>
+  <rect x="14" y="14" width="484" height="484" rx="102" fill="none" stroke="#161b2b" stroke-width="1.5" opacity="0.6"/>
 
-  <!-- Orbital Rings -->
-  <!-- Outer Orbit (Violet/Arp) -->
-  <circle cx="256" cy="256" r="184" fill="none" stroke="#7d5fff" stroke-width="1.8" stroke-dasharray="6 8" opacity="0.35"/>
-  
-  <!-- Mid Orbit (Cyan/Drone) -->
-  <circle cx="256" cy="256" r="132" fill="none" stroke="#00e5ff" stroke-width="2.2" opacity="0.45"/>
-  <circle cx="256" cy="256" r="132" fill="none" stroke="#00e5ff" stroke-width="5" opacity="0.15" filter="url(#glow)"/>
+  <!-- Faceplate Modular Hex Screws -->
+  <g id="screws" fill="#141824" stroke="#374362" stroke-width="2">
+    <!-- Top Left -->
+    <circle cx="56" cy="56" r="14"/>
+    <line x1="48" y1="56" x2="64" y2="56" stroke="#4b5b82" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="56" y1="48" x2="56" y2="64" stroke="#4b5b82" stroke-width="2.5" stroke-linecap="round"/>
 
-  <!-- Inner Orbit (Gold/Chord) -->
-  <circle cx="256" cy="256" r="82" fill="none" stroke="#fed330" stroke-width="2" stroke-dasharray="14 6" opacity="0.55"/>
+    <!-- Top Right -->
+    <circle cx="456" cy="56" r="14"/>
+    <line x1="448" y1="56" x2="464" y2="56" stroke="#4b5b82" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="456" y1="48" x2="456" y2="64" stroke="#4b5b82" stroke-width="2.5" stroke-linecap="round"/>
 
-  <!-- Constellation Nodes & Connecting Rays -->
-  <line x1="256" y1="256" x2="388" y2="256" stroke="#00e5ff" stroke-width="1.5" opacity="0.3"/>
-  <line x1="256" y1="256" x2="162" y2="350" stroke="#fed330" stroke-width="1.5" opacity="0.3"/>
-  <line x1="256" y1="256" x2="256" y2="72" stroke="#7d5fff" stroke-width="1.5" opacity="0.3"/>
-  <line x1="256" y1="256" x2="126" y2="178" stroke="#ff5fc4" stroke-width="1.5" opacity="0.25"/>
+    <!-- Bottom Left -->
+    <circle cx="56" cy="456" r="14"/>
+    <line x1="48" y1="456" x2="64" y2="456" stroke="#4b5b82" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="56" y1="448" x2="56" y2="464" stroke="#4b5b82" stroke-width="2.5" stroke-linecap="round"/>
 
-  <!-- Node: Top (Arp) -->
-  <circle cx="256" cy="72" r="12" fill="#7d5fff" filter="url(#glow)"/>
-  <circle cx="256" cy="72" r="7" fill="#ffffff"/>
+    <!-- Bottom Right -->
+    <circle cx="456" cy="456" r="14"/>
+    <line x1="448" y1="456" x2="464" y2="456" stroke="#4b5b82" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="456" y1="448" x2="456" y2="464" stroke="#4b5b82" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
 
-  <!-- Node: Mid Right (Drone) -->
-  <circle cx="388" cy="256" r="16" fill="#00e5ff" filter="url(#glow)"/>
-  <circle cx="388" cy="256" r="9" fill="#e6fcff"/>
+  <!-- MEANDER ENGINE: Archimedean Stepper Dial Track (Outer) -->
+  <circle cx="256" cy="256" r="196" fill="none" stroke="#252e46" stroke-width="2"/>
+  <circle cx="256" cy="256" r="172" fill="none" stroke="#fed330" stroke-width="2.5" stroke-dasharray="14 10" opacity="0.65"/>
+  <circle cx="256" cy="256" r="148" fill="none" stroke="#00e5ff" stroke-width="2" stroke-dasharray="6 8" opacity="0.5"/>
 
-  <!-- Node: Inner Bottom Left (Chord) -->
-  <circle cx="198" cy="314" r="14" fill="#fed330" filter="url(#glow)"/>
-  <circle cx="198" cy="314" r="8" fill="#fffdf0"/>
+  <!-- 12 Chromatic Metric Vernier Step Ticks -->
+  <!-- 0 deg / Top -->
+  <line x1="256" y1="60" x2="256" y2="84" stroke="#fed330" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- 30 deg -->
+  <line x1="354" y1="86" x2="342" y2="106" stroke="#374362" stroke-width="2" stroke-linecap="round"/>
+  <!-- 60 deg -->
+  <line x1="426" y1="158" x2="406" y2="170" stroke="#374362" stroke-width="2" stroke-linecap="round"/>
+  <!-- 90 deg / Right -->
+  <line x1="452" y1="256" x2="428" y2="256" stroke="#fed330" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- 120 deg -->
+  <line x1="426" y1="354" x2="406" y2="342" stroke="#374362" stroke-width="2" stroke-linecap="round"/>
+  <!-- 150 deg -->
+  <line x1="354" y1="426" x2="342" y2="406" stroke="#374362" stroke-width="2" stroke-linecap="round"/>
+  <!-- 180 deg / Bottom -->
+  <line x1="256" y1="452" x2="256" y2="428" stroke="#fed330" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- 210 deg -->
+  <line x1="158" y1="426" x2="170" y2="406" stroke="#374362" stroke-width="2" stroke-linecap="round"/>
+  <!-- 240 deg -->
+  <line x1="86" y1="354" x2="106" y2="342" stroke="#374362" stroke-width="2" stroke-linecap="round"/>
+  <!-- 270 deg / Left -->
+  <line x1="60" y1="256" x2="84" y2="256" stroke="#fed330" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- 300 deg -->
+  <line x1="86" y1="158" x2="106" y2="170" stroke="#374362" stroke-width="2" stroke-linecap="round"/>
+  <!-- 330 deg -->
+  <line x1="158" y1="86" x2="170" y2="106" stroke="#374362" stroke-width="2" stroke-linecap="round"/>
 
-  <!-- Node: Outer Diagonal (Noise/Reverb) -->
-  <circle cx="126" cy="178" r="10" fill="#1dd1a1" opacity="0.8"/>
-  <circle cx="126" cy="178" r="5" fill="#ffffff"/>
+  <!-- Coprime Vernier Pulse Markers (Golden ratio positions) -->
+  <circle cx="378" cy="134" r="11" fill="#00e5ff" opacity="0.9"/>
+  <circle cx="378" cy="134" r="5" fill="#ffffff"/>
 
-  <circle cx="370" cy="370" r="13" fill="#ff5fc4" filter="url(#glow)"/>
-  <circle cx="370" cy="370" r="7" fill="#ffffff"/>
+  <circle cx="134" cy="378" r="11" fill="#ff5fc4" opacity="0.9"/>
+  <circle cx="134" cy="378" r="5" fill="#ffffff"/>
 
-  <!-- Central Star / Singularity Core -->
-  <circle cx="256" cy="256" r="64" fill="url(#coreGlow)"/>
-  <circle cx="256" cy="256" r="26" fill="#07080c" stroke="#00e5ff" stroke-width="3"/>
-  <circle cx="256" cy="256" r="10" fill="#ffffff"/>
+  <circle cx="378" cy="378" r="9" fill="#1dd1a1" opacity="0.8"/>
+  <circle cx="378" cy="378" r="4.5" fill="#ffffff"/>
 
-  <!-- Dynamic Waveform Ticks around core -->
-  <line x1="256" y1="216" x2="256" y2="204" stroke="#fed330" stroke-width="3" stroke-linecap="round"/>
-  <line x1="256" y1="296" x2="256" y2="308" stroke="#fed330" stroke-width="3" stroke-linecap="round"/>
-  <line x1="216" y1="256" x2="204" y2="256" stroke="#00e5ff" stroke-width="3" stroke-linecap="round"/>
-  <line x1="296" y1="256" x2="308" y2="256" stroke="#00e5ff" stroke-width="3" stroke-linecap="round"/>
+  <!-- SLAMBIENT: The Eurorack Milled Jack Bezel (Octagonal Silkscreen Reticle) -->
+  <g id="jackBezel">
+    <!-- Glow halo -->
+    <polygon points="256,140 338,174 372,256 338,338 256,372 174,338 140,256 174,174" 
+             fill="none" stroke="#fed330" stroke-width="8" opacity="0.15" filter="url(#amberGlow)"/>
+    <!-- Outer Milled Chamfer -->
+    <polygon points="256,144 335,177 368,256 335,335 256,368 177,335 144,256 177,177" 
+             fill="#151b2a" stroke="url(#anodizedBezel)" stroke-width="4.5"/>
+    <!-- Inner Recessed Jack Well -->
+    <circle cx="256" cy="256" r="82" fill="url(#jackWell)" stroke="#2b354e" stroke-width="3"/>
+    <circle cx="256" cy="256" r="66" fill="#06080e" stroke="#1c2336" stroke-width="2"/>
+
+    <!-- 3.5mm Core Bore -->
+    <circle cx="256" cy="256" r="32" fill="#030406" stroke="#fed330" stroke-width="3.5"/>
+    <circle cx="256" cy="256" r="18" fill="#fed330"/>
+    <circle cx="256" cy="256" r="8" fill="#ffffff"/>
+
+    <!-- Cardinal Calibration Reticle Marks -->
+    <line x1="256" y1="144" x2="256" y2="120" stroke="#fed330" stroke-width="4.5" stroke-linecap="round"/>
+    <line x1="256" y1="368" x2="256" y2="392" stroke="#fed330" stroke-width="4.5" stroke-linecap="round"/>
+    <line x1="144" y1="256" x2="120" y2="256" stroke="#fed330" stroke-width="4.5" stroke-linecap="round"/>
+    <line x1="368" y1="256" x2="392" y2="256" stroke="#fed330" stroke-width="4.5" stroke-linecap="round"/>
+  </g>
 </svg>

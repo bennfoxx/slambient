@@ -271,7 +271,8 @@
   .app-title {
     width: 100%;
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
     font-size: 28px;
     font-weight: 900;
     text-transform: uppercase;
@@ -280,11 +281,26 @@
     text-shadow: 0 0 14px rgba(var(--rgb-drone), 0.5), 0 0 28px rgba(var(--rgb-drone), 0.25);
     line-height: 1;
   }
+  .app-title-letters {
+    display: flex;
+    justify-content: space-between;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .brand-jack-glyph {
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 4px rgba(254, 211, 48, 0.45));
+    transition: transform 0.22s ease;
+  }
+  .brand-group:hover .brand-jack-glyph {
+    transform: rotate(45deg);
+  }
   .app-sub {
     width: 100%;
     box-sizing: border-box;
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
     font-size: 13px;
     font-weight: 800;
     color: var(--accent);
@@ -293,8 +309,22 @@
     line-height: 1;
     border: 1px solid rgba(var(--rgb-chord), 0.4);
     border-radius: 20px;
-    padding: 4px 12px;
+    padding: 4px 10px;
     background: rgba(var(--rgb-chord), 0.07);
+  }
+  .app-sub-letters {
+    display: flex;
+    justify-content: space-between;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .brand-stepper-glyph {
+    flex-shrink: 0;
+    animation: stepperSpin 18s linear infinite;
+  }
+  @keyframes stepperSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
 
   .preset-group {
