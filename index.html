@@ -48,6 +48,9 @@
               <button class="btn-bank-tab" id="tabBankUser" onclick="switchPresetBank('user')" title="User saved patch bank (U1-U9)">USER [U1–U9]</button>
             </div>
             <div class="patch-bank-actions">
+              <button type="button" class="btn-bank-tab btn-preset-io btn-store-user-subtab" onclick="storeToUserSlotPrompt()" title="Save current console & synth state into a user patch slot">
+                <span>+ STORE</span>
+              </button>
               <button type="button" class="btn-bank-tab btn-preset-io" onclick="savePresetBankJson()" title="Export current console & DSP chain patch as a JSON file">
                 <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 1.5V8M6 8L3.2 5.2M6 8L8.8 5.2M2 10.5H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 <span>SAVE</span>
@@ -86,7 +89,6 @@
             <button class="btn-preset-chip user-slot-chip" id="btnUserSlot7" onclick="handleUserSlotClick(7, event)" oncontextmenu="handleUserSlotContextMenu(event, 7)" title="Slot U7 — Click to load / Shift-click to save">U7: Empty</button>
             <button class="btn-preset-chip user-slot-chip" id="btnUserSlot8" onclick="handleUserSlotClick(8, event)" oncontextmenu="handleUserSlotContextMenu(event, 8)" title="Slot U8 — Click to load / Shift-click to save">U8: Empty</button>
             <button class="btn-preset-chip user-slot-chip" id="btnUserSlot9" onclick="handleUserSlotClick(9, event)" oncontextmenu="handleUserSlotContextMenu(event, 9)" title="Slot U9 — Click to load / Shift-click to save">U9: Empty</button>
-            <button class="btn-preset-chip btn-store-user" onclick="storeToUserSlotPrompt()" title="Save current console & synth state into a user patch slot">+ STORE</button>
           </div>
         </div>
       </div>
@@ -5038,6 +5040,7 @@ function getArpNotesPool() {
 </script>
 <script src="js/audio/drums.js"></script>
 <script src="js/audio/ambient-noise.js"></script>
+<script src="js/audio/dsp-rack.js"></script>
 <script>
 
 let clockInterval = null;
@@ -6301,6 +6304,11 @@ function syncAppFullscreenButton() {
   btn.title = on ? "Exit full screen (Esc)" : "Full screen";
   const lbl = btn.querySelector("span");
   if (lbl) lbl.textContent = on ? "Exit Full" : "Full Screen";
+  setTimeout(() => {
+    window.dispatchEvent(new Event("resize"));
+    if (typeof scopeNeedsResize !== "undefined") scopeNeedsResize = true;
+    if (typeof orbitalNeedsResize !== "undefined") orbitalNeedsResize = true;
+  }, 60);
 }
 document.addEventListener("fullscreenchange", syncAppFullscreenButton);
 document.addEventListener("webkitfullscreenchange", syncAppFullscreenButton);

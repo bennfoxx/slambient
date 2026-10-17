@@ -54,6 +54,10 @@ const jsFiles = [
   'js/ui/workspace.js',
   'js/audio/drums.js',
   'js/audio/ambient-noise.js',
+  'js/audio/dsp-rack.js',
+  'js/audio/recorder.js',
+  'js/audio/field-recorder.js',
+  'js/midi/web-midi.js',
   'js/visualizers/chord-wheel.js',
   'js/visualizers/scope.js',
   'js/visualizers/orbital.js'
