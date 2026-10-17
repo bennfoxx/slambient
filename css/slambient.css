@@ -3166,63 +3166,673 @@
   .pedals-deck.view-grid-hidden {
     display: none !important;
   }
+    /* =====================================================================
+     5. LOWER DECK ARCHITECTURE & DEDICATED FX PEDALBOARD (Phase 9)
+     ===================================================================== */
   .lower-deck {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(280px, 320px);
-    grid-template-rows: auto auto;
-    grid-template-areas:
-      "sub   chord noise fx"
-      "drum  arp   field fx";
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 10px;
+    gap: 0;
+  }
+
+  /* Segmented View Switcher Header Bar */
+  .lower-deck-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
     gap: 12px;
-    align-items: stretch;
+    padding: 8px 14px;
+    margin-bottom: 12px;
+    background: linear-gradient(180deg, #131724 0%, #0a0d16 100%);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
   }
-  .strip-channel.drone-ch  { grid-area: sub; }
-  .strip-channel.drum-ch   { grid-area: drum; }
-  .strip-channel.chord-ch  { grid-area: chord; }
-  .strip-channel.arp-ch    { grid-area: arp; }
-  .strip-channel.noise-ch  { grid-area: noise; }
-  .strip-channel.field-ch  { grid-area: field; }
-  .strip-channel.pedal-chain-module { grid-area: fx; }
 
-  @media (max-width: 1200px) {
-    .lower-deck {
-      grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(260px, 300px);
-      grid-template-areas:
-        "sub   chord fx"
-        "drum  arp   fx"
-        "noise field fx";
-      gap: 10px;
+  .deck-mode-switcher {
+    display: inline-flex;
+    background: #060810;
+    padding: 3px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    gap: 4px;
+  }
+
+  .btn-deck-mode {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    user-select: none;
+    line-height: 1;
+  }
+
+  .btn-deck-mode:hover {
+    color: var(--text-bright);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .btn-deck-mode.active {
+    background: linear-gradient(180deg, #1d2538 0%, #101524 100%);
+    color: #00e5ff;
+    border-color: rgba(0, 229, 255, 0.4);
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.22);
+  }
+
+  .btn-deck-mode .mode-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    font-size: 10px;
+    font-family: var(--font-mono, monospace);
+    color: var(--text-dim);
+  }
+
+  .btn-deck-mode.active .mode-count {
+    background: rgba(0, 229, 255, 0.18);
+    color: #00e5ff;
+    border: 1px solid rgba(0, 229, 255, 0.3);
+  }
+
+  .deck-header-telemetry {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-left: auto;
+  }
+
+  .deck-routing-stream-compact {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #070912;
+    border: 1px solid #1a2234;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-family: var(--font-mono, monospace);
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+  }
+
+  .deck-routing-stream-compact .stream-label {
+    color: var(--text-dim);
+  }
+
+  .deck-routing-stream-compact .stream-pill {
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-family: inherit;
+    border: none;
+  }
+
+  .deck-routing-stream-compact .stream-bus {
+    background: rgba(75, 123, 236, 0.18);
+    color: #4b7bec;
+    border: 1px solid rgba(75, 123, 236, 0.4);
+  }
+
+  .deck-routing-stream-compact .stream-out {
+    background: rgba(255, 95, 196, 0.18);
+    color: #ff5fc4;
+    border: 1px solid rgba(255, 95, 196, 0.4);
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+
+  .deck-routing-stream-compact .stream-out:hover {
+    color: #ffffff;
+    box-shadow: 0 0 8px rgba(255, 95, 196, 0.5);
+  }
+
+  .deck-routing-stream-compact .stream-counter {
+    color: #00e5ff;
+  }
+
+  .deck-routing-stream-compact .stream-arr {
+    color: #3b4252;
+  }
+
+  .deck-header-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-deck-quick-action {
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 10px;
+    background: #090c14;
+    border: 1px solid var(--border-light);
+    color: var(--text-dim);
+    border-radius: 4px;
+    font-family: var(--font-mono, monospace);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.14s ease;
+    user-select: none;
+  }
+
+  .btn-deck-quick-action:hover {
+    color: #fff;
+    border-color: #00e5ff;
+    background: rgba(0, 229, 255, 0.1);
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+  }
+
+  /* Lower Deck Body & Decks Container */
+  .lower-deck-body {
+    width: 100%;
+  }
+
+  /* Mode 1: INSTRUMENTS (6 Instruments full width) */
+  .lower-deck.deck-mode-instruments .studio-fx-pedalboard {
+    display: none !important;
+  }
+
+  .lower-deck.deck-mode-instruments .instruments-deck {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+  }
+
+  /* Mode 2: STUDIO FX RACK (10 Pedals full width) */
+  .lower-deck.deck-mode-fx .instruments-deck {
+    display: none !important;
+  }
+
+  .lower-deck.deck-mode-fx .studio-fx-pedalboard {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .lower-deck.deck-mode-fx .studio-fx-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+  }
+
+  /* Mode 3: SPLIT VIEW (Desktop > 1200px: 60% Instruments + 40% FX) */
+  @media (min-width: 1201px) {
+    .lower-deck.deck-mode-split .lower-deck-body {
+      display: flex;
+      flex-direction: row;
+      gap: 14px;
+      align-items: flex-start;
+      width: 100%;
     }
-  }
 
-  @media (max-width: 900px) {
-    .lower-deck {
+    .lower-deck.deck-mode-split .instruments-deck {
+      flex: 0 0 calc(60% - 7px);
+      width: calc(60% - 7px);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .lower-deck.deck-mode-split .studio-fx-pedalboard {
+      flex: 0 0 calc(40% - 7px);
+      width: calc(40% - 7px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .lower-deck.deck-mode-split .studio-fx-grid {
+      display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      grid-template-areas:
-        "sub   chord"
-        "drum  arp"
-        "noise field"
-        "fx    fx";
       gap: 10px;
+      width: 100%;
     }
   }
 
+  /* Compact / Tablet Breakpoint (<= 1200px) */
+  @media (max-width: 1200px) {
+    .btn-deck-mode.btn-deck-mode-split {
+      display: none !important;
+    }
+
+    .lower-deck.deck-mode-instruments .instruments-deck {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .lower-deck.deck-mode-fx .studio-fx-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    /* Fallback if split mode active on compact screen */
+    .lower-deck.deck-mode-split .instruments-deck {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      width: 100%;
+    }
+    .lower-deck.deck-mode-split .studio-fx-pedalboard {
+      display: none !important;
+    }
+  }
+
+  /* Mobile Breakpoint (<= 640px) */
   @media (max-width: 640px) {
-    .lower-deck {
+    .lower-deck-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      padding: 8px 10px;
+    }
+
+    .deck-mode-switcher {
+      width: 100%;
+      justify-content: stretch;
+    }
+
+    .btn-deck-mode {
+      flex: 1;
+      justify-content: center;
+      padding: 8px 10px;
+      font-size: 11px;
+    }
+
+    .deck-header-telemetry {
+      width: 100%;
+      justify-content: space-between;
+      margin-left: 0;
+    }
+
+    .lower-deck.deck-mode-instruments .instruments-deck {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
-    .strip-channel.drone-ch,
-    .strip-channel.drum-ch,
-    .strip-channel.chord-ch,
-    .strip-channel.arp-ch,
-    .strip-channel.noise-ch,
-    .strip-channel.field-ch,
-    .strip-channel.pedal-chain-module {
-      grid-area: auto;
+
+    .lower-deck.deck-mode-fx .studio-fx-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
   }
+
+  /* =====================================================================
+     FULL-SIZED EURORACK FX PEDALBOARD & HARDWARE CHASSIS
+     ===================================================================== */
+  .studio-fx-pedalboard {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pedalboard-routing-ribbon {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: #070912;
+    border: 1px solid #1a2234;
+    border-radius: 5px;
+    padding: 6px 10px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+  }
+
+  .routing-ribbon-left {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .routing-stream-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .routing-pill-node {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 7px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+    font-family: var(--font-mono, monospace);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--node-color, var(--text-dim));
+    cursor: pointer;
+    transition: all 0.14s ease;
+    user-select: none;
+  }
+
+  .routing-pill-node:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--node-color, #00e5ff);
+    color: #fff;
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.35);
+    transform: translateY(-1px);
+  }
+
+  .routing-pill-node.bypassed {
+    opacity: 0.45;
+    filter: grayscale(0.8);
+    border-style: dashed;
+  }
+
+  .routing-pill-node .node-idx {
+    font-size: 8px;
+    opacity: 0.75;
+  }
+
+  .routing-ribbon-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  /* Hardware Eurorack Pedal Chassis */
+  .studio-fx-grid .pedal-chassis {
+    background: linear-gradient(180deg, #131724 0%, #0a0d16 100%);
+    border: 1px solid var(--border-light);
+    border-top: 3px solid var(--pedal-color, #00e5ff);
+    border-radius: 6px;
+    padding: 10px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .studio-fx-grid .pedal-chassis:hover {
+    border-color: rgba(var(--pedal-color-rgb, 0, 229, 255), 0.5);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 12px rgba(var(--pedal-color-rgb, 0, 229, 255), 0.18);
+  }
+
+  /* Brushed hairline faceplate finish */
+  .studio-fx-grid .pedal-chassis::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.012) 0px,
+      rgba(255, 255, 255, 0.012) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    pointer-events: none;
+    border-radius: 6px;
+  }
+
+  .studio-fx-grid .pedal-chassis.bypassed {
+    opacity: 0.55;
+    filter: grayscale(0.65);
+    border-top-color: #4b5b82;
+  }
+
+  .studio-fx-grid .pedal-chassis.pedal-dragging {
+    opacity: 0.45;
+    border: 2px dashed #00e5ff !important;
+    transform: scale(0.97);
+  }
+
+  .studio-fx-grid .pedal-chassis.pedal-drag-over {
+    border-color: #00e5ff !important;
+    box-shadow: 0 0 16px rgba(0, 229, 255, 0.5) !important;
+    transform: translateY(-2px);
+  }
+
+  .studio-fx-grid .pedal-chassis.pedal-highlight-flash {
+    animation: pedalPulseFlash 1.2s ease-out;
+  }
+
+  @keyframes pedalPulseFlash {
+    0% {
+      box-shadow: 0 0 24px var(--pedal-color, #00e5ff);
+      border-color: var(--pedal-color, #00e5ff);
+    }
+    100% {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  /* Panel Header inside Pedal Chassis */
+  .studio-fx-grid .pedal-chassis .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(var(--pedal-color-rgb, 0, 229, 255), 0.25);
+    gap: 8px;
+  }
+
+  .studio-fx-grid .pedal-chassis .panel-header-left {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+  }
+
+  .studio-fx-grid .pedal-drag-handle {
+    color: var(--text-dim);
+    cursor: grab;
+    display: inline-flex;
+    align-items: center;
+    padding: 2px;
+    border-radius: 3px;
+    transition: color 0.12s ease;
+  }
+
+  .studio-fx-grid .pedal-drag-handle:hover {
+    color: var(--pedal-color, #00e5ff);
+  }
+
+  .studio-fx-grid .pedal-slot-index {
+    font-family: var(--font-mono, monospace);
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--pedal-color, #00e5ff);
+    background: rgba(var(--pedal-color-rgb, 0, 229, 255), 0.12);
+    padding: 2px 5px;
+    border-radius: 3px;
+    border: 1px solid rgba(var(--pedal-color-rgb, 0, 229, 255), 0.35);
+    letter-spacing: 0.5px;
+  }
+
+  .studio-fx-grid .pedal-card-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    color: var(--text-bright);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .studio-fx-grid .pedal-slot-badge {
+    font-family: var(--font-mono, monospace);
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: #090c14;
+    border: 1px solid var(--border-light);
+    color: var(--text-dim);
+  }
+
+  .studio-fx-grid .btn-pedal-shift {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #090c14;
+    border: 1px solid var(--border-light);
+    color: var(--text-dim);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    padding: 0;
+  }
+
+  .studio-fx-grid .btn-pedal-shift:hover:not(:disabled) {
+    color: #fff;
+    border-color: var(--border-bright);
+    background: #141926;
+  }
+
+  .studio-fx-grid .btn-pedal-shift:disabled {
+    opacity: 0.25;
+    cursor: default;
+  }
+
+  .studio-fx-grid .btn-pedal-rand {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #090c14;
+    border: 1px solid var(--border-light);
+    color: var(--pedal-color, var(--text-dim));
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    padding: 0;
+  }
+
+  .studio-fx-grid .btn-pedal-rand:hover {
+    color: #fff;
+    border-color: var(--pedal-color, #00e5ff);
+    background: rgba(var(--pedal-color-rgb, 0, 229, 255), 0.2);
+  }
+
+  /* Illuminated Stomp Power Switch */
+  .studio-fx-grid .btn-power {
+    min-width: 36px;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 3px;
+    font-family: var(--font-mono, monospace);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    background: #090c14;
+    border: 1px solid #2a354f;
+    color: #556483;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .studio-fx-grid .btn-power.active {
+    background: linear-gradient(180deg, #15382b 0%, #0d221a 100%);
+    border-color: #2ed573;
+    color: #2ed573;
+    box-shadow: 0 0 8px rgba(46, 213, 115, 0.4);
+  }
+
+  .pedal-faceplate-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 0 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 10px;
+    letter-spacing: 0.4px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .pedal-silk-role {
+    font-weight: 600;
+    color: #8c9bb7;
+  }
+
+  .pedal-silk-model {
+    font-family: var(--font-mono, monospace);
+    font-size: 8.5px;
+    color: #556483;
+  }
+
+  /* Controls Body: High Contrast 12px-13px Typography */
+  .studio-fx-grid .pedal-controls-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .studio-fx-grid .control-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .studio-fx-grid .control-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 600;
+    color: #c7d2e5;
+    letter-spacing: 0.3px;
+  }
+
+  .studio-fx-grid .control-val {
+    font-size: 12.5px;
+    font-family: var(--font-mono, monospace);
+    font-weight: 700;
+    color: var(--pedal-color, #00e5ff);
+    white-space: nowrap;
+  }
+
+  .studio-fx-grid input[type="range"] {
+    height: 26px;
+    cursor: pointer;
+  }
+
+  .pedalboard-master-section {
+    width: 100%;
+    margin-top: 10px;
+  }
+
 
   /* =====================================================================
      6. BIRDS-EYE VIEW PEDAL CHAIN MODULE (Rack View)

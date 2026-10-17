@@ -43,7 +43,7 @@
     arp: ".strip-channel.arp-ch",
     noise: ".strip-channel.noise-ch",
     field: "#fieldModule",
-    fxChain: "#pedalChainModule"
+    fxChain: "#studioFxPedalboard"
   };
 
   // Complete registry for dock chips and window chrome labels
@@ -57,7 +57,17 @@
     { id: "arp", selector: ".strip-channel.arp-ch", label: "ARP", type: "rack" },
     { id: "noise", selector: ".strip-channel.noise-ch", label: "NOISE", type: "rack" },
     { id: "field", selector: "#fieldModule", label: "FIELD", type: "rack" },
-    { id: "fxChain", selector: "#pedalChainModule", label: "DSP FX", type: "rack" }
+    { id: "fxChain", selector: "#studioFxPedalboard", label: "STUDIO FX", type: "rack" },
+    { id: "fx_overdrive", selector: "#pedalCard_OVERDRIVE", label: "TUBE DRIVE", type: "fx" },
+    { id: "fx_filter", selector: "#pedalCard_FILTER", label: "FILTER", type: "fx" },
+    { id: "fx_tremolo", selector: "#pedalCard_TREMOLO", label: "TREMOLO", type: "fx" },
+    { id: "fx_phaser", selector: "#pedalCard_PHASER", label: "PHASER", type: "fx" },
+    { id: "fx_flanger", selector: "#pedalCard_FLANGER", label: "FLANGER", type: "fx" },
+    { id: "fx_delay", selector: "#pedalCard_DELAY", label: "TAPE DELAY", type: "fx" },
+    { id: "fx_digital_delay", selector: "#pedalCard_DIGITAL_DELAY", label: "DIGITAL DELAY", type: "fx" },
+    { id: "fx_space_delay", selector: "#pedalCard_SPACE_DELAY", label: "SPACE DELAY", type: "fx" },
+    { id: "fx_tape_echo", selector: "#pedalCard_TAPE_ECHO", label: "TAPE ECHO", type: "fx" },
+    { id: "fx_space", selector: "#pedalCard_SPACE", label: "SPACE REVERB", type: "fx" }
   ];
 
   // Curated templates configuration

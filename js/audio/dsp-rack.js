@@ -141,6 +141,21 @@
       this.setupFeedbackPaths();
     }
 
+    setTime(val) {
+      this.timeSec = Math.max(0.01, Math.min(3.0, Number(val) || 0.375));
+      this.updateParams();
+    }
+
+    setFeedback(val) {
+      this.feedback = Math.max(0, Math.min(0.95, Number(val) || 0));
+      this.updateParams();
+    }
+
+    setMix(val) {
+      this.mix = Math.max(0, Math.min(1.0, Number(val) || 0));
+      this.updateParams();
+    }
+
     updateParams(time) {
       const now = time || this.ctx.currentTime;
       safeParam(this.delayL.delayTime, this.timeSec, now, 0.03);
@@ -207,6 +222,28 @@
       this.updateParams();
     }
 
+    setTime(val) {
+      this.timeSec = Math.max(0.01, Math.min(3.0, Number(val) || 0.42));
+      this.updateParams();
+    }
+
+    setFeedback(val) {
+      this.feedback = Math.max(0, Math.min(0.95, Number(val) || 0));
+      this.updateParams();
+    }
+
+    setFlutter(val) {
+      const f = Math.max(0, Math.min(1.0, Number(val) || 0));
+      const now = this.ctx.currentTime;
+      safeParam(this.flutterGain.gain, f * 0.0018, now, 0.02);
+      safeParam(this.wowGain.gain, f * 0.0035, now, 0.02);
+    }
+
+    setMix(val) {
+      this.mix = Math.max(0, Math.min(1.0, Number(val) || 0));
+      this.updateParams();
+    }
+
     updateParams(time) {
       const now = time || this.ctx.currentTime;
       safeParam(this.delayNode.delayTime, this.timeSec, now, 0.04);
@@ -269,12 +306,28 @@
       this.updateParams();
     }
 
+    setSpeed(val) {
+      const spd = Math.max(0.1, Math.min(3.0, Number(val) || 1.0));
+      this.baseTime = 0.28 / spd;
+      this.updateParams();
+    }
+
+    setInertia(val) {
+      this.inertia = Math.max(0.01, Math.min(1.0, Number(val) || 0.12));
+    }
+
+    setMix(val) {
+      this.mix = Math.max(0, Math.min(1.0, Number(val) || 0));
+      this.updateParams();
+    }
+
     updateParams(time) {
       const now = time || this.ctx.currentTime;
+      const slew = this.inertia !== undefined ? this.inertia : 0.18;
       // Motor inertia: use setTargetAtTime for realistic analog pitch-slew
-      this.head1.delayTime.setTargetAtTime(this.baseTime, now, 0.18);
-      this.head2.delayTime.setTargetAtTime(this.baseTime * 1.5, now, 0.18);
-      this.head3.delayTime.setTargetAtTime(this.baseTime * 2.0, now, 0.18);
+      this.head1.delayTime.setTargetAtTime(this.baseTime, now, slew);
+      this.head2.delayTime.setTargetAtTime(this.baseTime * 1.5, now, slew);
+      this.head3.delayTime.setTargetAtTime(this.baseTime * 2.0, now, slew);
 
       safeParam(this.headVol1.gain, 0.85, now, 0.02);
       safeParam(this.headVol2.gain, 0.65, now, 0.02);
@@ -502,6 +555,20 @@
       const trim = 1.0 / (1.0 + Math.log10(1 + d * 0.8));
       this.trimGain.gain.value = trim;
     }
+
+    setTone(val) {
+      const freq = Math.max(200, Math.min(14000, Number(val) || 3200));
+      if (this.toneFilter) {
+        safeParam(this.toneFilter.frequency, freq, this.ctx.currentTime, 0.02);
+      }
+    }
+
+    setMix(val) {
+      const m = Math.max(0, Math.min(1.0, Number(val) || 0));
+      const now = this.ctx.currentTime;
+      safeParam(this.wetGain.gain, m, now, 0.02);
+      safeParam(this.dryGain.gain, 1.0 - m * 0.5, now, 0.02);
+    }
   }
 
   /* ==========================================================================
@@ -628,6 +695,110 @@
       }
       this.rewire(false);
       return [...this.chain];
+    }
+
+    /**
+     * Loads a complete signature preset configuration into the FX rack:
+     * - Reorders the DSP chain
+     * - Configures pedal bypass flags
+     * - Smoothly updates parameter values (with anti-click ramping)
+     * - Crossfades the master bus seamlessly without clicks
+     */
+    loadChainPreset(config) {
+      if (!config || typeof config !== "object") return;
+
+      const ALL_KEYS = [
+        "OVERDRIVE", "FILTER", "TREMOLO", "PHASER", "FLANGER",
+        "DELAY", "DIGITAL_DELAY", "SPACE_DELAY", "TAPE_ECHO", "SPACE"
+      ];
+
+      // 1. Reorder chain
+      if (Array.isArray(config.chain) && config.chain.length > 0) {
+        const newChain = [...config.chain.filter(k => ALL_KEYS.includes(k))];
+        ALL_KEYS.forEach(k => {
+          if (!newChain.includes(k)) newChain.push(k);
+        });
+        this.chain = newChain;
+        if (typeof dspChainOrder !== "undefined" && Array.isArray(dspChainOrder)) {
+          dspChainOrder.length = 0;
+          dspChainOrder.push(...this.chain);
+        }
+      }
+
+      // 2. Bypass flags
+      if (config.bypass && typeof config.bypass === "object") {
+        Object.keys(config.bypass).forEach(k => {
+          const isBypassed = !!config.bypass[k];
+          this.bypassMap.set(k, isBypassed);
+          if (typeof pedalBypassState !== "undefined") {
+            pedalBypassState[k] = isBypassed;
+          }
+
+          if (typeof document !== "undefined") {
+            const card = document.getElementById("pedalCard_" + k);
+            const btn = document.getElementById("stompBtn_" + k);
+            if (card) card.classList.toggle("bypassed", isBypassed);
+            if (btn) btn.classList.toggle("active", !isBypassed);
+
+            const miniCard = document.querySelector(`.mini-pedal-card[data-pedal="${k}"]`);
+            if (miniCard) {
+              miniCard.classList.toggle("bypassed", isBypassed);
+              miniCard.classList.toggle("active", !isBypassed);
+              const pwrBtn = miniCard.querySelector(".btn-mini-power");
+              if (pwrBtn) {
+                pwrBtn.classList.toggle("active", !isBypassed);
+                pwrBtn.title = isBypassed ? ("Turn ON " + k) : ("Turn OFF " + k);
+              }
+            }
+
+            const chainItem = document.querySelector(`.master-dsp-chain-item[data-chain-pedal="${k}"]`);
+            if (chainItem) {
+              chainItem.classList.toggle("bypassed", isBypassed);
+              const itemPwr = chainItem.querySelector(".btn-mini-power");
+              if (itemPwr) {
+                itemPwr.classList.toggle("active", !isBypassed);
+                itemPwr.title = isBypassed ? ("Enable " + k) : ("Bypass " + k);
+              }
+            }
+          }
+        });
+      }
+
+      // 3. DSP parameters and UI sync
+      if (config.params && typeof config.params === "object") {
+        Object.keys(config.params).forEach(key => {
+          const paramsObj = config.params[key];
+          if (!paramsObj || typeof paramsObj !== "object") return;
+          Object.keys(paramsObj).forEach(paramId => {
+            const val = paramsObj[paramId];
+            if (typeof updateFxParam === "function") {
+              updateFxParam(key, paramId, val);
+            }
+            if (typeof fxParamsState !== "undefined") {
+              if (!fxParamsState[key]) fxParamsState[key] = {};
+              fxParamsState[key][paramId] = val;
+            }
+            if (typeof document !== "undefined") {
+              const slider = document.getElementById(`slider_${key}_${paramId}`);
+              if (slider) slider.value = val;
+              const lbl = document.getElementById(`lbl_${key}_${paramId}`);
+              if (lbl && typeof formatFxParamValue === "function" && typeof PEDAL_REGISTRY !== "undefined") {
+                const reg = PEDAL_REGISTRY[key];
+                const pMeta = reg && reg.params && reg.params.find(p => p.id === paramId);
+                lbl.textContent = formatFxParamValue(pMeta, val);
+              }
+            }
+          });
+        });
+      }
+
+      // 4. Smooth audio crossfade rewire
+      this.rewire(false);
+
+      // 5. Update UI views
+      if (typeof updatePedalsOrderUI === "function") {
+        updatePedalsOrderUI();
+      }
     }
   }
 

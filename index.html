@@ -3473,6 +3473,7 @@ function initAudio() {
   // Initialize Modular Studio FX Rack & Register DSP Engines
   if (typeof SlambientFxRackManager !== "undefined") {
     window.fxRackManager = new SlambientFxRackManager(audioCtx, masterBusPre, masterBusPost);
+    window.slambientFxRackManager = window.fxRackManager;
 
     // Register legacy built-in modules
     window.fxRackManager.registerModule("FILTER", { input: filterModuleInput, output: filterModuleOutput });

@@ -908,21 +908,21 @@ function restoreStripsToRack() {
     const strip = getOrbModuleElement(orb);
     if (!strip) return;
     if (ORBITAL_LOWER_DECK_IDS.includes(orb.id)) {
-      if (lowerRack) lowerRack.appendChild(strip);
+      const instDeck = document.getElementById("instrumentsDeck") || lowerRack;
+      if (instDeck) instDeck.appendChild(strip);
     } else if (orb.id === "space") {
-      const unifiedMaster = document.getElementById("masterDeckUnified");
-      if (unifiedMaster) unifiedMaster.appendChild(strip);
+      const masterSec = document.getElementById("pedalboardMasterSection") || document.getElementById("studioFxGrid") || document.getElementById("masterDeckUnified");
+      if (masterSec) masterSec.appendChild(strip);
     } else if (ORBITAL_ID_TO_PEDAL_KEY[orb.id]) {
-      // Filter/Delay/Reverb pedal cards belong in the unified pedal deck too
-      // -- updatePedalsOrderUI() below puts them back in the right slot.
-      const unifiedMaster = document.getElementById("masterDeckUnified");
-      if (unifiedMaster) unifiedMaster.appendChild(strip);
+      const fxGrid = document.getElementById("studioFxGrid") || document.getElementById("masterDeckUnified");
+      if (fxGrid) fxGrid.appendChild(strip);
       movedAPedal = true;
     }
   });
-  const pedalChainMod = document.getElementById("pedalChainModule");
-  if (lowerRack && pedalChainMod) {
-    lowerRack.appendChild(pedalChainMod);
+  const pedalBoard = document.getElementById("studioFxPedalboard") || document.getElementById("pedalChainModule");
+  const deckBody = document.getElementById("lowerDeckBody") || lowerRack;
+  if (deckBody && pedalBoard && !pedalBoard.parentElement) {
+    deckBody.appendChild(pedalBoard);
   }
   if (typeof updatePedalsOrderUI === "function") updatePedalsOrderUI();
   if (typeof renderMobileMacroGrid === "function") renderMobileMacroGrid();
