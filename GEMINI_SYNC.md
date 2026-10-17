@@ -1651,3 +1651,12 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
     - `ArrowRight` or `]`: Cycles to next module in signal chain.
     - `P` / `p`: Toggles power/bypass for current module.
     - `R` / `r`: Triggers randomization for current module.
+
+## Update — 2026-10-16 (Mobile & Core Engine Action Plan: Phased Agent Briefs)
+
+- **Roadmap Integration in `MASTER_BLUEPRINT.md`**:
+  - Incorporated full action plan across Section 11 (Roadmap & Status) and Section 27 (Phasing):
+    - **Phase 4 (Agent 1: High-Priority Mobile UI Bugs & QoL Fixes)**: Header title centering, sticky header modular scroll sub-wrapper, keyboard header tabular dimensions (25-key vs 88-key), `?` info panel static coordinate anchor, touch handler bindings for module buttons, viewport manipulation/zoom lockdown, `touch-action: none` vs `touch-action: pan-y` drag scoping, preset name 15-char cap, randomize button wrapping prevention, pitch analyzer decoupled dispatcher on auto-play toggle, tab wake AudioContext resume & WebGL restore, full-screen visualizer 100dvh portrait fix, and orbital dropdown z-index scrim blackout elimination.
+    - **Phase 5 (Agent 2: Mobile UX Architecture Overhaul)**: Macro Overview (2-column ~110px compact summary tiles with Name, Power, 15-char preset, LED/meter) vs. Micro Inspect Sheet (`max-height: 85dvh` bottom drawer with "Back to Rack" button), plus Master Out modular signal-chain reordering pass.
+    - **Phase 6 (Experimental Staging Branches)**: `experiment/scale-tied-voicings` (scale-coupled chord voicing profiles), `experiment/midi-file-recorder` (multi-track Standard MIDI File Type 1 in-browser exporter), and `experiment/accompaniment-mode` (interactive live harmonic follower accompaniment).
+  - All mobile adjustments enforced strictly under `@media (max-width: 768px)` with zero regression to desktop layout.
