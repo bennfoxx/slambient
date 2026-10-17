@@ -2197,16 +2197,34 @@
   .piano-keys-wrapper.mode-radar {
     pointer-events: none !important;
     cursor: default;
-    padding: 4px;
+    padding: 18px 4px 4px 4px;
+  }
+  .piano-keys-wrapper.mode-radar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 16px;
+    background: linear-gradient(180deg, #090b12 0%, #05060a 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px 4px 0 0;
+    z-index: 4;
+    pointer-events: none;
   }
   .piano-keys-wrapper.mode-radar .white-keys-layer {
     gap: 1px;
+  }
+  .piano-keys-wrapper.mode-radar .black-keys-layer {
+    top: 18px;
+    height: calc((100% - 22px) * 0.58);
   }
   .piano-keys-wrapper.mode-radar .white-key {
     min-width: 0;
     padding-bottom: 3px;
     border-radius: 0 0 2px 2px;
     border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: visible;
   }
   .piano-keys-wrapper.mode-radar .white-key::after {
     width: 65%;
@@ -2237,9 +2255,33 @@
   }
   .piano-keys-wrapper.mode-radar .key-label.octave-marker {
     display: flex;
-    font-size: 8px;
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 12px;
+    padding: 0 2px;
+    font-size: 8.5px;
     font-weight: 800;
-    color: var(--text-tertiary);
+    letter-spacing: 0;
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--text-secondary) !important;
+    z-index: 6;
+    pointer-events: none;
+  }
+  .piano-keys-wrapper.mode-radar .white-key:first-child .key-label.octave-marker {
+    left: 0;
+    transform: none;
+  }
+  .piano-keys-wrapper.mode-radar .white-key:last-child .key-label.octave-marker {
+    left: auto;
+    right: 0;
+    transform: none;
+  }
+  .piano-keys-wrapper.mode-radar .white-key[class*="active-"] .key-label.octave-marker {
+    color: #ffffff !important;
+    text-shadow: 0 0 6px var(--color-drone);
   }
   .piano-keys-wrapper.mode-radar .black-key-label {
     display: none !important;
@@ -4276,8 +4318,11 @@
     min-width: 100%;
     width: max-content;
     max-width: 360px;
-    max-height: none;
-    overflow: visible;
+    max-height: min(320px, 55vh);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
     background: #11141d;
     border: 1px solid var(--dd-accent, var(--border-bright));
     border-radius: 2px;
@@ -5554,8 +5599,20 @@
       touch-action: none !important;
     }
     .piano-keys-wrapper.mode-radar {
-      height: clamp(50px, 15vh, 75px) !important;
-      min-height: 50px !important;
+      height: clamp(60px, 18vh, 85px) !important;
+      min-height: 60px !important;
+      padding: 16px 3px 3px 3px !important;
+    }
+    .piano-keys-wrapper.mode-radar::before {
+      height: 14px !important;
+    }
+    .piano-keys-wrapper.mode-radar .black-keys-layer {
+      top: 16px !important;
+      height: calc((100% - 19px) * 0.58) !important;
+    }
+    .piano-keys-wrapper.mode-radar .key-label.octave-marker {
+      top: -13px !important;
+      font-size: 7.5px !important;
     }
     .white-key { padding-bottom: 5px !important; min-width: 0 !important; }
     .black-key { width: 4.8% !important; padding-bottom: 3px !important; }
@@ -7692,17 +7749,21 @@
       -webkit-user-select: none;
     }
     .piano-keys-wrapper.mode-radar {
-      height: clamp(90px, 26vw, 130px);
-      padding: 3px 2px;
+      height: clamp(95px, 28vw, 135px);
+      padding: 18px 2px 3px 2px;
+    }
+    .piano-keys-wrapper.mode-radar .black-keys-layer {
+      top: 18px;
+      height: calc((100% - 21px) * 0.58);
     }
     .piano-keys-wrapper.mode-radar .white-key {
       padding-bottom: 2px;
       border-width: 0.5px;
     }
     .piano-keys-wrapper.mode-radar .key-label.octave-marker {
-      font-size: 7.5px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0;
     }
     .white-key { padding-bottom: 7px; min-width: 0; }
     .black-key { width: 5.6%; padding-bottom: 5px; }
@@ -8690,7 +8751,7 @@
     <!-- 6. POCKET FIELD RECORDER (Dedicated Instrument Module) -->
     <div class="strip-channel field-ch" id="fieldModule">
       <div class="panel-header">
-        <span onclick="openModuleInOrbital(this.closest('.strip-channel'))" style="cursor: pointer;" title="6. FIELD — Click to open in orbital view">6. FIELD</span>
+        <span style="cursor: pointer;" title="6. FIELD — Click to open in orbital view">6. FIELD</span>
         <div class="panel-header-actions">
           <span class="control-val field-val" data-field-status style="font-size:10px;margin-right:2px;">EMPTY</span>
           <button class="btn-power active" id="btnPower_field" onclick="toggleChannelPower('field')" title="Toggle Field Recorder Power (On / Off)">PWR</button>
@@ -11009,6 +11070,12 @@ function updatePedalsOrderUI() {
   if (typeof renderMasterDspChainList === "function") {
     renderMasterDspChainList();
   }
+  if (typeof renderMobileMacroGrid === "function") {
+    renderMobileMacroGrid();
+  }
+  if (typeof expandedOrbId !== "undefined" && expandedOrbId && typeof renderSignalRibbon === "function") {
+    renderSignalRibbon(expandedOrbId);
+  }
 }
 
 function renderBirdsEyePedalRack() {
@@ -11210,6 +11277,13 @@ function togglePedalBypass(key, ev) {
   const currentOrbId = (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && PEDAL_KEY_TO_ORBITAL_ID[key]) ? PEDAL_KEY_TO_ORBITAL_ID[key] : key.toLowerCase();
   if (modalPwr && expandedOrbId === currentOrbId) {
     modalPwr.classList.toggle("active", !isBypassed);
+  }
+
+  if (typeof renderMasterDspChainList === "function") {
+    renderMasterDspChainList();
+  }
+  if (typeof renderMobileMacroGrid === "function") {
+    renderMobileMacroGrid();
   }
 
   // 4. Update audio DSP if audioCtx exists
@@ -16772,6 +16846,9 @@ function updateAudioParams() {
   if (typeof syncAllSmartDropdowns === 'function') {
     syncAllSmartDropdowns();
   }
+  if (typeof renderMobileMacroGrid === 'function') {
+    renderMobileMacroGrid();
+  }
 
   if (!audioCtx) return;
 
@@ -17227,6 +17304,9 @@ function updateMuteSoloUI() {
     if (pBtn) pBtn.classList.toggle("active", channelPower[ch] !== false);
     if (aBtn) aBtn.classList.toggle("active", channelAux[ch] !== false);
   });
+  if (typeof renderMobileMacroGrid === "function") {
+    renderMobileMacroGrid();
+  }
 }
 
 function toggleMute(ch) {
@@ -20860,10 +20940,18 @@ function initSmartDropdowns() {
         menu.classList.add("open");
         trigger.classList.add("open");
         wrap.classList.add("is-open");
-        // Check viewport bottom collision to flip menu upward if needed
+        // Check viewport & modal body bottom collision to flip menu upward if needed
         const rect = menu.getBoundingClientRect();
-        if (rect.bottom > window.innerHeight - 12) {
-          menu.classList.add("drop-up");
+        const modalBody = wrap.closest("#orbitalModalBody");
+        const containerBottom = modalBody ? modalBody.getBoundingClientRect().bottom - 6 : window.innerHeight - 12;
+        const containerTop = modalBody ? modalBody.getBoundingClientRect().top + 6 : 12;
+        if (rect.bottom > containerBottom) {
+          const triggerRect = trigger.getBoundingClientRect();
+          const roomBelow = containerBottom - triggerRect.bottom;
+          const roomAbove = triggerRect.top - containerTop;
+          if (roomAbove > roomBelow) {
+            menu.classList.add("drop-up");
+          }
         }
       }
     }
@@ -21037,6 +21125,9 @@ function setModuleView(mode) {
     if (pedalsRack) pedalsRack.classList.remove("view-grid-hidden");
     const panel = document.getElementById("orbitalSidePanel");
     if (panel) panel.classList.remove("active");
+    const backdrop = document.getElementById("orbitalModalBackdrop");
+    if (backdrop) backdrop.classList.remove("active");
+    document.body.classList.remove("orbital-panel-open");
     expandedOrbId = null;
     orbitalPanelActive = false;
     const hint = document.getElementById("orbitalHint");
@@ -21214,12 +21305,20 @@ function initTouchViewSwitchers() {
     const el = document.getElementById(id);
     if (!el || el.dataset.touchFastBound) return;
     el.dataset.touchFastBound = "1";
+    let lastTouchPointerUp = 0;
     el.addEventListener("pointerup", (e) => {
       if (e.pointerType === "touch") {
         e.preventDefault();
+        lastTouchPointerUp = performance.now();
         action();
       }
     }, { passive: false });
+    el.addEventListener("click", (e) => {
+      if (performance.now() - lastTouchPointerUp < 450) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    }, true);
   });
 }
 if (document.readyState === "loading") {
@@ -22183,8 +22282,11 @@ window.addEventListener("keydown", (e) => {
     }, { passive: false });
   });
 
-  // 2. Multi-touch touchmove pinch zoom prevention
+  // 2. Multi-touch touchmove pinch zoom prevention (preserves multi-touch piano chords & arcade controls)
   document.addEventListener('touchmove', (e) => {
+    if (e.target && e.target.closest && e.target.closest('.piano-keys-wrapper, .arcade-controls, .arcade-pad, .arcade-btn')) {
+      return;
+    }
     if ((e.scale !== undefined && e.scale !== 1) || (e.touches && e.touches.length > 1)) {
       e.preventDefault();
     }
@@ -22196,7 +22298,7 @@ window.addEventListener("keydown", (e) => {
     const now = Date.now();
     if (now - lastTouchEndTime <= 320) {
       const isInteractive = e.target && e.target.closest && e.target.closest(
-        'button, [role="button"], input, select, a, .piano-key, .black-key, .white-key, .mobile-macro-tile, .custom-select-trigger, .btn-preset-chip, .btn-oct, .btn-kb-view, .vert-mode-btn, .arcade-btn, .arcade-pad-thumb, .master-vol-mute, .toggle-switch, .badge-tag'
+        'button, [role="button"], input, select, a, .piano-key, .black-key, .white-key, .mobile-macro-tile, .custom-dropdown-trigger, .custom-dropdown-item, .custom-dropdown-wrap, .btn-preset-chip, .btn-oct, .btn-kb-view, .vert-mode-btn, .arcade-btn, .arcade-pad-thumb, .master-vol-mute, .toggle-switch, .badge-tag'
       );
       if (!isInteractive) {
         e.preventDefault();
