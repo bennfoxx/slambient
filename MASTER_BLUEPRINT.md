@@ -1067,11 +1067,11 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
 > **Target Files:** `index.html` (and internal CSS blocks)  
 > **Scope Guardrail (Desktop Parity):** All structural layout changes must strictly be scoped under mobile breakpoints (`@media (max-width: 768px)`). The desktop layout, sizing, and interaction model must remain 100% untouched.
 
-* [ ] **Mobile Bird's-Eye Grid (Macro State):** Replace 100dvh single-column stacking with a 2-column compact grid fitting cleanly within the mobile viewport using ~110px summary tiles displaying Module Name, Power/Bypass toggle, Preset Name (max 15 chars), and active LED/meter under `@media (max-width: 768px)`.
-* [ ] **Mobile Inspect Sheet (Micro State):** Tapping a macro tile opens full parameters in a slide-up bottom sheet or modal drawer (`max-height: 85dvh`) with an explicit "Close / Back to Rack" button.
-* [ ] **Orbital View Parity:** Orbital visual nodes act as the macro state; tapping a node slides open the inspection sheet rather than rendering full-height scrolling panels.
-* [ ] **Master Out Effects Chain Reordering:** Add signal-chain reordering directly inside the Master Out modular view (Up/Down arrow nudges or handle drag), sequentially reconnecting Web Audio nodes (`source -> chain[0] -> chain[1] -> destination`) wrapped in an `audioCtx.suspend()` / `resume()` pass to avoid audio pops.
-* [ ] **Brand Guidelines Conformance:** Follow `BRAND_GUIDELINES.md` for strict visual symmetry, single-line text protection (`white-space: nowrap !important;`), and complete modular styling (borders, subtle inset shadows, 6px-8px chassis radius).
+* [x] **Mobile Bird's-Eye Grid (Macro State):** Replace 100dvh single-column stacking with a 2-column compact grid fitting cleanly within the mobile viewport using ~110px summary tiles displaying Module Name, Power/Bypass toggle, Preset Name (max 15 chars), and active LED/meter under `@media (max-width: 768px)`.
+* [x] **Mobile Inspect Sheet (Micro State):** Tapping a macro tile opens full parameters in a slide-up bottom sheet or modal drawer (`max-height: 85dvh`) with an explicit "Close / Back to Rack" button.
+* [x] **Orbital View Parity:** Orbital visual nodes act as the macro state; tapping a node slides open the inspection sheet rather than rendering full-height scrolling panels.
+* [x] **Master Out Effects Chain Reordering:** Add signal-chain reordering directly inside the Master Out modular view (Up/Down arrow nudges or handle drag), sequentially reconnecting Web Audio nodes (`source -> chain[0] -> chain[1] -> destination`) wrapped in an `audioCtx.suspend()` / `resume()` pass to avoid audio pops.
+* [x] **Brand Guidelines Conformance:** Follow `BRAND_GUIDELINES.md` for strict visual symmetry, single-line text protection (`white-space: nowrap !important;`), and complete modular styling (borders, subtle inset shadows, 6px-8px chassis radius).
 
 ##### Phase 6: Experimental Feature Staging (FUTURE CANARY BUILDS)
 * [ ] **Build A (`experiment/scale-tied-voicings`):** Scale-Coupled Chord Voicing Engine (Lydian Quartal/#11, Dorian Drop-2/So What, Mixolydian Sus4/Sus2, Phrygian semitone clusters, Pentatonic/Hirajoshi open quintal), voicing spread/density dials, and voice-leading optimization.
