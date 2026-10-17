@@ -404,11 +404,14 @@
     root.addEventListener && root.addEventListener('orientationchange', () => { needsResize = true; });
 
     function resize() {
-      if (!needsResize && canvas.width > 0) return cachedDpr;
-      cssSize = canvas.clientWidth || opt.size || cssSize || 128;
+      const cw = canvas.clientWidth || opt.size || cssSize || 128;
+      const ch = canvas.clientHeight || cw;
+      const targetSize = Math.max(48, Math.min(cw, ch));
+      if (!needsResize && canvas.width > 0 && Math.abs(targetSize - cssSize) < 2) return cachedDpr;
+      cssSize = targetSize;
       cachedDpr = Math.min(2, root.devicePixelRatio || 1);
       const px = Math.round(cssSize * cachedDpr);
-      if (canvas.width !== px) { canvas.width = px; canvas.height = px; }
+      if (canvas.width !== px || canvas.height !== px) { canvas.width = px; canvas.height = px; }
       rend.o.size = cssSize; rend.o.scale = cssSize * 0.34;
       needsResize = false;
       return cachedDpr;

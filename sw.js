@@ -1,10 +1,11 @@
 // Slambient Service Worker - Offline Caching & App Shell
-const CACHE_NAME = 'slambient-v36';
+const CACHE_NAME = 'slambient-v37';
 const PRECACHE_URLS = [
   './',
   'index.html',
   'css/slambient.css',
   'css/field-recorder.css',
+  'css/mobile-app.css',
   'js/theory/scales.js',
   'js/ui/presets.js',
   'js/ui/keyboard.js',

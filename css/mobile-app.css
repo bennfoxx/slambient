@@ -1,0 +1,642 @@
+/* ==========================================================================
+   DECOUPLED VERTICAL MOBILE ARCHITECTURE (css/mobile-app.css)
+   Dedicated standalone mobile app layout layer (@media max-width: 780px).
+   Decoupled from desktop grid calculations so mobile and desktop layouts can
+   evolve independently without regression.
+   ========================================================================== */
+
+@media (max-width: 780px) and (orientation: portrait), (max-width: 640px) {
+
+  /* ------------------------------------------------------------------------
+     1. TOP-BAR GRID CONTAINER & DECOUPLED FLOW
+     ------------------------------------------------------------------------ */
+  .header-bar-wrapper {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  header.top-bar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 10px !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  .top-bar-stacks,
+  .top-bar-stack-main,
+  .transport-row,
+  .readout-row {
+    display: contents !important;
+  }
+
+  /* ------------------------------------------------------------------------
+     2. ORDER 1: BRAND HEADER, SUB-HEADER PILL, SAVE/LOAD & PRESET SLIDER
+     ------------------------------------------------------------------------ */
+  .brand-row {
+    grid-column: 1 / -1 !important;
+    order: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .brand-group {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    gap: 6px !important;
+    margin: 0 auto !important;
+  }
+
+  .app-title {
+    width: auto !important;
+    max-width: 100% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    font-size: clamp(22px, 6.6vw, 29px) !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+
+  .app-title-letters {
+    justify-content: center !important;
+    gap: 2px !important;
+    flex: 0 1 auto !important;
+  }
+
+  /* Sub-header pill: strictly contained within pill border */
+  .app-sub {
+    width: auto !important;
+    max-width: 96% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    padding: 4px 12px !important;
+    margin: 0 auto !important;
+    font-size: clamp(10px, 2.9vw, 12px) !important;
+    letter-spacing: 0.6px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    border-radius: 999px !important;
+    box-sizing: border-box !important;
+  }
+
+  .app-sub-letters {
+    justify-content: center !important;
+    gap: 1.5px !important;
+    flex: 0 1 auto !important;
+  }
+
+  /* Preset Group & Save/Load Controls: strictly inside outer border */
+  .preset-group {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  .preset-bank-header {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 4px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+  }
+
+  .preset-bank-tabs {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    display: flex !important;
+    gap: 2px !important;
+    padding: 2px !important;
+    box-sizing: border-box !important;
+  }
+
+  .patch-bank-actions {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    display: flex !important;
+    gap: 2px !important;
+    padding: 2px !important;
+    box-sizing: border-box !important;
+  }
+
+  .btn-bank-tab,
+  .btn-preset-io {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    height: 28px !important;
+    padding: 0 5px !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.3px !important;
+    white-space: nowrap !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Preset Selection Slider Bar: full width, never blocked on right side */
+  .preset-bar,
+  #presetBarFactory,
+  #presetBarUser {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 4px 2px !important;
+    display: grid !important;
+    grid-auto-flow: column !important;
+    grid-template-columns: none !important;
+    grid-template-rows: repeat(3, 28px) !important;
+    grid-auto-columns: minmax(105px, max-content) !important;
+    gap: 5px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-snap-type: x proximity !important;
+    scrollbar-width: none !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+    box-sizing: border-box !important;
+  }
+
+  .preset-bar::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .preset-bar .btn-preset-chip,
+  #presetBarUser .user-slot-chip {
+    width: 100% !important;
+    max-width: none !important;
+    height: 28px !important;
+    padding: 0 10px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+
+  /* ------------------------------------------------------------------------
+     3. ORDER 2: TRANSPORT CONTROLS (Start / Record / Sample / Export)
+     ------------------------------------------------------------------------ */
+  .header-sec-transport {
+    grid-column: 1 / -1 !important;
+    order: 2 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    padding: 8px !important;
+    box-sizing: border-box !important;
+  }
+
+  .header-sec-transport .transport-row-top {
+    display: grid !important;
+    grid-template-columns: 1.15fr 1fr 64px !important;
+    gap: 6px !important;
+    width: 100% !important;
+    height: 38px !important;
+    align-items: center !important;
+  }
+
+  .header-sec-transport .transport-row-top .btn-main-play {
+    width: 100% !important;
+    height: 38px !important;
+    padding: 0 8px !important;
+    font-size: 12px !important;
+    margin: 0 !important;
+  }
+
+  .header-sec-transport .transport-row-top .rec-ctrl-wrap {
+    grid-column: 2 / 4 !important;
+    display: grid !important;
+    grid-template-columns: 1fr 64px !important;
+    gap: 6px !important;
+    width: 100% !important;
+    height: 38px !important;
+  }
+
+  .header-sec-transport .transport-row-top .rec-ctrl-wrap .btn-record {
+    width: 100% !important;
+    height: 38px !important;
+    padding: 0 8px !important;
+    font-size: 11.5px !important;
+  }
+
+  .header-sec-transport .transport-row-top .rec-ctrl-wrap .custom-dropdown-wrap,
+  .header-sec-transport .transport-row-top .rec-ctrl-wrap .record-format-select {
+    width: 64px !important;
+    height: 38px !important;
+    min-width: 64px !important;
+  }
+
+  .header-sec-transport .transport-row-top .rec-ctrl-wrap .custom-dropdown-trigger {
+    height: 38px !important;
+    font-size: 11px !important;
+    padding: 0 6px !important;
+  }
+
+  .header-sec-transport .transport-row-bottom {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    width: 100% !important;
+    height: 36px !important;
+  }
+
+  .header-sec-transport .transport-row-bottom .sample-ctrl {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    height: 36px !important;
+    padding: 0 6px !important;
+    gap: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    background: #06070a !important;
+    border: 1px solid var(--border-light) !important;
+    border-radius: 4px !important;
+  }
+
+  .header-sec-transport .transport-row-bottom .sample-ctrl .tag {
+    font-size: 10.5px !important;
+    min-width: auto !important;
+    padding-right: 2px !important;
+  }
+
+  .header-sec-transport .transport-row-bottom .sample-ctrl .btn-field {
+    height: 28px !important;
+    padding: 0 6px !important;
+    font-size: 10.5px !important;
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+  }
+
+  .header-sec-transport .transport-row-bottom .btn-header-midi {
+    flex: 0 0 56px !important;
+    width: 56px !important;
+    height: 36px !important;
+    font-size: 10.5px !important;
+  }
+
+  /* ------------------------------------------------------------------------
+     4. ORDER 3: HARMONY & CLOCK (Zero Overlapping Labels)
+     ------------------------------------------------------------------------ */
+  .header-sec-harmony {
+    grid-column: 1 / -1 !important;
+    order: 3 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    padding: 8px !important;
+    box-sizing: border-box !important;
+  }
+
+  .header-sec-harmony .harmony-row-top {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .header-sec-harmony .harmony-row-top .root-scale-ctrl {
+    width: 100% !important;
+    flex: none !important;
+    height: 36px !important;
+    padding: 0 8px !important;
+    margin: 0 !important;
+    border: 1px solid var(--border-light) !important;
+    background: #06070a !important;
+    border-radius: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
+  }
+
+  .header-sec-harmony .harmony-row-top .time-sig-ctrl {
+    width: 100% !important;
+    flex: none !important;
+    height: 36px !important;
+    padding: 0 8px !important;
+    margin: 0 !important;
+    border: 1px solid var(--border-light) !important;
+    background: #06070a !important;
+    border-radius: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
+  }
+
+  .header-sec-harmony .harmony-row-bottom {
+    width: 100% !important;
+    height: 36px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .header-sec-harmony .harmony-row-bottom.tempo-ctrl,
+  .header-sec-harmony .harmony-row-bottom .tempo-ctrl {
+    width: 100% !important;
+    height: 36px !important;
+    padding: 0 8px !important;
+    border: 1px solid var(--border-light) !important;
+    background: #06070a !important;
+    border-radius: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* ------------------------------------------------------------------------
+     5. ORDER 4: MASTER VOLUME POD
+     ------------------------------------------------------------------------ */
+  .master-vol-pod {
+    grid-column: 1 / -1 !important;
+    order: 4 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 54px !important;
+    max-height: none !important;
+    padding: 6px 10px !important;
+  }
+
+  /* ------------------------------------------------------------------------
+     6. ORDER 5: TIME / METER / ROOT-SCALE / SEED
+        Double-stacked, thinner horizontal module spanning full screen width
+     ------------------------------------------------------------------------ */
+  .sys-readout {
+    grid-column: 1 / -1 !important;
+    order: 5 !important;
+    aspect-ratio: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 58px !important;
+    max-height: none !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) !important;
+    grid-template-rows: repeat(2, 24px) !important;
+    gap: 4px 6px !important;
+    padding: 6px 8px !important;
+    box-sizing: border-box !important;
+    background: linear-gradient(180deg, #141923 0%, #0b0e15 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 6px !important;
+  }
+
+  .sys-readout .telemetry-pill {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    height: 24px !important;
+    min-height: 24px !important;
+    max-height: 24px !important;
+    padding: 0 8px !important;
+    gap: 6px !important;
+    background: #06070a !important;
+    border: 1px solid var(--border-light) !important;
+    border-radius: 4px !important;
+    box-sizing: border-box !important;
+  }
+
+  .sys-readout .telemetry-pill .pill-k {
+    font-size: 9.5px !important;
+    font-weight: 800 !important;
+    color: #94a3b8 !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  .sys-readout .telemetry-pill .val {
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    width: auto !important;
+  }
+
+  /* ------------------------------------------------------------------------
+     7. ORDER 6: DUAL SYMMETRICAL COCKPIT SQUARES
+        Left Square: Randomize / Seed / Panic / Undo (.header-sec-gen)
+        Right Square: S.L.A.M. Phosphor 3D Spin (.eno-standalone-pod)
+     ------------------------------------------------------------------------ */
+  .header-sec-gen {
+    grid-column: 1 !important;
+    order: 6 !important;
+    aspect-ratio: 1 / 1 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: 1fr 1fr !important;
+    gap: 6px !important;
+    padding: 8px !important;
+    box-sizing: border-box !important;
+    background: #090a10 !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    border-radius: 6px !important;
+    margin: 0 !important;
+    align-self: stretch !important;
+  }
+
+  .header-sec-gen > .btn-randomize-all,
+  .header-sec-gen > .btn-header-util {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 4px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    font-size: 10.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.4px !important;
+    border-radius: 5px !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+
+  .header-sec-gen > .btn-randomize-all svg,
+  .header-sec-gen > .btn-header-util svg {
+    width: 16px !important;
+    height: 16px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .eno-standalone-pod {
+    grid-column: 2 !important;
+    order: 6 !important;
+    aspect-ratio: 1 / 1 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 8px !important;
+    box-sizing: border-box !important;
+    background: #090a10 !important;
+    border: 1px solid var(--eno-glow-border, var(--border-light)) !important;
+    border-radius: 6px !important;
+    margin: 0 !important;
+    align-self: stretch !important;
+  }
+
+  .eno-standalone-pod .eno-crt-screen {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 1 / 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 2px 0 !important;
+    position: relative !important;
+  }
+
+  .eno-standalone-pod #enoWidgetCanvas {
+    position: relative !important;
+    inset: auto !important;
+    width: auto !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    object-fit: contain !important;
+    margin: auto !important;
+    display: block !important;
+  }
+
+  /* ------------------------------------------------------------------------
+     8. ORDER 7: SYSTEM UTILITIES BAR
+     ------------------------------------------------------------------------ */
+  .header-sec-utils {
+    grid-column: 1 / -1 !important;
+    order: 7 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: auto !important;
+    gap: 6px !important;
+    padding: 6px !important;
+  }
+
+  /* ------------------------------------------------------------------------
+     9. STUDIO FX RACK VIEW: FULL MODULE NAMES & SCROLL CLEARANCE
+     ------------------------------------------------------------------------ */
+  .studio-fx-pedalboard,
+  .lower-deck {
+    padding-bottom: 96px !important;
+  }
+
+  .pedal-chassis .pedal-card-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
+    padding: 6px 8px !important;
+  }
+
+  .pedal-chassis .pedal-header-left {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    overflow: visible !important;
+  }
+
+  .pedal-chassis .pedal-card-title {
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    max-width: none !important;
+    flex: 1 1 auto !important;
+  }
+
+  /* Hide redundant badges/handles on mobile when not in edit mode so FX names never cut off */
+  body:not(.workspace-edit-mode) .pedal-chassis .pedal-drag-handle,
+  body:not(.workspace-edit-mode) .pedal-chassis .pedal-io-tag,
+  body:not(.workspace-edit-mode) .pedal-chassis .module-window-controls .btn-win-hide,
+  body:not(.workspace-edit-mode) .pedal-chassis .module-window-controls .btn-win-focus {
+    display: none !important;
+  }
+
+  /* ------------------------------------------------------------------------
+     10. FULLSCREEN VISUALIZER & MODULE FOCUS SAFEGUARDS
+     ------------------------------------------------------------------------ */
+  .scope-panel.is-fullscreen,
+  .module-fullscreen-active {
+    z-index: 260000 !important;
+  }
+
+  body.module-focus-open::after {
+    pointer-events: none !important;
+  }
+}

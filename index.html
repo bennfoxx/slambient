@@ -30,6 +30,7 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/slambient.css">
 <link rel="stylesheet" href="css/field-recorder.css">
+<link rel="stylesheet" href="css/mobile-app.css">
 </head>
 <body>
 
@@ -1069,6 +1070,19 @@
 
       <!-- 2. FULL-SIZED EURORACK STUDIO FX PEDALBOARD (10 Inserts) -->
       <div class="studio-fx-pedalboard" id="studioFxPedalboard" data-module-id="fxChain">
+        <!-- SPLIT VIEW DEDICATED WINDOW HEADER -->
+        <div class="split-fx-header" id="splitFxHeader">
+          <div class="split-fx-title">
+            <span class="split-fx-icon">🎛️</span>
+            <span class="split-fx-label">STUDIO EFFECTS RACK // SPLIT MONITOR</span>
+            <span class="split-fx-tag">5 CONSOLIDATED UNITS</span>
+          </div>
+          <button type="button" class="btn-rail-expand" onclick="setLowerDeckMode('fx')" title="Expand to Full Eurorack Studio FX Rack">
+            <span>FULL RACK</span>
+            <svg viewBox="0 0 16 16" width="10" height="10" fill="none"><path d="M2 8h10M8 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+
         <div class="pedalboard-routing-ribbon" id="pedalboardRoutingRibbon">
           <div class="routing-ribbon-left">
             <span class="routing-node-badge stream-bus">BUS PRE</span>
@@ -1875,7 +1889,7 @@
           <div class="split-rail-header">
             <div class="split-rail-title">
               <span class="rail-icon">🎛️</span>
-              <span class="rail-label">STUDIO FX RAIL</span>
+              <span class="rail-label">STUDIO EFFECTS RACK // SPLIT MONITOR</span>
               <span class="rail-tag">5 CONSOLIDATED UNITS</span>
             </div>
             <button type="button" class="btn-rail-expand" onclick="setLowerDeckMode('fx')" title="Expand to Full Eurorack Studio FX Rack">

@@ -1338,8 +1338,20 @@ function toggleScopeFullscreen(forceState) {
   const panel = document.getElementById('scopePanel');
   const btn = document.getElementById('btnToggleScopeFullscreen');
   const svg = document.getElementById('svgScopeFullscreen');
-  if (panel) panel.classList.toggle('is-fullscreen', scopeFullscreen);
+  if (panel) {
+    panel.classList.toggle('is-fullscreen', scopeFullscreen);
+    if (!scopeFullscreen) {
+      panel.classList.remove('module-fullscreen-active');
+    }
+  }
   document.body.classList.toggle('scope-fullscreen-open', scopeFullscreen);
+  if (!scopeFullscreen) {
+    document.body.classList.remove('module-focus-open');
+    if (window.workspaceManager) {
+      window.workspaceManager.state.fullscreenModule = null;
+      if (typeof window.workspaceManager.saveState === 'function') window.workspaceManager.saveState();
+    }
+  }
   if (btn) btn.classList.toggle('active', scopeFullscreen);
   if (svg) {
     svg.innerHTML = scopeFullscreen
@@ -1348,16 +1360,26 @@ function toggleScopeFullscreen(forceState) {
   }
   cachedScopeW = 0;
   cachedScopeH = 0;
+  scopeNeedsResize = true;
+  if (typeof updateCanvasDimensions === "function") updateCanvasDimensions();
   setTimeout(() => {
     cachedScopeW = 0;
     cachedScopeH = 0;
+    scopeNeedsResize = true;
     if (typeof updateCanvasDimensions === "function") updateCanvasDimensions();
+    if (typeof triggerCanvasResizes === "function") triggerCanvasResizes();
   }, 150);
 }
 
 window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && scopeFullscreen) {
-    toggleScopeFullscreen(false);
+  if (e.key === 'Escape') {
+    if (scopeFullscreen) {
+      toggleScopeFullscreen(false);
+    }
+    if (document.body.classList.contains('module-focus-open') || document.querySelector('.module-fullscreen-active')) {
+      if (typeof exitModuleFullscreen === 'function') exitModuleFullscreen();
+      else if (window.workspaceManager && typeof window.workspaceManager.exitFullscreen === 'function') window.workspaceManager.exitFullscreen();
+    }
   }
 });
 

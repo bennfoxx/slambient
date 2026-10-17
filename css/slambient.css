@@ -4129,49 +4129,131 @@
     width: 100%;
   }
 
-  /* Mode 3: SPLIT VIEW (Two Columns of Instruments on Left, Birds Eye Effects Chain Rack on Right) */
+  /* Mode 3: SPLIT VIEW (Two Columns of Instruments on Left, Dedicated Effects Window on Right) */
   .lower-deck.deck-mode-split .lower-deck-body,
   body.split-view-active .lower-deck-body {
     display: flex;
     flex-direction: row;
     gap: 14px;
-    align-items: flex-start;
+    align-items: stretch;
     width: 100%;
+    min-height: 580px;
     box-sizing: border-box;
   }
 
   .lower-deck.deck-mode-split .instruments-deck,
   body.split-view-active .instruments-deck {
-    flex: 1 1 58%;
-    width: 58%;
+    flex: 1 1 56%;
+    width: 56%;
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 12px;
+    gap: 10px;
     box-sizing: border-box;
+    align-content: start;
   }
 
   .lower-deck.deck-mode-split .studio-fx-pedalboard,
   body.split-view-active .studio-fx-pedalboard {
-    flex: 0 0 calc(42% - 14px);
-    width: calc(42% - 14px);
+    flex: 0 0 44%;
+    width: 44%;
     display: flex !important;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
+    background: #080b12;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
+    padding: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     box-sizing: border-box;
+    align-self: stretch;
+    overflow-y: auto;
+  }
+
+  .split-fx-header {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    height: 28px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .lower-deck.deck-mode-split .split-fx-header,
+  body.split-view-active .split-fx-header {
+    display: flex !important;
+  }
+
+  .split-fx-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .split-fx-title .split-fx-icon {
+    font-size: 13px;
+  }
+
+  .split-fx-title .split-fx-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #f1f2f6;
+  }
+
+  .split-fx-title .split-fx-tag {
+    font-family: var(--font-mono, monospace);
+    font-size: 9px;
+    color: #718096;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1px 5px;
+    border-radius: 3px;
   }
 
   .lower-deck.deck-mode-split .studio-fx-grid,
   body.split-view-active .studio-fx-grid,
-  .lower-deck.deck-mode-split .pedalboard-routing-ribbon,
-  body.split-view-active .pedalboard-routing-ribbon,
   .lower-deck.deck-mode-split .pedalboard-master-section,
-  body.split-view-active .pedalboard-master-section {
+  body.split-view-active .pedalboard-master-section,
+  .lower-deck.deck-mode-split .split-rail-header,
+  body.split-view-active .split-rail-header {
     display: none !important;
+  }
+
+  .lower-deck.deck-mode-split .pedalboard-routing-ribbon,
+  body.split-view-active .pedalboard-routing-ribbon {
+    display: flex !important;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    padding: 6px 10px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+  }
+
+  .lower-deck.deck-mode-split .pedalboard-routing-ribbon .routing-ribbon-left,
+  body.split-view-active .pedalboard-routing-ribbon .routing-ribbon-left {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .lower-deck.deck-mode-split .pedalboard-routing-ribbon .routing-stream-list,
+  body.split-view-active .pedalboard-routing-ribbon .routing-stream-list {
+    flex-wrap: wrap;
+    gap: 4px;
   }
 
   .lower-deck.deck-mode-split .split-fx-rail,
   body.split-view-active .split-fx-rail {
     display: flex !important;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 0;
+    box-shadow: none;
   }
 
   /* Split FX Rail Default: Hidden unless in deck-mode-split on desktop */
@@ -4735,6 +4817,24 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+    }
+
+    .lower-deck.deck-mode-split .lower-deck-body,
+    body.split-view-active .lower-deck-body {
+      flex-direction: column;
+      min-height: auto;
+    }
+
+    .lower-deck.deck-mode-split .instruments-deck,
+    body.split-view-active .instruments-deck {
+      width: 100%;
+      flex: 1 1 100%;
+    }
+
+    .lower-deck.deck-mode-split .studio-fx-pedalboard,
+    body.split-view-active .studio-fx-pedalboard {
+      width: 100%;
+      flex: 1 1 100%;
     }
   }
 
@@ -10721,10 +10821,14 @@
     padding: 12px 16px !important;
   }
 
-  .module-fullscreen-active .btn-win-focus {
-    display: none;
+  .module-fullscreen-active .btn-win-focus,
+  .module-fullscreen-active .btn-win-hide,
+  .is-fullscreen .btn-win-focus,
+  .is-fullscreen .btn-win-hide {
+    display: none !important;
   }
-  .module-fullscreen-active .btn-exit-focus {
+  .module-fullscreen-active .btn-exit-focus,
+  .is-fullscreen .btn-exit-focus {
     position: absolute !important;
     top: 14px !important;
     right: 16px !important;
@@ -10746,17 +10850,20 @@
     transition: all 0.14s ease !important;
     line-height: 1 !important;
   }
-  .module-fullscreen-active .btn-exit-focus:hover {
+  .module-fullscreen-active .btn-exit-focus:hover,
+  .is-fullscreen .btn-exit-focus:hover {
     background: rgba(255, 71, 87, 0.35) !important;
     border-color: #ff4757 !important;
     color: #ffffff !important;
     box-shadow: 0 0 14px rgba(255, 71, 87, 0.6) !important;
     transform: scale(1.08);
   }
-  .module-fullscreen-active .btn-exit-focus svg {
+  .module-fullscreen-active .btn-exit-focus svg,
+  .is-fullscreen .btn-exit-focus svg {
     display: none !important;
   }
-  .module-fullscreen-active .btn-exit-focus span {
+  .module-fullscreen-active .btn-exit-focus span,
+  .is-fullscreen .btn-exit-focus span {
     display: inline-block !important;
     font-size: 0 !important;
     line-height: 0 !important;
@@ -10764,7 +10871,8 @@
     height: 16px;
     text-align: center;
   }
-  .module-fullscreen-active .btn-exit-focus span::after {
+  .module-fullscreen-active .btn-exit-focus span::after,
+  .is-fullscreen .btn-exit-focus span::after {
     content: "✕";
     font-size: 16px !important;
     line-height: 16px !important;
@@ -10775,18 +10883,23 @@
   .module-fullscreen-active .strip-header,
   .module-fullscreen-active .panel-header,
   .module-fullscreen-active .pedal-card-header,
-  .module-fullscreen-active .module-header {
+  .module-fullscreen-active .module-header,
+  .is-fullscreen .panel-header {
     padding-right: 56px !important;
     box-sizing: border-box !important;
     flex-wrap: nowrap !important;
   }
   .module-fullscreen-active,
-  .module-fullscreen-active * {
+  .module-fullscreen-active *,
+  .is-fullscreen,
+  .is-fullscreen * {
     -webkit-user-drag: none !important;
     user-drag: none !important;
   }
   .module-fullscreen-active .module-win-drag,
-  .module-fullscreen-active .upper-drag-handle {
+  .module-fullscreen-active .upper-drag-handle,
+  .is-fullscreen .module-win-drag,
+  .is-fullscreen .upper-drag-handle {
     display: none !important;
   }
 
@@ -10799,7 +10912,7 @@
     inset: 0;
     background: rgba(0, 0, 0, 0.75);
     z-index: 240000;
-    pointer-events: auto;
+    pointer-events: none;
   }
 
   /* Hidden module in dock */

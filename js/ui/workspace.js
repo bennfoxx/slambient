@@ -214,7 +214,7 @@
         { id: "arp", selector: ".strip-channel.arp-ch" },
         { id: "noise", selector: ".strip-channel.noise-ch" },
         { id: "field", selector: "#fieldModule" },
-        { id: "fxChain", selector: "#pedalChainModule" }
+        { id: "fxChain", selector: "#studioFxPedalboard, #pedalChainModule" }
       ];
       rackModules.forEach(({ id, selector }) => {
         const el = document.querySelector(selector);
@@ -253,6 +253,8 @@
         controlsWrap.setAttribute("role", "group");
         controlsWrap.setAttribute("aria-label", `${mod.label} Window Controls`);
 
+        const hasNativeFocus = !!el.querySelector(".btn-pedal-focus");
+
         controlsWrap.innerHTML = `
           <span class="module-win-drag upper-drag-handle" title="Drag to reorder module" aria-label="Drag Handle">
             <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><circle cx="8" cy="6" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg>
@@ -263,11 +265,11 @@
               <circle cx="12" cy="12" r="3"/>
             </svg>
           </button>
-          <button type="button" class="btn-win-action btn-win-focus" title="Expand to Fullscreen Focus (Esc to Exit)" aria-label="Focus ${mod.label}">
+          ${hasNativeFocus ? "" : `<button type="button" class="btn-win-action btn-win-focus" title="Expand to Fullscreen Focus (Esc to Exit)" aria-label="Focus ${mod.label}">
             <svg viewBox="0 0 16 16" width="12" height="12" fill="none">
               <path d="M1.5 5.5V1.5H5.5M10.5 1.5H14.5V5.5M14.5 10.5V14.5H10.5M5.5 14.5H1.5V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-          </button>
+          </button>`}
           <button type="button" class="btn-exit-focus" title="Exit Fullscreen Focus (Esc)" aria-label="Exit Focus">
             <svg viewBox="0 0 16 16" width="11" height="11" fill="none">
               <path d="M5.5 1.5V5.5H1.5M14.5 5.5H10.5V1.5M10.5 14.5V10.5H14.5M1.5 10.5H5.5V14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -280,20 +282,26 @@
         const btnFocus = controlsWrap.querySelector(".btn-win-focus");
         const btnExit = controlsWrap.querySelector(".btn-exit-focus");
 
-        btnHide.addEventListener("click", (e) => {
-          e.stopPropagation();
-          this.toggleModuleVisibility(mod.id);
-        });
+        if (btnHide) {
+          btnHide.addEventListener("click", (e) => {
+            e.stopPropagation();
+            this.toggleModuleVisibility(mod.id);
+          });
+        }
 
-        btnFocus.addEventListener("click", (e) => {
-          e.stopPropagation();
-          this.toggleModuleFullscreen(mod.id);
-        });
+        if (btnFocus) {
+          btnFocus.addEventListener("click", (e) => {
+            e.stopPropagation();
+            this.toggleModuleFullscreen(mod.id);
+          });
+        }
 
-        btnExit.addEventListener("click", (e) => {
-          e.stopPropagation();
-          this.exitFullscreen();
-        });
+        if (btnExit) {
+          btnExit.addEventListener("click", (e) => {
+            e.stopPropagation();
+            this.exitFullscreen();
+          });
+        }
 
         actionsContainer.insertBefore(controlsWrap, actionsContainer.firstChild);
       });
@@ -415,13 +423,45 @@
         });
       }
 
-      // Rack modules
+      // Rack modules & lower deck layout
       const lowerDeck = document.querySelector(".lower-deck");
-      if (lowerDeck && Array.isArray(this.state.rackOrder)) {
+      const lowerDeckBody = document.querySelector(".lower-deck-body");
+      const instrumentsDeck = document.querySelector(".instruments-deck");
+      const studioFx = document.querySelector("#studioFxPedalboard");
+
+      // Ensure lowerDeckBody is properly seated inside lowerDeck
+      if (lowerDeck && lowerDeckBody && lowerDeckBody.parentNode !== lowerDeck) {
+        const header = lowerDeck.querySelector(".lower-deck-header");
+        if (header && header.nextSibling) {
+          lowerDeck.insertBefore(lowerDeckBody, header.nextSibling);
+        } else {
+          lowerDeck.appendChild(lowerDeckBody);
+        }
+      }
+
+      // Ensure instrumentsDeck and studioFxPedalboard are inside lowerDeckBody in proper side-by-side order
+      if (lowerDeckBody) {
+        if (instrumentsDeck && instrumentsDeck.parentNode !== lowerDeckBody) {
+          lowerDeckBody.insertBefore(instrumentsDeck, lowerDeckBody.firstChild);
+        }
+        if (studioFx && studioFx.parentNode !== lowerDeckBody) {
+          lowerDeckBody.appendChild(studioFx);
+        }
+      }
+
+      // Sort and seat instrument modules strictly inside instrumentsDeck (never flatten into lowerDeck)
+      const targetInstContainer = instrumentsDeck || lowerDeck;
+      if (targetInstContainer && Array.isArray(this.state.rackOrder)) {
         this.state.rackOrder.forEach(key => {
+          if (key === "fxChain") {
+            if (lowerDeckBody && studioFx && studioFx.parentNode !== lowerDeckBody) {
+              lowerDeckBody.appendChild(studioFx);
+            }
+            return;
+          }
           const sel = RACK_KEY_TO_SELECTOR[key];
-          const el = sel ? lowerDeck.querySelector(sel) : null;
-          if (el) lowerDeck.appendChild(el);
+          const el = sel ? (targetInstContainer.querySelector(sel) || document.querySelector(sel)) : null;
+          if (el) targetInstContainer.appendChild(el);
         });
       }
 
@@ -511,15 +551,18 @@
       const el = mod ? document.querySelector(mod.selector) : document.querySelector(`[data-module-id="${moduleId}"]`);
       if (!el) return;
 
-      const isCurrent = el.classList.contains("module-fullscreen-active");
+      const isCurrent = el.classList.contains("module-fullscreen-active") || el.classList.contains("is-fullscreen");
 
-      document.querySelectorAll(".module-fullscreen-active").forEach(item => {
-        item.classList.remove("module-fullscreen-active");
+      document.querySelectorAll(".module-fullscreen-active, .is-fullscreen").forEach(item => {
+        item.classList.remove("module-fullscreen-active", "is-fullscreen");
       });
 
       if (isCurrent) {
         this.state.fullscreenModule = null;
-        document.body.classList.remove("module-focus-open");
+        document.body.classList.remove("module-focus-open", "scope-fullscreen-open");
+        if (typeof toggleScopeFullscreen === "function" && typeof scopeFullscreen !== "undefined" && scopeFullscreen) {
+          toggleScopeFullscreen(false);
+        }
       } else {
         this.state.fullscreenModule = moduleId;
         el.classList.add("module-fullscreen-active");
@@ -533,11 +576,14 @@
     }
 
     exitFullscreen() {
-      if (!document.body.classList.contains("module-focus-open") && !document.querySelector(".module-fullscreen-active")) return;
-      document.querySelectorAll(".module-fullscreen-active").forEach(item => {
-        item.classList.remove("module-fullscreen-active");
+      if (!document.body.classList.contains("module-focus-open") && !document.body.classList.contains("scope-fullscreen-open") && !document.querySelector(".module-fullscreen-active, .is-fullscreen") && !(typeof scopeFullscreen !== "undefined" && scopeFullscreen)) return;
+      document.querySelectorAll(".module-fullscreen-active, .is-fullscreen").forEach(item => {
+        item.classList.remove("module-fullscreen-active", "is-fullscreen");
       });
-      document.body.classList.remove("module-focus-open");
+      document.body.classList.remove("module-focus-open", "scope-fullscreen-open");
+      if (typeof toggleScopeFullscreen === "function" && typeof scopeFullscreen !== "undefined" && scopeFullscreen) {
+        toggleScopeFullscreen(false);
+      }
       this.state.fullscreenModule = null;
       this.saveState();
       if (typeof lastChordWheelSignature !== "undefined") lastChordWheelSignature = "";
@@ -806,7 +852,7 @@
       };
 
       setupModuleDrag(".upper-deck-card", "upperDeckOrder", "upper");
-      setupModuleDrag(".strip-channel", "rackOrder", "rack");
+      setupModuleDrag(".instruments-deck > .strip-channel, .instruments-deck > #fieldModule", "rackOrder", "rack");
 
       // C. Pointer Event Tactile Drag & Touch Support
       const bindPointerSwapping = (selector, typeName, stateKey, attrName) => {
@@ -889,7 +935,7 @@
 
       bindPointerSwapping("[data-header-slot]", "header", "headerOrder", "data-header-slot");
       bindPointerSwapping(".upper-deck-card", "upper", "upperDeckOrder", "data-module-id");
-      bindPointerSwapping(".strip-channel", "rack", "rackOrder", "data-module-id");
+      bindPointerSwapping(".instruments-deck > .strip-channel, .instruments-deck > #fieldModule", "rack", "rackOrder", "data-module-id");
     }
 
     // 12. Trigger Canvas and Layout Resizes
