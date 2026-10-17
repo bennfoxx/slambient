@@ -4331,9 +4331,129 @@
     border-left-color: var(--dd-accent, var(--accent));
     font-weight: 800;
   }
-  .custom-dropdown-item.selected:hover {
-    background-color: var(--dd-accent, var(--accent));
-    color: #07080c !important;
+  /* MOBILE MACRO GRID: Hidden on desktop */
+  .mobile-macro-grid {
+    display: none;
+  }
+
+  /* MASTER OUT EFFECTS CHAIN REORDERING (Section in Master Out) */
+  .master-dsp-chain-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: rgba(15, 18, 28, 0.6);
+    border: 1px solid rgba(75, 123, 236, 0.25);
+    margin: 8px 0;
+  }
+  .master-dsp-chain-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .master-dsp-chain-title {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    color: var(--color-space, #4b7bec);
+    text-transform: uppercase;
+  }
+  .master-dsp-chain-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .master-dsp-chain-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+  }
+  .master-dsp-chain-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 8px;
+    background: rgba(10, 12, 18, 0.85);
+    border: 1px solid var(--border-light);
+    border-left: 3px solid var(--item-color, #4b7bec);
+    border-radius: 4px;
+    gap: 8px;
+    transition: background 0.12s ease, border-color 0.12s ease;
+  }
+  .master-dsp-chain-item.bypassed {
+    opacity: 0.6;
+    border-left-color: var(--text-tertiary);
+  }
+  .master-dsp-item-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .master-dsp-item-badge {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 9px;
+    font-weight: 800;
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+  }
+  .master-dsp-item-name {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #e6ebf5;
+  }
+  .master-dsp-item-role {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+  }
+  .master-dsp-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .master-dsp-nudge-btn {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0;
+    font-size: 10px;
+    transition: all 0.12s ease;
+  }
+  .master-dsp-nudge-btn:hover:not(:disabled) {
+    background: rgba(var(--rgb-space), 0.2);
+    border-color: var(--color-space);
+    color: #fff;
+  }
+  .master-dsp-nudge-btn:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+  }
+  .master-dsp-nudge-btn svg {
+    width: 10px;
+    height: 10px;
   }
 
   /* UNIFIED CHANNEL STRIP MASTER VOLUME & AUX ROUTING */
@@ -6398,20 +6518,19 @@
       letter-spacing: 1px;
     }
 
-    /* ---- Orb controls: direct border-aligned overlay on #orbitalArenaWrapper (phone) ----
-       #orbitalSidePanel is a child of #orbitalArenaWrapper and overlays the
-       arena card 1:1 (inset: 0) so its borders line up with and overlay the
-       borders of the module behind it, never extending past the arena width. */
+    /* ---- Orb controls & Modular Inspector: Mobile Inspect Bottom Sheet ----
+       Slides up from bottom to max-height: 85dvh with touch physics & Back to Rack button */
     .orbital-side-panel {
       position: fixed;
-      top: 0;
+      top: auto;
       left: 0;
       right: 0;
       bottom: 0;
       width: 100%;
       max-width: 100%;
-      height: 100%;
-      max-height: 100%;
+      height: auto;
+      max-height: 85dvh;
+      max-height: 85vh;
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
@@ -6419,9 +6538,10 @@
       overflow: hidden;
       z-index: 10000;
       border: 1.5px solid var(--modal-accent-color, var(--color-drone));
-      border-radius: 7px;
+      border-bottom: 0;
+      border-radius: 12px 12px 0 0;
       background:
-        linear-gradient(180deg, rgba(var(--modal-accent-rgb, var(--rgb-drone)), 0.12) 0%, rgba(var(--modal-accent-rgb, var(--rgb-drone)), 0.03) 110px, rgba(var(--modal-accent-rgb, var(--rgb-drone)), 0) 220px),
+        linear-gradient(180deg, rgba(var(--modal-accent-rgb, var(--rgb-drone)), 0.14) 0%, rgba(var(--modal-accent-rgb, var(--rgb-drone)), 0.04) 110px, rgba(var(--modal-accent-rgb, var(--rgb-drone)), 0) 220px),
         rgba(8, 10, 18, 0.98);
       box-shadow:
         inset 0 0 18px rgba(var(--modal-accent-rgb, var(--rgb-drone)), 0.22),
@@ -6686,18 +6806,150 @@
        Master EQ in #pedalsContainer (6-9). Every rule is scoped to those
        containers so the same strips stay untouched while borrowed into the
        orbital side panel. */
+     /* ---- Mobile Macro Overview Grid vs Micro Inspect Sheet ----
+        Replaces 100dvh single-column stacking with a clean 2-column compact grid
+        (~110px summary tiles with Name, Power, 15-char preset, active LED/meter).
+        Tapping a tile slides up the Micro Inspect Sheet. */
+    .mobile-macro-grid {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+    }
+    .mobile-macro-tile {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 108px;
+      height: 110px;
+      padding: 9px 10px;
+      box-sizing: border-box;
+      background: rgba(13, 15, 23, 0.94);
+      border: 1px solid var(--border-light);
+      border-top: 3px solid var(--tile-color, var(--accent));
+      border-radius: 7px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.14s ease, transform 0.12s ease, box-shadow 0.14s ease;
+      touch-action: manipulation;
+    }
+    .mobile-macro-tile:active {
+      transform: scale(0.97);
+      background: rgba(20, 24, 38, 0.98);
+      border-color: var(--tile-color, var(--accent));
+    }
+    .mobile-macro-tile-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      width: 100%;
+      min-width: 0;
+    }
+    .mobile-macro-tile-title {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      color: var(--tile-color, #e6ebf5);
+      white-space: nowrap !important;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-shadow: 0 0 6px var(--tile-glow, transparent);
+    }
+    .mobile-macro-tile-pwr {
+      width: 28px;
+      height: 22px;
+      flex-shrink: 0;
+      padding: 0;
+      font-size: 9px;
+      font-weight: 800;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      border-radius: 3px;
+      border: 1px solid var(--border-light);
+      background: #11141f;
+      color: var(--text-tertiary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+    .mobile-macro-tile-pwr.active {
+      background: rgba(var(--tile-rgb, 0, 229, 255), 0.16);
+      border-color: var(--tile-color, #00e5ff);
+      color: var(--tile-color, #00e5ff);
+      box-shadow: 0 0 6px rgba(var(--tile-rgb, 0, 229, 255), 0.4);
+    }
+    .mobile-macro-tile-body {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      width: 100%;
+      min-width: 0;
+      margin-top: auto;
+    }
+    .mobile-macro-tile-preset {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 9.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      white-space: nowrap !important;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      line-height: 1.2;
+    }
+    .mobile-macro-tile-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      width: 100%;
+      padding-top: 2px;
+    }
+    .mobile-macro-tile-meter-wrap {
+      flex: 1 1 auto;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+    .mobile-macro-tile-meter-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--tile-color, #00e5ff);
+      border-radius: 2px;
+      transition: width 0.08s linear;
+      box-shadow: 0 0 5px var(--tile-color, #00e5ff);
+    }
+    .mobile-macro-tile-inspect-hint {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .mobile-macro-tile:hover .mobile-macro-tile-inspect-hint,
+    .mobile-macro-tile:active .mobile-macro-tile-inspect-hint {
+      color: var(--tile-color, #e6ebf5);
+    }
+
+    /* In mobile macro mode: hide verbose direct module strip cards in rack view */
+    .lower-deck > .strip-channel { display: none !important; }
+    #masterDeckUnified > .pedal-chassis,
+    #masterDeckUnified > .strip-channel { display: none !important; }
+
     .lower-deck { gap: 12px; }
     #pedalsContainer { margin-top: 0 !important; gap: 12px; }
     #masterDeckUnified { grid-template-columns: 1fr; gap: 12px; }
-
-    /* Strip / pedal cards */
-    .lower-deck > .strip-channel,
-    #masterDeckUnified > .pedal-chassis,
-    #masterDeckUnified > .strip-channel {
-      padding: 12px;
-      gap: 12px;
-    }
-    #masterDeckUnified .pedal-controls-body { gap: 12px; }
 
     /* Card header: title left (wraps to 2 lines rather than squeezing the
        buttons), 32px action buttons right */
@@ -8345,6 +8597,11 @@
         <!-- Kept dynamically rendered and synchronized by updatePedalsOrderUI() -->
       </div>
     </div>
+
+    <!-- MOBILE MACRO OVERVIEW GRID (2-column compact grid, ~110px summary tiles) -->
+    <div class="mobile-macro-grid" id="mobileMacroGrid" aria-label="Mobile Macro Rack Grid">
+      <!-- Dynamically rendered and synchronized with live module parameters -->
+    </div>
   </div>
 
   <!-- BACKING STORE FOR PEDAL CONTROLS (Borrowed into popup on inspection) -->
@@ -8624,6 +8881,29 @@
         <div class="control-row">
           <div class="control-label"><span>Master Tape Saturation / Drive</span><span class="control-val space-val" id="lblMasterDrive">10%</span></div>
           <input type="range" id="knobMasterDrive" min="0" max="100" value="10" oninput="updateAudioParams()">
+        </div>
+
+        <!-- Master Out DSP Effects Chain Reordering -->
+        <div class="master-dsp-chain-section" id="masterDspChainSection">
+          <div class="master-dsp-chain-header">
+            <span class="master-dsp-chain-title">DSP INSERT CHAIN REORDERING</span>
+            <div class="master-dsp-chain-actions">
+              <button type="button" class="btn-pedal-action btn-pedal-shuffle" onclick="randomizeDspChain(event)" title="Shuffle insert order">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/>
+                  <polyline points="21 3 21 8 16 8"/>
+                  <path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/>
+                  <polyline points="3 21 3 16 8 16"/>
+                </svg>
+              </button>
+              <button type="button" class="btn-pedal-action btn-pedal-reset" onclick="resetDspChain(event)" title="Reset order">
+                <span>RESET</span>
+              </button>
+            </div>
+          </div>
+          <div class="master-dsp-chain-list" id="masterDspChainList">
+            <!-- Dynamically populated by renderMasterDspChainList() -->
+          </div>
         </div>
       </div>
     </div>
@@ -10552,6 +10832,9 @@ function updatePedalsOrderUI() {
   if (typeof renderBirdsEyePedalRack === "function") {
     renderBirdsEyePedalRack();
   }
+  if (typeof renderMasterDspChainList === "function") {
+    renderMasterDspChainList();
+  }
 }
 
 function renderBirdsEyePedalRack() {
@@ -10659,6 +10942,67 @@ function randomizeDspChain(ev) {
 function resetDspChain(ev) {
   if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
   rewireDspChain(['FILTER', 'DELAY', 'SPACE'], false);
+}
+
+function renderMasterDspChainList() {
+  const container = document.getElementById("masterDspChainList");
+  if (!container) return;
+
+  const pedalsMeta = {
+    FILTER: { name: "FILTER", orbId: "filter", color: "#2ed573", desc: "SVF Filter & Env" },
+    DELAY: { name: "DELAY", orbId: "delay", color: "#ff793f", desc: "Tape Delay" },
+    SPACE: { name: "SPACE", orbId: "reverb", color: "#ff5fc4", desc: "Reverb & Chorus" }
+  };
+
+  const order = Array.isArray(dspChainOrder) ? dspChainOrder : ["FILTER", "DELAY", "SPACE"];
+  let html = "";
+
+  order.forEach((key, idx) => {
+    const meta = pedalsMeta[key];
+    if (!meta) return;
+    const isBypassed = !!(typeof pedalBypassState !== "undefined" && pedalBypassState[key]);
+    const num = 7 + idx;
+    const isFirst = idx === 0;
+    const isLast = idx === order.length - 1;
+
+    html += `
+      <div class="master-dsp-chain-item ${isBypassed ? 'bypassed' : ''}" style="--item-color: ${meta.color};">
+        <div class="master-dsp-item-left">
+          <span class="master-dsp-item-badge">${num}</span>
+          <span class="master-dsp-item-name">${meta.name}</span>
+          <span class="master-dsp-item-role">${meta.desc}</span>
+        </div>
+        <div class="master-dsp-item-actions">
+          <button type="button" class="master-dsp-nudge-btn" onclick="shiftMasterDspChain('${key}', -1, event)" ${isFirst ? 'disabled' : ''} title="Nudge Up in Signal Chain">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+          </button>
+          <button type="button" class="master-dsp-nudge-btn" onclick="shiftMasterDspChain('${key}', 1, event)" ${isLast ? 'disabled' : ''} title="Nudge Down in Signal Chain">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function shiftMasterDspChain(key, direction, ev) {
+  if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
+  if (audioCtx && typeof audioCtx.suspend === "function") {
+    audioCtx.suspend().catch(() => {});
+  }
+  if (direction < 0) {
+    shiftPedalLeft(key, ev);
+  } else {
+    shiftPedalRight(key, ev);
+  }
+  if (audioCtx && typeof audioCtx.resume === "function") {
+    setTimeout(() => {
+      audioCtx.resume().catch(() => {});
+    }, 15);
+  }
+  renderMasterDspChainList();
 }
 
 function togglePedalBypass(key, ev) {
@@ -17724,6 +18068,7 @@ function applyPreset(idx) {
   updateBpm();
   updateMusicalConfig(false);
   updateAudioParams();
+  if (typeof renderMobileMacroGrid === "function") renderMobileMacroGrid();
 
   // Deliberately NOT forcing an immediate chord hit on preset switch: the
   // outgoing preset's delay/reverb tail is often still ringing, and firing
@@ -20696,11 +21041,21 @@ function initTouchViewSwitchers() {
   });
 }
 if (document.readyState === "loading") {
-  window.addEventListener("DOMContentLoaded", initTouchViewSwitchers);
+  window.addEventListener("DOMContentLoaded", () => {
+    initTouchViewSwitchers();
+    if (typeof renderMobileMacroGrid === "function") renderMobileMacroGrid();
+    if (typeof renderMasterDspChainList === "function") renderMasterDspChainList();
+  });
 } else {
   initTouchViewSwitchers();
+  if (typeof renderMobileMacroGrid === "function") renderMobileMacroGrid();
+  if (typeof renderMasterDspChainList === "function") renderMasterDspChainList();
 }
-window.addEventListener("load", initTouchViewSwitchers);
+window.addEventListener("load", () => {
+  initTouchViewSwitchers();
+  if (typeof renderMobileMacroGrid === "function") renderMobileMacroGrid();
+  if (typeof renderMasterDspChainList === "function") renderMasterDspChainList();
+});
 
 function toggleModuleDrawer(toggleEl) {
   if (!toggleEl) return;
@@ -20827,6 +21182,158 @@ function restoreStripsToRack() {
     lowerRack.appendChild(pedalChainMod);
   }
   if (typeof updatePedalsOrderUI === "function") updatePedalsOrderUI();
+  if (typeof renderMobileMacroGrid === "function") renderMobileMacroGrid();
+}
+
+/* ==========================================================================
+   MOBILE MACRO OVERVIEW GRID (PHASE 5: 2-COLUMN ~110PX SUMMARY TILES)
+   ========================================================================== */
+const MOBILE_MACRO_MODULES = [
+  { id: "drone",  name: "1. SUB",    orbId: "drone",  color: "#00e5ff", rgb: [0, 229, 255],   type: "inst" },
+  { id: "drum",   name: "2. DRUMS",  orbId: "drum",   color: "#ff3838", rgb: [255, 56, 56],   type: "inst" },
+  { id: "chord",  name: "3. CHORDS", orbId: "chord",  color: "#fed330", rgb: [254, 211, 48],  type: "inst" },
+  { id: "arp",    name: "4. ARP",    orbId: "arp",    color: "#7d5fff", rgb: [125, 95, 255],  type: "inst" },
+  { id: "noise",  name: "5. NOISE",  orbId: "noise",  color: "#1dd1a1", rgb: [29, 209, 161],  type: "inst" },
+  { id: "field",  name: "6. FIELD",  orbId: "field",  color: "#2bcbba", rgb: [43, 203, 186],  type: "inst" },
+  { id: "FILTER", name: "7. FILTER", orbId: "filter", color: "#2ed573", rgb: [46, 213, 115],  type: "fx" },
+  { id: "DELAY",  name: "8. DELAY",  orbId: "delay",  color: "#ff793f", rgb: [255, 121, 63],  type: "fx" },
+  { id: "SPACE",  name: "9. SPACE",  orbId: "reverb", color: "#ff5fc4", rgb: [255, 95, 196],  type: "fx" },
+  { id: "space",  name: "10. OUT",   orbId: "space",  color: "#4b7bec", rgb: [75, 123, 236], type: "master" }
+];
+
+function getModuleCurrentPresetOrTimbre(modId) {
+  let text = "DEFAULT";
+  if (modId === "drone") {
+    const sel = document.getElementById("selDroneTimbre");
+    text = sel ? sel.options[sel.selectedIndex]?.text || sel.value : "Sub Bass";
+  } else if (modId === "drum") {
+    const sel = document.getElementById("selDrumStyle");
+    text = sel ? sel.options[sel.selectedIndex]?.text || sel.value : "Organic Kit";
+  } else if (modId === "chord") {
+    const sel = document.getElementById("selChordTimbre");
+    text = sel ? sel.options[sel.selectedIndex]?.text || sel.value : "Warm Pad";
+  } else if (modId === "arp") {
+    const sel = document.getElementById("selArpTimbre");
+    text = sel ? sel.options[sel.selectedIndex]?.text || sel.value : "Kalimba";
+  } else if (modId === "noise") {
+    const sel = document.getElementById("selNoiseProfile");
+    text = sel ? sel.options[sel.selectedIndex]?.text || sel.value : "Rain Dust";
+  } else if (modId === "field") {
+    const sel = document.getElementById("selFieldMode");
+    text = sel ? sel.options[sel.selectedIndex]?.text || sel.value : "Weave All";
+  } else if (modId === "FILTER") {
+    const sel = document.getElementById("selFilterTopology");
+    text = sel ? sel.options[sel.selectedIndex]?.text || sel.value : "24dB Ladder";
+  } else if (modId === "DELAY") {
+    const sel = document.getElementById("selDelayEngine");
+    text = sel ? sel.options[sel.selectedIndex]?.text || sel.value : "Tape Delay";
+  } else if (modId === "SPACE") {
+    const sel = document.getElementById("selReverbMode");
+    text = sel ? sel.options[sel.selectedIndex]?.text || sel.value : "Cathedral";
+  } else if (modId === "space") {
+    text = "Master Bus";
+  }
+  // Truncate to max 15 chars per architectural specification
+  const clean = text.replace(/\(.*\)/, "").trim();
+  return clean.length > 15 ? clean.slice(0, 15) : clean;
+}
+
+function renderMobileMacroGrid() {
+  const grid = document.getElementById("mobileMacroGrid");
+  if (!grid) return;
+
+  // Sync pedal numbering and order from dspChainOrder
+  const pedalsOrder = Array.isArray(dspChainOrder) ? dspChainOrder : ["FILTER", "DELAY", "SPACE"];
+  const pedalMetaMap = {
+    FILTER: { orbId: "filter", color: "#2ed573", rgb: [46, 213, 115] },
+    DELAY:  { orbId: "delay",  color: "#ff793f", rgb: [255, 121, 63] },
+    SPACE:  { orbId: "reverb", color: "#ff5fc4", rgb: [255, 95, 196] }
+  };
+
+  const dynamicModules = [
+    { id: "drone",  name: "1. SUB",    orbId: "drone",  color: "#00e5ff", rgb: [0, 229, 255],   type: "inst" },
+    { id: "drum",   name: "2. DRUMS",  orbId: "drum",   color: "#ff3838", rgb: [255, 56, 56],   type: "inst" },
+    { id: "chord",  name: "3. CHORDS", orbId: "chord",  color: "#fed330", rgb: [254, 211, 48],  type: "inst" },
+    { id: "arp",    name: "4. ARP",    orbId: "arp",    color: "#7d5fff", rgb: [125, 95, 255],  type: "inst" },
+    { id: "noise",  name: "5. NOISE",  orbId: "noise",  color: "#1dd1a1", rgb: [29, 209, 161],  type: "inst" },
+    { id: "field",  name: "6. FIELD",  orbId: "field",  color: "#2bcbba", rgb: [43, 203, 186],  type: "inst" }
+  ];
+
+  pedalsOrder.forEach((pkey, idx) => {
+    const meta = pedalMetaMap[pkey] || { orbId: pkey.toLowerCase(), color: "#2ed573", rgb: [46, 213, 115] };
+    const num = 7 + idx;
+    dynamicModules.push({
+      id: pkey,
+      name: `${num}. ${pkey}`,
+      orbId: meta.orbId,
+      color: meta.color,
+      rgb: meta.rgb,
+      type: "fx"
+    });
+  });
+
+  dynamicModules.push({ id: "space", name: "10. OUT", orbId: "space", color: "#4b7bec", rgb: [75, 123, 236], type: "master" });
+
+  let html = "";
+  dynamicModules.forEach(mod => {
+    let isPowered = true;
+    if (mod.type === "inst") {
+      isPowered = channelPower[mod.id] !== false;
+    } else if (mod.type === "fx") {
+      isPowered = !(typeof pedalBypassState !== "undefined" && pedalBypassState[mod.id]);
+    }
+
+    const presetName = getModuleCurrentPresetOrTimbre(mod.id);
+
+    html += `
+      <div class="mobile-macro-tile" data-orb-id="${mod.orbId}" onclick="openMiniPedalInspector('${mod.orbId}', event)" style="--tile-color: ${mod.color}; --tile-rgb: ${mod.rgb.join(',')}; --tile-glow: rgba(${mod.rgb.join(',')}, 0.35);">
+        <div class="mobile-macro-tile-header">
+          <span class="mobile-macro-tile-title">${mod.name}</span>
+          ${mod.type !== 'master' ? `
+            <button type="button" class="mobile-macro-tile-pwr ${isPowered ? 'active' : ''}" onclick="toggleMacroTilePower('${mod.id}', '${mod.type}', event)" title="Toggle Power">PWR</button>
+          ` : `
+            <span class="mobile-macro-tile-inspect-hint">TERM</span>
+          `}
+        </div>
+        <div class="mobile-macro-tile-body">
+          <span class="mobile-macro-tile-preset">${presetName}</span>
+          <div class="mobile-macro-tile-footer">
+            <div class="mobile-macro-tile-meter-wrap">
+              <div class="mobile-macro-tile-meter-bar" id="macroMeter_${mod.orbId}"></div>
+            </div>
+            <span class="mobile-macro-tile-inspect-hint">EDIT ↗</span>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  grid.innerHTML = html;
+}
+
+function toggleMacroTilePower(modId, type, ev) {
+  if (ev) {
+    if (typeof ev.stopPropagation === "function") ev.stopPropagation();
+    if (typeof ev.preventDefault === "function") ev.preventDefault();
+  }
+  if (type === "inst") {
+    toggleChannelPower(modId);
+  } else if (type === "fx") {
+    togglePedalBypass(modId, ev);
+  }
+  renderMobileMacroGrid();
+}
+
+function updateMobileMacroMeterValues() {
+  if (document.hidden || !PHONE_LAYOUT_MQ.matches) return;
+  if (typeof ORBITAL_MODULES === "undefined" || !Array.isArray(ORBITAL_MODULES)) return;
+
+  ORBITAL_MODULES.forEach(orb => {
+    const bar = document.getElementById("macroMeter_" + orb.id);
+    if (!bar) return;
+    const pulsePct = Math.min(100, Math.round((orb.pulse || 0) * 160));
+    bar.style.width = (isPlaying ? Math.max(8, pulsePct) : 0) + "%";
+  });
 }
 
 let cachedOrbitalW = 0, cachedOrbitalH = 0, orbitalNeedsResize = true;
@@ -20850,6 +21357,9 @@ function loopOrbitalPhysics() {
     if (orbitalCanvasVisible && !coveredByPhoneSheet) {
       updateAndDrawOrbitalCanvas();
     }
+  }
+  if (typeof updateMobileMacroMeterValues === "function") {
+    updateMobileMacroMeterValues();
   }
   requestAnimationFrame(loopOrbitalPhysics);
 }
