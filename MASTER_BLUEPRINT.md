@@ -1108,3 +1108,54 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
   * [ ] Serialize layout arrangements, hidden module states, and header slot order to `localStorage["slambient_workspace_v1"]`.
   * [ ] Ship curated workspace presets: **Full Studio** (all modules visible), **Live Performance** (oversized keyboard + transport + visualizers), **Meditation / Drone** (Drone, Noise, Space Reverb, and Circle of Fifths only), plus user-saveable custom layouts.
 
+##### Phase 9: High-Priority UI/UX Fixes, Mobile Landscape & Typography Readability
+* [ ] **Module Titles & Navigation Arrows Fix (Mobile):** Restore broken module titles, labels, and step navigation arrows (`◀` / `▶`) on mobile viewports and inspect drawers.
+* [ ] **Global Typography & Readability Overhaul:**
+  * Re-evaluate `html { zoom: 0.75 }` scaling floor; scale micro-labels (`6px–10px`) up to legible minimum bounds (`12px–14px` effective physical size).
+  * Improve contrast and label hierarchy across knob clusters, telemetry readouts, and badge tags.
+* [ ] **Mobile Landscape (Horizontal) Repair:**
+  * Fix broken layout flow in Rack View and Orbital View when modern mobile phones rotate to landscape orientation.
+  * Adjust flex wrapping, height constraints (`100dvh`), and drawer modals to prevent viewport overflow and squished controls.
+* [ ] **Desktop Full-Screen Mode True-Fill:**
+  * Fix Full Screen view on desktop browsers where the canvas and UI containers fail to occupy 100% of the display viewport width/height.
+* [ ] **Decouple Re-seed & Panic from View Mode Switcher:**
+  * Remove `Re-seed` (Dice/Randomize) and `Panic` (Audio reset) from the Orbital / Rack view toggle container.
+  * Relocate them cleanly into the Master Transport / Header Utilities row so view switching is purely navigational.
+* [ ] **Preset Bank Division of 3 Rule:**
+  * Standardize factory and user preset grids to strictly maintain banks divisible by 3 (e.g., 3 rows × 5 columns = 15, or 3 rows × 6 columns = 18) for uniform row alignment across desktop and mobile.
+
+##### Phase 10: Expanded FX Rack, Signal Chain Architecture & Yoshimura Acoustic Engine
+* [ ] **Tap Tempo Accuracy Recalibration:**
+  * Replace naive two-tap delta calculation with an exponential moving average (EMA) or median window of the last 4–8 taps to eliminate tempo jitter.
+* [ ] **Low-Latency Mobile Touchscreen Keyboard Dispatch:**
+  * Optimize pointer/touch event listeners on the virtual piano keyboard to eliminate touch latency and audio trigger delays on mobile WebKit/Blink.
+* [ ] **Expanded Audio FX Engine & Modular Insert/Send Matrix:**
+  * Integrate new studio-grade DSP effects:
+    * **Delays:** Digital Delay (clean ping-pong & tempo sync), Space Delay (analog wow/flutter diffusion), Echo (multi-tap tape simulation).
+    * **Modulation:** Analog Tremolo (sine/square optical tremolo with stereo panning), Multi-Stage Phaser, Analog Flanger (comb modulation).
+    * **Drive:** Tube Overdrive / Soft-Clipping Distortion with dynamic drive control.
+  * Develop a modular signal chain and flexible auxiliary send system with user-customizable and randomizable routing paths.
+* [ ] **"Green / Yoshimura" Preset & Acoustic Refinements:**
+  * Remove traditional beat/drum patterns from Hiroshi Yoshimura / Midori Takada ambient presets.
+  * Introduce organic synthesized environmental textures (gentle water drops, wind chimes, resonant temple stones).
+  * Focus on interlocking stereo fading, slow binaural swells, subtle harmonic drones, and delicate, intentional melodic raindrops.
+
+##### Phase 11: Visualizer Evolution, Interactive Harmony & Video Synthesis
+* [ ] **Playable Radar Range Calibration (Replacing Unused 88 Keys):**
+  * Evaluate the full 88-key radar display; truncate unused extreme sub-bass and ultra-high treble octaves down to active engine bounds (e.g., focused 49 or 61-key range) to prioritize high-detail visual interplay between active voices.
+* [ ] **Tanpura Visualizer Telemetry:**
+  * Add real-time visual representation (resonant string glow / Lissajous ring) for the Indian Tanpura drone whenever it is engaged.
+* [ ] **Interactive Chord Analysis Module:**
+  * Add direct interactive controls into the Chord Wheel / Harmony analysis card, allowing users to tap and switch the active scale mode directly from the chord inspector.
+* [ ] **Video Synthesis & Infinite Fractal Engine:**
+  * Refactor fractal visualizer to guarantee continuous, infinite generative drift without unexpected start/stop freezes.
+  * Implement video blending and generative video synthesis layer.
+  * Add client-side video capture/recording (`MediaRecorder` with WebGL canvas stream) to export video soundscapes (`.webm` / `.mp4`).
+* [ ] **Global CPU & RAM Memory Optimization:**
+  * Audit canvas render loops, garbage collection allocations, and Web Audio node teardown to minimize CPU usage and prevent browser memory bloat.
+
+##### Phase 12: Branding, Logo Identity & Visual Language
+* [ ] **Slambient Logo & Iconography Suite:**
+  * Design an official, cohesive vector logo and wordmark reflecting Slambient's blend of vintage Japanese ambient minimalism, Eurorack modular hardware, and cosmic generative mathematics.
+
+
