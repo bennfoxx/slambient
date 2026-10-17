@@ -20,3 +20,15 @@
 
 /*.svg
   Cache-Control: public, max-age=604800, immutable
+
+/*.webm
+  Content-Type: video/webm
+  Cache-Control: no-cache
+
+/clock-processor.js
+  Content-Type: text/javascript; charset=utf-8
+  Cache-Control: public, max-age=0, must-revalidate
+
+/dsp-engines.js
+  Content-Type: text/javascript; charset=utf-8
+  Cache-Control: public, max-age=0, must-revalidate
