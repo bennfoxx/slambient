@@ -1,3 +1,428 @@
+/* ==========================================================================
+   DYNAMIC SIGNATURE FX CHAINS FOR FACTORY PRESETS (0 - 14)
+   ========================================================================== */
+const PRESET_FX_CONFIGS = {
+  // 0: Nostalgia (Warm tape pads, music box arp, drifting sub)
+  // Signature FX: Tube Drive + Optical Tremolo + Space Delay
+  0: {
+    chain: ["OVERDRIVE", "TREMOLO", "SPACE_DELAY", "FILTER", "SPACE", "DELAY", "DIGITAL_DELAY", "TAPE_ECHO", "PHASER", "FLANGER"],
+    bypass: {
+      OVERDRIVE: false,
+      FILTER: true,
+      TREMOLO: false,
+      PHASER: true,
+      FLANGER: true,
+      DELAY: true,
+      DIGITAL_DELAY: true,
+      SPACE_DELAY: false,
+      TAPE_ECHO: true,
+      SPACE: false
+    },
+    params: {
+      OVERDRIVE: { drive: 1.8, tone: 3200, mix: 42 },
+      TREMOLO: { rate: 1.8, depth: 55, pan: 60 },
+      SPACE_DELAY: { time: 0.48, flutter: 38, mix: 45 },
+      SPACE: { decay: 68, chorus: 30, mix: 48 }
+    }
+  },
+
+  // 1: Green / Yoshimura & Organic (Hiroshi Yoshimura acoustic naturalism, crystal drops, temple stones)
+  // Signature FX: Digital Ping-Pong Delay + Space Delay (Zero Tube Drive, Zero Flanger)
+  1: {
+    chain: ["DIGITAL_DELAY", "SPACE_DELAY", "SPACE", "FILTER", "DELAY", "TAPE_ECHO", "TREMOLO", "PHASER", "FLANGER", "OVERDRIVE"],
+    bypass: {
+      OVERDRIVE: true, // Zero Tube Drive
+      FILTER: true,
+      TREMOLO: true,
+      PHASER: true,
+      FLANGER: true,   // Zero Flanger
+      DELAY: true,
+      DIGITAL_DELAY: false, // Active Ping-Pong Delay
+      SPACE_DELAY: false,   // Active Space Delay
+      TAPE_ECHO: true,
+      SPACE: false          // Active Ambient Space
+    },
+    params: {
+      OVERDRIVE: { drive: 0.2, tone: 5000, mix: 0 },
+      FLANGER: { rate: 0.1, depth: 0, feedback: 0 },
+      DIGITAL_DELAY: { time: 0.375, feedback: 46, mix: 42 },
+      SPACE_DELAY: { time: 0.52, flutter: 16, mix: 45 },
+      SPACE: { decay: 78, chorus: 24, mix: 46 }
+    }
+  },
+
+  // 2: Shimmer Cascade (7/8 Lydian string swells, glass FM chimes, cathedral wash)
+  // Signature FX: Multi-Stage Phaser + Digital Delay + Space Reverb
+  2: {
+    chain: ["PHASER", "DIGITAL_DELAY", "SPACE", "SPACE_DELAY", "FILTER", "DELAY", "TREMOLO", "TAPE_ECHO", "OVERDRIVE", "FLANGER"],
+    bypass: {
+      OVERDRIVE: true,
+      FILTER: true,
+      TREMOLO: true,
+      PHASER: false,
+      FLANGER: true,
+      DELAY: true,
+      DIGITAL_DELAY: false,
+      SPACE_DELAY: true,
+      TAPE_ECHO: true,
+      SPACE: false
+    },
+    params: {
+      PHASER: { rate: 0.18, depth: 55, feedback: 45 },
+      DIGITAL_DELAY: { time: 0.44, feedback: 55, mix: 45 },
+      SPACE: { decay: 85, chorus: 45, mix: 65 }
+    }
+  },
+
+  // 3: Hauntological Tape (5/4 Aeolian dub echo, tape flutter, chamber woods)
+  // Signature FX: Tube Drive + Tape Echo + Space Reverb
+  3: {
+    chain: ["OVERDRIVE", "TAPE_ECHO", "SPACE_DELAY", "SPACE", "FILTER", "DELAY", "DIGITAL_DELAY", "TREMOLO", "PHASER", "FLANGER"],
+    bypass: {
+      OVERDRIVE: false,
+      FILTER: true,
+      TREMOLO: true,
+      PHASER: true,
+      FLANGER: true,
+      DELAY: true,
+      DIGITAL_DELAY: true,
+      SPACE_DELAY: false,
+      TAPE_ECHO: false,
+      SPACE: false
+    },
+    params: {
+      OVERDRIVE: { drive: 2.6, tone: 2400, mix: 50 },
+      TAPE_ECHO: { speed: 0.85, inertia: 0.22, mix: 52 },
+      SPACE_DELAY: { time: 0.55, flutter: 50, mix: 40 },
+      SPACE: { decay: 72, chorus: 35, mix: 50 }
+    }
+  },
+
+  // 4: Velvet Horizon (4/4 Major 9 celestial organ, water droplet arp, deep sub)
+  // Signature FX: Resonant Filter + Optical Tremolo + Space Delay + Space Reverb
+  4: {
+    chain: ["FILTER", "TREMOLO", "SPACE_DELAY", "SPACE", "DELAY", "DIGITAL_DELAY", "TAPE_ECHO", "OVERDRIVE", "PHASER", "FLANGER"],
+    bypass: {
+      OVERDRIVE: true,
+      FILTER: false,
+      TREMOLO: false,
+      PHASER: true,
+      FLANGER: true,
+      DELAY: true,
+      DIGITAL_DELAY: true,
+      SPACE_DELAY: false,
+      TAPE_ECHO: true,
+      SPACE: false
+    },
+    params: {
+      FILTER: { cutoff: 3200, res: 1.8, lfo: 25 },
+      TREMOLO: { rate: 2.2, depth: 45, pan: 55 },
+      SPACE_DELAY: { time: 0.58, flutter: 32, mix: 44 },
+      SPACE: { decay: 80, chorus: 40, mix: 60 }
+    }
+  },
+
+  // 5: Pale Bloom (3/4 Major Pentatonic minimal clicks, celesta, pizzicato strings)
+  // Signature FX: Digital Delay + Space Delay + Space Reverb (delicate acoustic diffusion)
+  5: {
+    chain: ["DIGITAL_DELAY", "SPACE_DELAY", "SPACE", "FILTER", "DELAY", "TAPE_ECHO", "TREMOLO", "PHASER", "FLANGER", "OVERDRIVE"],
+    bypass: {
+      OVERDRIVE: true,
+      FILTER: true,
+      TREMOLO: true,
+      PHASER: true,
+      FLANGER: true,
+      DELAY: true,
+      DIGITAL_DELAY: false,
+      SPACE_DELAY: false,
+      TAPE_ECHO: true,
+      SPACE: false
+    },
+    params: {
+      DIGITAL_DELAY: { time: 0.28, feedback: 38, mix: 35 },
+      SPACE_DELAY: { time: 0.45, flutter: 15, mix: 40 },
+      SPACE: { decay: 72, chorus: 28, mix: 52 }
+    }
+  },
+
+  // 6: Kankyō Green (Hiroshi Yoshimura & Midori Takada environmental acoustics, crystal drops, temple chimes & binaural mist)
+  // Signature FX: Digital Ping-Pong Delay + Space Delay (Zero Tube Drive, Zero Flanger)
+  6: {
+    chain: ["DIGITAL_DELAY", "SPACE_DELAY", "SPACE", "FILTER", "DELAY", "TAPE_ECHO", "TREMOLO", "PHASER", "FLANGER", "OVERDRIVE"],
+    bypass: {
+      OVERDRIVE: true, // Zero Tube Drive
+      FILTER: true,
+      TREMOLO: true,
+      PHASER: true,
+      FLANGER: true,   // Zero Flanger
+      DELAY: true,
+      DIGITAL_DELAY: false, // Active Ping-Pong Delay
+      SPACE_DELAY: false,   // Active Space Delay
+      TAPE_ECHO: true,
+      SPACE: false          // Active Ambient Space
+    },
+    params: {
+      OVERDRIVE: { drive: 0.2, tone: 5000, mix: 0 },
+      FLANGER: { rate: 0.1, depth: 0, feedback: 0 },
+      DIGITAL_DELAY: { time: 0.48, feedback: 42, mix: 44 },
+      SPACE_DELAY: { time: 0.62, flutter: 12, mix: 46 },
+      SPACE: { decay: 82, chorus: 35, mix: 55 }
+    }
+  },
+
+  // 7: Classical Lineage (Indian Classical Raga / Maihar Tradition)
+  // Signature FX: Resonant Filter + Space Delay + Cathedral Reverb
+  7: {
+    chain: ["FILTER", "SPACE_DELAY", "SPACE", "TAPE_ECHO", "DELAY", "DIGITAL_DELAY", "TREMOLO", "PHASER", "FLANGER", "OVERDRIVE"],
+    bypass: {
+      OVERDRIVE: true,
+      FILTER: false,
+      TREMOLO: true,
+      PHASER: true,
+      FLANGER: true,
+      DELAY: true,
+      DIGITAL_DELAY: true,
+      SPACE_DELAY: false,
+      TAPE_ECHO: true,
+      SPACE: false
+    },
+    params: {
+      FILTER: { cutoff: 2600, res: 3.2, lfo: 30 },
+      SPACE_DELAY: { time: 0.54, flutter: 24, mix: 48 },
+      SPACE: { decay: 88, chorus: 42, mix: 58 }
+    }
+  },
+
+  // 8: After Hours Deep (Super Chill Deep House)
+  // Signature FX: Tube Drive + Filter + Tape Delay + Digital Delay + Space Reverb
+  8: {
+    chain: ["OVERDRIVE", "FILTER", "DELAY", "DIGITAL_DELAY", "SPACE", "SPACE_DELAY", "TAPE_ECHO", "TREMOLO", "PHASER", "FLANGER"],
+    bypass: {
+      OVERDRIVE: false,
+      FILTER: false,
+      TREMOLO: true,
+      PHASER: true,
+      FLANGER: true,
+      DELAY: false,
+      DIGITAL_DELAY: true,
+      SPACE_DELAY: true,
+      TAPE_ECHO: true,
+      SPACE: false
+    },
+    params: {
+      OVERDRIVE: { drive: 1.5, tone: 4200, mix: 35 },
+      FILTER: { cutoff: 1800, res: 2.2, lfo: 20 },
+      DELAY: { time: 0.375, feedback: 38, mix: 42 },
+      SPACE: { decay: 60, chorus: 30, mix: 45 }
+    }
+  },
+
+  // 9: Airports (Generative Tape Loops & Glass Diffusion)
+  // Signature FX: Space Delay + Tape Echo + Space Reverb
+  9: {
+    chain: ["SPACE_DELAY", "TAPE_ECHO", "SPACE", "FILTER", "DELAY", "DIGITAL_DELAY", "TREMOLO", "PHASER", "FLANGER", "OVERDRIVE"],
+    bypass: {
+      OVERDRIVE: true,
+      FILTER: true,
+      TREMOLO: true,
+      PHASER: true,
+      FLANGER: true,
+      DELAY: true,
+      DIGITAL_DELAY: true,
+      SPACE_DELAY: false,
+      TAPE_ECHO: false,
+      SPACE: false
+    },
+    params: {
+      SPACE_DELAY: { time: 0.72, flutter: 35, mix: 52 },
+      TAPE_ECHO: { speed: 0.9, inertia: 0.25, mix: 48 },
+      SPACE: { decay: 92, chorus: 50, mix: 65 }
+    }
+  },
+
+  // 10: Douglas Firs (Noir Vibraphone Ballad & Rain Mist)
+  // Signature FX: Optical Tremolo + Tape Echo + Tube Warmth
+  10: {
+    chain: ["TREMOLO", "TAPE_ECHO", "OVERDRIVE", "SPACE", "FILTER", "DELAY", "DIGITAL_DELAY", "SPACE_DELAY", "PHASER", "FLANGER"],
+    bypass: {
+      OVERDRIVE: false, // Tube Warmth
+      FILTER: true,
+      TREMOLO: false,   // Optical Tremolo
+      PHASER: true,
+      FLANGER: true,
+      DELAY: true,
+      DIGITAL_DELAY: true,
+      SPACE_DELAY: true,
+      TAPE_ECHO: false, // Tape Echo
+      SPACE: false
+    },
+    params: {
+      TREMOLO: { rate: 3.2, depth: 65, pan: 70 },
+      TAPE_ECHO: { speed: 0.95, inertia: 0.16, mix: 48 },
+      OVERDRIVE: { drive: 1.6, tone: 2800, mix: 40 },
+      SPACE: { decay: 78, chorus: 38, mix: 55 }
+    }
+  },
+
+  // 11: Twinning (Braindance Micro-Poly & IDM Breakbeat Pocket)
+  // Signature FX: Analog Flanger + Tube Drive + Ping-Pong Delay
+  11: {
+    chain: ["FLANGER", "OVERDRIVE", "DIGITAL_DELAY", "FILTER", "SPACE", "DELAY", "SPACE_DELAY", "TAPE_ECHO", "TREMOLO", "PHASER"],
+    bypass: {
+      OVERDRIVE: false,     // Tube Drive
+      FILTER: false,
+      TREMOLO: true,
+      PHASER: true,
+      FLANGER: false,       // Analog Flanger
+      DELAY: true,
+      DIGITAL_DELAY: false, // Ping-Pong Delay
+      SPACE_DELAY: true,
+      TAPE_ECHO: true,
+      SPACE: false
+    },
+    params: {
+      FLANGER: { rate: 0.22, depth: 75, feedback: 55 },
+      OVERDRIVE: { drive: 3.2, tone: 4800, mix: 45 },
+      DIGITAL_DELAY: { time: 0.26, feedback: 48, mix: 45 },
+      FILTER: { cutoff: 3600, res: 2.8, lfo: 40 },
+      SPACE: { decay: 62, chorus: 30, mix: 42 }
+    }
+  },
+
+  // 12: Tangerine (Berlin School Analog Sequencer)
+  // Signature FX: Multi-Stage Phaser + Dotted-8th Delay
+  12: {
+    chain: ["PHASER", "DIGITAL_DELAY", "FILTER", "SPACE", "DELAY", "SPACE_DELAY", "TAPE_ECHO", "OVERDRIVE", "TREMOLO", "FLANGER"],
+    bypass: {
+      OVERDRIVE: true,
+      FILTER: false,
+      TREMOLO: true,
+      PHASER: false,        // Multi-Stage Phaser
+      FLANGER: true,
+      DELAY: true,
+      DIGITAL_DELAY: false, // Dotted-8th Delay
+      SPACE_DELAY: true,
+      TAPE_ECHO: true,
+      SPACE: false
+    },
+    params: {
+      PHASER: { rate: 0.42, depth: 78, feedback: 65 },
+      DIGITAL_DELAY: { time: 0.375, feedback: 52, mix: 50 },
+      FILTER: { cutoff: 4200, res: 3.5, lfo: 45 },
+      SPACE: { decay: 70, chorus: 35, mix: 50 }
+    }
+  },
+
+  // 13: Disintegration (Degraded Tape Loops & Muffled Repeats)
+  // Signature FX: Heavy Tape Echo flutter + Tube Lo-Fi Tone + Space
+  13: {
+    chain: ["TAPE_ECHO", "SPACE_DELAY", "OVERDRIVE", "SPACE", "FILTER", "DELAY", "DIGITAL_DELAY", "TREMOLO", "PHASER", "FLANGER"],
+    bypass: {
+      OVERDRIVE: false,   // Tube Lo-Fi Tone
+      FILTER: true,
+      TREMOLO: true,
+      PHASER: true,
+      FLANGER: true,
+      DELAY: true,
+      DIGITAL_DELAY: true,
+      SPACE_DELAY: false, // Heavy flutter diffusion
+      TAPE_ECHO: false,   // Heavy Tape Echo
+      SPACE: false
+    },
+    params: {
+      TAPE_ECHO: { speed: 0.72, inertia: 0.35, mix: 58 },
+      SPACE_DELAY: { time: 0.65, flutter: 75, mix: 52 },
+      OVERDRIVE: { drive: 3.8, tone: 2100, mix: 55 },
+      SPACE: { decay: 88, chorus: 45, mix: 62 }
+    }
+  },
+
+  // 14: Lo-Fi Chillhop (Boom-Bap Swing, Rhodes Chords, Rain/Vinyl Texture)
+  // Signature FX: Tube Drive + Filter + Tape Delay + Space Reverb
+  14: {
+    chain: ["OVERDRIVE", "FILTER", "DELAY", "SPACE", "DIGITAL_DELAY", "SPACE_DELAY", "TAPE_ECHO", "TREMOLO", "PHASER", "FLANGER"],
+    bypass: {
+      OVERDRIVE: false, // Warm tube saturation
+      FILTER: false,
+      TREMOLO: true,
+      PHASER: true,
+      FLANGER: true,
+      DELAY: false,     // Tape Delay
+      DIGITAL_DELAY: true,
+      SPACE_DELAY: true,
+      TAPE_ECHO: true,
+      SPACE: false
+    },
+    params: {
+      OVERDRIVE: { drive: 2.4, tone: 2800, mix: 48 },
+      FILTER: { cutoff: 1950, res: 1.8, lfo: 18 },
+      DELAY: { time: 0.32, feedback: 32, mix: 35 },
+      SPACE: { decay: 55, chorus: 25, mix: 40 }
+    }
+  }
+};
+
+if (typeof window !== "undefined") {
+  window.PRESET_FX_CONFIGS = PRESET_FX_CONFIGS;
+}
+
+function applyPresetFxConfig(idx) {
+  const config = PRESET_FX_CONFIGS[idx];
+  if (!config) return;
+
+  const fxMgr = (typeof slambientFxRackManager !== "undefined" && slambientFxRackManager) ||
+                (typeof window !== "undefined" && (window.slambientFxRackManager || window.fxRackManager));
+
+  if (fxMgr && typeof fxMgr.loadChainPreset === "function") {
+    fxMgr.loadChainPreset(config);
+  } else {
+    if (Array.isArray(config.chain) && config.chain.length > 0) {
+      if (typeof dspChainOrder !== "undefined" && Array.isArray(dspChainOrder)) {
+        dspChainOrder.length = 0;
+        dspChainOrder.push(...config.chain);
+      }
+    }
+    if (config.bypass && typeof config.bypass === "object" && typeof pedalBypassState !== "undefined") {
+      Object.keys(config.bypass).forEach(k => {
+        pedalBypassState[k] = !!config.bypass[k];
+        if (typeof document !== "undefined") {
+          const card = document.getElementById("pedalCard_" + k);
+          const btn = document.getElementById("stompBtn_" + k);
+          if (card) card.classList.toggle("bypassed", pedalBypassState[k]);
+          if (btn) btn.classList.toggle("active", !pedalBypassState[k]);
+        }
+      });
+    }
+    if (config.params && typeof config.params === "object") {
+      Object.keys(config.params).forEach(k => {
+        if (typeof fxParamsState !== "undefined") {
+          if (!fxParamsState[k]) fxParamsState[k] = {};
+          Object.assign(fxParamsState[k], config.params[k]);
+        }
+        if (typeof document !== "undefined") {
+          Object.keys(config.params[k]).forEach(pId => {
+            const val = config.params[k][pId];
+            const slider = document.getElementById(`slider_${k}_${pId}`);
+            if (slider) slider.value = val;
+            const lbl = document.getElementById(`lbl_${k}_${pId}`);
+            if (lbl && typeof formatFxParamValue === "function" && typeof PEDAL_REGISTRY !== "undefined") {
+              const reg = PEDAL_REGISTRY[k];
+              const pMeta = reg && reg.params && reg.params.find(p => p.id === pId);
+              lbl.textContent = formatFxParamValue(pMeta, val);
+            }
+          });
+        }
+      });
+    }
+    if (typeof rewireDspChain === "function" && typeof dspChainOrder !== "undefined") {
+      rewireDspChain(dspChainOrder, false);
+    }
+    if (typeof updatePedalsOrderUI === "function") {
+      updatePedalsOrderUI();
+    }
+  }
+}
+
 function applyPreset(idx) {
   document.querySelectorAll(".preset-bar button").forEach((b, i) => b.classList.toggle("active", i === idx));
 
@@ -18,11 +443,6 @@ function applyPreset(idx) {
   const chkDelaySync = document.getElementById("chkDelayTempoSync");
   if (chkDelaySync) chkDelaySync.checked = false;
 
-  // Reset module controls and DSP pedal routing that only certain presets override
-  // so switching presets or coming from Randomize All never leaks stale state.
-  if (!window.slambientFxRackManager && typeof rewireDspChain === "function") {
-    rewireDspChain(['FILTER', 'DELAY', 'SPACE'], false);
-  }
   const selDroneTimbre = document.getElementById("selDroneTimbre");
   if (selDroneTimbre) selDroneTimbre.value = "SUB";
   if (document.getElementById("selDroneOctave")) document.getElementById("selDroneOctave").value = "D2";
@@ -1014,6 +1434,7 @@ function applyPreset(idx) {
   updateBpm();
   updateMusicalConfig(false);
   updateAudioParams();
+  applyPresetFxConfig(idx);
   if (typeof renderMobileMacroGrid === "function") renderMobileMacroGrid();
 
   // Deliberately NOT forcing an immediate chord hit on preset switch: the
@@ -1052,6 +1473,12 @@ function serializeCurrentPatch() {
     currentChordStepIdx,
     dspChainOrder: Array.isArray(dspChainOrder) ? [...dspChainOrder] : ["FILTER", "DELAY", "SPACE"],
     pedalBypass: typeof pedalBypassState !== "undefined" ? Object.assign({}, pedalBypassState) : { FILTER: false, DELAY: false, SPACE: false },
+    fxParams: typeof fxParamsState !== "undefined" ? JSON.parse(JSON.stringify(fxParamsState)) : {},
+    fxChain: {
+      order: Array.isArray(dspChainOrder) ? [...dspChainOrder] : [],
+      bypass: typeof pedalBypassState !== "undefined" ? Object.assign({}, pedalBypassState) : {},
+      params: typeof fxParamsState !== "undefined" ? JSON.parse(JSON.stringify(fxParamsState)) : {}
+    },
     channelPower: Object.assign({}, channelPower),
     channelAux: Object.assign({}, channelAux),
     channelMute: Object.assign({}, channelMute),
@@ -1153,20 +1580,63 @@ function applyPatchData(data, skipIds) {
   droneEnabled = channelPower.drone !== false;
   updateMuteSoloUI();
 
-  // 4. Restore pedal bypass states and DSP chain routing topology
-  if (data.pedalBypass && typeof data.pedalBypass === "object" && typeof pedalBypassState !== "undefined") {
-    ["FILTER", "DELAY", "SPACE"].forEach(k => {
-      if (typeof data.pedalBypass[k] === "boolean") {
-        pedalBypassState[k] = data.pedalBypass[k];
-        const card = document.getElementById("pedalCard_" + k);
-        const btn = document.getElementById("stompBtn_" + k);
-        if (card) card.classList.toggle("bypassed", pedalBypassState[k]);
-        if (btn) btn.classList.toggle("active", !pedalBypassState[k]);
+  // 4. Restore pedalboard and modular DSP chain routing topology
+  const fxConfig = {
+    chain: (data.fxChain && data.fxChain.order) || data.dspChainOrder,
+    bypass: (data.fxChain && data.fxChain.bypass) || data.pedalBypass,
+    params: (data.fxChain && data.fxChain.params) || data.fxParams
+  };
+
+  const fxMgr = (typeof slambientFxRackManager !== "undefined" && slambientFxRackManager) ||
+                (typeof window !== "undefined" && (window.slambientFxRackManager || window.fxRackManager));
+
+  if (fxMgr && typeof fxMgr.loadChainPreset === "function") {
+    fxMgr.loadChainPreset(fxConfig);
+  } else {
+    if (Array.isArray(fxConfig.chain) && fxConfig.chain.length > 0) {
+      if (typeof dspChainOrder !== "undefined" && Array.isArray(dspChainOrder)) {
+        dspChainOrder.length = 0;
+        dspChainOrder.push(...fxConfig.chain);
       }
-    });
-  }
-  if (Array.isArray(data.dspChainOrder) && data.dspChainOrder.length === 3) {
-    rewireDspChain(data.dspChainOrder, false);
+    }
+    if (fxConfig.bypass && typeof fxConfig.bypass === "object" && typeof pedalBypassState !== "undefined") {
+      Object.keys(fxConfig.bypass).forEach(k => {
+        pedalBypassState[k] = !!fxConfig.bypass[k];
+        if (typeof document !== "undefined") {
+          const card = document.getElementById("pedalCard_" + k);
+          const btn = document.getElementById("stompBtn_" + k);
+          if (card) card.classList.toggle("bypassed", pedalBypassState[k]);
+          if (btn) btn.classList.toggle("active", !pedalBypassState[k]);
+        }
+      });
+    }
+    if (fxConfig.params && typeof fxConfig.params === "object") {
+      Object.keys(fxConfig.params).forEach(k => {
+        if (typeof fxParamsState !== "undefined") {
+          if (!fxParamsState[k]) fxParamsState[k] = {};
+          Object.assign(fxParamsState[k], fxConfig.params[k]);
+        }
+        if (typeof document !== "undefined") {
+          Object.keys(fxConfig.params[k]).forEach(pId => {
+            const val = fxConfig.params[k][pId];
+            const slider = document.getElementById(`slider_${k}_${pId}`);
+            if (slider) slider.value = val;
+            const lbl = document.getElementById(`lbl_${k}_${pId}`);
+            if (lbl && typeof formatFxParamValue === "function" && typeof PEDAL_REGISTRY !== "undefined") {
+              const reg = PEDAL_REGISTRY[k];
+              const pMeta = reg && reg.params && reg.params.find(p => p.id === pId);
+              lbl.textContent = formatFxParamValue(pMeta, val);
+            }
+          });
+        }
+      });
+    }
+    if (typeof rewireDspChain === "function" && typeof dspChainOrder !== "undefined") {
+      rewireDspChain(dspChainOrder, false);
+    }
+    if (typeof updatePedalsOrderUI === "function") {
+      updatePedalsOrderUI();
+    }
   }
 
   // Highlight matching preset chip if presetName matches

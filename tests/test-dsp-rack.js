@@ -169,6 +169,50 @@ assert.deepStrictEqual(manager.chain, ["TREMOLO", "TUBE_DRIVE", "PHASER"], "reor
 manager.shiftModule("TREMOLO", 1);
 assert.deepStrictEqual(manager.chain, ["TUBE_DRIVE", "TREMOLO", "PHASER"], "shiftModule must move item by delta");
 
-console.log("✔ SlambientFxRackManager reorderChain and shiftModule verified");
-console.log("✔ SlambientFxRackManager routing and safe intelligent randomizer passed");
+// 4. Test SlambientFxRackManager.loadChainPreset
+manager.loadChainPreset({
+  chain: ["OVERDRIVE", "TREMOLO", "SPACE_DELAY"],
+  bypass: {
+    OVERDRIVE: false,
+    TREMOLO: false,
+    SPACE_DELAY: false,
+    PHANGER: true
+  },
+  params: {
+    OVERDRIVE: { drive: 2.5, tone: 3600, mix: 50 },
+    TREMOLO: { rate: 2.0, depth: 60 }
+  }
+});
+
+assert.strictEqual(manager.chain[0], "OVERDRIVE", "First pedal should be OVERDRIVE");
+assert.strictEqual(manager.chain[1], "TREMOLO", "Second pedal should be TREMOLO");
+assert.strictEqual(manager.chain[2], "SPACE_DELAY", "Third pedal should be SPACE_DELAY");
+assert.strictEqual(manager.bypassMap.get("OVERDRIVE"), false, "OVERDRIVE should not be bypassed");
+assert.strictEqual(manager.bypassMap.get("TREMOLO"), false, "TREMOLO should not be bypassed");
+
+// 5. Test DSP class setters
+digitalDelay.setTime(0.75);
+digitalDelay.setFeedback(0.6);
+digitalDelay.setMix(0.5);
+assert.strictEqual(digitalDelay.timeSec, 0.75);
+assert.strictEqual(digitalDelay.feedback, 0.6);
+assert.strictEqual(digitalDelay.mix, 0.5);
+
+spaceDelay.setTime(0.8);
+spaceDelay.setFeedback(0.5);
+spaceDelay.setFlutter(0.7);
+spaceDelay.setMix(0.6);
+assert.strictEqual(spaceDelay.timeSec, 0.8);
+assert.strictEqual(spaceDelay.feedback, 0.5);
+
+tapeEcho.setSpeed(1.5);
+tapeEcho.setInertia(0.25);
+tapeEcho.setMix(0.55);
+assert.strictEqual(tapeEcho.inertia, 0.25);
+assert.strictEqual(tapeEcho.mix, 0.55);
+
+tubeDrive.setTone(3000);
+tubeDrive.setMix(0.65);
+
+console.log("✔ SlambientFxRackManager loadChainPreset and DSP setters verified");
 console.log("ALL DSP RACK UNIT TESTS PASSED CLEANLY!");
