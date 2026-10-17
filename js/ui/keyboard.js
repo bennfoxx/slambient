@@ -7,27 +7,63 @@
 const pointerActiveMidi = new Map();
 
 function bindKeyEvents(el, midi) {
+  el.style.touchAction = "none";
+
+  const handleNoteStart = (pointerId) => {
+    if (typeof initAudio === "function" && !window.audioCtx) initAudio();
+    if (window.audioCtx && window.audioCtx.state === "suspended") window.audioCtx.resume();
+    pointerActiveMidi.set(pointerId, midi);
+    startNoteLive(midi, 90);
+  };
+
+  const handleNoteStop = (pointerId) => {
+    const activeMidi = pointerActiveMidi.get(pointerId);
+    pointerActiveMidi.delete(pointerId);
+    stopNoteLive(activeMidi !== undefined ? activeMidi : midi);
+  };
+
   el.addEventListener("pointerdown", (e) => {
     e.preventDefault();
-    pointerActiveMidi.set(e.pointerId, midi);
-    startNoteLive(midi, 90);
-  });
+    handleNoteStart(e.pointerId);
+  }, { passive: false });
+
+  // Direct touchstart listener fallback to guarantee 0ms latency on iOS/WebKit
+  // before gesture recognizers can attach or cause frame delays
+  el.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      handleNoteStart(e.changedTouches[i].identifier);
+    }
+  }, { passive: false });
+
   el.addEventListener("pointerup", (e) => {
     e.preventDefault();
-    const activeMidi = pointerActiveMidi.get(e.pointerId);
-    pointerActiveMidi.delete(e.pointerId);
-    stopNoteLive(activeMidi !== undefined ? activeMidi : midi);
+    handleNoteStop(e.pointerId);
   });
+
+  el.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      handleNoteStop(e.changedTouches[i].identifier);
+    }
+  }, { passive: false });
+
   el.addEventListener("pointerleave", (e) => {
     if (e.pointerType !== "touch" && heldMidiNotes.has(midi)) {
       stopNoteLive(midi);
     }
   });
+
   el.addEventListener("pointercancel", (e) => {
-    const activeMidi = pointerActiveMidi.get(e.pointerId);
-    pointerActiveMidi.delete(e.pointerId);
-    stopNoteLive(activeMidi !== undefined ? activeMidi : midi);
+    handleNoteStop(e.pointerId);
   });
+
+  el.addEventListener("touchcancel", (e) => {
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      handleNoteStop(e.changedTouches[i].identifier);
+    }
+  });
+
   el.addEventListener("lostpointercapture", (e) => {
     const activeMidi = pointerActiveMidi.get(e.pointerId);
     if (activeMidi !== undefined) {
@@ -35,6 +71,7 @@ function bindKeyEvents(el, midi) {
       stopNoteLive(activeMidi);
     }
   });
+
   el.addEventListener("pointerenter", (e) => {
     if (e.pointerType !== "touch" && e.buttons === 1 && !heldMidiNotes.has(midi)) {
       startNoteLive(midi, 90);
@@ -76,11 +113,12 @@ function setKeyboardDisplayMode(mode) {
   const hintText = document.getElementById("keyboardHintText");
   const octControls = document.querySelector(".keyboard-panel .oct-controls");
 
-  if (mode === "88") {
+  if (mode === "88" || mode === "61") {
+    keyboardDisplayMode = "61";
     if (container) container.classList.add("mode-radar");
     if (btnPlay) btnPlay.classList.remove("active");
     if (btnRadar) btnRadar.classList.add("active");
-    if (hintText) hintText.innerHTML = `Full-Range Radar (A0 - C8) · Multi-Voice Harmonic Radar`;
+    if (hintText) hintText.innerHTML = `Focused Radar (C2 - C7 · 61 Keys) · Multi-Voice Harmonic Radar`;
     if (octControls) {
       octControls.style.visibility = "hidden";
       octControls.style.pointerEvents = "none";
@@ -108,15 +146,16 @@ function buildKeyboard() {
   const whiteKeysLayer = document.createElement("div"); whiteKeysLayer.className = "white-keys-layer";
   const blackKeysLayer = document.createElement("div"); blackKeysLayer.className = "black-keys-layer";
 
-  if (keyboardDisplayMode === "88") {
+  if (keyboardDisplayMode === "88" || keyboardDisplayMode === "61") {
     container.classList.add("mode-radar");
     const whiteKeys = [];
-    for (let m = 21; m <= 108; m++) {
+    for (let m = 36; m <= 96; m++) {
       if ([0, 2, 4, 5, 7, 9, 11].includes(m % 12)) {
         whiteKeys.push(m);
       }
     }
 
+    const numWhite = whiteKeys.length; // 36 white keys
     for (let w = 0; w < whiteKeys.length; w++) {
       const midi = whiteKeys[w];
       const keyEl = document.createElement("div");
@@ -124,7 +163,7 @@ function buildKeyboard() {
       keyEl.dataset.midi = midi;
       if (isKeyLedLit(midi)) keyEl.classList.add("in-scale");
 
-      if (midi === 21 || midi % 12 === 0) {
+      if (midi % 12 === 0) {
         const label = document.createElement("span");
         label.className = "key-label octave-marker";
         label.textContent = `${NOTE_NAMES[midi % 12]}${Math.floor(midi / 12) - 1}`;
@@ -141,10 +180,10 @@ function buildKeyboard() {
         const bKeyEl = document.createElement("div");
         bKeyEl.className = "black-key";
         bKeyEl.dataset.midi = bMidi;
-        const pct = ((w + 1) / 52) * 100;
+        const pct = ((w + 1) / numWhite) * 100;
         bKeyEl.style.left = `calc(${pct.toFixed(4)}% - 0.5px)`;
         bKeyEl.style.transform = "translateX(-50%)";
-        bKeyEl.style.width = `calc(100% / 52 * 0.72)`;
+        bKeyEl.style.width = `calc(100% / ${numWhite} * 0.72)`;
         if (isKeyLedLit(bMidi)) bKeyEl.classList.add("in-scale");
 
         blackKeysLayer.appendChild(bKeyEl);

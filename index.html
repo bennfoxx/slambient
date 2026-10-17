@@ -45,7 +45,7 @@
           <div class="preset-bank-header">
             <div class="preset-bank-tabs">
               <button class="btn-bank-tab active" id="tabBankFactory" onclick="switchPresetBank('factory')" title="Factory curated presets">PRESETS</button>
-              <button class="btn-bank-tab" id="tabBankUser" onclick="switchPresetBank('user')" title="User saved patch bank (U1-U6)">USER [U1–U6]</button>
+              <button class="btn-bank-tab" id="tabBankUser" onclick="switchPresetBank('user')" title="User saved patch bank (U1-U9)">USER [U1–U9]</button>
             </div>
             <div class="patch-bank-actions">
               <button type="button" class="btn-bank-tab btn-preset-io" onclick="savePresetBankJson()" title="Export current console & DSP chain patch as a JSON file">
@@ -66,7 +66,7 @@
             <button class="btn-preset-chip" onclick="applyPreset(3)" title="Hauntological Tape — 5/4 Aeolian dub echo, tape flutter, chamber woods">Hauntology</button>
             <button class="btn-preset-chip" onclick="applyPreset(4)" title="Velvet Horizon — 4/4 Major 9 celestial organ, water droplet arp, deep sub">Velvet</button>
             <button class="btn-preset-chip" onclick="applyPreset(5)" title="Pale Bloom — 3/4 Major Pentatonic minimal clicks, celesta, pizzicato strings">Pale Bloom</button>
-            <button class="btn-preset-chip" onclick="applyPreset(6)" title="Kankyō Green — 4/4 Hirajoshi pure glass tones, crystal chimes, subtle pulse">Green</button>
+            <button class="btn-preset-chip" onclick="applyPreset(6)" title="Kankyō Green — Hiroshi Yoshimura environmental acoustics, crystal drops, temple chimes & binaural mist">Green</button>
             <button class="btn-preset-chip" onclick="applyPreset(7)" title="Classical Lineage — 7/4 Rupak Tala classical tabla, sitar meend, tanpura drone">Lineage</button>
             <button class="btn-preset-chip" onclick="applyPreset(8)" title="After Hours — 4/4 Dorian deep groove, electric tine keys, dotted-eighth dub delay">After Hours</button>
             <button class="btn-preset-chip" onclick="applyPreset(9)" title="Airports — 4/4 Lydian tape loops, pure mineral glass, cathedral diffusion">Airports</button>
@@ -83,6 +83,9 @@
             <button class="btn-preset-chip user-slot-chip" id="btnUserSlot4" onclick="handleUserSlotClick(4, event)" oncontextmenu="handleUserSlotContextMenu(event, 4)" title="Slot U4 — Click to load / Shift-click to save">U4: Empty</button>
             <button class="btn-preset-chip user-slot-chip" id="btnUserSlot5" onclick="handleUserSlotClick(5, event)" oncontextmenu="handleUserSlotContextMenu(event, 5)" title="Slot U5 — Click to load / Shift-click to save">U5: Empty</button>
             <button class="btn-preset-chip user-slot-chip" id="btnUserSlot6" onclick="handleUserSlotClick(6, event)" oncontextmenu="handleUserSlotContextMenu(event, 6)" title="Slot U6 — Click to load / Shift-click to save">U6: Empty</button>
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot7" onclick="handleUserSlotClick(7, event)" oncontextmenu="handleUserSlotContextMenu(event, 7)" title="Slot U7 — Click to load / Shift-click to save">U7: Empty</button>
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot8" onclick="handleUserSlotClick(8, event)" oncontextmenu="handleUserSlotContextMenu(event, 8)" title="Slot U8 — Click to load / Shift-click to save">U8: Empty</button>
+            <button class="btn-preset-chip user-slot-chip" id="btnUserSlot9" onclick="handleUserSlotClick(9, event)" oncontextmenu="handleUserSlotContextMenu(event, 9)" title="Slot U9 — Click to load / Shift-click to save">U9: Empty</button>
             <button class="btn-preset-chip btn-store-user" onclick="storeToUserSlotPrompt()" title="Save current console & synth state into a user patch slot">+ STORE</button>
           </div>
         </div>
@@ -109,10 +112,11 @@
               <div class="rec-dot"></div>
               <span id="btnRecordLabel">Record</span>
             </button>
-            <select id="selRecordFormat" class="record-format-select" title="Output format: 320k MP3, Lossless WAV, 5-Track Stems ZIP, Multi-Track MIDI, or MIDI Stems">
+            <select id="selRecordFormat" class="record-format-select" title="Output format: 320k MP3, Lossless WAV, 5-Track Stems ZIP, Video (MP4/WebM), or MIDI">
               <option value="MP3">MP3</option>
               <option value="WAV">WAV</option>
               <option value="STEMS">STEMS</option>
+              <option value="VIDEO">VIDEO (MP4/WebM)</option>
               <option value="MIDI">MIDI (.mid)</option>
               <option value="MIDI_STEMS">MIDI Stems</option>
             </select>
@@ -237,9 +241,11 @@
             </button>
           </div>
 
-          <!-- SECTION 4: Generative Engine & History (Randomize All, Undo) -->
+          <!-- SECTION 4: Generative Engine & History (Randomize All, Re-Seed, Panic, Undo) -->
           <div class="header-section header-sec-gen">
             <button class="btn-preset-chip btn-randomize-all" id="btnRandomizeAll" onclick="randomizeEverything()" title="Randomize every module"><svg class="rand-all-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20.5 3.5v5h-5"/></svg><span>Randomize All</span></button>
+            <button class="btn-header-util btn-reseed-patch" id="btnHeaderReseed" onclick="newSeed()" title="Reroll Deterministic PRNG Seed">⤾ Re-Seed</button>
+            <button class="btn-header-util btn-panic-audio" id="btnHeaderPanic" onclick="panicMute()" title="Instantly silence all voices">Panic</button>
             <button class="btn-header-util" id="btnUndoPatch" onclick="undoPatchChange()" title="Undo the last randomize / preset / new seed (Ctrl/⌘+Z)" disabled>
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.5 3.5L2 7L5.5 10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 7H10a4 4 0 0 1 0 8H7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
               <span>Undo</span>
@@ -442,7 +448,7 @@
           <span class="takeover-badge" id="hudTakeover" title="Takeover Status: AUTO progression or LIVE keyboard takeover">AUTO</span>
           <div class="keyboard-view-toggle" id="keyboardViewToggle" title="Toggle between 25-Key Playable mode and 88-Key Panoramic Harmonic Radar">
             <button class="btn-kb-view active" id="btnKbPlay" onclick="setKeyboardDisplayMode('25')" title="25-Key Touch & QWERTY Playable Keyboard">25 PLAY</button>
-            <button class="btn-kb-view" id="btnKbRadar" onclick="setKeyboardDisplayMode('88')" title="88-Key Full-Range Harmonic Radar (Multi-Voice Spectrum)">88 RADAR</button>
+            <button class="btn-kb-view" id="btnKbRadar" onclick="setKeyboardDisplayMode('61')" title="61-Key Focused Harmonic Radar (Multi-Voice Spectrum C2-C7)">61 RADAR</button>
           </div>
           <div class="oct-controls" id="octControlsGroup">
             <button class="btn-oct" onclick="shiftOctave(-1)">OCT -</button>
@@ -523,11 +529,6 @@
         <input type="range" id="knobOrbBaseSize" min="50" max="200" value="100" oninput="updateOrbitalFeelParams()" title="Baseline size of the module orbs">
         <span class="tempo-val" id="lblOrbBaseSize">100%</span>
       </div>
-    </div>
-
-    <div class="orbital-bar-actions">
-      <button class="btn-telemetry-action" onclick="newSeed()" title="Reroll Deterministic PRNG Seed">⤾ RE-SEED</button>
-      <button class="btn-telemetry-action" onclick="panicMute()" title="Instantly silence all voices">PANIC</button>
     </div>
   </div>
 
@@ -2087,9 +2088,11 @@ function disconnectOnEnded(sourceNode, ...nodesToDisconnect) {
   nodesToDisconnect.forEach(collect);
 
   let cleaned = false;
+  let safetyTimer = null;
   const cleanup = () => {
     if (cleaned) return;
     cleaned = true;
+    if (safetyTimer) { clearTimeout(safetyTimer); safetyTimer = null; }
     try { sourceNode.onended = null; } catch (e) {}
     nodes.forEach(n => {
       try { n.disconnect(); } catch (e) {}
@@ -2101,6 +2104,8 @@ function disconnectOnEnded(sourceNode, ...nodesToDisconnect) {
     if (prevOnEnded) { try { prevOnEnded(); } catch (e) {} }
     cleanup();
   };
+  // Multi-hour leak protection: fallback safety timer ensures node graph garbage collection even under tab throttling
+  safetyTimer = setTimeout(cleanup, 12000);
 }
 
 // OS Music Player / Media Session integration & silent audio carrier:

@@ -417,15 +417,15 @@ function drawFractalVisualizer(w, h, ts) {
   const bw = Math.max(FRACTAL_MIN_BUFFER_W, Math.min(fractalBufferW, Math.round(w / 2)));
   const bh = Math.max(70, Math.round(bw * h / w));
 
-  // End of the dive: keep its last frame to fade out over a fresh dive.
+  // Infinite unbroken flow: seamlessly capture the dive horizon and recycle magnification
   if (fractalDepth >= FRACTAL_DIVE_DECADES) {
     if (fractalBuf.width > 0) {
       fractalFadeBuf.width = fractalBuf.width;
       fractalFadeBuf.height = fractalBuf.height;
       fractalFadeCtx.drawImage(fractalBuf, 0, 0);
-      fractalFade = 1;
+      fractalFade = 1.0;
     }
-    fractalDepth = 0;
+    fractalDepth = 0.35; // Seamless loop entry point
     fractalTargetIdx = (fractalTargetIdx + 1) % FRACTAL_ZOOM_TARGETS.length;
   }
 
@@ -436,7 +436,18 @@ function drawFractalVisualizer(w, h, ts) {
     fractalPixels = new Uint32Array(fractalImage.data.buffer);
   }
 
-  const [tx, ty] = FRACTAL_ZOOM_TARGETS[fractalTargetIdx];
+  // Smooth Hermite coordinate trajectory towards next target as depth nears handoff
+  const currTarget = FRACTAL_ZOOM_TARGETS[fractalTargetIdx];
+  const nextTarget = FRACTAL_ZOOM_TARGETS[(fractalTargetIdx + 1) % FRACTAL_ZOOM_TARGETS.length];
+  const blendWindow = 1.8;
+  const blendStart = FRACTAL_DIVE_DECADES - blendWindow;
+  let tx = currTarget[0], ty = currTarget[1];
+  if (fractalDepth > blendStart) {
+    const rawT = (fractalDepth - blendStart) / blendWindow;
+    const s = rawT * rawT * (3 - 2 * rawT); // Hermite smoothstep
+    tx = currTarget[0] * (1 - s) + nextTarget[0] * s;
+    ty = currTarget[1] * (1 - s) + nextTarget[1] * s;
+  }
   const spanY = FRACTAL_START_SPAN * Math.pow(10, -fractalDepth);
   const spanX = spanY * (bw / bh);
   const cosR = Math.cos(fractalRot), sinR = Math.sin(fractalRot);
@@ -1833,6 +1844,71 @@ function drawVisualizerCenterCore(cx, cy) {
   scopeCtx.restore();
 }
 
+function drawTanpuraResonance(cx, cy, fit) {
+  if (typeof tanpuraEnabled === "undefined" || !tanpuraEnabled) return;
+  if (!isPlaying && (typeof droneVol === "undefined" || droneVol <= 0.01)) return;
+
+  const tVol = (typeof tanpuraVol !== "undefined" ? tanpuraVol : 0.45);
+  const tStep = (typeof tanpuraStep !== "undefined" ? (tanpuraStep % 4) : 0);
+  const baseR = 58; // Sits between Sub-Drone (46) and Drums (70)
+  const pts = 64;
+
+  scopeCtx.save();
+  scopeCtx.beginPath();
+
+  // Subtle pulsating 4-lobe harmonic Lissajous ring representing the 4 physical tanpura strings
+  const pulse = Math.sin(scopeAngle * 4.5 + tStep * 1.57) * (3.5 * tVol);
+  for (let i = 0; i <= pts; i++) {
+    const theta = (i / pts) * Math.PI * 2;
+    // 4-lobe harmonic overtone modulation
+    const harmonicDisp = Math.cos(4 * theta + scopeAngle * 2.2) * (2.2 * tVol) + Math.sin(theta * 2 - scopeAngle) * 1.2;
+    const r = baseR + harmonicDisp + pulse;
+    const x = cx + Math.cos(theta) * r;
+    const y = cy + Math.sin(theta) * r;
+    if (i === 0) scopeCtx.moveTo(x, y);
+    else scopeCtx.lineTo(x, y);
+  }
+  scopeCtx.closePath();
+
+  // Shimmering warm golden/amber glow
+  scopeCtx.strokeStyle = "rgba(254, 211, 48, 0.65)";
+  scopeCtx.lineWidth = 1.3;
+  scopeCtx.shadowColor = "#fed330";
+  scopeCtx.shadowBlur = 9 * tVol;
+  scopeCtx.stroke();
+
+  // 4 string harmonic nodal beacons
+  for (let s = 0; s < 4; s++) {
+    const sAngle = (s / 4) * Math.PI * 2 + scopeAngle * 0.8;
+    const isPlucked = s === tStep;
+    const sR = baseR + (isPlucked ? 4 : 0);
+    const sx = cx + Math.cos(sAngle) * sR;
+    const sy = cy + Math.sin(sAngle) * sR;
+    scopeCtx.beginPath();
+    scopeCtx.arc(sx, sy, isPlucked ? 3.5 : 1.8, 0, Math.PI * 2);
+    scopeCtx.fillStyle = isPlucked ? "#ffffff" : "rgba(255, 121, 63, 0.85)";
+    scopeCtx.shadowColor = isPlucked ? "#ffffff" : "#ff793f";
+    scopeCtx.shadowBlur = isPlucked ? 12 : 5;
+    scopeCtx.fill();
+  }
+  scopeCtx.restore();
+}
+
+// Video Blending & Synthesis Layer Hook
+window.videoSynthesisCompositor = {
+  activeEffect: "CRT_SUBTLE",
+  applyPostProcessing(ctx, w, h) {
+    if (this.activeEffect === "CRT_SUBTLE") {
+      ctx.save();
+      ctx.fillStyle = "rgba(0, 0, 0, 0.035)";
+      for (let y = 0; y < h; y += 4) {
+        ctx.fillRect(0, y, w, 1);
+      }
+      ctx.restore();
+    }
+  }
+};
+
 function drawScope(ts) {
   currentAnalyserFrameId++;
   const now = performance.now();
@@ -1863,6 +1939,9 @@ function drawScope(ts) {
       drawWaterfallSpectrogram(w, h);
       drawFlightTerrainGrid(w, h);
       drawRoadsideObjects(w, h);
+      if (window.videoSynthesisCompositor) {
+        window.videoSynthesisCompositor.applyPostProcessing(scopeCtx, w, h);
+      }
     }
 
     // Tempo-synced rotation speed: a full revolution takes a fixed number of
@@ -1882,6 +1961,7 @@ function drawScope(ts) {
       scopeCtx.translate(cx, cy); scopeCtx.scale(fit, fit); scopeCtx.rotate(scopeRotationAngle); scopeCtx.translate(-cx, -cy);
       drawReferenceTracks(cx, cy);
       RING_CONFIGS.forEach(cfg => { drawSymmetricalRing(cfg, cx, cy); });
+      drawTanpuraResonance(cx, cy, fit);
       drawVisualizerCenterCore(cx, cy);
       scopeCtx.restore();
     }

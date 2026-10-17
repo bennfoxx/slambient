@@ -99,6 +99,14 @@
     touch-action: manipulation;
   }
 
+  /* Piano keys: bypass mobile double-tap and scroll gesture delay for 0ms touch latency */
+  .white-key, .black-key, .piano-keys-wrapper, #keyboardContainer, .white-keys-layer, .black-keys-layer {
+    touch-action: none !important;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
   /* Sliders: enforce custom cursor across track and thumb on hover and active drag */
   input[type="range"] {
     cursor: var(--cursor-pointer) !important;
@@ -1825,6 +1833,62 @@
     border-radius: 3px;
     padding: 3px 6px;
     white-space: nowrap;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    transition: all 0.15s ease;
+  }
+  .chord-wheel-mode-pill:hover, .chord-wheel-mode-pill:focus-visible {
+    background: rgba(var(--rgb-drone), 0.22);
+    border-color: var(--color-drone);
+    box-shadow: 0 0 8px rgba(var(--rgb-drone), 0.45);
+    transform: translateY(-1px);
+  }
+  .chord-scale-popover {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0f1118;
+    border: 1px solid var(--border-bright, #2e354b);
+    border-radius: 6px;
+    padding: 6px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(130px, 1fr));
+    gap: 4px;
+    z-index: 1000;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.85);
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  .chord-scale-item {
+    display: flex;
+    flex-direction: column;
+    padding: 5px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
+    transition: all 0.12s ease;
+    text-align: left;
+  }
+  .chord-scale-item:hover, .chord-scale-item.active {
+    background: rgba(var(--rgb-chord), 0.15);
+    border-color: var(--color-chord);
+  }
+  .chord-scale-name {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .chord-scale-desc {
+    font-size: 8px;
+    color: var(--text-dim, #718096);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
     flex-shrink: 0;
     margin-left: auto;
     text-shadow: 0 0 8px rgba(var(--rgb-drone), 0.40);
@@ -6764,58 +6828,79 @@
       grid-column: 1;
       grid-row: 1;
       justify-self: start;
-      height: 36px;
-      padding: 0 8px;
-      font-size: 11px;
+      min-height: 44px;
+      height: 44px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      z-index: 2;
     }
     .orbital-side-panel .orbital-nav-group {
       grid-column: 2;
       grid-row: 1;
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
+      position: static;
+      transform: none;
       justify-self: center;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: clamp(14px, 4.5vw, 22px);
-      max-width: calc(100% - 140px);
+      gap: 8px;
+      width: 100%;
+      max-width: 100%;
       min-width: 0;
       text-align: center;
       margin: 0 auto;
+      z-index: 1;
     }
     .orbital-side-panel .btn-orbital-nav {
-      width: 32px;
-      height: 32px;
-      font-size: 16px;
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      font-size: 20px;
+      font-weight: 800;
       flex-shrink: 0;
-      border-radius: 5px;
+      border-radius: 6px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      touch-action: manipulation;
     }
     .orbital-side-panel .orbital-modal-header-right { display: contents; }
     .orbital-side-panel .orbital-modal-title {
+      flex: 1 1 auto;
       min-width: 0;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 800;
-      line-height: 1.2;
+      line-height: 1.25;
       letter-spacing: 0.8px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       text-align: center;
+      display: inline-flex;
+      align-items: center;
       justify-content: center;
-      padding: 0 4px;
+      padding: 0 6px;
     }
     .orbital-side-panel .orbital-modal-close {
       grid-column: 3;
       grid-row: 1;
       justify-self: end;
-      width: 40px;
-      height: 40px;
-      font-size: 15px;
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      font-size: 18px;
       border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
     }
     .orbital-side-panel .orbital-modal-actions-slot {
       grid-column: 1 / -1;
@@ -6842,15 +6927,16 @@
       flex: 1 1 0;
       width: auto;
       min-width: 0;
-      height: 36px;
+      min-height: 44px;
+      height: 44px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       box-sizing: border-box;
-      padding: 0 6px;
+      padding: 0 8px;
       margin: 0;
-      font-size: 11px;
-      border-radius: 5px;
+      font-size: 12px;
+      border-radius: 6px;
     }
     /* A pedal's slot badge (IN / INSERT / OUT) is a label, not a button. */
     .orbital-side-panel .orbital-modal-actions-slot .pedal-slot-badge {

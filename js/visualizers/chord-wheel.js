@@ -35,7 +35,8 @@ function drawChordWheelCard() {
     ? `${liveActiveChord.rootMidi}:${liveActiveChord.chordQuality}:${liveActiveChord.sortedNotes.join(",")}`
     : "auto";
   const themeSig = (typeof activeTheme !== "undefined" && activeTheme) ? `${activeTheme.id}:${themeHex("chord")}:${themeHex("arp")}:${themeHex("drone")}:${themeHex("field")}` : "";
-  const sig = `${rootNote}|${activeScaleKey}|${currentChordVoicing}|${currentChordRootStep}|${currentChordDeg}|${manualSig}|${themeSig}|${isPhone ? 1 : 0}`;
+  const tanpuraSig = (typeof tanpuraEnabled !== "undefined" && tanpuraEnabled && typeof isPlaying !== "undefined" && isPlaying) ? `tanpura:${typeof tanpuraTuning !== "undefined" ? tanpuraTuning : "PA"}:${typeof tanpuraStep !== "undefined" ? (tanpuraStep % 4) : 0}` : "no-tanpura";
+  const sig = `${rootNote}|${activeScaleKey}|${currentChordVoicing}|${currentChordRootStep}|${currentChordDeg}|${manualSig}|${themeSig}|${tanpuraSig}|${isPhone ? 1 : 0}`;
   if (sig === lastChordWheelSignature) return;
   lastChordWheelSignature = sig;
 
@@ -102,6 +103,35 @@ function drawChordWheelCard() {
   // Inner harmonic orbit ring
   chordWheelCtx.beginPath(); chordWheelCtx.arc(cx, cy, dotR, 0, Math.PI * 2);
   chordWheelCtx.strokeStyle = `rgba(${themeRgb("drone")}, 0.16)`; chordWheelCtx.lineWidth = 0.85; chordWheelCtx.stroke();
+
+  // Resonant Indian Tanpura drone aura & 4-string tuning nodes
+  if (typeof tanpuraEnabled !== "undefined" && tanpuraEnabled && (typeof isPlaying !== "undefined" && isPlaying) && (typeof tanpuraVol !== "undefined" && tanpuraVol > 0.01)) {
+    const tRad = dotR * 0.70;
+    chordWheelCtx.save();
+    chordWheelCtx.beginPath();
+    chordWheelCtx.arc(cx, cy, tRad, 0, Math.PI * 2);
+    chordWheelCtx.strokeStyle = "rgba(254, 211, 48, 0.45)";
+    chordWheelCtx.lineWidth = 1.2;
+    chordWheelCtx.setLineDash([2, 3]);
+    chordWheelCtx.stroke();
+    chordWheelCtx.setLineDash([]);
+
+    // 4-String resonant tuning nodes (String 1: Pa/Ma/Ni, Strings 2 & 3: Sa, String 4: Kharaj Sa)
+    const tIntervals = (typeof tanpuraTuning !== "undefined" && tanpuraTuning === "MA") ? [5, 12, 12, 0] : ((typeof tanpuraTuning !== "undefined" && tanpuraTuning === "NI") ? [11, 12, 12, 0] : [7, 12, 12, 0]);
+    tIntervals.forEach((iv, sIdx) => {
+      const pc = (rootPitchClass + iv) % 12;
+      const cof = (pc * 7) % 12;
+      const sAngle = -Math.PI / 2 + (cof / 12) * Math.PI * 2;
+      const sx = cx + Math.cos(sAngle) * tRad;
+      const sy = cy + Math.sin(sAngle) * tRad;
+      const isCur = sIdx === (typeof tanpuraStep !== "undefined" ? (tanpuraStep % 4) : 0);
+      chordWheelCtx.beginPath();
+      chordWheelCtx.arc(sx, sy, isCur ? 3.6 : 2.0, 0, Math.PI * 2);
+      chordWheelCtx.fillStyle = isCur ? "#fed330" : "rgba(255, 121, 63, 0.70)";
+      chordWheelCtx.fill();
+    });
+    chordWheelCtx.restore();
+  }
 
   // Center harmonic reticle
   chordWheelCtx.beginPath();
@@ -270,3 +300,116 @@ function updateInstrumentMeters() {
     }
   }
 }
+
+// Interactive Chord Analysis Scale Mode Picker Popover
+const SCALE_PICKER_OPTIONS = [
+  { key: "DORIAN", label: "Dorian", desc: "Soulful, nocturnal modal jazz" },
+  { key: "LYDIAN", label: "Lydian", desc: "Ethereal raised 4th celestial" },
+  { key: "AEOLIAN", label: "Aeolian", desc: "Natural minor, melancholic" },
+  { key: "MIXOLYDIAN", label: "Mixolydian", desc: "Warm pastoral dominant" },
+  { key: "PENTATONIC", label: "Pentatonic Minor", desc: "Universal blues / ambient" },
+  { key: "MAJOR9", label: "Major 9th", desc: "Lush celestial dream pop" },
+  { key: "HIRAJOSHI", label: "Hirajoshi", desc: "Traditional Japanese ambient" },
+  { key: "INSEN", label: "Insen", desc: "Meditative shakuhachi temple" },
+  { key: "LYDIAN_DOM", label: "Lydian Dominant", desc: "Overtone / acoustic space" },
+  { key: "PHRYGIAN", label: "Phrygian", desc: "Dark meditative Eastern drone" },
+  { key: "WHOLE_TONE", label: "Whole Tone", desc: "Impressionist floating clouds" },
+  { key: "MAJ_PENTATONIC", label: "Maj Pentatonic", desc: "Pure pastoral bright peace" },
+  { key: "BILAWAL", label: "Bilawal Thaat", desc: "Indian Classical Major Raga" },
+  { key: "BHAIRAV", label: "Bhairav Raga", desc: "Sacred Indian morning raga" }
+];
+
+let scalePickerPopoverEl = null;
+
+function toggleScalePicker(e) {
+  if (e) { e.stopPropagation(); e.preventDefault(); }
+  const modePill = document.getElementById("cardChordMode");
+  if (!modePill) return;
+
+  if (scalePickerPopoverEl) {
+    scalePickerPopoverEl.remove();
+    scalePickerPopoverEl = null;
+    return;
+  }
+
+  const popover = document.createElement("div");
+  popover.className = "chord-scale-popover";
+  popover.setAttribute("role", "dialog");
+  popover.setAttribute("aria-label", "Select Musical Scale Mode");
+
+  SCALE_PICKER_OPTIONS.forEach(opt => {
+    const item = document.createElement("div");
+    item.className = "chord-scale-item" + (activeScaleKey === opt.key ? " active" : "");
+    item.dataset.scale = opt.key;
+
+    const name = document.createElement("div");
+    name.className = "chord-scale-name";
+    name.textContent = opt.label;
+
+    const desc = document.createElement("div");
+    desc.className = "chord-scale-desc";
+    desc.textContent = opt.desc;
+
+    item.appendChild(name);
+    item.appendChild(desc);
+
+    item.addEventListener("pointerdown", (ev) => {
+      ev.stopPropagation();
+      if (typeof syncScaleMode === "function") {
+        syncScaleMode(opt.key);
+      } else {
+        activeScaleKey = opt.key;
+        if (typeof updateMusicalConfig === "function") updateMusicalConfig(true);
+      }
+      lastChordWheelSignature = "";
+      drawChordWheelCard();
+      popover.remove();
+      scalePickerPopoverEl = null;
+    });
+
+    popover.appendChild(item);
+  });
+
+  const parent = modePill.closest(".chord-wheel-header") || modePill.parentElement;
+  if (parent) {
+    parent.style.position = "relative";
+    parent.appendChild(popover);
+  }
+  scalePickerPopoverEl = popover;
+
+  const closeHandler = (ev) => {
+    if (scalePickerPopoverEl && !scalePickerPopoverEl.contains(ev.target) && ev.target !== modePill) {
+      scalePickerPopoverEl.remove();
+      scalePickerPopoverEl = null;
+      document.removeEventListener("pointerdown", closeHandler);
+    }
+  };
+  setTimeout(() => document.addEventListener("pointerdown", closeHandler), 10);
+}
+
+// Bind click / tap to #cardChordMode
+(function initChordWheelModeInteraction() {
+  const init = () => {
+    const modePill = document.getElementById("cardChordMode");
+    if (modePill && !modePill.dataset.pickerBound) {
+      modePill.dataset.pickerBound = "true";
+      modePill.setAttribute("role", "button");
+      modePill.setAttribute("tabindex", "0");
+      modePill.setAttribute("title", "Click to choose musical scale / mode");
+      modePill.addEventListener("click", toggleScalePicker);
+      modePill.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggleScalePicker(e);
+        }
+      });
+    }
+  };
+  if (typeof document !== "undefined") {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  }
+})();

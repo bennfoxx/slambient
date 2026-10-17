@@ -60,14 +60,20 @@ function undoPatchChange() {
 });
 refreshUndoButton();
 
-// TAP TEMPO: average the last few intervals; a pause longer than 2s starts a
-// fresh count. Clamped to the tempo slider's own range.
+// TAP TEMPO: robust jitter-resistant algorithm with outlier rejection and
+// Exponential Moving Average (EMA) across a sliding window of the last 4-8 taps.
+// A pause longer than 2.2s starts a fresh count. Clamped to the tempo slider range.
 const tapTimes = [];
+let tapSmoothedInterval = null;
 function tapTempo() {
   const now = performance.now();
-  if (tapTimes.length && now - tapTimes[tapTimes.length - 1] > 2000) tapTimes.length = 0;
+  if (tapTimes.length && now - tapTimes[tapTimes.length - 1] > 2200) {
+    tapTimes.length = 0;
+    tapSmoothedInterval = null;
+  }
   tapTimes.push(now);
-  if (tapTimes.length > 6) tapTimes.shift();
+  if (tapTimes.length > 8) tapTimes.shift();
+
   const btn = document.getElementById("btnTapTempo");
   if (btn) {
     btn.classList.add("tapped");
@@ -77,11 +83,41 @@ function tapTempo() {
     setRecordStatus(`Tap tempo: keep tapping (${tapTimes.length})`);
     return;
   }
-  const intervals = tapTimes.slice(1).map((t, i) => t - tapTimes[i]);
-  const avg = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+
+  // Calculate raw delta intervals between successive taps
+  const intervals = [];
+  for (let i = 1; i < tapTimes.length; i++) {
+    intervals.push(tapTimes[i] - tapTimes[i - 1]);
+  }
+
+  // Outlier rejection: if 4 or more intervals exist, compute median and filter
+  // out taps that diverge more than 40% from the median pace (e.g. accidental double-clicks or delayed taps)
+  const sorted = intervals.slice().sort((a, b) => a - b);
+  const medianInterval = sorted[Math.floor(sorted.length / 2)];
+  const validIntervals = intervals.filter(iv => Math.abs(iv - medianInterval) < medianInterval * 0.40);
+  const activeIntervals = validIntervals.length >= 2 ? validIntervals : intervals;
+
+  // Compute weighted average of valid intervals (recent intervals get higher weight)
+  let weightedSum = 0;
+  let weightTotal = 0;
+  activeIntervals.forEach((iv, idx) => {
+    const w = 1 + idx * 0.35;
+    weightedSum += iv * w;
+    weightTotal += w;
+  });
+  const currentIntervalAvg = weightedSum / weightTotal;
+
+  // Apply Exponential Moving Average (EMA) if previous smoothed interval exists
+  if (tapSmoothedInterval === null) {
+    tapSmoothedInterval = currentIntervalAvg;
+  } else {
+    const alpha = 0.42; // Fast convergence without jumpiness
+    tapSmoothedInterval = alpha * currentIntervalAvg + (1 - alpha) * tapSmoothedInterval;
+  }
+
   const knob = document.getElementById("knobBpmHeader");
   const lo = knob ? +knob.min : 45, hi = knob ? +knob.max : 115;
-  const tapped = Math.round(60000 / avg);
+  const tapped = Math.round(60000 / tapSmoothedInterval);
   const next = Math.max(lo, Math.min(hi, tapped));
   if (knob) knob.value = next;
   updateBpm(knob);

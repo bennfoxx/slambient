@@ -23,6 +23,9 @@ let recordSilentOut = null;
 let recordChunksL = [];
 let recordChunksR = [];
 let recordEncoding = false;
+let activeVideoRecorder = null;
+let videoRecorderChunks = [];
+let videoAudioDestNode = null;
 
 function loadLameJs() {
   if (window.lamejs) return Promise.resolve(window.lamejs);
@@ -407,6 +410,49 @@ function toggleRecord() {
           console.warn("Failed to tap bus for stems:", e);
         }
       });
+    } else if (currentRecordFormat === "VIDEO") {
+      const canvas = document.getElementById("scopeCanvas");
+      if (!canvas || !canvas.captureStream) {
+        setRecordStatus("Visualizer canvas captureStream not supported in this browser");
+        return;
+      }
+      try {
+        const videoStream = canvas.captureStream(30);
+        videoAudioDestNode = audioCtx.createMediaStreamDestination();
+        limiterNode.connect(videoAudioDestNode);
+        const combined = new MediaStream([
+          ...videoStream.getVideoTracks(),
+          ...videoAudioDestNode.stream.getAudioTracks()
+        ]);
+        let mime = "video/webm;codecs=vp9,opus";
+        if (!MediaRecorder.isTypeSupported(mime)) mime = "video/webm;codecs=vp8,opus";
+        if (!MediaRecorder.isTypeSupported(mime)) mime = "video/mp4;codecs=avc1,mp4a";
+        if (!MediaRecorder.isTypeSupported(mime)) mime = "video/webm";
+
+        videoRecorderChunks = [];
+        activeVideoRecorder = new MediaRecorder(combined, { mimeType: mime, videoBitsPerSecond: 3500000 });
+        activeVideoRecorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) videoRecorderChunks.push(e.data);
+        };
+        activeVideoRecorder.onstop = () => {
+          const isMp4 = mime.includes("mp4");
+          const ext = isMp4 ? "mp4" : "webm";
+          const blob = new Blob(videoRecorderChunks, { type: mime });
+          const fileName = recordingFileName(ext);
+          downloadBlob(blob, fileName);
+          setRecordStatus(`Saved ${fileName} (${(blob.size / 1048576).toFixed(1)} MB Video Soundscape)`);
+          videoRecorderChunks = [];
+          if (videoAudioDestNode) {
+            try { limiterNode.disconnect(videoAudioDestNode); } catch (err) {}
+            videoAudioDestNode = null;
+          }
+        };
+        activeVideoRecorder.start(1000);
+      } catch (err) {
+        console.error("Video recording initialization error:", err);
+        setRecordStatus("Failed to initialize video recorder: " + err.message);
+        return;
+      }
     } else if (currentRecordFormat === "MIDI" || currentRecordFormat === "MIDI_STEMS") {
       // Pure MIDI session recording - skip audio buffer processing
     } else {
@@ -449,6 +495,13 @@ function toggleRecord() {
     if (recordSilentOut) {
       try { recordSilentOut.disconnect(); } catch (e) {}
       recordSilentOut = null;
+    }
+
+    if (currentRecordFormat === "VIDEO") {
+      if (activeVideoRecorder && activeVideoRecorder.state !== "inactive") {
+        activeVideoRecorder.stop();
+      }
+      return;
     }
 
     if (currentRecordFormat === "MIDI") {

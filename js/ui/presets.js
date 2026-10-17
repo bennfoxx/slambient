@@ -341,66 +341,81 @@ function applyPreset(idx) {
     document.getElementById("knobChorusRate").value = 0.4;
     document.getElementById("knobChorusDepth").value = 30;
     document.getElementById("knobChorusMix").value = 22;
-  } else if (idx === 6) { // Kankyō Green (Environmental Minimalist Ambient)
+  } else if (idx === 6) { // Kankyō Green (Hiroshi Yoshimura & Midori Takada Environmental Ambient)
     document.getElementById("selTimeSig").value = "4/4";
     activeScaleKey = "HIRAJOSHI";
-    document.getElementById("knobBpm").value = 60;
-    document.getElementById("knobWeather").value = 35; // Pure, pristine transparent space
-    document.getElementById("knobMutation").value = 15; // Serene, stable harmonic architecture
+    document.getElementById("knobBpm").value = 58;
+    document.getElementById("knobWeather").value = 32; // Pure, pristine transparent space
+    document.getElementById("knobMutation").value = 12; // Serene, meditative harmonic stability
     
-    document.getElementById("selDrumStyle").value = "MINIMAL_CLICK";
+    // Traditional percussion silenced completely in favor of natural environmental textures
+    document.getElementById("selDrumStyle").value = "MUTED";
     document.getElementById("chkAutoEvolveDrums").checked = false;
-    document.getElementById("knobDrumEvolveChance").value = 10;
-    document.getElementById("knobDrumVol").value = 30;
-    document.getElementById("knobDrumPunch").value = 20;
-    document.getElementById("knobDrumDensity").value = 15;
+    document.getElementById("knobDrumEvolveChance").value = 0;
+    document.getElementById("knobDrumVol").value = 0;
+    document.getElementById("knobDrumPunch").value = 0;
+    document.getElementById("knobDrumDensity").value = 0;
+    document.getElementById("knobDrumFx").value = 0;
     
-    document.getElementById("knobStrum").value = 95;
-    document.getElementById("selChordTimbre").value = "PURE_SINE_GLASS";
-    document.getElementById("knobChordFx").value = 65;
+    // Synthesized environmental textures (gentle water drops, breeze drift, resonant stone reflections)
+    if (document.getElementById("selNoiseProfile")) document.getElementById("selNoiseProfile").value = "BROOK";
+    if (document.getElementById("selNoiseMode")) document.getElementById("selNoiseMode").value = "SPARSE";
+    if (document.getElementById("knobNoiseColor")) document.getElementById("knobNoiseColor").value = 68; // Crystalline clarity
+    if (document.getElementById("knobNoiseRate")) document.getElementById("knobNoiseRate").value = 30;  // Gentle droplet intervals
+    if (document.getElementById("knobNoiseDrift")) document.getElementById("knobNoiseDrift").value = 78; // Wide stereo air drift
+    if (document.getElementById("knobNoiseVol")) document.getElementById("knobNoiseVol").value = 46;
+    if (document.getElementById("knobNoiseFx")) document.getElementById("knobNoiseFx").value = 65;
 
-    // Weightless, soft sub-foundation
-    document.getElementById("knobDrone").value = 45;
-    document.getElementById("knobDroneFilter").value = 120;
-    document.getElementById("knobDroneDetune").value = 1.8;
-    document.getElementById("knobDroneWander").value = 15;
+    // Weightless, subtle harmonic drone foundation
     document.getElementById("selDroneOctave").value = "D1";
-    document.getElementById("knobDroneFx").value = 20;
+    document.getElementById("knobDrone").value = 38;
+    document.getElementById("knobDroneFilter").value = 150;
+    document.getElementById("knobDroneDetune").value = 1.2;
+    document.getElementById("knobDroneWander").value = 22;
+    document.getElementById("knobDroneFx").value = 28;
 
-    // Meditative, crystalline arpeggio resembling water ripples
+    // Crystalline chord glass
+    document.getElementById("knobStrum").value = 92;
+    document.getElementById("selChordTimbre").value = "PURE_SINE_GLASS";
+    document.getElementById("knobChordVol").value = 76;
+    document.getElementById("knobChordFx").value = 75;
+
+    // Meditative, crystalline arpeggio resembling water ripples and raindrops
     document.getElementById("selArpPattern").value = "PENDULUM";
     document.getElementById("chkAutoEvolveArpPattern").checked = false;
     document.getElementById("selArpTimbre").value = "SINE_CRYSTAL";
     document.getElementById("chkAutoEvolveArpTimbre").checked = false;
-    document.getElementById("knobArpEvolveChance").value = 10;
-    document.getElementById("knobArpGate").value = 440;
-    document.getElementById("knobArpRest").value = 28; // Intentional breathing room / Ma (間)
+    document.getElementById("knobArpEvolveChance").value = 0;
+    document.getElementById("knobArpGate").value = 340;
+    document.getElementById("knobArpRest").value = 44; // Intentional breathing room / Ma (間)
     document.getElementById("knobArpOctaves").value = 2;
-    document.getElementById("knobArpVol").value = 75;
+    document.getElementById("knobArpVol").value = 70;
     document.getElementById("knobArpFx").value = 85;
 
     // Natural acoustic envelope with gentle open cutoff and low resonance
-    document.getElementById("knobMasterCutoff").value = 76.5; // ~3800 Hz transparent openness
+    document.getElementById("knobMasterCutoff").value = 78; // Transparent, open acoustic field
     document.getElementById("knobMasterRes").value = 1.1; // Smooth, uncolored resonance
     document.getElementById("knobFilterAttack").value = 65;
     document.getElementById("knobFilterDecay").value = 1200;
-    document.getElementById("knobFilterEnvDepth").value = 30;
-    document.getElementById("knobFilterLfoRate").value = 0.04;
-    document.getElementById("knobFilterLfoDepth").value = 12;
+    document.getElementById("knobFilterEnvDepth").value = 28;
+    document.getElementById("knobFilterLfoRate").value = 0.035;
+    document.getElementById("knobFilterLfoDepth").value = 10;
 
     // Prismatic spatial analog delay (echo chamber reflections)
-    document.getElementById("knobDelayTime").value = 420;
-    document.getElementById("knobDelayFeedback").value = 42;
-    document.getElementById("knobDelayTone").value = 2600;
-    document.getElementById("knobDelayFlutter").value = 18;
-    document.getElementById("knobDelayMix").value = 46;
-    document.getElementById("selReverbMode").value = "PLATE";
-    document.getElementById("knobReverbMix").value = 30;
-    document.getElementById("knobReverbTone").value = 6500;
-    document.getElementById("selChorusMode").value = "CLASSIC";
-    document.getElementById("knobChorusRate").value = 0.25;
-    document.getElementById("knobChorusDepth").value = 20;
-    document.getElementById("knobChorusMix").value = 15;
+    document.getElementById("knobDelayTime").value = 480;
+    document.getElementById("knobDelayFeedback").value = 45;
+    document.getElementById("knobDelayTone").value = 3200;
+    document.getElementById("knobDelayFlutter").value = 14;
+    document.getElementById("knobDelayMix").value = 42;
+
+    // Crystalline shimmer space and slow binaural swells
+    document.getElementById("selReverbMode").value = "SHIMMER";
+    document.getElementById("knobReverbMix").value = 42;
+    document.getElementById("knobReverbTone").value = 7200;
+    document.getElementById("selChorusMode").value = "ENSEMBLE";
+    document.getElementById("knobChorusRate").value = 0.08; // Ultra-slow binaural drift
+    document.getElementById("knobChorusDepth").value = 38;
+    document.getElementById("knobChorusMix").value = 26;
   } else if (idx === 7) { // Classical Lineage (Indian Classical Raga / Maihar Tradition)
     document.getElementById("selTimeSig").value = "7/4"; // Rupak Taal (7 matras: 3 + 2 + 2)
     activeScaleKey = "BILAWAL";
@@ -1236,7 +1251,7 @@ let userSlotLongPressTimer = null;
 let userSlotLongPressTriggered = false;
 
 function bindUserSlotLongPress() {
-  for (let i = 1; i <= 6; i++) {
+  for (let i = 1; i <= 9; i++) {
     const btn = document.getElementById(`btnUserSlot${i}`);
     if (!btn || btn.dataset.longPressBound) continue;
     btn.dataset.longPressBound = "1";
@@ -1265,7 +1280,7 @@ function bindUserSlotLongPress() {
 
 function renderUserPatchSlots() {
   const patches = getUserPatches();
-  for (let i = 1; i <= 6; i++) {
+  for (let i = 1; i <= 9; i++) {
     const btn = document.getElementById(`btnUserSlot${i}`);
     if (!btn) continue;
     const entry = patches[i];
@@ -1349,21 +1364,21 @@ function handleUserSlotContextMenu(event, slotNum) {
 function storeToUserSlotPrompt() {
   const patches = getUserPatches();
   let suggested = 1;
-  for (let i = 1; i <= 6; i++) {
+  for (let i = 1; i <= 9; i++) {
     if (!patches[i]) { suggested = i; break; }
   }
-  const input = window.prompt("Store current soundscape into User Slot (1-6):", String(suggested));
+  const input = window.prompt("Store current soundscape into User Slot (1-9):", String(suggested));
   if (!input) return;
   const slotNum = parseInt(input.trim(), 10);
-  if (isNaN(slotNum) || slotNum < 1 || slotNum > 6) {
-    alert("Please enter a valid slot number between 1 and 6.");
+  if (isNaN(slotNum) || slotNum < 1 || slotNum > 9) {
+    alert("Please enter a valid slot number between 1 and 9.");
     return;
   }
   handleUserSlotClick(slotNum, { shiftKey: true });
 }
 
 function highlightActiveUserSlot(slotNum) {
-  for (let i = 1; i <= 6; i++) {
+  for (let i = 1; i <= 9; i++) {
     const btn = document.getElementById(`btnUserSlot${i}`);
     if (btn) btn.classList.toggle("active", i === slotNum);
   }
