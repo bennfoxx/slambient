@@ -1085,14 +1085,26 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
 * [ ] **Build B (`experiment/midi-file-recorder`):** Multi-Track MIDI File Recorder & Exporter capturing internal sequencer, keyboard, and synth events to export Type 1 Standard MIDI Files (`.mid`) and multi-track stems in-browser.
 * [ ] **Build C (`experiment/accompaniment-mode`):** Intelligent Live Accompaniment Mode dynamically generating accompaniment audio strictly in response to live user playing, tracking roots, triad qualities, and scale degrees on a metric grid.
 
-##### Phase 7: Zero-Build Native ES Module & CSS Decoupling Engine (FUTURE ARCHITECTURE OVERHAUL)
-* [ ] **Directory Blueprint Provisioning:** Create clean modular directory skeletons: `css/` (`tokens.css`, `layout.css`, `modules.css`, `mobile.css`), `js/audio/` (`context.js`, `voices.js`, `dsp.js`, `sampler.js`), `js/theory/` (`scales.js`), `js/visualizers/` (`scope.js`, `orbital.js`), and `js/ui/` (`keyboard.js`, `gestures.js`, `presets.js`).
-* [ ] **Stage 1 — CSS Decoupling:** Extract ~6,500 lines of CSS from `index.html` into semantic files linked in `<head>` without modifying selectors or specificity rules.
-* [ ] **Stage 2 — Static Audio Math & Presets:** Extract scales, tuning constants, and preset definitions into standalone modules without runtime changes.
-* [ ] **Stage 3 — Audio DSP Engines:** Decouple `SlambientFilterEngine`, `SlambientMultiDelayEngine`, and voice synthesizers into `js/audio/`.
-* [ ] **Stage 4 — Visualizers & Gesture Physics:** Decouple canvas visualizer loops and pointer swipe physics.
-* [ ] **Stage 5 — App Shell & Entrypoint:** Convert main application entry to `<script type="module" src="./js/app.js"></script>`, verifying zero build steps, complete PWA offline service worker caching, and Cloudflare Pages deployment parity.
+##### Phase 7: Zero-Build Native ES Module & CSS Decoupling Engine (IN PROGRESS)
+* [x] **Directory Blueprint Provisioning:** Create clean modular directory skeletons: `css/` (`slambient.css`, `field-recorder.css`), `js/audio/`, `js/theory/` (`scales.js`), `js/midi/`, `js/visualizers/`, and `js/ui/` (`presets.js`).
+* [x] **Stage 1 — CSS Decoupling (COMPLETED):** Extracted 8,100+ lines of CSS from `index.html` into `css/slambient.css` and `css/field-recorder.css` linked in `<head>` without modifying selectors or specificity rules.
+* [x] **Stage 2 — Static Audio Math & Presets (COMPLETED):** Extracted scales, modal signature voicings, tuning constants, and preset definitions into `js/theory/scales.js` (370 lines) and `js/ui/presets.js` (1,373 lines), reducing `index.html` from 24,174 to 14,669 lines.
+* [ ] **Stage 3 — Web MIDI, Recording & Field Sampler (QUEUED — TECH + MIDI):** Decouple `js/midi/web-midi.js`, `js/audio/recorder.js`, and `js/audio/field-recorder.js`.
+* [ ] **Stage 4 — UI Palette, Header Utilities & Visualizers (QUEUED — ART + DESIGN):** Decouple `js/ui/palette.js`, `js/ui/header-utils.js`, and `js/ui/visualizers.js`.
+* [ ] **Stage 5 — Core DSP Voices & App Shell Entrypoint:** Decouple `js/audio/dsp-voices.js` and finalize lightweight app shell with full PWA offline service worker caching (`sw.js`).
 
-
-
+##### Phase 8: Modular Studio Workspace & Custom Layout Engine (v2.0 Flagship)
+* **Pillar 1 — Self-Contained Module Sandboxing (CSS Container Queries):**
+  * [ ] Wrap every `.module-card`, `.strip-channel`, and visualizer widget in isolated CSS Container Queries (`container-type: inline-size; container-name: moduleCard;`) so internal controls, rotary grids, and typography scale independently of viewport width (whether in a compact mobile tile, standard rack slot, or full-screen focus view).
+* **Pillar 2 — "Studio Edit Mode" Toggle & Drag-and-Drop Reordering:**
+  * [ ] Add a global header lock/unlock toggle (`[ 🔒 Layout Locked ]` / `[ 🔓 Edit Layout ]`).
+  * [ ] Convert header sections (`#headerSlot-logo`, `#headerSlot-transport`, `#headerSlot-presets`, `#headerSlot-clock`, `#headerSlot-utilities`) into discrete draggable flex slots with `⋮⋮` drag handles when Edit Mode is active.
+  * [ ] Enable full drag-and-drop position swapping across all rack modules and visualizer decks.
+* **Pillar 3 — Per-Window Controls (Fullscreen Anything & Show/Hide Module Dock):**
+  * [ ] Equip every module card and visualizer with a standardized window utility header (`[ 👁 Hide ]`, `[ ☰ Drag ]`, `[ ⛶ Fullscreen / Focus ]`).
+  * [ ] Implement universal `[ ⛶ Fullscreen ]` expansion allowing any single module (e.g., Chord Analysis Wheel, Tabla/Drum Matrix, Field Sampler, or Scope) to maximize into a distraction-free studio focus overlay.
+  * [ ] Build a collapsible **Workspace Module Dock** to toggle visibility (`Show / Hide`) of individual instruments and effects on the fly.
+* **Pillar 4 — Workspace State Persistence & Curated Templates (`js/ui/workspace.js`):**
+  * [ ] Serialize layout arrangements, hidden module states, and header slot order to `localStorage["slambient_workspace_v1"]`.
+  * [ ] Ship curated workspace presets: **Full Studio** (all modules visible), **Live Performance** (oversized keyboard + transport + visualizers), **Meditation / Drone** (Drone, Noise, Space Reverb, and Circle of Fifths only), plus user-saveable custom layouts.
 
