@@ -234,7 +234,7 @@
         <!-- SECTION 3: Master Output Volume Capsule (Top Row Module 3) -->
         <div class="header-section master-vol-pod" data-header-slot="masterVol" title="Master Output Volume">
           <div class="master-vol-row-top">
-            <span class="tag">LEVEL</span>
+            <span class="tag">MASTER</span>
             <span class="master-vol-val" id="lblMasterVolume">85%</span>
             <button type="button" class="master-vol-mute" id="btnMasterMute" onclick="toggleMasterMute()" title="Mute Master Output">MUTE</button>
           </div>
@@ -623,7 +623,7 @@
           <span class="mode-label">STUDIO FX RACK</span>
           <span class="mode-count">10</span>
         </button>
-        <button type="button" class="btn-deck-mode btn-deck-mode-split" id="btnDeckModeSplit" onclick="setLowerDeckMode('split')" role="tab" aria-selected="false" title="Side-by-Side: 6 Instruments (60%) + 2-Column FX Rack (40%)">
+        <button type="button" class="btn-deck-mode btn-deck-mode-split" id="btnDeckModeSplit" onclick="setLowerDeckMode('split')" role="tab" aria-selected="false" title="Side-by-Side: 2 Columns of Instruments (58%) + Effects Chain Rack (42%)">
           <span class="mode-icon">◫</span>
           <span class="mode-label">SPLIT VIEW</span>
         </button>
@@ -4495,21 +4495,20 @@ function togglePedalFullscreen(key, ev) {
 let currentLowerDeckMode = "instruments";
 
 function setLowerDeckMode(mode) {
-  const isCompact = window.innerWidth <= 1200;
-  if (isCompact && mode === "split") {
-    mode = "instruments";
-  }
-
   currentLowerDeckMode = mode;
   try {
     localStorage.setItem("slambient_lower_deck_mode", mode);
   } catch (e) {}
 
   const lowerDeck = document.querySelector(".lower-deck") || document.getElementById("lowerDeck");
-  if (!lowerDeck) return;
+  if (lowerDeck) {
+    lowerDeck.classList.remove("deck-mode-instruments", "deck-mode-fx", "deck-mode-split");
+    lowerDeck.classList.add("deck-mode-" + mode);
+  }
 
-  lowerDeck.classList.remove("deck-mode-instruments", "deck-mode-fx", "deck-mode-split");
-  lowerDeck.classList.add("deck-mode-" + mode);
+  if (document.body) {
+    document.body.classList.toggle("split-view-active", mode === "split");
+  }
 
   const btnInst = document.getElementById("btnDeckModeInstruments");
   const btnFx = document.getElementById("btnDeckModeFx");
@@ -4542,22 +4541,8 @@ function initLowerDeckView() {
     saved = localStorage.getItem("slambient_lower_deck_mode");
   } catch (e) {}
 
-  const isCompact = window.innerWidth <= 1200;
-  let targetMode = "instruments";
-
-  if (!isCompact) {
-    targetMode = (saved === "instruments" || saved === "fx" || saved === "split") ? saved : "split";
-  } else {
-    targetMode = (saved === "fx") ? "fx" : "instruments";
-  }
-
+  let targetMode = (saved === "instruments" || saved === "fx" || saved === "split") ? saved : "split";
   setLowerDeckMode(targetMode);
-
-  window.addEventListener("resize", () => {
-    if (window.innerWidth <= 1200 && currentLowerDeckMode === "split") {
-      setLowerDeckMode("instruments");
-    }
-  });
 
   if (typeof initStudioFxDragAndDrop === "function") {
     initStudioFxDragAndDrop();

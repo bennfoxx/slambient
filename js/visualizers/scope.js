@@ -1361,8 +1361,10 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-function drawFlightTerrainGrid(w, h) {
+function drawFlightTerrainGrid(w, h, dtSec) {
   if (!flightGridEnabled) return;
+
+  const dt = typeof dtSec === "number" ? dtSec : 0.016;
 
   scopeCtx.save();
   // This function never sets its own shadowBlur, so without an explicit
@@ -1381,7 +1383,8 @@ function drawFlightTerrainGrid(w, h) {
 
   if (isPlaying) {
     const tempoRate = (typeof bpm !== "undefined" ? bpm : 72) / 60;
-    flightGridScroll = (flightGridScroll + 0.012 * tempoRate) % 1.0;
+    // Normalized smooth ambient gliding: 0.36 cycles per second at 120bpm, serene and frame-rate invariant
+    flightGridScroll = (flightGridScroll + dt * 0.36 * tempoRate) % 1.0;
   }
 
   const bassImpulse = (ringDynamics.drone ? ringDynamics.drone.energy * 1.8 : 0) +
@@ -1731,9 +1734,10 @@ function drawRoadsideShape(obj, x, y, size, alpha) {
   scopeCtx.restore();
 }
 
-function drawRoadsideObjects(w, h) {
+function drawRoadsideObjects(w, h, dtSec) {
   if (!roadsideEnabled) return;
 
+  const dt = typeof dtSec === "number" ? dtSec : 0.016;
   const horizonY = h * 0.58;
   const bottomY = h;
   const gridH = bottomY - horizonY;
@@ -1747,7 +1751,8 @@ function drawRoadsideObjects(w, h) {
   }
 
   const tempoRate = (typeof bpm !== "undefined" ? bpm : 72) / 60;
-  const speed = 0.0020 * tempoRate * (isPlaying ? 1 : 0.45);
+  // Normalized serene glide: 0.065 per second at 120bpm (~15 seconds to travel full depth)
+  const speed = dt * 0.065 * tempoRate * (isPlaying ? 1 : 0.45);
   const nowMs = performance.now();
 
   scopeCtx.save();
@@ -1760,10 +1765,11 @@ function drawRoadsideObjects(w, h) {
     obj.progress += speed;
     if (obj.progress >= 1) { roadsideObjects.splice(i, 1); continue; }
 
-    // Rotate 3D geometry smoothly each frame
-    obj.rotX += obj.spinX;
-    obj.rotY += obj.spinY;
-    obj.rotZ += obj.spinZ;
+    // Rotate 3D geometry smoothly each second at an elegant, hypnotic ambient speed
+    const rotMult = dt * 45; // calibrated for smooth, serene rotation regardless of display refresh rate
+    obj.rotX += obj.spinX * rotMult;
+    obj.rotY += obj.spinY * rotMult;
+    obj.rotZ += obj.spinZ * rotMult;
 
     const p = obj.progress;
     const eased = p * p;
@@ -2044,6 +2050,10 @@ function drawScope(ts) {
   const isFsActive = (typeof scopeFullscreen !== "undefined" && scopeFullscreen) ||
     (typeof document !== "undefined" && !!document.getElementById("scopePanel") && document.getElementById("scopePanel").classList.contains("module-fullscreen-active"));
   if (scopeCanvasVisible || isFsActive) {
+    if (lastScopeFrameTs === null) lastScopeFrameTs = ts || now;
+    const dtSec = Math.min(0.06, ((ts || now) - lastScopeFrameTs) / 1000);
+    lastScopeFrameTs = ts || now;
+
     updateWaterfallSpectrogram();
     const { w, h, cx, cy } = updateCanvasDimensions();
     if (fractalModeEnabled) {
@@ -2052,8 +2062,8 @@ function drawScope(ts) {
       scopeCtx.fillStyle = "#0c0d11"; scopeCtx.fillRect(0, 0, w, h);
     }
     drawWaterfallSpectrogram(w, h);
-    drawFlightTerrainGrid(w, h);
-    drawRoadsideObjects(w, h);
+    drawFlightTerrainGrid(w, h, dtSec);
+    drawRoadsideObjects(w, h, dtSec);
     if (window.videoSynthesisCompositor) {
       window.videoSynthesisCompositor.applyPostProcessing(scopeCtx, w, h);
     }
@@ -2062,9 +2072,6 @@ function drawScope(ts) {
     // beats, so the angular speed itself scales with bpm -- faster music spins
     // visibly faster. Keeps a faint drift (not a hard stop) while paused, to
     // match how the rest of the visualizer dims rather than freezes when idle.
-    if (lastScopeFrameTs === null) lastScopeFrameTs = ts || now;
-    const dtSec = Math.min(0.06, ((ts || now) - lastScopeFrameTs) / 1000);
-    lastScopeFrameTs = ts || now;
     const beatsPerSec = bpm / 60;
     const revolutionBeats = 480; // one full 360 deg turn every 480 beats -- slow, "slight" rotation
     scopeRotationAngle += dtSec * beatsPerSec * (Math.PI * 2 / revolutionBeats) * (isPlaying ? 1 : 0.15);
@@ -2079,7 +2086,8 @@ function drawScope(ts) {
       drawVisualizerCenterCore(cx, cy);
       scopeCtx.restore();
     }
-    scopeAngle += dtSec * 0.48;
+    // Ambient calm scope angle: smooth, hypnotic drift rather than rapid spinning
+    scopeAngle += dtSec * 0.28;
   } else {
     lastScopeFrameTs = ts || now;
   }
