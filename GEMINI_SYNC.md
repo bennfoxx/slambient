@@ -1856,4 +1856,23 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Linked both scripts in `index.html` and safely purged duplicate inline code.
   - Bumped PWA cache to `slambient-v6` in `sw.js` and verified 0 JS syntax or runtime errors. `index.html` reduced from 24,200+ lines to 14,669 lines (~40% reduction).
 
+## Update — 2026-10-16 (Decoupling Stages 3, 4, & 5 Completed: Full Modular Zero-Build ES Engine)
+
+- **Stage 3 (Visualizers Decoupling into `js/visualizers/`)**:
+  - `js/visualizers/chord-wheel.js` (256 lines): Circle of Fifths spoke geometry, compass ticks, chord telemetry, and analyzer meters.
+  - `js/visualizers/scope.js` (1,896 lines): CRT vector oscilloscope, flight terrain grid, waterfall spectrogram, 3D floating wireframe roadside objects (cubes, pyramids, diamonds, spheres), fractal zoom engine, and arcade Easter egg game.
+  - `js/visualizers/orbital.js` (1,251 lines): Floating module orbs, interactive constellation physics, starfield, modal module drawer expansions, and touch gesture navigation.
+- **Stage 4 (UI, Keyboard & Mobile Macro Decoupling into `js/ui/`)**:
+  - `js/ui/keyboard.js` (316 lines): On-screen 25-key and 88-key radar modes, touch glissando controller, active LED voice highlights, and QWERTY key event listeners.
+  - `js/ui/mobile-macro.js` (213 lines): 2-column mobile macro tiles, fast bypass/power toggles, and live responsive audio meters.
+- **Stage 5 (Audio Engines Decoupling into `js/audio/`)**:
+  - `js/audio/drums.js` (760 lines): Polyrhythmic drum synthesis (kick, snare, woodblock, hi-hats), Hindustani classical Tabla (Dayan/Bayan), Tala phrasing, and clock-locked groove fills.
+  - `js/audio/ambient-noise.js` (236 lines): Stochastic environmental soundscape generator for Rain, Thunder, Brook, Crickets, Tape Flutter, and Wind.
+- **Milestone Results**:
+  - `index.html` reduced from **24,200+ lines down to 9,780 lines** (over **60% code reduction** from the root HTML document).
+  - 10 standalone semantic JS modules and 2 external CSS stylesheets.
+  - Updated PWA offline cache to `slambient-v9` in `sw.js`.
+  - 100% zero-build vanilla browser runtime with zero runtime or syntax errors.
+
+
 
