@@ -1,5 +1,5 @@
 // Slambient Service Worker - Offline Caching & App Shell
-const CACHE_NAME = 'slambient-v6';
+const CACHE_NAME = 'slambient-v7';
 const PRECACHE_URLS = [
   './',
   'index.html',
@@ -7,6 +7,9 @@ const PRECACHE_URLS = [
   'css/field-recorder.css',
   'js/theory/scales.js',
   'js/ui/presets.js',
+  'js/visualizers/chord-wheel.js',
+  'js/visualizers/scope.js',
+  'js/visualizers/orbital.js',
   'clock-processor.js',
   'dsp-engines.js',
   'manifest.webmanifest',
