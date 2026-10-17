@@ -1825,3 +1825,17 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Because `let activeTheme` was still in its ES6 Temporal Dead Zone, `themeHex()` threw `ReferenceError: Cannot access 'activeTheme' before initialization`, aborting script initialization and leaving `activeTheme` permanently in the TDZ on every subsequent visualizer frame (`drawScope`, `drawChordWheelCard`) and audio playback call (`togglePlay`).
   - Converted `MOBILE_MACRO_MODULES`, `MOBILE_MACRO_METERS`, `THEME_KEYS`, `COLOR_THEMES`, `THEME_STORAGE_KEY`, `DEFAULT_ROADSIDE_COLORS`, and `activeTheme` to hoisted `var` bindings with safe fallback initialization (`FALLBACK_THEME_HEX` / `FALLBACK_THEME_RGB`), and added null-safe guards inside `themeHex()`, `themeRgbArr()`, and `themeRgb()`.
 
+## Update — 2026-10-16 (Architectural Audit: Zero-Build Modular ES & CSS Decoupling Engine)
+
+- **Monolith Assessment**:
+  - `index.html` has expanded to ~24,200 lines (~970 KB uncompressed), consisting of ~6,500 lines of CSS, ~2,500 lines of HTML DOM markup, and ~15,200 lines of JavaScript.
+  - While single-file delivery provided zero-build simplicity during early prototyping, it creates friction with AI coding agent context limits (e.g. Bonsai 27B / Claude / Gemini tool-call truncation), global variable collisions, and CSS specificity wars.
+- **Architectural Action Plan (Phase 15 / Phase 7)**:
+  - Codified the **Zero-Build Native ES Module & CSS Decoupling Plan** into `MASTER_BLUEPRINT.md`:
+    - **Zero Build Tooling Mandate**: No npm, Webpack, Vite, or Node runtime. Operates purely on native browser standards: `<link rel="stylesheet">` and `<script type="module" src="./js/app.js"></script>`.
+    - **Step 1 (CSS Extraction)**: Decouple 6,500 lines into `css/tokens.css` (variables, cursors, palettes), `css/layout.css` (header, upper visualizer deck, keyboard), `css/modules.css` (Eurorack chassis, knobs, strips), and `css/mobile.css` (mobile portrait and landscape overrides).
+    - **Step 2 (DSP & Audio Engine Modules)**: Extract Web Audio logic into `js/audio/` (`context.js`, `voices.js`, `dsp.js`, `sampler.js`).
+    - **Step 3 (Visualizers & Theory Modules)**: Extract CRT scope and WebGL/Canvas starfield physics into `js/visualizers/` (`scope.js`, `orbital.js`); extract scales and tuning math into `js/theory/scales.js`.
+    - **Step 4 (UI, Gestures & State Modules)**: Extract keyboard routing, gestures, drawers, and JSON presets into `js/ui/` (`keyboard.js`, `gestures.js`, `presets.js`).
+    - **Parity Verification**: Complete offline PWA service worker caching (`sw.js`), Cloudflare Pages edge delivery, and `file:///` standalone execution must remain 100% intact.
+
