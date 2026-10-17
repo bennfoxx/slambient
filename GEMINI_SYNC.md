@@ -1891,6 +1891,17 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
   - Responsive panel width upgraded to `clamp(285px, 20vw, 320px)` on desktop and `clamp(235px, 32vw, 290px)` on mobile landscape deck.
   - Bumped PWA offline cache to `slambient-v10` in `sw.js`.
 
+## Update — 2026-10-16 (Decoupling Theme Palette Picker & Header Utilities into js/ui/)
+
+- **Extracted Modules**:
+  - `js/ui/header-utils.js` (337 lines): Undo snapshotting, patch change rollbacks, tap tempo interval averaging, interactive Field Manual & Shortcuts modal panel builder, and keyboard shortcuts event listeners (`?`, `Ctrl/⌘+Z`, `Esc`).
+  - `js/ui/palette.js` (221 lines): Color themes (`slambient`, `kankyo`, `aurora`, `sodium`, `glacier`, `random`), color conversions (`hexToRgbArr`, `hslToHex`, `mixRgb`), live CSS variable injector (`--color-<module>`, `--rgb-<module>`), dynamic canvas palette sync (oscilloscope rings, waterfall tracks, orbital modules, arcade invaders), and dropdown menu controller.
+- **index.html & PWA Sync**:
+  - Linked `<script src="js/ui/header-utils.js"></script>` and `<script src="js/ui/palette.js"></script>`.
+  - Added both modules to `PRECACHE_URLS` in `sw.js` and bumped offline cache to `slambient-v12`.
+  - `index.html` reduced by another 553 lines down to **7,663 lines**.
+
+
 
 
 
