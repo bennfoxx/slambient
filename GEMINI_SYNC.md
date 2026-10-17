@@ -1795,3 +1795,47 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
 - **Touch View-Switcher Ghost-Click Prevention & Multi-Touch Piano/Arcade Pass-Through**:
   - Added a 450ms capture-phase `click` guard after `pointerup` in `initTouchViewSwitchers()` to prevent synthetic ghost clicks from double-firing view/module transitions.
   - Exempted `.piano-keys-wrapper, .arcade-controls, .arcade-pad, .arcade-btn` from multi-touch `touchmove` prevention in `lockMobileZoom()` and added `.custom-dropdown-*` selectors to `isInteractive` in `touchend`.
+
+## Update — 2026-10-16 (Scale-Tied Modal Chord Voicing Engine on `experiment/scale-tied-voicings`)
+
+- **Scale-Tied Signature Harmonic Profiles (`SCALE_SIGNATURE_VOICINGS`)**:
+  - Added dedicated, mode-authentic chord voicing profiles across all 14 ambient scales:
+    - **Lydian**: Quartal (#11) `[0, 4, 6, 10]`, Lydian Maj7 (#11), Ether Drop-2.
+    - **Lydian Dominant**: Overtone Acoustic (#11/b7), Lydian Dom 9(#11) Spread.
+    - **Dorian**: So What Modal Fourths `[0, 3, 6, 9, 11]`, Dorian 6/9 Drop-2, Deep Dorian 11th.
+    - **Phrygian**: Dark Halo (b2/b6) `[0, 4, 7, 8]`, Sus Cluster, Mystic 5th (b9 Hover).
+    - **Mixolydian**: Sus4 Dominant Spread, Floating 9th (Modal 7th).
+    - **Aeolian**: Deep 9th, Nordic Sus2 (b6 Cloud).
+    - **Hirajoshi & Insen**: Quintal Stacks, Koto Reflection, Temple Bell (Shakuhachi), Zen Quartal.
+    - **Bhairav & Bilawal**: Maihar Morning Resonance, Senia Raga Pillar, Bilawal Shuddha, Hindustani Consonant Prism.
+    - **Whole Tone & Major9**: Impressionist Augmented Prism, Floating Mystic Stack, Prism Maj9 Spread, Lyric Octave Add9.
+- **Harmonic Color & Anti-Clash Preservation Engine (`getVoicingIntervals`)**:
+  - Replaced indiscriminate semitone smoothing with scale-aware color preservation:
+    - In Lydian and Whole Tone modes, true `#11` (tritone, 6 semitones) is strictly preserved and exempt from 5th flattening.
+    - In Phrygian and Bhairav modes, authentic `b2`/`b9` halo tension (1 semitone above root/octave) is preserved without forced flattening to major 2nd.
+- **Dynamic UI Select & HUD Synchronization**:
+  - Added `updateChordVoicingSelectOptions()` which dynamically injects mode signature voicings (labeled with `★`) under an optgroup whenever the scale shifts, while retaining the full universal library.
+  - `updateChordHud()` and `renderChordWheel()` now use `getActiveVoicingObject()` and `getVoicingDisplayName()` to accurately display signature names (e.g., `D Lydian Quartal (#11)`, `D So What Modal Fourths`) and their exact harmonic intervals on the wheel and HUD telemetry.
+  - Generative downbeat advance and randomizers pick scale signature voicings with a 60% weighting while preserving full backward compatibility with stored user patches and numeric indices.
+
+## Update — 2026-10-16 (Temporal Dead Zone Fix for `activeTheme` and `MOBILE_MACRO_METERS`)
+
+- **Resolved Startup Temporal Dead Zone (`ReferenceError`) Restoring Visualizers & Audio Engine**:
+  - In `d6b9fb9`, calling `renderMobileMacroGrid()` inside `updateAudioParams()` and `updateMuteSoloUI()` during early top-level script execution referenced `let activeTheme` and `const MOBILE_MACRO_METERS` before their declarations were reached.
+  - Because `let activeTheme` was still in its ES6 Temporal Dead Zone, `themeHex()` threw `ReferenceError: Cannot access 'activeTheme' before initialization`, aborting script initialization and leaving `activeTheme` permanently in the TDZ on every subsequent visualizer frame (`drawScope`, `drawChordWheelCard`) and audio playback call (`togglePlay`).
+  - Converted `MOBILE_MACRO_MODULES`, `MOBILE_MACRO_METERS`, `THEME_KEYS`, `COLOR_THEMES`, `THEME_STORAGE_KEY`, `DEFAULT_ROADSIDE_COLORS`, and `activeTheme` to hoisted `var` bindings with safe fallback initialization (`FALLBACK_THEME_HEX` / `FALLBACK_THEME_RGB`), and added null-safe guards inside `themeHex()`, `themeRgbArr()`, and `themeRgb()`.
+
+## Update — 2026-10-16 (Architectural Audit: Zero-Build Modular ES & CSS Decoupling Engine)
+
+- **Monolith Assessment**:
+  - `index.html` has expanded to ~24,200 lines (~970 KB uncompressed), consisting of ~6,500 lines of CSS, ~2,500 lines of HTML DOM markup, and ~15,200 lines of JavaScript.
+  - While single-file delivery provided zero-build simplicity during early prototyping, it creates friction with AI coding agent context limits (e.g. Bonsai 27B / Claude / Gemini tool-call truncation), global variable collisions, and CSS specificity wars.
+- **Architectural Action Plan (Phase 15 / Phase 7)**:
+  - Codified the **Zero-Build Native ES Module & CSS Decoupling Plan** into `MASTER_BLUEPRINT.md`:
+    - **Zero Build Tooling Mandate**: No npm, Webpack, Vite, or Node runtime. Operates purely on native browser standards: `<link rel="stylesheet">` and `<script type="module" src="./js/app.js"></script>`.
+    - **Step 1 (CSS Extraction)**: Decouple 6,500 lines into `css/tokens.css` (variables, cursors, palettes), `css/layout.css` (header, upper visualizer deck, keyboard), `css/modules.css` (Eurorack chassis, knobs, strips), and `css/mobile.css` (mobile portrait and landscape overrides).
+    - **Step 2 (DSP & Audio Engine Modules)**: Extract Web Audio logic into `js/audio/` (`context.js`, `voices.js`, `dsp.js`, `sampler.js`).
+    - **Step 3 (Visualizers & Theory Modules)**: Extract CRT scope and WebGL/Canvas starfield physics into `js/visualizers/` (`scope.js`, `orbital.js`); extract scales and tuning math into `js/theory/scales.js`.
+    - **Step 4 (UI, Gestures & State Modules)**: Extract keyboard routing, gestures, drawers, and JSON presets into `js/ui/` (`keyboard.js`, `gestures.js`, `presets.js`).
+    - **Parity Verification**: Complete offline PWA service worker caching (`sw.js`), Cloudflare Pages edge delivery, and `file:///` standalone execution must remain 100% intact.
+

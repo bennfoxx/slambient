@@ -230,6 +230,13 @@ This master architecture document serves as the authoritative single-source-of-t
     * *Build A (`experiment/scale-tied-voicings`):* Scale-Coupled Chord Voicing Engine where each scale dictates its own unique voicing profile (Lydian Quartal & #11 Spreads, Dorian Drop-2 Minor 9th/11th & So What, Mixolydian Sus4/Sus2 clusters, Phrygian semitone clusters & quintal bass, Pentatonic/Hirajoshi open quintal & wide spreads), voicing spread/density controls, and minimal pitch-distance voice leading.
     * *Build B (`experiment/midi-file-recorder`):* Multi-Track MIDI File Recorder & Exporter capturing internal sequencer, keyboard, and synth events to export synchronized Type 1 Standard MIDI Files (`.mid`) and individual track stems directly in-browser.
     * *Build C (`experiment/accompaniment-mode`):* Intelligent Live Accompaniment Mode where background instruments silence unconstrained generative wandering and generate audio only in response to live user playing, dynamically tracking root notes, triad qualities, and scale degrees locked to a metric clock grid.
+* **Phase 15 — Zero-Build Native ES Module & CSS Decoupling Engine (PLANNED ARCHITECTURE):**
+  * **Objective:** Decouple monolithic `index.html` (~24,200 lines, ~970 KB) into a structured, zero-build native ES module and CSS hierarchy without requiring npm, bundlers, or node runtimes.
+  * **Step 1 (CSS Extraction):** Decouple 6,500 lines of CSS into semantic stylesheets linked in `<head>`: `css/tokens.css` (variables, cursors, palettes), `css/layout.css` (header, visualizer deck, keyboard), `css/modules.css` (channel strips, chassis, knobs), and `css/mobile.css` (portrait and landscape mobile rules).
+  * **Step 2 (DSP & Audio Engine Modules):** Extract Web Audio logic into `js/audio/` (`context.js`, `voices.js`, `dsp.js`, `sampler.js`), linking via native `<script type="module" src="./js/app.js"></script>`.
+  * **Step 3 (Visualizers & Theory Modules):** Extract CRT scope and WebGL/Canvas starfield physics into `js/visualizers/` (`scope.js`, `orbital.js`); extract scale formulas, chord dictionaries, and raga math into `js/theory/scales.js`.
+  * **Step 4 (UI, Gestures & State Modules):** Extract keyboard dispatch, touch gestures, accordion drawers, and JSON patch serialization into `js/ui/` (`keyboard.js`, `gestures.js`, `presets.js`).
+  * **Zero-Regression Mandate:** Ensure browser offline caching (`sw.js`), Cloudflare Pages edge delivery, standalone PWA execution, and local file access (`file:///`) remain 100% functional with zero build step.
 
 #### 12. Implementation Guardrails & Known Issues
 
@@ -1077,6 +1084,14 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
 * [ ] **Build A (`experiment/scale-tied-voicings`):** Scale-Coupled Chord Voicing Engine (Lydian Quartal/#11, Dorian Drop-2/So What, Mixolydian Sus4/Sus2, Phrygian semitone clusters, Pentatonic/Hirajoshi open quintal), voicing spread/density dials, and voice-leading optimization.
 * [ ] **Build B (`experiment/midi-file-recorder`):** Multi-Track MIDI File Recorder & Exporter capturing internal sequencer, keyboard, and synth events to export Type 1 Standard MIDI Files (`.mid`) and multi-track stems in-browser.
 * [ ] **Build C (`experiment/accompaniment-mode`):** Intelligent Live Accompaniment Mode dynamically generating accompaniment audio strictly in response to live user playing, tracking roots, triad qualities, and scale degrees on a metric grid.
+
+##### Phase 7: Zero-Build Native ES Module & CSS Decoupling Engine (FUTURE ARCHITECTURE OVERHAUL)
+* [ ] **Directory Blueprint Provisioning:** Create clean modular directory skeletons: `css/` (`tokens.css`, `layout.css`, `modules.css`, `mobile.css`), `js/audio/` (`context.js`, `voices.js`, `dsp.js`, `sampler.js`), `js/theory/` (`scales.js`), `js/visualizers/` (`scope.js`, `orbital.js`), and `js/ui/` (`keyboard.js`, `gestures.js`, `presets.js`).
+* [ ] **Stage 1 — CSS Decoupling:** Extract ~6,500 lines of CSS from `index.html` into semantic files linked in `<head>` without modifying selectors or specificity rules.
+* [ ] **Stage 2 — Static Audio Math & Presets:** Extract scales, tuning constants, and preset definitions into standalone modules without runtime changes.
+* [ ] **Stage 3 — Audio DSP Engines:** Decouple `SlambientFilterEngine`, `SlambientMultiDelayEngine`, and voice synthesizers into `js/audio/`.
+* [ ] **Stage 4 — Visualizers & Gesture Physics:** Decouple canvas visualizer loops and pointer swipe physics.
+* [ ] **Stage 5 — App Shell & Entrypoint:** Convert main application entry to `<script type="module" src="./js/app.js"></script>`, verifying zero build steps, complete PWA offline service worker caching, and Cloudflare Pages deployment parity.
 
 
 
