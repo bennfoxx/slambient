@@ -1043,26 +1043,37 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
 * [x] **Modular Multi-Delay DSP Engine (`SlambientMultiDelayEngine` in `dsp-engines.js`):** 4 discrete delay algorithms (Tape with capstan wow/flutter drift, BBD with clock noise grit, Digital 32-bit pristine with bitcrush, Ping-Pong stereo alternating spatial Haas bounce), dynamic lead voice ducking, and musical tempo sync.
 * [ ] Connect internal modulation sources (LFOs/Envelope Followers) to drive real-time parameter changes with pulsing visual feedback on patch lines.
 
-##### Phase 4: High-Priority Mobile UI Bugs & QoL Fixes (ACTIVE — AGENT 1)
-* [ ] **Header Title Centering Regression:** Restore absolute center alignment (`position: absolute; left: 50%; transform: translateX(-50%)`) or balanced flex spacers so action buttons do not drag the title off-center.
+##### Phase 4: High-Priority Mobile UI Bugs & QoL Fixes (MAIN DEV TASK BRIEF)
+> **Assigned Workspace:** `/Users/benfox/Documents/Development/slambient_dev` (or `/Users/benfox/Documents/Development/slambient_dev-thread2`)  
+> **Target Files:** `index.html` (and internal CSS blocks)  
+> **Scope Guardrail (Desktop Parity):** All mobile layout, touch, and navigation adjustments must strictly be scoped under mobile breakpoints (`@media (max-width: 768px)` or `@media (max-width: 640px)`); desktop layout, sizing, and interaction models must remain 100% untouched.
+
+* [ ] **Header Title Centering Regression:** Restore absolute center alignment (`position: absolute; left: 50%; transform: translateX(-50%)`) or balanced flex spacers (`flex: 1`) so action buttons do not drag the title off-center.
 * [ ] **Sticky Header Lock-Up in Modular View:** Confine module scrolling inside a dedicated sub-wrapper (`overflow-y: auto; overscroll-behavior: contain; height: 100dvh`) and lock outer `html, body` scrolling so inertial rubber-banding cannot pull the header down over modules.
-* [ ] **Playable MIDI Keyboard Header Consistency (25-Key vs. 88-Key):** Lock container dimensions (`height: 44px; min-height: 44px`), fix flex alignment, and enforce tabular numbers (`font-variant-numeric: tabular-nums`).
-* [ ] **Info (`?`) Panel Anchor Offset:** Anchor top edge to a static coordinate (`top: 16px; left: 50%; transform: translateX(-50%)`) with downward scrolling (`overflow-y: auto`).
+* [ ] **Playable MIDI Keyboard Header Consistency (25-Key vs. 88-Key):** Lock container dimensions (`height: 44px; min-height: 44px`), fix flex alignment, and enforce tabular numbers (`font-variant-numeric: tabular-nums`) so switching between 25-key and 88-key modes does not alter outer padding or readout baselines.
+* [ ] **Info (`?`) Panel Anchor Offset:** Anchor top edge to a static coordinate (`top: 16px; left: 50%; transform: translateX(-50%)`) with downward scrolling (`overflow-y: auto`) to stop vertical jumping based on text length.
 * [ ] **Unresponsive Touch Module Switching Buttons:** Bind explicit pointer/touch handlers (`pointerup` / `touchend`) and remove desktop `:hover` dependencies.
+* [ ] **Static Interface & Zoom Prevention:** Enforce `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">` and `touch-action: manipulation; overscroll-behavior: none;` on `html, body` to eliminate double-tap zoom delays and pinch scaling.
 * [ ] **Touch Drag vs. Scroll Interplay:** Assign `touch-action: none` strictly to dedicated drag handles (`☰`) and rotary/XY controls; keep `touch-action: pan-y` on card bodies and lists.
 * [ ] **Custom Preset Name Hard Limit (Max 15 Chars):** Enforce `maxlength="15"`, JS sanitization (`.slice(0, 15)`), and CSS truncation (`overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 130px;`).
-* [ ] **Molecular View "Randomize" Button Wrapping:** Apply `flex-wrap: nowrap; flex-shrink: 0;` and collapse to icon-only (dice) under 480px width.
+* [ ] **Modular View "Randomize" Button Wrapping:** Apply `flex-wrap: nowrap; flex-shrink: 0;` and collapse to icon-only (dice) under 480px width.
 * [ ] **Analyzer Frozen on Auto-Play Switch:** Decouple pitch analyzer from DOM touch listeners; route manual input and auto-play sequencer through a unified `triggerNote(note, velocity)` dispatcher, clearing stale latches on auto-play toggle.
 * [ ] **Visualizer Blank / Black Screen on Tab Wake:** Wake suspended `AudioContext` on `visibilitychange`, clamp rAF delta timestamps (max 100ms), and handle `webglcontextlost` / `webglcontextrestored`.
 * [ ] **Full-Screen Visualizer Mobile Portrait Fix:** Switch canvas sizing from `vh` to dynamic viewport units (`100dvh`), avoid forcing orientation locks, and recalculate canvas bounds on `fullscreenchange` with a 150ms delay.
 * [ ] **Orbital View Pop-Up Dropdowns Blackout:** Audit `z-index` stacking contexts, prevent duplicate black scrim/backdrop overlays from mounting, and preserve WebGL render loops.
 
-##### Phase 5: Mobile UX Architecture Overhaul (Macro vs. Micro Views) (ACTIVE — AGENT 2)
-* [ ] **Mobile Bird's-Eye Grid (Macro State):** Replace 100dvh single-column stacking with a 2-column compact grid fitting cleanly within the viewport using ~110px summary tiles displaying Module Name, Power/Bypass toggle, Preset Name (max 15 chars), and active LED/meter under `@media (max-width: 768px)`.
-* [ ] **Mobile Inspect Sheet (Micro State):** Tapping a macro tile opens full parameters in a slide-up bottom sheet or modal drawer (`max-height: 85dvh`) with an explicit "Close / Back to Rack" button.
-* [ ] **Master Out Effects Chain Reordering:** Add signal-chain reordering directly inside the Master Out modular view (Up/Down arrow nudges or handle drag), sequentially reconnecting Web Audio nodes (`source -> chain[0] -> chain[1] -> destination`) wrapped in an `audioCtx.suspend()` / `resume()` pass to avoid audio pops.
+##### Phase 5: Mobile UX Architecture Overhaul (Macro vs. Micro Views) (SECONDARY DEV TASK BRIEF)
+> **Assigned Workspace:** `/Users/benfox/Documents/Development/slambient_dev-bonsai`  
+> **Target Files:** `index.html` (and internal CSS blocks)  
+> **Scope Guardrail (Desktop Parity):** All structural layout changes must strictly be scoped under mobile breakpoints (`@media (max-width: 768px)`). The desktop layout, sizing, and interaction model must remain 100% untouched.
 
-##### Phase 6: Experimental Feature Staging
+* [ ] **Mobile Bird's-Eye Grid (Macro State):** Replace 100dvh single-column stacking with a 2-column compact grid fitting cleanly within the mobile viewport using ~110px summary tiles displaying Module Name, Power/Bypass toggle, Preset Name (max 15 chars), and active LED/meter under `@media (max-width: 768px)`.
+* [ ] **Mobile Inspect Sheet (Micro State):** Tapping a macro tile opens full parameters in a slide-up bottom sheet or modal drawer (`max-height: 85dvh`) with an explicit "Close / Back to Rack" button.
+* [ ] **Orbital View Parity:** Orbital visual nodes act as the macro state; tapping a node slides open the inspection sheet rather than rendering full-height scrolling panels.
+* [ ] **Master Out Effects Chain Reordering:** Add signal-chain reordering directly inside the Master Out modular view (Up/Down arrow nudges or handle drag), sequentially reconnecting Web Audio nodes (`source -> chain[0] -> chain[1] -> destination`) wrapped in an `audioCtx.suspend()` / `resume()` pass to avoid audio pops.
+* [ ] **Brand Guidelines Conformance:** Follow `BRAND_GUIDELINES.md` for strict visual symmetry, single-line text protection (`white-space: nowrap !important;`), and complete modular styling (borders, subtle inset shadows, 6px-8px chassis radius).
+
+##### Phase 6: Experimental Feature Staging (FUTURE CANARY BUILDS)
 * [ ] **Build A (`experiment/scale-tied-voicings`):** Scale-Coupled Chord Voicing Engine (Lydian Quartal/#11, Dorian Drop-2/So What, Mixolydian Sus4/Sus2, Phrygian semitone clusters, Pentatonic/Hirajoshi open quintal), voicing spread/density dials, and voice-leading optimization.
 * [ ] **Build B (`experiment/midi-file-recorder`):** Multi-Track MIDI File Recorder & Exporter capturing internal sequencer, keyboard, and synth events to export Type 1 Standard MIDI Files (`.mid`) and multi-track stems in-browser.
 * [ ] **Build C (`experiment/accompaniment-mode`):** Intelligent Live Accompaniment Mode dynamically generating accompaniment audio strictly in response to live user playing, tracking roots, triad qualities, and scale degrees on a metric grid.
