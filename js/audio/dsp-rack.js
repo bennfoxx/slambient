@@ -574,15 +574,64 @@
   /* ==========================================================================
      8. SLAMBIENT FX RACK MANAGER (N-Slot Reorderable Routing & Safe Shuffler)
      ========================================================================== */
+  const CONSOLIDATED_GROUPS = {
+    DRIVE_FILTER: ["OVERDRIVE", "FILTER"],
+    MOD_CLUSTER: ["TREMOLO", "PHASER", "FLANGER"],
+    ANALOG_DELAY: ["DELAY", "TAPE_ECHO"],
+    DIGITAL_DELAY: ["DIGITAL_DELAY", "SPACE_DELAY"],
+    SPACE_REVERB: ["SPACE"]
+  };
+
+  const LEGACY_TO_CONSOLIDATED = {
+    OVERDRIVE: "DRIVE_FILTER",
+    TUBE_DRIVE: "DRIVE_FILTER",
+    FILTER: "DRIVE_FILTER",
+    TREMOLO: "MOD_CLUSTER",
+    OPTICAL_TREMOLO: "MOD_CLUSTER",
+    PHASER: "MOD_CLUSTER",
+    FLANGER: "MOD_CLUSTER",
+    DELAY: "ANALOG_DELAY",
+    TAPE_ECHO: "ANALOG_DELAY",
+    ECHO: "ANALOG_DELAY",
+    DIGITAL_DELAY: "DIGITAL_DELAY",
+    SPACE_DELAY: "DIGITAL_DELAY",
+    SPACE: "SPACE_REVERB",
+    REVERB: "SPACE_REVERB",
+    SPACE_REVERB: "SPACE_REVERB",
+    DRIVE_FILTER: "DRIVE_FILTER",
+    MOD_CLUSTER: "MOD_CLUSTER",
+    ANALOG_DELAY: "ANALOG_DELAY"
+  };
+
   class SlambientFxRackManager {
-    constructor(ctx, busPre, busPost) {
+    static get CONSOLIDATED_GROUPS() { return CONSOLIDATED_GROUPS; }
+    static get LEGACY_TO_CONSOLIDATED() { return LEGACY_TO_CONSOLIDATED; }
+
+    static adaptLegacyChain(rawChain) {
+      const DEFAULT_5 = ['DRIVE_FILTER', 'MOD_CLUSTER', 'ANALOG_DELAY', 'DIGITAL_DELAY', 'SPACE_REVERB'];
+      if (!Array.isArray(rawChain) || rawChain.length === 0) return [...DEFAULT_5];
+      const result = [];
+      rawChain.forEach(k => {
+        const mapped = LEGACY_TO_CONSOLIDATED[k] || k;
+        if (DEFAULT_5.includes(mapped) && !result.includes(mapped)) {
+          result.push(mapped);
+        }
+      });
+      DEFAULT_5.forEach(k => {
+        if (!result.includes(k)) result.push(k);
+      });
+      return result;
+    }
+
+    constructor(ctx, busPre, busPost, options = {}) {
       this.ctx = ctx;
       this.busPre = busPre;
       this.busPost = busPost;
 
       this.modules = new Map();
-      this.chain = ["FILTER", "DELAY", "SPACE"];
+      this.chain = ["DRIVE_FILTER", "MOD_CLUSTER", "ANALOG_DELAY", "DIGITAL_DELAY", "SPACE_REVERB"];
       this.bypassMap = new Map();
+      this.consolidated = options.consolidated !== undefined ? !!options.consolidated : false;
     }
 
     registerModule(key, instance) {
@@ -593,12 +642,20 @@
 
     setBypass(key, bypassed) {
       this.bypassMap.set(key, !!bypassed);
+      const subKeys = CONSOLIDATED_GROUPS[key];
+      if (subKeys) {
+        subKeys.forEach(sk => this.bypassMap.set(sk, !!bypassed));
+      }
       this.rewire(false);
     }
 
     setChainOrder(newChain, immediate = false) {
       if (Array.isArray(newChain) && newChain.length > 0) {
-        this.chain = [...newChain];
+        if (this.consolidated && newChain.some(k => LEGACY_TO_CONSOLIDATED[k] && !CONSOLIDATED_GROUPS[k])) {
+          this.chain = SlambientFxRackManager.adaptLegacyChain(newChain);
+        } else {
+          this.chain = [...newChain];
+        }
       }
       this.rewire(immediate);
     }
@@ -639,11 +696,19 @@
 
           let prev = this.busPre;
           for (const key of this.chain) {
-            const m = this.modules.get(key);
-            const isBypassed = !!this.bypassMap.get(key);
-            if (m && m.input && m.output && !isBypassed) {
-              prev.connect(m.input);
-              prev = m.output;
+            const isGroupBypassed = !!this.bypassMap.get(key);
+            const subKeys = CONSOLIDATED_GROUPS[key] || [key];
+
+            if (!isGroupBypassed) {
+              for (const subKey of subKeys) {
+                const isSubBypassed = !!this.bypassMap.get(subKey);
+                const normSubKey = (subKey === "TUBE_DRIVE" ? "OVERDRIVE" : (subKey === "OPTICAL_TREMOLO" ? "TREMOLO" : (subKey === "ECHO" ? "TAPE_ECHO" : subKey)));
+                const m = this.modules.get(subKey) || this.modules.get(normSubKey);
+                if (m && m.input && m.output && !isSubBypassed) {
+                  prev.connect(m.input);
+                  prev = m.output;
+                }
+              }
             }
           }
           prev.connect(this.busPost);
@@ -678,20 +743,34 @@
      */
     randomizeChain(mode = "SAFE") {
       const activeKeys = [...this.chain];
-      if (mode === "SAFE") {
-        const isDriveOrFilter = k => k === "TUBE_DRIVE" || k === "DRIVE" || k === "PHASER" || k === "FILTER";
-        const isModulation = k => k === "OPTICAL_TREMOLO" || k === "TREMOLO" || k === "FLANGER" || k === "CHORUS";
-        const isTimeBased = k => k === "DELAY" || k === "DIGITAL_DELAY" || k === "SPACE_DELAY" || k === "TAPE_ECHO" || k === "SPACE" || k === "REVERB";
+      const isConsolidated = activeKeys.some(k => CONSOLIDATED_GROUPS[k]);
 
-        const frontPool = activeKeys.filter(isDriveOrFilter);
-        const modPool   = activeKeys.filter(k => isModulation(k) && !isDriveOrFilter(k));
-        const backPool  = activeKeys.filter(k => isTimeBased(k) && !isDriveOrFilter(k) && !isModulation(k));
-        const otherPool = activeKeys.filter(k => !isDriveOrFilter(k) && !isModulation(k) && !isTimeBased(k));
-
-        const shuffle = arr => arr.slice().sort(() => Math.random() - 0.5);
-        this.chain = [...shuffle(frontPool), ...shuffle(modPool), ...shuffle(otherPool), ...shuffle(backPool)];
+      if (isConsolidated) {
+        if (mode === "SAFE") {
+          const frontPool = ["DRIVE_FILTER", "MOD_CLUSTER"].filter(k => activeKeys.includes(k));
+          const backPool = ["ANALOG_DELAY", "DIGITAL_DELAY", "SPACE_REVERB"].filter(k => activeKeys.includes(k));
+          const otherPool = activeKeys.filter(k => !frontPool.includes(k) && !backPool.includes(k));
+          const shuffle = arr => arr.slice().sort(() => Math.random() - 0.5);
+          this.chain = [...shuffle(frontPool), ...shuffle(otherPool), ...shuffle(backPool)];
+        } else {
+          this.chain = activeKeys.sort(() => Math.random() - 0.5);
+        }
       } else {
-        this.chain = activeKeys.sort(() => Math.random() - 0.5);
+        if (mode === "SAFE") {
+          const isDriveOrFilter = k => k === "TUBE_DRIVE" || k === "OVERDRIVE" || k === "DRIVE" || k === "PHASER" || k === "FILTER";
+          const isModulation = k => k === "OPTICAL_TREMOLO" || k === "TREMOLO" || k === "FLANGER" || k === "CHORUS";
+          const isTimeBased = k => k === "DELAY" || k === "DIGITAL_DELAY" || k === "SPACE_DELAY" || k === "TAPE_ECHO" || k === "SPACE" || k === "REVERB";
+
+          const frontPool = activeKeys.filter(isDriveOrFilter);
+          const modPool   = activeKeys.filter(k => isModulation(k) && !isDriveOrFilter(k));
+          const backPool  = activeKeys.filter(k => isTimeBased(k) && !isDriveOrFilter(k) && !isModulation(k));
+          const otherPool = activeKeys.filter(k => !isDriveOrFilter(k) && !isModulation(k) && !isTimeBased(k));
+
+          const shuffle = arr => arr.slice().sort(() => Math.random() - 0.5);
+          this.chain = [...shuffle(frontPool), ...shuffle(modPool), ...shuffle(otherPool), ...shuffle(backPool)];
+        } else {
+          this.chain = activeKeys.sort(() => Math.random() - 0.5);
+        }
       }
       this.rewire(false);
       return [...this.chain];
@@ -730,12 +809,16 @@
       // 1. Reorder chain
       const rawChain = Array.isArray(config.order) ? config.order : (Array.isArray(config.chain) ? config.chain : null);
       if (rawChain && rawChain.length > 0) {
-        const mapped = rawChain.map(normKey).filter(k => ALL_KEYS.includes(k));
-        const newChain = [...mapped];
-        ALL_KEYS.forEach(k => {
-          if (!newChain.includes(k)) newChain.push(k);
-        });
-        this.chain = newChain;
+        if (this.consolidated || rawChain.some(k => CONSOLIDATED_GROUPS[k])) {
+          this.chain = SlambientFxRackManager.adaptLegacyChain(rawChain);
+        } else {
+          const mapped = rawChain.map(normKey).filter(k => ALL_KEYS.includes(k));
+          const newChain = [...mapped];
+          ALL_KEYS.forEach(k => {
+            if (!newChain.includes(k)) newChain.push(k);
+          });
+          this.chain = newChain;
+        }
         if (typeof dspChainOrder !== "undefined" && Array.isArray(dspChainOrder)) {
           dspChainOrder.length = 0;
           dspChainOrder.push(...this.chain);

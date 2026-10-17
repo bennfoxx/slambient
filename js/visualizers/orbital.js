@@ -157,9 +157,22 @@ const ORBITAL_MODULES = [
 ];
 
 // Maps a dspChainOrder pedal key to the orbital orb it corresponds to --
-// note the pedal chain's "SPACE" key is the Reverb & Chorus pedal, not the
-// "space" orb (that id is the fixed Master EQ & Out orb, #8).
-const PEDAL_KEY_TO_ORBITAL_ID = { FILTER: "filter", DELAY: "delay", SPACE: "reverb" };
+const PEDAL_KEY_TO_ORBITAL_ID = {
+  DRIVE_FILTER: "filter",
+  MOD_CLUSTER: "filter",
+  ANALOG_DELAY: "delay",
+  DIGITAL_DELAY: "delay",
+  SPACE_REVERB: "reverb",
+  FILTER: "filter",
+  DELAY: "delay",
+  SPACE: "reverb",
+  OVERDRIVE: "filter",
+  TREMOLO: "filter",
+  PHASER: "filter",
+  FLANGER: "filter",
+  SPACE_DELAY: "delay",
+  TAPE_ECHO: "delay"
+};
 
 // The constellation chain always links all 8 orbs 1->2->...->8, but the
 // Filter/Delay/Reverb segment (orbs 5-7) follows the live DSP insert
@@ -173,13 +186,20 @@ function getOrbitalConnectionChain() {
   if (typeof dspChainOrder === "undefined" || !Array.isArray(dspChainOrder)) {
     return ORBITAL_MODULES;
   }
-  const pedalOrbs = dspChainOrder
-    .map(key => ORBITAL_MODULES.find(o => o.id === PEDAL_KEY_TO_ORBITAL_ID[key]))
-    .filter(Boolean);
+  const pedalOrbs = [];
+  const seen = new Set();
+  dspChainOrder.forEach(key => {
+    const orbId = PEDAL_KEY_TO_ORBITAL_ID[key];
+    if (orbId && !seen.has(orbId)) {
+      seen.add(orbId);
+      const orb = ORBITAL_MODULES.find(o => o.id === orbId);
+      if (orb) pedalOrbs.push(orb);
+    }
+  });
   return [...leading, ...pedalOrbs, trailing].filter(Boolean);
 }
 
-const ORBITAL_ID_TO_PEDAL_KEY = { filter: "FILTER", delay: "DELAY", reverb: "SPACE" };
+const ORBITAL_ID_TO_PEDAL_KEY = { filter: "DRIVE_FILTER", delay: "ANALOG_DELAY", reverb: "SPACE_REVERB" };
 
 // The Filter/Delay/Reverb orbs' module is a .pedal-chassis card (id
 // pedalCard_FILTER etc), not a .strip-channel.<chClass> like every other

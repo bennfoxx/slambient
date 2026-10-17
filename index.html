@@ -1305,6 +1305,11 @@
             <span class="pedal-silk-role">12-Pole All-Pass Sweep</span>
             <span class="pedal-silk-model">OTA CASCADE // QUAD LFO</span>
           </div>
+          <div class="mod-cluster-pills" role="tablist" aria-label="Modulation Cluster Selector">
+            <button type="button" class="mod-pill" onclick="selectModSubStage('TREMOLO', event)" title="Select Opto Tremolo">OPTO</button>
+            <button type="button" class="mod-pill active" onclick="selectModSubStage('PHASER', event)" title="Select 12-Pole Phaser">PHASE</button>
+            <button type="button" class="mod-pill" onclick="selectModSubStage('FLANGER', event)" title="Select Analog Flanger">FLANGE</button>
+          </div>
           <div class="pedal-controls-body">
             <div class="control-row">
               <div class="control-label"><span>Sweep Speed</span><span class="control-val" id="lbl_PHASER_rate">0.35 Hz</span></div>
@@ -1356,6 +1361,11 @@
             <span class="pedal-silk-role">Comb-Filter Micro-Delay</span>
             <span class="pedal-silk-model">BBD BRIGADE // BIPOLAR FDBK</span>
           </div>
+          <div class="mod-cluster-pills" role="tablist" aria-label="Modulation Cluster Selector">
+            <button type="button" class="mod-pill" onclick="selectModSubStage('TREMOLO', event)" title="Select Opto Tremolo">OPTO</button>
+            <button type="button" class="mod-pill" onclick="selectModSubStage('PHASER', event)" title="Select 12-Pole Phaser">PHASE</button>
+            <button type="button" class="mod-pill active" onclick="selectModSubStage('FLANGER', event)" title="Select Analog Flanger">FLANGE</button>
+          </div>
           <div class="pedal-controls-body">
             <div class="control-row">
               <div class="control-label"><span>Flanger Rate</span><span class="control-val" id="lbl_FLANGER_rate">0.25 Hz</span></div>
@@ -1406,6 +1416,25 @@
           <div class="pedal-faceplate-banner">
             <span class="pedal-silk-role">Analog Tape Delay</span>
             <span class="pedal-silk-model">BBD LINE // TAPE SLOW SLEW</span>
+          </div>
+          <div class="tape-reel-transport-faceplate">
+            <div class="tape-reels-visual" aria-hidden="true">
+              <svg viewBox="0 0 140 38" class="tape-reels-svg">
+                <circle cx="28" cy="19" r="14" class="tape-reel-rim" stroke="#feca57" stroke-width="1.5" fill="#12161f"/>
+                <circle cx="28" cy="19" r="4.5" fill="#feca57"/>
+                <line x1="16" y1="19" x2="40" y2="19" stroke="rgba(254,202,87,0.5)" stroke-width="1.5"/>
+                <circle cx="112" cy="19" r="14" class="tape-reel-rim" stroke="#feca57" stroke-width="1.5" fill="#12161f"/>
+                <circle cx="112" cy="19" r="4.5" fill="#feca57"/>
+                <line x1="100" y1="19" x2="124" y2="19" stroke="rgba(254,202,87,0.5)" stroke-width="1.5"/>
+                <path d="M28 32 C 55 30, 85 30, 112 32" stroke="rgba(254,202,87,0.7)" stroke-width="1.5" fill="none"/>
+                <circle cx="70" cy="22" r="3.5" fill="#ff9f43" class="tape-capstan-roller"/>
+              </svg>
+            </div>
+            <div class="tape-flutter-readout">
+              <span class="tape-tele-pill"><span class="k">CAPSTAN</span> <span class="v" id="hudCapstanSpeed">15 IPS</span></span>
+              <span class="tape-tele-pill"><span class="k">FLUTTER</span> <span class="v" id="hudFlutterVal">0.14%</span></span>
+              <span class="tape-tele-pill"><span class="k">WOW</span> <span class="v" id="hudWowVal">0.08 Hz</span></span>
+            </div>
           </div>
           <div class="pedal-controls-body">
             <div class="control-row">
@@ -1498,6 +1527,22 @@
           <div class="pedal-faceplate-banner">
             <span class="pedal-silk-role">Ping-Pong Delay</span>
             <span class="pedal-silk-model">PRISTINE 64-BIT // TEMPO GRID</span>
+          </div>
+          <div class="digital-delay-grid-faceplate">
+            <div class="digital-division-strip">
+              <span class="digital-division-tag">DIV</span>
+              <div class="delay-divisions-selector" role="group" aria-label="Rhythmic Division">
+                <button type="button" class="btn-division" onclick="setDelayDivision('1/16', event)">1/16</button>
+                <button type="button" class="btn-division" onclick="setDelayDivision('1/8', event)">1/8</button>
+                <button type="button" class="btn-division active" onclick="setDelayDivision('1/8d', event)">1/8d</button>
+                <button type="button" class="btn-division" onclick="setDelayDivision('1/4', event)">1/4</button>
+                <button type="button" class="btn-division" onclick="setDelayDivision('1/2', event)">1/2</button>
+              </div>
+            </div>
+            <div class="digital-grid-sync-readout">
+              <span class="digital-grid-indicator">● SYNC LOCK</span>
+              <span class="digital-grid-ms" id="digitalDelayMsReadout">375.0 ms [1/8d]</span>
+            </div>
           </div>
           <div class="pedal-controls-body">
             <div class="control-row">
@@ -1651,6 +1696,25 @@
           <div class="pedal-faceplate-banner">
             <span class="pedal-silk-role">Shimmer Reverb &amp; Chorus</span>
             <span class="pedal-silk-model">SCHROEDER-MOORER // DIFFUSED CHORUS</span>
+          </div>
+          <div class="cosmic-plate-faceplate">
+            <div class="cathedral-mode-selector-strip">
+              <span class="cathedral-tag">SPACE MODEL</span>
+              <div class="cathedral-modes-selector" role="group" aria-label="Reverb Space Model">
+                <button type="button" class="btn-reverb-mode" onclick="setReverbCathedralMode('PLATE', event)">PLATE</button>
+                <button type="button" class="btn-reverb-mode" onclick="setReverbCathedralMode('ROOM', event)">ROOM</button>
+                <button type="button" class="btn-reverb-mode active" onclick="setReverbCathedralMode('CATHEDRAL', event)">CATHEDRAL</button>
+                <button type="button" class="btn-reverb-mode" onclick="setReverbCathedralMode('INFINITE', event)">INFINITE</button>
+              </div>
+            </div>
+            <div class="cosmic-plate-motif" aria-hidden="true">
+              <svg viewBox="0 0 140 22" class="cosmic-plate-svg">
+                <ellipse cx="70" cy="11" rx="60" ry="8" fill="none" stroke="rgba(165,94,234,0.35)" stroke-dasharray="2 3"/>
+                <ellipse cx="70" cy="11" rx="35" ry="5" fill="none" stroke="rgba(165,94,234,0.5)"/>
+                <circle cx="70" cy="11" r="2.5" fill="#a55eea"/>
+                <line x1="20" y1="11" x2="120" y2="11" stroke="rgba(165,94,234,0.25)"/>
+              </svg>
+            </div>
           </div>
           <div class="pedal-controls-body">
             <div class="control-row">
@@ -4316,6 +4380,260 @@ function initLowerDeckView() {
   if (typeof initStudioFxDragAndDrop === "function") {
     initStudioFxDragAndDrop();
   }
+  if (typeof syncAllMiniFxCards === "function") {
+    syncAllMiniFxCards();
+  }
+}
+
+// =========================================================================
+// 5 CONSOLIDATED FX UNITS & SPLIT-VIEW MINI-CARDS ENGINE
+// =========================================================================
+
+function syncMiniParam(pedalKey, paramId, value, lblId, unit) {
+  const numVal = parseFloat(value);
+  if (typeof updateFxParam === "function") {
+    updateFxParam(pedalKey, paramId, numVal);
+  }
+  const lbl = document.getElementById(lblId);
+  if (lbl) {
+    if (unit === "Hz") {
+      lbl.textContent = numVal >= 1000 ? (numVal / 1000).toFixed(1) + "k" : Math.round(numVal) + "Hz";
+    } else if (unit === "s") {
+      lbl.textContent = Math.round(numVal * 1000) + "ms";
+    } else if (unit === "x") {
+      lbl.textContent = numVal.toFixed(1) + "x";
+    } else {
+      lbl.textContent = Math.round(numVal) + (unit || "");
+    }
+  }
+
+  const fullSlider = document.getElementById(`slider_${pedalKey}_${paramId}`) ||
+                     (paramId === "cutoff" ? document.getElementById("knobMasterCutoff") : null) ||
+                     (paramId === "weather" ? document.getElementById("knobWeather") : null);
+  if (fullSlider) {
+    fullSlider.value = numVal;
+  }
+}
+
+function syncMiniModParam(paramType, value, lblId, unit) {
+  const numVal = parseFloat(value);
+  ["TREMOLO", "PHASER", "FLANGER"].forEach(key => {
+    if (typeof updateFxParam === "function") {
+      updateFxParam(key, paramType, numVal);
+    }
+    const fullSlider = document.getElementById(`slider_${key}_${paramType}`);
+    if (fullSlider) fullSlider.value = numVal;
+  });
+  const lbl = document.getElementById(lblId);
+  if (lbl) {
+    if (unit === "Hz") lbl.textContent = numVal.toFixed(2) + "Hz";
+    else lbl.textContent = Math.round(numVal) + "%";
+  }
+}
+
+function toggleUnitBypass(unitKey, event) {
+  if (event) event.stopPropagation();
+  const unitMap = {
+    unit1: ["OVERDRIVE", "FILTER"],
+    unit2: ["TREMOLO", "PHASER", "FLANGER"],
+    unit3: ["TAPE_ECHO", "DELAY"],
+    unit4: ["DIGITAL_DELAY"],
+    unit5: ["SPACE"]
+  };
+  const keys = unitMap[unitKey] || [];
+  if (!keys.length) return;
+
+  const firstKey = keys[0];
+  const currentlyBypassed = !!(typeof pedalBypassState !== "undefined" && pedalBypassState[firstKey]);
+  const newBypass = !currentlyBypassed;
+
+  keys.forEach(k => {
+    if (typeof pedalBypassState !== "undefined") {
+      pedalBypassState[k] = newBypass;
+    }
+    if (window.fxRackManager && typeof window.fxRackManager.setBypass === "function") {
+      window.fxRackManager.setBypass(k, newBypass);
+    }
+    const card = document.getElementById("pedalCard_" + k);
+    const btn = document.getElementById("stompBtn_" + k);
+    if (card) card.classList.toggle("bypassed", newBypass);
+    if (btn) btn.classList.toggle("active", !newBypass);
+  });
+
+  updateUnitBypassUI(unitKey);
+  if (typeof renderPedalboardRoutingRibbon === "function") renderPedalboardRoutingRibbon();
+}
+
+function updateUnitBypassUI(unitKey) {
+  const unitMap = {
+    unit1: ["OVERDRIVE", "FILTER"],
+    unit2: ["TREMOLO", "PHASER", "FLANGER"],
+    unit3: ["TAPE_ECHO", "DELAY"],
+    unit4: ["DIGITAL_DELAY"],
+    unit5: ["SPACE"]
+  };
+  const keys = unitMap[unitKey] || [];
+  if (!keys.length) return;
+  const isEngaged = keys.some(k => !(typeof pedalBypassState !== "undefined" && pedalBypassState[k]));
+  const miniCard = document.getElementById("miniCard_" + unitKey);
+  const pwrBtn = document.getElementById("mini_pwr_" + unitKey);
+  if (miniCard) miniCard.classList.toggle("bypassed", !isEngaged);
+  if (pwrBtn) {
+    pwrBtn.classList.toggle("active", isEngaged);
+    pwrBtn.title = isEngaged ? "Turn OFF Unit" : "Turn ON Unit";
+  }
+}
+
+function inspectConsolidatedUnit(unitKey, event) {
+  if (event) event.stopPropagation();
+  setLowerDeckMode("fx");
+  const targetMap = {
+    unit1: "pedalCard_OVERDRIVE",
+    unit2: "pedalCard_TREMOLO",
+    unit3: "pedalCard_DELAY",
+    unit4: "pedalCard_DIGITAL_DELAY",
+    unit5: "pedalCard_SPACE"
+  };
+  const targetId = targetMap[unitKey];
+  const targetEl = document.getElementById(targetId);
+  if (targetEl) {
+    targetEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    targetEl.classList.add("unit-target-highlight");
+    setTimeout(() => targetEl.classList.remove("unit-target-highlight"), 1200);
+  }
+}
+
+function setDelayDivision(divStr, event) {
+  if (event) event.stopPropagation();
+  document.querySelectorAll(".btn-division").forEach(btn => {
+    btn.classList.toggle("active", btn.textContent.trim() === divStr);
+  });
+  const currentBpm = (typeof bpm !== "undefined" && bpm > 0) ? bpm : 72;
+  const beatSec = 60.0 / currentBpm;
+  let factor = 1.0;
+  if (divStr === "1/16") factor = 0.25;
+  else if (divStr === "1/8") factor = 0.5;
+  else if (divStr === "1/8d") factor = 0.75;
+  else if (divStr === "1/4") factor = 1.0;
+  else if (divStr === "1/2") factor = 2.0;
+
+  const delaySec = Math.max(0.02, Math.min(2.0, beatSec * factor));
+  const delayMs = Math.round(delaySec * 1000);
+
+  if (typeof updateFxParam === "function") {
+    updateFxParam("DIGITAL_DELAY", "time", delaySec);
+  }
+  const slider = document.getElementById("slider_DIGITAL_DELAY_time");
+  if (slider) slider.value = delaySec;
+  const readout = document.getElementById("digitalDelayMsReadout");
+  if (readout) readout.textContent = `${delayMs}.0 ms [${divStr}]`;
+  const miniSlider = document.getElementById("mini_slider_dig_time");
+  if (miniSlider) miniSlider.value = delaySec;
+  const miniLbl = document.getElementById("lbl_mini_dig_time");
+  if (miniLbl) miniLbl.textContent = `${delayMs}ms`;
+}
+
+function setReverbCathedralMode(modeStr, event) {
+  if (event) event.stopPropagation();
+  document.querySelectorAll(".btn-reverb-mode").forEach(btn => {
+    btn.classList.toggle("active", btn.textContent.trim() === modeStr);
+  });
+  const sel = document.getElementById("selReverbMode");
+  if (sel) {
+    if (modeStr === "CATHEDRAL") sel.value = "CATHEDRAL";
+    else if (modeStr === "PLATE") sel.value = "PLATE";
+    else sel.value = "HALL";
+  }
+  let weatherTarget = 65;
+  if (modeStr === "PLATE") weatherTarget = 45;
+  else if (modeStr === "ROOM") weatherTarget = 30;
+  else if (modeStr === "CATHEDRAL") weatherTarget = 80;
+  else if (modeStr === "INFINITE") weatherTarget = 95;
+
+  if (typeof updateFxParam === "function") {
+    updateFxParam("SPACE", "weather", weatherTarget);
+  }
+  const kWeather = document.getElementById("knobWeather");
+  if (kWeather) kWeather.value = weatherTarget;
+  const lWeather = document.getElementById("lblWeather");
+  if (lWeather) lWeather.textContent = weatherTarget + "%";
+
+  const miniS = document.getElementById("mini_slider_spc_size");
+  if (miniS) miniS.value = weatherTarget;
+  const miniL = document.getElementById("lbl_mini_spc_size");
+  if (miniL) miniL.textContent = weatherTarget + "%";
+}
+
+function selectModSubStage(stageKey, event) {
+  if (event) event.stopPropagation();
+  document.querySelectorAll(".mod-cluster-pills .mod-pill").forEach(pill => {
+    pill.classList.toggle("active", pill.textContent.trim() === (stageKey === "TREMOLO" ? "OPTO" : (stageKey === "PHASER" ? "PHASE" : "FLANGE")));
+  });
+  const targetCard = document.getElementById("pedalCard_" + stageKey);
+  if (targetCard) {
+    targetCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    targetCard.classList.add("unit-target-highlight");
+    setTimeout(() => targetCard.classList.remove("unit-target-highlight"), 1200);
+  }
+}
+
+function syncAllMiniFxCards() {
+  const drvVal = (typeof fxParamsState !== "undefined" && fxParamsState["OVERDRIVE"] && fxParamsState["OVERDRIVE"]["drive"]) || 2.0;
+  const cutVal = (typeof fxParamsState !== "undefined" && fxParamsState["FILTER"] && fxParamsState["FILTER"]["cutoff"]) || 2400;
+  const sDrv = document.getElementById("mini_slider_drive");
+  const sCut = document.getElementById("mini_slider_cutoff");
+  if (sDrv) sDrv.value = drvVal;
+  if (sCut) sCut.value = cutVal;
+  const lDrv = document.getElementById("lbl_mini_drive");
+  const lCut = document.getElementById("lbl_mini_cutoff");
+  if (lDrv) lDrv.textContent = parseFloat(drvVal).toFixed(1) + "x";
+  if (lCut) lCut.textContent = (cutVal >= 1000 ? (cutVal / 1000).toFixed(1) + "k" : cutVal) + "Hz";
+
+  const modR = (typeof fxParamsState !== "undefined" && fxParamsState["PHASER"] && fxParamsState["PHASER"]["rate"]) || 0.35;
+  const modD = (typeof fxParamsState !== "undefined" && fxParamsState["PHASER"] && fxParamsState["PHASER"]["depth"]) || 65;
+  const sMR = document.getElementById("mini_slider_mod_rate");
+  const sMD = document.getElementById("mini_slider_mod_depth");
+  if (sMR) sMR.value = modR;
+  if (sMD) sMD.value = modD;
+  const lMR = document.getElementById("lbl_mini_mod_rate");
+  const lMD = document.getElementById("lbl_mini_mod_depth");
+  if (lMR) lMR.textContent = parseFloat(modR).toFixed(2) + "Hz";
+  if (lMD) lMD.textContent = Math.round(modD) + "%";
+
+  const tapeT = (typeof fxParamsState !== "undefined" && fxParamsState["DELAY"] && fxParamsState["DELAY"]["time"]) || 0.38;
+  const tapeF = (typeof fxParamsState !== "undefined" && fxParamsState["TAPE_ECHO"] && fxParamsState["TAPE_ECHO"]["flutter"]) || 35;
+  const sTT = document.getElementById("mini_slider_tape_time");
+  const sTF = document.getElementById("mini_slider_tape_flutter");
+  if (sTT) sTT.value = tapeT;
+  if (sTF) sTF.value = tapeF;
+  const lTT = document.getElementById("lbl_mini_tape_time");
+  const lTF = document.getElementById("lbl_mini_tape_flutter");
+  if (lTT) lTT.textContent = Math.round(tapeT * 1000) + "ms";
+  if (lTF) lTF.textContent = Math.round(tapeF) + "%";
+
+  const digT = (typeof fxParamsState !== "undefined" && fxParamsState["DIGITAL_DELAY"] && fxParamsState["DIGITAL_DELAY"]["time"]) || 0.375;
+  const digF = (typeof fxParamsState !== "undefined" && fxParamsState["DIGITAL_DELAY"] && fxParamsState["DIGITAL_DELAY"]["feedback"]) || 45;
+  const sDT = document.getElementById("mini_slider_dig_time");
+  const sDF = document.getElementById("mini_slider_dig_fdbk");
+  if (sDT) sDT.value = digT;
+  if (sDF) sDF.value = digF;
+  const lDT = document.getElementById("lbl_mini_dig_time");
+  const lDF = document.getElementById("lbl_mini_dig_fdbk");
+  if (lDT) lDT.textContent = Math.round(digT * 1000) + "ms";
+  if (lDF) lDF.textContent = Math.round(digF) + "%";
+
+  const spcS = (typeof fxParamsState !== "undefined" && fxParamsState["SPACE"] && fxParamsState["SPACE"]["weather"]) || 65;
+  const spcM = (typeof fxParamsState !== "undefined" && fxParamsState["SPACE"] && fxParamsState["SPACE"]["mix"]) || 48;
+  const sSS = document.getElementById("mini_slider_spc_size");
+  const sSM = document.getElementById("mini_slider_spc_mix");
+  if (sSS) sSS.value = spcS;
+  if (sSM) sSM.value = spcM;
+  const lSS = document.getElementById("lbl_mini_spc_size");
+  const lSM = document.getElementById("lbl_mini_spc_mix");
+  if (lSS) lSS.textContent = Math.round(spcS) + "%";
+  if (lSM) lSM.textContent = Math.round(spcM) + "%";
+
+  ["unit1", "unit2", "unit3", "unit4", "unit5"].forEach(updateUnitBypassUI);
 }
 
 function renderBirdsEyePedalRack() {

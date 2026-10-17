@@ -215,4 +215,42 @@ tubeDrive.setTone(3000);
 tubeDrive.setMix(0.65);
 
 console.log("✔ SlambientFxRackManager loadChainPreset and DSP setters verified");
+
+// 6. Test Consolidated Chaining and Adapter Fallbacks
+const consolidatedManager = new SlambientFxRackManager(ctx, busPre, busPost, { consolidated: true });
+consolidatedManager.registerModule("OVERDRIVE", tubeDrive);
+consolidatedManager.registerModule("FILTER", { input: ctx.createGain(), output: ctx.createGain() });
+consolidatedManager.registerModule("TREMOLO", tremolo);
+consolidatedManager.registerModule("PHASER", phaser);
+consolidatedManager.registerModule("FLANGER", flanger);
+consolidatedManager.registerModule("DELAY", { input: ctx.createGain(), output: ctx.createGain() });
+consolidatedManager.registerModule("TAPE_ECHO", tapeEcho);
+consolidatedManager.registerModule("DIGITAL_DELAY", digitalDelay);
+consolidatedManager.registerModule("SPACE_DELAY", spaceDelay);
+consolidatedManager.registerModule("SPACE", { input: ctx.createGain(), output: ctx.createGain() });
+
+assert.deepStrictEqual(consolidatedManager.chain, ['DRIVE_FILTER', 'MOD_CLUSTER', 'ANALOG_DELAY', 'DIGITAL_DELAY', 'SPACE_REVERB']);
+
+// Test adapter mapping
+const legacyChain = ["OVERDRIVE", "TREMOLO", "SPACE_DELAY", "FILTER", "SPACE", "DELAY", "DIGITAL_DELAY", "TAPE_ECHO", "PHASER", "FLANGER"];
+const adapted = SlambientFxRackManager.adaptLegacyChain(legacyChain);
+assert.strictEqual(adapted.length, 5);
+assert.deepStrictEqual(adapted, ["DRIVE_FILTER", "MOD_CLUSTER", "DIGITAL_DELAY", "SPACE_REVERB", "ANALOG_DELAY"]);
+
+// Test consolidated loadChainPreset with legacy config
+consolidatedManager.loadChainPreset({
+  chain: legacyChain,
+  bypass: { OVERDRIVE: false, FILTER: true, TREMOLO: false, PHASER: true, FLANGER: true },
+  params: { OVERDRIVE: { drive: 3.5 } }
+});
+assert.strictEqual(consolidatedManager.chain.length, 5);
+assert.strictEqual(consolidatedManager.chain[0], "DRIVE_FILTER");
+
+// Test safe randomization on consolidated chain
+const randConsolidated = consolidatedManager.randomizeChain("SAFE");
+assert.strictEqual(randConsolidated.length, 5);
+const front = randConsolidated.slice(0, 2);
+assert(front.includes("DRIVE_FILTER") && front.includes("MOD_CLUSTER"), "Front pool must contain pre-gain & mod cluster");
+
+console.log("✔ SlambientFxRackManager consolidated chaining and adapter fallbacks verified");
 console.log("ALL DSP RACK UNIT TESTS PASSED CLEANLY!");

@@ -3462,7 +3462,7 @@
     width: 100%;
   }
 
-  /* Mode 3: SPLIT VIEW (Desktop > 1200px: 60% Instruments + 40% FX) */
+  /* Mode 3: SPLIT VIEW (Desktop > 1200px: 60% Instruments + 40% Split FX Rail) */
   @media (min-width: 1201px) {
     .lower-deck.deck-mode-split .lower-deck-body {
       display: flex;
@@ -3473,27 +3473,533 @@
     }
 
     .lower-deck.deck-mode-split .instruments-deck {
-      flex: 0 0 calc(60% - 7px);
-      width: calc(60% - 7px);
+      flex: 1 1 60%;
+      width: 60%;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 12px;
     }
 
     .lower-deck.deck-mode-split .studio-fx-pedalboard {
-      flex: 0 0 calc(40% - 7px);
-      width: calc(40% - 7px);
-      display: flex;
+      flex: 0 0 calc(40% - 14px);
+      width: calc(40% - 14px);
+      display: flex !important;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
     }
 
-    .lower-deck.deck-mode-split .studio-fx-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      width: 100%;
+    .lower-deck.deck-mode-split .studio-fx-grid,
+    .lower-deck.deck-mode-split .pedalboard-routing-ribbon,
+    .lower-deck.deck-mode-split .pedalboard-master-section {
+      display: none !important;
     }
+
+    .lower-deck.deck-mode-split .split-fx-rail {
+      display: flex !important;
+    }
+  }
+
+  /* Split FX Rail Default: Hidden unless in deck-mode-split on desktop */
+  .split-fx-rail {
+    display: none !important;
+    box-sizing: border-box;
+    width: 100%;
+    background: rgba(9, 12, 19, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 8px 10px;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+  }
+
+  .split-rail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 24px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .split-rail-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .split-rail-title .rail-icon {
+    font-size: 12px;
+  }
+
+  .split-rail-title .rail-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #f1f2f6;
+  }
+
+  .split-rail-title .rail-tag {
+    font-family: var(--font-mono, monospace);
+    font-size: 9px;
+    color: #718096;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  .btn-rail-expand {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 20px;
+    padding: 0 8px;
+    font-family: var(--font-mono, monospace);
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #00e5ff;
+    background: rgba(0, 229, 255, 0.1);
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.14s ease;
+  }
+
+  .btn-rail-expand:hover {
+    background: rgba(0, 229, 255, 0.2);
+    border-color: #00e5ff;
+    color: #ffffff;
+  }
+
+  .split-rail-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  /* Mini-FX Card: Compact 54px (52px-60px spec floor) */
+  .mini-fx-card {
+    height: 54px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(14, 18, 26, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 5px;
+    padding: 4px 8px 4px 0;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  }
+
+  .mini-fx-card:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(18, 23, 33, 0.94);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  }
+
+  .mini-fx-card.bypassed {
+    opacity: 0.55;
+    background: rgba(10, 13, 20, 0.65);
+    border-color: rgba(255, 255, 255, 0.04);
+  }
+
+  .mini-fx-pip {
+    width: 4px;
+    height: 100%;
+    flex-shrink: 0;
+    background: var(--unit-accent, #00d2d3);
+    box-shadow: 0 0 8px var(--unit-accent, #00d2d3);
+    border-radius: 4px 0 0 4px;
+  }
+
+  .mini-fx-badge-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 50px;
+    flex-shrink: 0;
+    gap: 1px;
+    padding-left: 2px;
+  }
+
+  .mini-fx-slot {
+    font-family: var(--font-mono, monospace);
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--unit-accent, #00e5ff);
+    letter-spacing: 0.5px;
+  }
+
+  .mini-fx-name {
+    font-size: 11px;
+    font-weight: 800;
+    color: #f1f2f6;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .mini-fx-sliders {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .mini-fx-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 19px;
+  }
+
+  .mini-fx-lbl {
+    width: 28px;
+    flex-shrink: 0;
+    font-family: var(--font-mono, monospace);
+    font-size: 8.5px;
+    font-weight: 700;
+    color: #8a9ba8;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  .mini-fx-range {
+    flex: 1 1 auto;
+    height: 4px;
+    cursor: pointer;
+    accent-color: var(--unit-accent, #00d2d3);
+    margin: 0;
+    touch-action: none !important;
+  }
+
+  .mini-fx-val {
+    width: 46px;
+    flex-shrink: 0;
+    font-family: var(--font-mono, monospace);
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--unit-accent, #00d2d3);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .mini-fx-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .btn-mini-fx-pwr {
+    height: 18px;
+    line-height: 16px;
+    width: 32px;
+    box-sizing: border-box;
+    padding: 0 4px;
+    font-family: var(--font-mono, monospace);
+    font-size: 8.5px;
+    font-weight: 800;
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.05);
+    color: #718096;
+    cursor: pointer;
+    transition: all 0.14s ease;
+  }
+
+  .btn-mini-fx-pwr.active {
+    background: rgba(46, 213, 115, 0.18);
+    border-color: rgba(46, 213, 115, 0.6);
+    color: #2ed573;
+    box-shadow: 0 0 6px rgba(46, 213, 115, 0.35);
+  }
+
+  .btn-mini-fx-edit {
+    height: 18px;
+    line-height: 16px;
+    box-sizing: border-box;
+    padding: 0 6px;
+    font-family: var(--font-mono, monospace);
+    font-size: 8.5px;
+    font-weight: 700;
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.05);
+    color: #cbd5e0;
+    cursor: pointer;
+    transition: all 0.14s ease;
+  }
+
+  .btn-mini-fx-edit:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+  }
+
+  /* =====================================================================
+     FACEPLATE GRAPHICS FOR THE 5 CONSOLIDATED UNITS (Full Eurorack Cards)
+     ===================================================================== */
+  /* Unit 1: Dual-Stage Drive & Filter */
+  .dual-stage-header-pip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 6px;
+    margin-bottom: 6px;
+    background: rgba(255, 82, 82, 0.08);
+    border-left: 2px solid #ff5252;
+    border-radius: 2px;
+  }
+
+  .dual-stage-tag {
+    font-family: var(--font-mono, monospace);
+    font-size: 9px;
+    font-weight: 800;
+    color: #ff5252;
+    letter-spacing: 0.06em;
+  }
+
+  .dual-stage-link-indicator {
+    font-family: var(--font-mono, monospace);
+    font-size: 8.5px;
+    font-weight: 700;
+    color: #718096;
+  }
+
+  /* Unit 2: Modulation Cluster Segmented Selector */
+  .mod-cluster-pills {
+    display: flex;
+    gap: 3px;
+    padding: 2px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+
+  .mod-pill {
+    flex: 1;
+    height: 20px;
+    padding: 0 4px;
+    font-family: var(--font-mono, monospace);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    color: #718096;
+    cursor: pointer;
+    transition: all 0.14s ease;
+  }
+
+  .mod-pill:hover {
+    color: #cbd5e0;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .mod-pill.active {
+    background: rgba(224, 86, 253, 0.16);
+    border-color: rgba(224, 86, 253, 0.45);
+    color: #e056fd;
+    font-weight: 800;
+    box-shadow: 0 0 8px rgba(224, 86, 253, 0.25);
+  }
+
+  /* Unit 3: Analog Tape Delay Reel-to-Reel Silkscreen & Telemetry */
+  .tape-reel-transport-faceplate {
+    background: #0a0d14;
+    border: 1px solid rgba(254, 202, 87, 0.2);
+    border-radius: 5px;
+    padding: 6px;
+    margin-bottom: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tape-reels-visual {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .tape-reels-svg {
+    width: 140px;
+    height: 38px;
+    overflow: visible;
+  }
+
+  .tape-reel-rim {
+    transition: transform 0.2s ease;
+  }
+
+  .tape-flutter-readout {
+    display: flex;
+    justify-content: space-around;
+    gap: 4px;
+    border-top: 1px solid rgba(254, 202, 87, 0.15);
+    padding-top: 4px;
+  }
+
+  .tape-tele-pill {
+    font-family: var(--font-mono, monospace);
+    font-size: 8.5px;
+    display: flex;
+    gap: 3px;
+  }
+
+  .tape-tele-pill .k {
+    color: #718096;
+    font-weight: 600;
+  }
+
+  .tape-tele-pill .v {
+    color: #feca57;
+    font-weight: 700;
+  }
+
+  /* Unit 4: Digital Delay LED Grid & Divisions */
+  .digital-delay-grid-faceplate {
+    background: radial-gradient(circle, rgba(72, 219, 251, 0.12) 1px, transparent 1px) 0 0 / 8px 8px, #070c14;
+    border: 1px solid rgba(72, 219, 251, 0.25);
+    border-radius: 5px;
+    padding: 6px;
+    margin-bottom: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .digital-division-strip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .digital-division-tag {
+    font-family: var(--font-mono, monospace);
+    font-size: 8.5px;
+    font-weight: 800;
+    color: #48dbfb;
+  }
+
+  .delay-divisions-selector {
+    display: flex;
+    gap: 2px;
+    flex: 1;
+  }
+
+  .btn-division {
+    flex: 1;
+    height: 18px;
+    font-family: var(--font-mono, monospace);
+    font-size: 8.5px;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+    color: #718096;
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+
+  .btn-division.active {
+    background: rgba(72, 219, 251, 0.2);
+    border-color: #48dbfb;
+    color: #48dbfb;
+    font-weight: 800;
+    box-shadow: 0 0 6px rgba(72, 219, 251, 0.3);
+  }
+
+  .digital-grid-sync-readout {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono, monospace);
+    font-size: 8.5px;
+  }
+
+  .digital-grid-indicator {
+    color: #2ed573;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .digital-grid-ms {
+    color: #48dbfb;
+    font-weight: 800;
+  }
+
+  /* Unit 5: Cosmic Plate Reverb & Cathedral Mode Selector */
+  .cosmic-plate-faceplate {
+    background: radial-gradient(ellipse at center, rgba(165, 94, 234, 0.15) 0%, transparent 70%), #0a0815;
+    border: 1px solid rgba(165, 94, 234, 0.25);
+    border-radius: 5px;
+    padding: 6px;
+    margin-bottom: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .cathedral-mode-selector-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+  }
+
+  .cathedral-tag {
+    font-family: var(--font-mono, monospace);
+    font-size: 8.5px;
+    font-weight: 800;
+    color: #a55eea;
+  }
+
+  .cathedral-modes-selector {
+    display: flex;
+    gap: 2px;
+  }
+
+  .btn-reverb-mode {
+    padding: 2px 5px;
+    height: 18px;
+    font-family: var(--font-mono, monospace);
+    font-size: 8.5px;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+    color: #718096;
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+
+  .btn-reverb-mode.active {
+    background: rgba(165, 94, 234, 0.2);
+    border-color: #a55eea;
+    color: #a55eea;
+    font-weight: 800;
+    box-shadow: 0 0 6px rgba(165, 94, 234, 0.35);
+  }
+
+  .cosmic-plate-motif {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .cosmic-plate-svg {
+    width: 140px;
+    height: 22px;
   }
 
   /* Compact / Tablet Breakpoint (<= 1200px) */
