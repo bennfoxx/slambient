@@ -7002,18 +7002,21 @@
     .mobile-macro-tile-meter-wrap {
       flex: 1 1 auto;
       height: 4px;
-      background: rgba(255, 255, 255, 0.06);
+      background: #141722;
       border-radius: 2px;
       overflow: hidden;
       position: relative;
+      pointer-events: none;
     }
     .mobile-macro-tile-meter-bar {
       height: 100%;
       width: 0%;
       background: var(--tile-color, #00e5ff);
       border-radius: 2px;
-      transition: width 0.08s linear;
-      box-shadow: 0 0 5px var(--tile-color, #00e5ff);
+      transition: width 0.05s ease-out;
+      box-shadow: 0 0 6px var(--tile-color, #00e5ff);
+      pointer-events: none;
+      will-change: width;
     }
     .mobile-macro-tile-inspect-hint {
       font-family: "JetBrains Mono", ui-monospace, monospace;
@@ -9783,7 +9786,7 @@ let droneBreathLFO, droneBreathLFOGain;
 let droneGrowlLFO, droneGrowlLFOGain;
 let droneFormantLFO, droneFormantLFOGain;
 
-let drumAnalyser, chordAnalyser, arpAnalyser, droneAnalyser, masterAnalyser;
+let drumAnalyser, chordAnalyser, arpAnalyser, droneAnalyser, masterAnalyser, filterAnalyser, delayAnalyser, spaceAnalyser;
 let masterFilter1, masterFilter2, masterFilterCompGain;
 let analogDelayNode, delayFeedbackGain, delayDampingFilter, delaySaturationNode;
 let delayDryGain, delayWetGain, delayLFO, delayLFOGain;
@@ -10479,6 +10482,9 @@ function initAudio() {
   noiseAnalyser = audioCtx.createAnalyser(); noiseAnalyser.fftSize = 512;
   fieldAnalyser = audioCtx.createAnalyser(); fieldAnalyser.fftSize = 512;
   masterAnalyser = audioCtx.createAnalyser(); masterAnalyser.fftSize = 1024;
+  filterAnalyser = audioCtx.createAnalyser(); filterAnalyser.fftSize = 512;
+  delayAnalyser = audioCtx.createAnalyser(); delayAnalyser.fftSize = 512;
+  spaceAnalyser = audioCtx.createAnalyser(); spaceAnalyser.fftSize = 512;
 
   masterGain = audioCtx.createGain(); masterGain.gain.value = 0.75;
   drumBusGain = audioCtx.createGain(); drumBusGain.gain.value = drumVol * 0.78;
@@ -10707,6 +10713,7 @@ function initAudio() {
   masterFilter1.connect(masterFilter2);
   masterFilter2.connect(masterFilterCompGain);
   masterFilterCompGain.connect(filterModuleOutput);
+  masterFilterCompGain.connect(filterAnalyser);
 
   filterLFO = audioCtx.createOscillator(); filterLFO.type = "sine";
   filterLFO.frequency.value = filterLfoRateHz;
@@ -10747,6 +10754,7 @@ function initAudio() {
   delayModuleInput.connect(analogDelayNode);
   analogDelayNode.connect(delayWetGain);
   delayWetGain.connect(delayModuleOutput);
+  delayWetGain.connect(delayAnalyser);
 
   // 3. SPACE Module boundary & internal wiring (Reverb + Chorus)
   spaceModuleInput = audioCtx.createGain();
@@ -10763,6 +10771,7 @@ function initAudio() {
   spaceModuleInput.connect(reverbSend); reverbSend.connect(reverbNode);
   reverbNode.connect(reverbToneFilter);
   reverbToneFilter.connect(spaceModuleOutput);
+  reverbToneFilter.connect(spaceAnalyser);
 
   // Chorus: 3 pre-built voices (short modulated delay lines)
   chorusInputGain = audioCtx.createGain();
@@ -10792,6 +10801,7 @@ function initAudio() {
   });
 
   chorusWetGain.connect(spaceModuleOutput);
+  chorusWetGain.connect(spaceAnalyser);
   applyChorusModeParams();
 
   // Connect initial serial topology via Live Web Audio API rewire manager
@@ -20583,9 +20593,9 @@ const ORBITAL_MODULES = [
   { id: "arp",    name: "ARP",    num: "4", color: "#7d5fff", rgb: [125, 95, 255],  baseR: 42, x: 0, y: 0, vx: -0.16, vy: -0.14, chClass: "arp-ch",    analyser: () => arpAnalyser,    pulse: 0, bump: 0 },
   { id: "noise",  name: "NOISE",  num: "5", color: "#1dd1a1", rgb: [29, 209, 161],  baseR: 40, x: 0, y: 0, vx: 0.16,  vy: -0.15, chClass: "noise-ch",  analyser: () => noiseAnalyser,  pulse: 0, bump: 0 },
   { id: "field",  name: "FIELD",  num: "6", color: "#2bcbba", rgb: [43, 203, 186],  baseR: 41, x: 0, y: 0, vx: -0.15, vy: 0.16,  chClass: "field-ch",  analyser: () => (typeof fieldAnalyser !== "undefined" ? fieldAnalyser : noiseAnalyser), pulse: 0, bump: 0 },
-  { id: "filter", name: "FILTER", num: "7", color: "#2ed573", rgb: [46, 213, 115],  baseR: 37, x: 0, y: 0, vx: 0.14,  vy: 0.17,  chClass: "filter-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
-  { id: "delay",  name: "DELAY",  num: "8", color: "#ff793f", rgb: [255, 121, 63],  baseR: 35, x: 0, y: 0, vx: -0.18, vy: 0.12,  chClass: "delay-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 },
-  { id: "reverb", name: "SPACE",  num: "9", color: "#ff5fc4", rgb: [255, 95, 196],  baseR: 38, x: 0, y: 0, vx: 0.17,  vy: 0.13,  chClass: "reverb-ch", analyser: () => masterAnalyser, pulse: 0, bump: 0 },
+  { id: "filter", name: "FILTER", num: "7", color: "#2ed573", rgb: [46, 213, 115],  baseR: 37, x: 0, y: 0, vx: 0.14,  vy: 0.17,  chClass: "filter-ch", analyser: () => (typeof filterAnalyser !== "undefined" ? filterAnalyser : masterAnalyser), pulse: 0, bump: 0 },
+  { id: "delay",  name: "DELAY",  num: "8", color: "#ff793f", rgb: [255, 121, 63],  baseR: 35, x: 0, y: 0, vx: -0.18, vy: 0.12,  chClass: "delay-ch",  analyser: () => (typeof delayAnalyser !== "undefined" ? delayAnalyser : masterAnalyser),   pulse: 0, bump: 0 },
+  { id: "reverb", name: "SPACE",  num: "9", color: "#ff5fc4", rgb: [255, 95, 196],  baseR: 38, x: 0, y: 0, vx: 0.17,  vy: 0.13,  chClass: "reverb-ch", analyser: () => (typeof spaceAnalyser !== "undefined" ? spaceAnalyser : masterAnalyser),   pulse: 0, bump: 0 },
   { id: "space",  name: "OUT",    num: "10", color: "#4b7bec", rgb: [75, 123, 236], baseR: 37, x: 0, y: 0, vx: 0.12,  vy: -0.16, chClass: "space-ch",  analyser: () => masterAnalyser, pulse: 0, bump: 0 }
 ];
 
@@ -21474,6 +21484,9 @@ function renderMobileMacroGrid() {
   });
 
   grid.innerHTML = html;
+  if (typeof MOBILE_MACRO_METERS !== "undefined" && Array.isArray(MOBILE_MACRO_METERS)) {
+    MOBILE_MACRO_METERS.forEach(m => { m.lastPct = -1; });
+  }
 }
 
 function toggleMacroTilePower(modId, type, ev) {
@@ -21489,16 +21502,71 @@ function toggleMacroTilePower(modId, type, ev) {
   renderMobileMacroGrid();
 }
 
+const MOBILE_MACRO_METERS = [
+  { id: "drone",  orbId: "drone",  type: "inst", ref: 0.26, fLow: 1,  fHigh: 20,  e: 0, lastPct: -1, getAnalyser: () => droneAnalyser },
+  { id: "drum",   orbId: "drum",   type: "inst", ref: 0.26, fLow: 4,  fHigh: 45,  e: 0, lastPct: -1, getAnalyser: () => drumAnalyser },
+  { id: "chord",  orbId: "chord",  type: "inst", ref: 0.075, fLow: 12, fHigh: 85,  e: 0, lastPct: -1, getAnalyser: () => chordAnalyser },
+  { id: "arp",    orbId: "arp",    type: "inst", ref: 0.038, fLow: 28, fHigh: 125, e: 0, lastPct: -1, getAnalyser: () => arpAnalyser },
+  { id: "noise",  orbId: "noise",  type: "inst", ref: 0.055, fLow: 10, fHigh: 110, e: 0, lastPct: -1, getAnalyser: () => noiseAnalyser },
+  { id: "field",  orbId: "field",  type: "inst", ref: 0.07,  fLow: 8,  fHigh: 120, e: 0, lastPct: -1, getAnalyser: () => (typeof fieldAnalyser !== "undefined" ? fieldAnalyser : noiseAnalyser) },
+  { id: "FILTER", orbId: "filter", type: "fx",   ref: 0.11,  fLow: 10, fHigh: 80,  e: 0, lastPct: -1, getAnalyser: () => (typeof filterAnalyser !== "undefined" ? filterAnalyser : masterAnalyser) },
+  { id: "DELAY",  orbId: "delay",  type: "fx",   ref: 0.09,  fLow: 18, fHigh: 95,  e: 0, lastPct: -1, getAnalyser: () => (typeof delayAnalyser !== "undefined" ? delayAnalyser : masterAnalyser) },
+  { id: "SPACE",  orbId: "reverb", type: "fx",   ref: 0.085, fLow: 25, fHigh: 130, e: 0, lastPct: -1, getAnalyser: () => (typeof spaceAnalyser !== "undefined" ? spaceAnalyser : masterAnalyser) },
+  { id: "space",  orbId: "space",  type: "master", ref: 0.20, fLow: 1, fHigh: 140, e: 0, lastPct: -1, getAnalyser: () => masterAnalyser }
+];
+
 function updateMobileMacroMeterValues() {
   if (document.hidden || !PHONE_LAYOUT_MQ.matches) return;
-  if (typeof ORBITAL_MODULES === "undefined" || !Array.isArray(ORBITAL_MODULES)) return;
+  const grid = document.getElementById("mobileMacroGrid");
+  if (!grid) return;
 
-  ORBITAL_MODULES.forEach(orb => {
-    const bar = document.getElementById("macroMeter_" + orb.id);
-    if (!bar) return;
-    const pulsePct = Math.min(100, Math.round((orb.pulse || 0) * 160));
-    bar.style.width = (isPlaying ? Math.max(8, pulsePct) : 0) + "%";
-  });
+  const active = isPlaying && audioCtx && audioCtx.state === "running";
+
+  for (let i = 0; i < MOBILE_MACRO_METERS.length; i++) {
+    const m = MOBILE_MACRO_METERS[i];
+    const bar = document.getElementById("macroMeter_" + m.orbId);
+    if (!bar) continue;
+
+    let isPowered = true;
+    if (m.type === "inst") {
+      isPowered = (typeof channelPower !== "undefined" && channelPower[m.id] !== false) && !(typeof channelMute !== "undefined" && channelMute[m.id]);
+    } else if (m.type === "fx") {
+      isPowered = !(typeof pedalBypassState !== "undefined" && pedalBypassState[m.id]);
+    }
+
+    let energy = 0;
+    if (active && isPowered) {
+      const an = m.getAnalyser ? m.getAnalyser() : null;
+      const sampled = typeof sampleAnalyserForFrame === "function" ? sampleAnalyserForFrame(an) : null;
+      if (sampled) {
+        const timeBuf = sampled.time, freqBuf = sampled.freq;
+        const n = timeBuf.length;
+        let sumSq = 0, band = 0;
+        for (let k = 0; k < n; k++) {
+          const d = (timeBuf[k] - 128) / 128;
+          sumSq += d * d;
+          if (k >= m.fLow && k <= m.fHigh) band += freqBuf[k];
+        }
+        energy = Math.sqrt(sumSq / n) * 0.55 + (band / ((m.fHigh - m.fLow + 1) * 255)) * 0.45;
+      }
+    }
+
+    // Snappy attack on note/drum strike for instant tactile response; smooth natural release
+    if (energy > m.e) {
+      m.e = m.e * 0.40 + energy * 0.60;
+    } else {
+      m.e = m.e * 0.78 + energy * 0.22;
+    }
+
+    const pct = active && isPowered
+      ? Math.min(100, Math.round(Math.pow(Math.max(0, m.e) / m.ref, 0.65) * 100))
+      : 0;
+
+    if (m.lastPct !== pct) {
+      m.lastPct = pct;
+      bar.style.width = pct + "%";
+    }
+  }
 }
 
 let cachedOrbitalW = 0, cachedOrbitalH = 0, orbitalNeedsResize = true;
@@ -21621,14 +21689,19 @@ function updateAndDrawOrbitalCanvas() {
       const an = orb.analyser();
       const sampled = typeof sampleAnalyserForFrame === "function" ? sampleAnalyserForFrame(an) : null;
       if (sampled) {
-        const freqBuf = sampled.freq;
-        let sum = 0;
-        const limit = Math.min(16, freqBuf.length);
-        for (let k = 1; k < limit; k++) sum += freqBuf[k];
-        energy = sum / (Math.max(1, limit - 1) * 255.0);
+        const timeBuf = sampled.time, freqBuf = sampled.freq;
+        const n = timeBuf.length;
+        let sumSq = 0, band = 0;
+        const limit = Math.min(64, freqBuf.length);
+        for (let k = 0; k < n; k++) {
+          const d = (timeBuf[k] - 128) / 128;
+          sumSq += d * d;
+          if (k < limit) band += freqBuf[k];
+        }
+        energy = Math.sqrt(sumSq / n) * 0.55 + (band / (limit * 255.0)) * 0.45;
       }
     }
-    orb.pulse = orb.pulse * 0.91 + energy * 0.14;
+    orb.pulse = orb.pulse * 0.88 + energy * 0.22;
     orb.bump *= 0.965;
 
     if (orb.id !== draggedOrbId) {
