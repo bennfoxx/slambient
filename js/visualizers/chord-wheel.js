@@ -1,6 +1,22 @@
 // Slambient — Circle of Fifths & Chord Analysis Visualizer Module
 // Handles active pitch-class wheel geometry, compass rim rendering, and instrument telemetry
 
+var FALLBACK_THEME_HEX = typeof FALLBACK_THEME_HEX !== "undefined" ? FALLBACK_THEME_HEX : {
+  drone: "#00e5ff", drum: "#ff3838", chord: "#fed330", arp: "#7d5fff", noise: "#1dd1a1",
+  field: "#2bcbba", filter: "#2ed573", delay: "#ff793f", reverb: "#ff5fc4", space: "#4b7bec"
+};
+var FALLBACK_THEME_RGB = typeof FALLBACK_THEME_RGB !== "undefined" ? FALLBACK_THEME_RGB : {
+  drone: [0, 229, 255], drum: [255, 56, 56], chord: [254, 211, 48], arp: [125, 95, 255], noise: [29, 209, 161],
+  field: [43, 203, 186], filter: [46, 213, 115], delay: [255, 121, 63], reverb: [255, 95, 196], space: [75, 123, 236]
+};
+function themeHex(key) {
+  return (typeof activeTheme !== "undefined" && activeTheme && activeTheme.hex && activeTheme.hex[key]) || (FALLBACK_THEME_HEX && FALLBACK_THEME_HEX[key]) || "#ffffff";
+}
+function themeRgbArr(key) {
+  return ((typeof activeTheme !== "undefined" && activeTheme && activeTheme.rgb && activeTheme.rgb[key]) || (FALLBACK_THEME_RGB && FALLBACK_THEME_RGB[key]) || [255, 255, 255]).slice();
+}
+function themeRgb(key) { return themeRgbArr(key).join(", "); }
+
 var chordWheelCanvas = typeof document !== "undefined" ? document.getElementById("chordWheelCanvas") : null;
 var chordWheelCtx = chordWheelCanvas ? chordWheelCanvas.getContext("2d") : null;
 

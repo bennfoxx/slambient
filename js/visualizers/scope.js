@@ -1888,8 +1888,8 @@ function drawScope(ts) {
     scopeAngle += 0.008;
   }
 
-  drawChordWheelCard();
-  renderKeyboardHighlights();
+  if (typeof drawChordWheelCard === "function") drawChordWheelCard();
+  if (typeof renderKeyboardHighlights === "function") renderKeyboardHighlights();
 
   requestAnimationFrame(drawScope);
 }
