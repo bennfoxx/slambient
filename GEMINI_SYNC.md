@@ -1688,3 +1688,21 @@ All in `index.html`; unverified by ear yet (syntax-checked only), so expect some
 - **Fullscreen Visualizer Delayed Bounds Recalculation**:
   - Added 150ms delayed bounds recalculation (`setTimeout(() => { cachedScopeW = 0; cachedScopeH = 0; if (typeof updateCanvasDimensions === "function") updateCanvasDimensions(); }, 150);`) in `toggleScopeFullscreen` to allow CSS transitions to finish before recalculating canvas dimensions.
 
+## Update — 2026-10-16 (Phase 5 / Track 2 Mobile UX Architecture Overhaul Completed)
+
+- **Mobile Bird's-Eye Grid (Macro State)**:
+  - Scoped strictly to `@media (max-width: 640px)` (phones), leaving desktop layout 100% untouched (`.mobile-macro-grid { display: none; }` above 640px).
+  - Replaces the 100dvh single-column stacking with a clean 2-column compact grid fitting inside the mobile viewport.
+  - Sized each summary tile (`.mobile-macro-tile`) at 110px height with brand cyber-hardware styling (7px rounded corners, subtle inset borders, module identity accent color).
+  - Displays Module Name, Power/Bypass toggle button with visual feedback, Active Preset/Timbre label (strictly truncated to 15 characters), and a live real-time RMS meter bar reading from `ORBITAL_MODULES[i].pulse`.
+- **Mobile Inspect Sheet (Micro State)**:
+  - Tapping any macro tile opens the full module parameters in a slide-up bottom drawer (`.orbital-side-panel` styled with `max-height: 85dvh; top: auto; bottom: 0; border-radius: 12px 12px 0 0;`).
+  - Integrated with the existing `#btnOrbitalBack` ("RACK") button to return cleanly to the macro overview.
+- **Orbital View Parity**:
+  - Tapping any orbital node in constellation view opens the identical slide-up bottom sheet instead of a jarring fullscreen takeover or full-height scroll.
+- **Master Out Effects Chain Reordering**:
+  - Injected direct signal-chain reordering in the Master Out modular view (`#masterDspChainSection` inside `#masterEqOutStrip`).
+  - Added Left/Right (Up/Down) shift nudges for reordering insert pedals (`dspChainOrder`).
+  - Reconnects Web Audio nodes sequentially wrapped in `audioCtx.suspend()` and `audioCtx.resume()` to guarantee zero audio popping or clicks during reordering.
+  - Synchronized dynamically with `updatePedalsOrderUI()` and macro grid rendering.
+
