@@ -326,28 +326,47 @@ const FRACTAL_ZOOM_TARGETS = [
   [-0.10109636384562, 0.95628651080914],       // Scepter Valley Towers
   [-1.7497591451303665, 0.0]                   // Western Antenna Satellite Minibrot
 ];
-const FRACTAL_MIN_BUFFER_W = 180;
-const FRACTAL_MAX_BUFFER_W = 400;
-const FRACTAL_FRAME_BUDGET_MS = 10;
+const FRACTAL_FIXED_W = 160;
+const FRACTAL_RASTER_INTERVAL_MS = 28; // ~35fps raster cadence; drawn smoothly every frame
 const fractalBuf = document.createElement("canvas");
-const fractalBufCtx = fractalBuf.getContext("2d");
+const fractalBufCtx = fractalBuf.getContext("2d", { alpha: false });
 const fractalFadeBuf = document.createElement("canvas");
-const fractalFadeCtx = fractalFadeBuf.getContext("2d");
+const fractalFadeCtx = fractalFadeBuf.getContext("2d", { alpha: false });
 let fractalImage = null;
 let fractalPixels = null;
-let fractalBufferW = 280;
+let fractalBufferW = FRACTAL_FIXED_W;
 let fractalDepth = 0;          // decades of magnification into the current dive
 let fractalTargetIdx = 0;
 let fractalFade = 0;           // 1 -> 0 while the previous dive's last frame fades out
 let fractalRot = 0;
 let fractalFloorIter = 0;      // lowest escape count seen last frame (see lum below)
 let fractalLastTs = null;
+let fractalLastRasterTs = 0;
 const fractalEnergy = { drone: 0, drum: 0, chord: 0, arp: 0, surge: 0 };
 const fractalAnalyserBuf = new Uint8Array(32);
+
+// Pre-allocated 1D coordinate and trig lookup tables (zero per-frame heap allocations)
+const FRACTAL_U_COS = new Float64Array(256);
+const FRACTAL_U_SIN = new Float64Array(256);
+const FRACTAL_SIN_LUT_SIZE = 1024;
+const FRACTAL_SIN_LUT_MASK = FRACTAL_SIN_LUT_SIZE - 1;
+const FRACTAL_SIN_SCALE = FRACTAL_SIN_LUT_SIZE / (Math.PI * 2);
+const FRACTAL_SIN_LUT = new Float32Array(FRACTAL_SIN_LUT_SIZE);
+for (let i = 0; i < FRACTAL_SIN_LUT_SIZE; i++) {
+  FRACTAL_SIN_LUT[i] = Math.sin((i / FRACTAL_SIN_LUT_SIZE) * Math.PI * 2);
+}
+const FRACTAL_GLOW_LUT = new Float32Array(256);
+for (let i = 0; i < 256; i++) {
+  FRACTAL_GLOW_LUT[i] = Math.pow(i / 255, 0.65);
+}
 
 // 512-step high-definition cyclic palette with smooth Hermite interpolation,
 // deep cosmic nebula undertones, and glowing instrument voice highlights.
 const FRACTAL_PALETTE_SIZE = 512;
+const FRACTAL_PAL_R = new Uint8Array(FRACTAL_PALETTE_SIZE);
+const FRACTAL_PAL_G = new Uint8Array(FRACTAL_PALETTE_SIZE);
+const FRACTAL_PAL_B = new Uint8Array(FRACTAL_PALETTE_SIZE);
+
 function buildFractalPalette() {
   const c = (k) => themeRgbArr(k);
   const darkCosmic = [10, 12, 20];
@@ -371,11 +390,13 @@ function buildFractalPalette() {
     const k = Math.floor(t), f = t - k;
     const s = f * f * (3 - 2 * f); // Hermite smoothstep
     const a = stops[k], b = stops[Math.min(stops.length - 1, k + 1)];
-    lut[i] = [
-      Math.round(a[0] + (b[0] - a[0]) * s),
-      Math.round(a[1] + (b[1] - a[1]) * s),
-      Math.round(a[2] + (b[2] - a[2]) * s)
-    ];
+    const r = Math.round(a[0] + (b[0] - a[0]) * s);
+    const g = Math.round(a[1] + (b[1] - a[1]) * s);
+    const bl = Math.round(a[2] + (b[2] - a[2]) * s);
+    lut[i] = [r, g, bl];
+    FRACTAL_PAL_R[i] = r;
+    FRACTAL_PAL_G[i] = g;
+    FRACTAL_PAL_B[i] = bl;
   }
   return lut;
 }
@@ -404,23 +425,18 @@ function readFractalBandEnergy(analyser) {
 }
 
 function updateFractalEnergy(dtSec) {
-  const targets = {
-    drone: readFractalBandEnergy(typeof droneAnalyser !== "undefined" ? droneAnalyser : null),
-    drum:  readFractalBandEnergy(typeof drumAnalyser  !== "undefined" ? drumAnalyser  : null),
-    chord: readFractalBandEnergy(typeof chordAnalyser !== "undefined" ? chordAnalyser : null),
-    arp:   readFractalBandEnergy(typeof arpAnalyser   !== "undefined" ? arpAnalyser   : null)
-  };
-  const smooth = (key, rate) => {
-    fractalEnergy[key] += (targets[key] - fractalEnergy[key]) * Math.min(1, dtSec * rate);
-  };
-  // A drum level jump well above its running average reads as a hit.
-  if (targets.drum > fractalEnergy.drum + 0.18) {
+  const tDrone = readFractalBandEnergy(typeof droneAnalyser !== "undefined" ? droneAnalyser : null);
+  const tDrum  = readFractalBandEnergy(typeof drumAnalyser  !== "undefined" ? drumAnalyser  : null);
+  const tChord = readFractalBandEnergy(typeof chordAnalyser !== "undefined" ? chordAnalyser : null);
+  const tArp   = readFractalBandEnergy(typeof arpAnalyser   !== "undefined" ? arpAnalyser   : null);
+
+  if (tDrum > fractalEnergy.drum + 0.18) {
     fractalEnergy.surge = Math.min(1, fractalEnergy.surge + 0.5);
   }
-  smooth("drone", 2.5);
-  smooth("drum", 9);
-  smooth("chord", 3);
-  smooth("arp", 6);
+  fractalEnergy.drone += (tDrone - fractalEnergy.drone) * Math.min(1, dtSec * 2.5);
+  fractalEnergy.drum  += (tDrum  - fractalEnergy.drum)  * Math.min(1, dtSec * 9);
+  fractalEnergy.chord += (tChord - fractalEnergy.chord) * Math.min(1, dtSec * 3);
+  fractalEnergy.arp   += (tArp   - fractalEnergy.arp)   * Math.min(1, dtSec * 6);
   fractalEnergy.surge *= Math.exp(-dtSec * 3);
 }
 
@@ -437,127 +453,174 @@ function drawFractalVisualizer(w, h, ts) {
   fractalDepth += dtSec * beatsPerSec / FRACTAL_BEATS_PER_DECADE * drive;
   fractalRot += dtSec * beatsPerSec * 0.004 * (isPlaying ? 1 : 0.2);
 
-  // Buffer size follows the canvas, capped by the adaptive frame budget.
-  const bw = Math.max(FRACTAL_MIN_BUFFER_W, Math.min(fractalBufferW, Math.round(w / 2)));
-  const bh = Math.max(70, Math.round(bw * h / w));
+  // Fixed buffer dimensions: prevents per-frame canvas texture and ImageData reallocation churn!
+  const bw = FRACTAL_FIXED_W;
+  const bh = Math.max(68, Math.min(128, Math.round(bw * h / Math.max(1, w))));
+  let forceRaster = false;
 
   // Infinite unbroken flow: seamlessly capture the dive horizon and recycle magnification
   if (fractalDepth >= FRACTAL_DIVE_DECADES) {
     if (fractalBuf.width > 0) {
-      fractalFadeBuf.width = fractalBuf.width;
-      fractalFadeBuf.height = fractalBuf.height;
+      if (fractalFadeBuf.width !== fractalBuf.width || fractalFadeBuf.height !== fractalBuf.height) {
+        fractalFadeBuf.width = fractalBuf.width;
+        fractalFadeBuf.height = fractalBuf.height;
+      }
       fractalFadeCtx.drawImage(fractalBuf, 0, 0);
       fractalFade = 1.0;
     }
     fractalDepth = 0.35; // Seamless loop entry point
     fractalTargetIdx = (fractalTargetIdx + 1) % FRACTAL_ZOOM_TARGETS.length;
+    forceRaster = true;
   }
 
-  if (fractalBuf.width !== bw || fractalBuf.height !== bh) {
+  if (fractalBuf.width !== bw || fractalBuf.height !== bh || !fractalPixels) {
     fractalBuf.width = bw;
     fractalBuf.height = bh;
     fractalImage = fractalBufCtx.createImageData(bw, bh);
     fractalPixels = new Uint32Array(fractalImage.data.buffer);
+    forceRaster = true;
   }
 
-  // Smooth Hermite coordinate trajectory towards next target as depth nears handoff
-  const currTarget = FRACTAL_ZOOM_TARGETS[fractalTargetIdx];
-  const nextTarget = FRACTAL_ZOOM_TARGETS[(fractalTargetIdx + 1) % FRACTAL_ZOOM_TARGETS.length];
-  const blendWindow = 1.8;
-  const blendStart = FRACTAL_DIVE_DECADES - blendWindow;
-  let tx = currTarget[0], ty = currTarget[1];
-  if (fractalDepth > blendStart) {
-    const rawT = (fractalDepth - blendStart) / blendWindow;
-    const s = rawT * rawT * (3 - 2 * rawT); // Hermite smoothstep
-    tx = currTarget[0] * (1 - s) + nextTarget[0] * s;
-    ty = currTarget[1] * (1 - s) + nextTarget[1] * s;
-  }
-  const spanY = FRACTAL_START_SPAN * Math.pow(10, -fractalDepth);
-  const spanX = spanY * (bw / bh);
-  const cosR = Math.cos(fractalRot), sinR = Math.sin(fractalRot);
-  const maxIter = Math.round(135 + fractalDepth * 52);
-  const hueShift = fractalDepth * 52 + e.chord * 110;
-  const gain = (isPlaying ? 0.85 : 0.65) + e.arp * 0.45;
-  const LOG2 = Math.log(2);
-  if (!FRACTAL_PALETTE) FRACTAL_PALETTE = buildFractalPalette();
-  const palMask = FRACTAL_PALETTE_SIZE - 1;
-  const t0 = performance.now();
-  const floorIter = fractalFloorIter;
-  let frameMinIter = Infinity;
+  // Throttle CPU pixel rasterization to ~35fps so 60Hz/120Hz displays never chug the main thread
+  if (forceRaster || (ts - fractalLastRasterTs) >= FRACTAL_RASTER_INTERVAL_MS) {
+    fractalLastRasterTs = ts;
 
-  for (let py = 0; py < bh; py++) {
-    const v = (py / bh - 0.5) * spanY;
-    for (let px = 0; px < bw; px++) {
-      const u = (px / bw - 0.5) * spanX;
-      const cr = tx + u * cosR - v * sinR;
-      const ci = ty + u * sinR + v * cosR;
-
-      let i = 0, zr = 0, zi = 0, zr2 = 0, zi2 = 0;
-
-      // Fast-skip main cardioid and period-2 bulb at shallow depth
-      if (fractalDepth < 1.4) {
-        const q = (cr - 0.25) * (cr - 0.25) + ci * ci;
-        if (q * (q + (cr - 0.25)) < 0.25 * ci * ci || (cr + 1) * (cr + 1) + ci * ci < 0.0625) {
-          i = maxIter;
-        }
-      }
-
-      if (i < maxIter) {
-        while (zr2 + zi2 < 64 && i < maxIter) {
-          zi = 2 * zr * zi + ci;
-          zr = zr2 - zi2 + cr;
-          zr2 = zr * zr;
-          zi2 = zi * zi;
-          i++;
-        }
-      }
-
-      let r, g, b;
-      if (i >= maxIter) {
-        // Deep breathing iridescent core inside the set, pulsed by drone & drum
-        const coreBreath = Math.sin(fractalDepth * 1.8 + (ts || 0) * 0.0016) * 0.5 + 0.5;
-        r = Math.min(255, Math.round(8 + coreBreath * 10 + e.drum * 18));
-        g = Math.min(255, Math.round(10 + coreBreath * 14 + e.drone * 24));
-        b = Math.min(255, Math.round(18 + coreBreath * 28 + e.chord * 28));
-      } else {
-        // Continuous smooth normalized iteration count
-        const smoothIter = i + 1 - Math.log(Math.log(zr2 + zi2) / 2 / LOG2) / LOG2;
-        if (smoothIter < frameMinIter) frameMinIter = smoothIter;
-
-        // Multi-frequency harmonic color indexing
-        const palIdx = Math.floor(smoothIter * 11 + hueShift) & palMask;
-        const col = FRACTAL_PALETTE[palIdx];
-
-        // Micro-filament edge waves: reveals razor-sharp dendritic filaments
-        const filament = 0.5 + 0.5 * Math.sin(smoothIter * 0.75 + hueShift * 0.03);
-        const shimmer = Math.pow(Math.max(0, Math.sin(smoothIter * 2.8 + (e.drum * 2.0))), 3) * (0.15 + e.arp * 0.7);
-
-        // Adaptive luminosity with smooth outer-space nebula floor
-        const iterDiff = Math.max(0, smoothIter - floorIter);
-        const boundaryGlow = Math.min(1.0, Math.pow(iterDiff / 32, 0.65));
-        const lum = (0.28 + 0.72 * boundaryGlow) * gain;
-
-        r = Math.min(255, Math.round((col[0] * lum * (0.85 + filament * 0.25)) + shimmer * 180));
-        g = Math.min(255, Math.round((col[1] * lum * (0.85 + filament * 0.25)) + shimmer * 210));
-        b = Math.min(255, Math.round((col[2] * lum * (0.85 + filament * 0.25)) + shimmer * 255));
-      }
-
-      fractalPixels[py * bw + px] = (255 << 24) | ((b & 255) << 16) | ((g & 255) << 8) | (r & 255);
+    // Smooth Hermite coordinate trajectory towards next target as depth nears handoff
+    const currTarget = FRACTAL_ZOOM_TARGETS[fractalTargetIdx];
+    const nextTarget = FRACTAL_ZOOM_TARGETS[(fractalTargetIdx + 1) % FRACTAL_ZOOM_TARGETS.length];
+    const blendWindow = 1.8;
+    const blendStart = FRACTAL_DIVE_DECADES - blendWindow;
+    let tx = currTarget[0], ty = currTarget[1];
+    if (fractalDepth > blendStart) {
+      const rawT = (fractalDepth - blendStart) / blendWindow;
+      const s = rawT * rawT * (3 - 2 * rawT); // Hermite smoothstep
+      tx = currTarget[0] * (1 - s) + nextTarget[0] * s;
+      ty = currTarget[1] * (1 - s) + nextTarget[1] * s;
     }
+    const spanY = FRACTAL_START_SPAN * Math.pow(10, -fractalDepth);
+    const spanX = spanY * (bw / bh);
+    const cosR = Math.cos(fractalRot), sinR = Math.sin(fractalRot);
+    const maxIter = Math.round(58 + fractalDepth * 16);
+    const hueShift = fractalDepth * 52 + e.chord * 110;
+    const gain = (isPlaying ? 0.85 : 0.65) + e.arp * 0.45;
+    const INV_LOG2 = 1.4426950408889634;
+    if (!FRACTAL_PALETTE) FRACTAL_PALETTE = buildFractalPalette();
+    const palMask = FRACTAL_PALETTE_SIZE - 1;
+    const floorIter = fractalFloorIter;
+    let frameMinIter = Infinity;
+
+    // Precompute interior core pixel ONCE per frame instead of inside the pixel loop
+    const coreBreath = Math.sin(fractalDepth * 1.8 + (ts || 0) * 0.0016) * 0.5 + 0.5;
+    const coreR = Math.min(255, Math.round(8 + coreBreath * 10 + e.drum * 18));
+    const coreG = Math.min(255, Math.round(10 + coreBreath * 14 + e.drone * 24));
+    const coreB = Math.min(255, Math.round(18 + coreBreath * 28 + e.chord * 28));
+    const corePixel = (255 << 24) | ((coreB & 255) << 16) | ((coreG & 255) << 8) | (coreR & 255);
+
+    // Precompute X-axis rotated offsets once per frame
+    const invBw = 1 / bw;
+    const invBh = 1 / bh;
+    for (let px = 0; px < bw; px++) {
+      const u = (px * invBw - 0.5) * spanX;
+      FRACTAL_U_COS[px] = u * cosR;
+      FRACTAL_U_SIN[px] = u * sinR;
+    }
+
+    const filPhaseOffset = hueShift * 0.03 * FRACTAL_SIN_SCALE;
+    const filFreqScale = 0.75 * FRACTAL_SIN_SCALE;
+    const shimPhaseOffset = (e.drum * 2.0) * FRACTAL_SIN_SCALE;
+    const shimFreqScale = 2.8 * FRACTAL_SIN_SCALE;
+    const shimAmp = 0.15 + e.arp * 0.7;
+    const shallowCardioidCheck = fractalDepth < 1.4;
+
+    for (let py = 0; py < bh; py++) {
+      const v = (py * invBh - 0.5) * spanY;
+      const baseCr = tx - v * sinR;
+      const baseCi = ty + v * cosR;
+      const rowOffset = py * bw;
+
+      for (let px = 0; px < bw; px++) {
+        const cr = baseCr + FRACTAL_U_COS[px];
+        const ci = baseCi + FRACTAL_U_SIN[px];
+
+        let i = 0, zr = 0, zi = 0, zr2 = 0, zi2 = 0;
+
+        // Fast-skip main cardioid and period-2 bulb at shallow depth
+        if (shallowCardioidCheck) {
+          const q = (cr - 0.25) * (cr - 0.25) + ci * ci;
+          if (q * (q + (cr - 0.25)) < 0.25 * ci * ci || (cr + 1) * (cr + 1) + ci * ci < 0.0625) {
+            i = maxIter;
+          }
+        }
+
+        if (i < maxIter) {
+          // Brent's periodicity detection: breaks out of interior cycles early
+          let pr = 0, pi = 0, period = 8, check = 0;
+          while (zr2 + zi2 < 64 && i < maxIter) {
+            zi = 2 * zr * zi + ci;
+            zr = zr2 - zi2 + cr;
+            const dr = zr - pr, di = zi - pi;
+            if (dr * dr + di * di < 1e-24) {
+              i = maxIter;
+              break;
+            }
+            zr2 = zr * zr;
+            zi2 = zi * zi;
+            i++;
+            if (++check === period) {
+              pr = zr;
+              pi = zi;
+              check = 0;
+              if (period < 64) period <<= 1;
+            }
+          }
+        }
+
+        if (i >= maxIter) {
+          fractalPixels[rowOffset + px] = corePixel;
+        } else {
+          // Continuous smooth normalized iteration count
+          const logMag = Math.log(zr2 + zi2) * 0.5;
+          const smoothIter = i + 1 - Math.log(logMag * INV_LOG2) * INV_LOG2;
+          if (smoothIter < frameMinIter) frameMinIter = smoothIter;
+
+          // Multi-frequency harmonic color indexing via typed arrays
+          const palIdx = (smoothIter * 11 + hueShift) & palMask;
+          const cR = FRACTAL_PAL_R[palIdx];
+          const cG = FRACTAL_PAL_G[palIdx];
+          const cB = FRACTAL_PAL_B[palIdx];
+
+          // Micro-filament edge waves via precomputed SIN_LUT
+          const filSin = FRACTAL_SIN_LUT[(smoothIter * filFreqScale + filPhaseOffset) & FRACTAL_SIN_LUT_MASK];
+          const filamentMod = 0.85 + (0.5 + 0.5 * filSin) * 0.25;
+
+          const shimSin = FRACTAL_SIN_LUT[(smoothIter * shimFreqScale + shimPhaseOffset) & FRACTAL_SIN_LUT_MASK];
+          let shimmer = 0;
+          if (shimSin > 0) {
+            shimmer = (shimSin * shimSin * shimSin) * shimAmp;
+          }
+
+          // Adaptive luminosity via precomputed GLOW_LUT
+          const iterDiff = smoothIter > floorIter ? smoothIter - floorIter : 0;
+          const glowIdx = iterDiff >= 32 ? 255 : (iterDiff * 7.96875) | 0;
+          const lum = (0.28 + 0.72 * FRACTAL_GLOW_LUT[glowIdx]) * gain * filamentMod;
+
+          const r = Math.min(255, (cR * lum + shimmer * 180) | 0);
+          const g = Math.min(255, (cG * lum + shimmer * 210) | 0);
+          const b = Math.min(255, (cB * lum + shimmer * 255) | 0);
+
+          fractalPixels[rowOffset + px] = (255 << 24) | (b << 16) | (g << 8) | r;
+        }
+      }
+    }
+    fractalBufCtx.putImageData(fractalImage, 0, 0);
+
+    // Ease toward the new floor so a crossfade or surge doesn't flicker.
+    if (frameMinIter !== Infinity) fractalFloorIter += (frameMinIter - fractalFloorIter) * (fractalDepth < 0.05 ? 1 : 0.2);
   }
-  fractalBufCtx.putImageData(fractalImage, 0, 0);
-
-  // Ease toward the new floor so a crossfade or surge doesn't flicker.
-  if (frameMinIter !== Infinity) fractalFloorIter += (frameMinIter - fractalFloorIter) * (fractalDepth < 0.05 ? 1 : 0.2);
-
-  // Adapt resolution to the frame budget (deeper = more iterations).
-  const cost = performance.now() - t0;
-  if (cost > FRACTAL_FRAME_BUDGET_MS) fractalBufferW = Math.max(FRACTAL_MIN_BUFFER_W, Math.round(fractalBufferW * 0.88));
-  else if (cost < FRACTAL_FRAME_BUDGET_MS * 0.55 && fractalBufferW < FRACTAL_MAX_BUFFER_W) fractalBufferW = Math.min(FRACTAL_MAX_BUFFER_W, fractalBufferW + 6);
 
   scopeCtx.save();
   scopeCtx.imageSmoothingEnabled = true;
-  scopeCtx.imageSmoothingQuality = "high";
+  scopeCtx.imageSmoothingQuality = "medium";
   scopeCtx.drawImage(fractalBuf, 0, 0, w, h);
   if (fractalFade > 0) {
     // The old dive's last frame keeps zooming as it fades, so the handoff
@@ -1608,44 +1671,91 @@ function triggerMusical3DObject(type) {
   });
 }
 
+const PROJECTED_POOL = Array.from({ length: 32 }, () => ({ x: 0, y: 0, z: 0 }));
+
 // Fast 3D Point Projection onto 2D canvas with Euler rotation
-function project3D(px, py, pz, rx, ry, rz, scale, cx, cy) {
-  // Rotate Y
+function project3D(px, py, pz, rx, ry, rz, scale, cx, cy, out) {
   const cosY = Math.cos(ry), sinY = Math.sin(ry);
   const x1 = px * cosY + pz * sinY;
   const z1 = -px * sinY + pz * cosY;
-  // Rotate X
   const cosX = Math.cos(rx), sinX = Math.sin(rx);
   const y2 = py * cosX - z1 * sinX;
   const z2 = py * sinX + z1 * cosX;
-  // Rotate Z
   const cosZ = Math.cos(rz), sinZ = Math.sin(rz);
   const x3 = x1 * cosZ - y2 * sinZ;
   const y3 = x1 * sinZ + y2 * cosZ;
+  if (out) {
+    out.x = cx + x3 * scale;
+    out.y = cy + y3 * scale;
+    out.z = z2;
+    return out;
+  }
   return { x: cx + x3 * scale, y: cy + y3 * scale, z: z2 };
 }
 
-// Draws 3D wireframe edges with vector CRT front/back depth shading
+function projectVerticesToPool(vertices, rx, ry, rz, scale, cx, cy) {
+  const cosY = Math.cos(ry), sinY = Math.sin(ry);
+  const cosX = Math.cos(rx), sinX = Math.sin(rx);
+  const cosZ = Math.cos(rz), sinZ = Math.sin(rz);
+  const len = vertices.length;
+  for (let i = 0; i < len; i++) {
+    const v = vertices[i];
+    const px = v[0], py = v[1], pz = v[2];
+    const x1 = px * cosY + pz * sinY;
+    const z1 = -px * sinY + pz * cosY;
+    const y2 = py * cosX - z1 * sinX;
+    const z2 = py * sinX + z1 * cosX;
+    const x3 = x1 * cosZ - y2 * sinZ;
+    const y3 = x1 * sinZ + y2 * cosZ;
+    const pt = PROJECTED_POOL[i];
+    pt.x = cx + x3 * scale;
+    pt.y = cy + y3 * scale;
+    pt.z = z2;
+  }
+}
+
+// Draws 3D wireframe edges with vector CRT front/back depth shading (batched into 2 strokes, zero allocations)
 function drawWireframeEdges(edges, vertices, rx, ry, rz, scale, cx, cy, rgb, alpha) {
-  const projected = vertices.map(v => project3D(v[0], v[1], v[2], rx, ry, rz, scale, cx, cy));
+  projectVerticesToPool(vertices, rx, ry, rz, scale, cx, cy);
+  const r = rgb[0], g = rgb[1], b = rgb[2];
 
-  edges.forEach(e => {
-    const p1 = projected[e[0]];
-    const p2 = projected[e[1]];
-    const avgZ = (p1.z + p2.z) / 2;
-
-    // Depth-based line weight and opacity (front-facing = luminous bright, back-facing = subtle ghost line)
-    const isFront = avgZ >= -0.10;
-    const edgeAlpha = alpha * (isFront ? 0.95 : 0.32);
-    const edgeWidth = isFront ? Math.max(1.1, scale * 0.045) : Math.max(0.65, scale * 0.024);
-
-    scopeCtx.beginPath();
-    scopeCtx.moveTo(p1.x, p1.y);
-    scopeCtx.lineTo(p2.x, p2.y);
-    scopeCtx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${edgeAlpha.toFixed(3)})`;
-    scopeCtx.lineWidth = edgeWidth;
+  // Pass 1: Back-facing ghost lines
+  scopeCtx.beginPath();
+  let hasBack = false;
+  for (let i = 0; i < edges.length; i++) {
+    const e = edges[i];
+    const p1 = PROJECTED_POOL[e[0]];
+    const p2 = PROJECTED_POOL[e[1]];
+    if ((p1.z + p2.z) * 0.5 < -0.10) {
+      scopeCtx.moveTo(p1.x, p1.y);
+      scopeCtx.lineTo(p2.x, p2.y);
+      hasBack = true;
+    }
+  }
+  if (hasBack) {
+    scopeCtx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${(alpha * 0.32).toFixed(3)})`;
+    scopeCtx.lineWidth = Math.max(0.65, scale * 0.024);
     scopeCtx.stroke();
-  });
+  }
+
+  // Pass 2: Front-facing luminous lines
+  scopeCtx.beginPath();
+  let hasFront = false;
+  for (let i = 0; i < edges.length; i++) {
+    const e = edges[i];
+    const p1 = PROJECTED_POOL[e[0]];
+    const p2 = PROJECTED_POOL[e[1]];
+    if ((p1.z + p2.z) * 0.5 >= -0.10) {
+      scopeCtx.moveTo(p1.x, p1.y);
+      scopeCtx.lineTo(p2.x, p2.y);
+      hasFront = true;
+    }
+  }
+  if (hasFront) {
+    scopeCtx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${(alpha * 0.95).toFixed(3)})`;
+    scopeCtx.lineWidth = Math.max(1.1, scale * 0.045);
+    scopeCtx.stroke();
+  }
 }
 
 // 1. 3D Wireframe Cube (Drums / Crimson #ff3838)
@@ -1710,30 +1820,46 @@ const SPHERE_UNIT_RINGS = [
 ];
 function draw3DSphere(cx, cy, scale, rgb, alpha, rx, ry, rz) {
   const r = scale * 0.58;
+  const colR = rgb[0], colG = rgb[1], colB = rgb[2];
 
-  SPHERE_UNIT_RINGS.forEach(ring => {
-    const projected = ring.map(p => project3D(p[0], p[1], p[2], rx, ry, rz, r, cx, cy));
-    for (let i = 0; i < projected.length; i++) {
-      const p1 = projected[i];
-      const p2 = projected[(i + 1) % projected.length];
-      const avgZ = (p1.z + p2.z) / 2;
-      const isFront = avgZ >= -0.10;
-      const edgeAlpha = alpha * (isFront ? 0.95 : 0.32);
-
-      scopeCtx.beginPath();
-      scopeCtx.moveTo(p1.x, p1.y);
-      scopeCtx.lineTo(p2.x, p2.y);
-      scopeCtx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${edgeAlpha.toFixed(3)})`;
-      scopeCtx.lineWidth = isFront ? Math.max(1.1, scale * 0.04) : Math.max(0.65, scale * 0.022);
-      scopeCtx.stroke();
-    }
-  });
-
-  // Small luminous center origin node
-  const centerNode = project3D(0, 0, 0, rx, ry, rz, r, cx, cy);
+  scopeCtx.strokeStyle = `rgba(${colR}, ${colG}, ${colB}, ${(alpha * 0.32).toFixed(3)})`;
+  scopeCtx.lineWidth = Math.max(0.65, scale * 0.022);
   scopeCtx.beginPath();
-  scopeCtx.arc(centerNode.x, centerNode.y, Math.max(1.2, scale * 0.05), 0, Math.PI * 2);
-  scopeCtx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${(alpha * 0.85).toFixed(3)})`;
+  for (let rIdx = 0; rIdx < SPHERE_UNIT_RINGS.length; rIdx++) {
+    const ring = SPHERE_UNIT_RINGS[rIdx];
+    projectVerticesToPool(ring, rx, ry, rz, r, cx, cy);
+    for (let i = 0; i < SPHERE_RING_PTS; i++) {
+      const p1 = PROJECTED_POOL[i];
+      const p2 = PROJECTED_POOL[(i + 1) & 15];
+      if ((p1.z + p2.z) * 0.5 < -0.10) {
+        scopeCtx.moveTo(p1.x, p1.y);
+        scopeCtx.lineTo(p2.x, p2.y);
+      }
+    }
+  }
+  scopeCtx.stroke();
+
+  scopeCtx.strokeStyle = `rgba(${colR}, ${colG}, ${colB}, ${(alpha * 0.95).toFixed(3)})`;
+  scopeCtx.lineWidth = Math.max(1.1, scale * 0.04);
+  scopeCtx.beginPath();
+  for (let rIdx = 0; rIdx < SPHERE_UNIT_RINGS.length; rIdx++) {
+    const ring = SPHERE_UNIT_RINGS[rIdx];
+    projectVerticesToPool(ring, rx, ry, rz, r, cx, cy);
+    for (let i = 0; i < SPHERE_RING_PTS; i++) {
+      const p1 = PROJECTED_POOL[i];
+      const p2 = PROJECTED_POOL[(i + 1) & 15];
+      if ((p1.z + p2.z) * 0.5 >= -0.10) {
+        scopeCtx.moveTo(p1.x, p1.y);
+        scopeCtx.lineTo(p2.x, p2.y);
+      }
+    }
+  }
+  scopeCtx.stroke();
+
+  // Small luminous center origin node (0,0,0 projects directly to cx, cy)
+  scopeCtx.beginPath();
+  scopeCtx.arc(cx, cy, Math.max(1.2, scale * 0.05), 0, Math.PI * 2);
+  scopeCtx.fillStyle = `rgba(${colR}, ${colG}, ${colB}, ${(alpha * 0.85).toFixed(3)})`;
   scopeCtx.fill();
 }
 
