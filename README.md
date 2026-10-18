@@ -10,19 +10,19 @@ It pairs a 10-module Web Audio synthesizer and physical modeling engine with a 4
 
 ## Project Layout (decoupled, still zero-build)
 
-`index.html` used to hold everything (about 24,000 lines). It now holds the page markup and the app's glue code (about 7,100 lines), and the rest lives in ordinary files the browser loads directly. The decoupling was done by Gemini agents in Antigravity, working from the plan in `MASTER_BLUEPRINT.md`. There is no bundler, npm or build step; edit a file, reload, done. In plain terms, "decoupling" means each job has its own file, so a change to the drums cannot accidentally break the visualizers, and a person or AI tool only has to read the file it is changing.
+`index.html` used to hold everything (about 24,000 lines). It now holds only the semantic HTML DOM markup and minimal glue code (about 4,200 lines, >82% reduction), with all functional domains cleanly decoupled into native browser ES scripts. The decoupling was done by Gemini agents in Antigravity, completing Phase 7 from `MASTER_BLUEPRINT.md`. There is no bundler, npm or build step; edit a file, reload, done.
 
 | Folder / file | What lives there |
 |---|---|
-| `css/slambient.css`, `css/field-recorder.css` | All styling (themes, phone layout, module cards) |
-| `js/audio/` | Drums and tabla, ambient noise, field recorder, stem/MP3/WAV recorder |
+| `css/slambient.css`, `css/field-recorder.css`, `css/mobile-app.css` | All styling (Eurorack themes, mobile app layout, module cards) |
+| `js/audio/` | DSP voices (drone, tanpura, chords, arp), clock sequencer, drums, noise, FX rack, recorders |
 | `js/midi/` | Web MIDI input/output, 4-channel DAW output, MIDI file recorder |
-| `js/theory/scales.js` | Scales and the 43 chord voicings |
-| `js/ui/` | Presets, keyboard, phone macro grid, theme palette, header helpers |
+| `js/theory/scales.js` | Scales and the 43 modal chord voicings |
+| `js/ui/` | Presets, keyboard, pedalboard, randomizer, transport, touch-mobile, macro grid, workspace |
 | `js/visualizers/` | CRT scope and Invaders, orbital orbs, chord wheel |
-| `clock-processor.js`, `dsp-engines.js` | Sample-accurate clock and DSP helpers |
+| `clock-processor.js`, `dsp-engines.js` | Sample-accurate clock worklet and multi-delay/filter DSP engines |
 | `sw.js`, `manifest.*` | Offline PWA (bump the cache version in `sw.js` when assets change) |
-| `scripts/qa-audit.js` | Automated QA and device audit, run by the pre-push hook |
+| `scripts/qa-audit.js`, `scripts/device-audit.js` | Automated QA syntax, unit test suite, and headless Chrome device lab |
 
 Docs: `GEMINI_SYNC.md` (dated change log and handoff notes, newest at the bottom), `MASTER_BLUEPRINT.md` (design, roadmap and phase status), `BRAND_GUIDELINES.md` (visual rules).
 

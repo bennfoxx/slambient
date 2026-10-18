@@ -1085,13 +1085,13 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
 * [ ] **Build B (`experiment/midi-file-recorder`):** Multi-Track MIDI File Recorder & Exporter capturing internal sequencer, keyboard, and synth events to export Type 1 Standard MIDI Files (`.mid`) and multi-track stems in-browser.
 * [ ] **Build C (`experiment/accompaniment-mode`):** Intelligent Live Accompaniment Mode dynamically generating accompaniment audio strictly in response to live user playing, tracking roots, triad qualities, and scale degrees on a metric grid.
 
-##### Phase 7: Zero-Build Native ES Module & CSS Decoupling Engine (IN PROGRESS)
-* [x] **Directory Blueprint Provisioning:** Create clean modular directory skeletons: `css/` (`slambient.css`, `field-recorder.css`), `js/audio/`, `js/theory/` (`scales.js`), `js/midi/`, `js/visualizers/`, and `js/ui/` (`presets.js`).
+##### Phase 7: Zero-Build Native ES Module & CSS Decoupling Engine (COMPLETED)
+* [x] **Directory Blueprint Provisioning:** Create clean modular directory skeletons: `css/` (`slambient.css`, `field-recorder.css`, `mobile-app.css`), `js/audio/`, `js/theory/` (`scales.js`), `js/midi/`, `js/visualizers/`, and `js/ui/` (`presets.js`).
 * [x] **Stage 1 — CSS Decoupling (COMPLETED):** Extracted 8,100+ lines of CSS from `index.html` into `css/slambient.css`, `css/field-recorder.css`, and `css/mobile-app.css` linked in `<head>` without modifying selectors or specificity rules.
 * [x] **Stage 2 — Static Audio Math & Presets (COMPLETED):** Extracted scales, modal signature voicings, tuning constants, and preset definitions into `js/theory/scales.js` (370 lines) and `js/ui/presets.js` (1,373 lines).
 * [x] **Stage 3 — Web MIDI, Recording & Field Sampler (COMPLETED):** Decoupled `js/midi/web-midi.js`, `js/audio/recorder.js`, `js/audio/field-recorder.js`, `js/audio/drums.js`, `js/audio/ambient-noise.js`, and `js/audio/dsp-rack.js`.
 * [x] **Stage 4 — UI Palette, Header Utilities, Workspace & Visualizers (COMPLETED):** Decoupled `js/ui/palette.js`, `js/ui/header-utils.js`, `js/ui/visualizers.js`, `js/ui/workspace.js`, `js/visualizers/scope.js`, `js/visualizers/orbital.js`, and `js/visualizers/chord-wheel.js`.
-* [ ] **Stage 5 — Core DSP Voices & App Shell Entrypoint:** Decouple `js/audio/dsp-voices.js` and finalize lightweight app shell with full PWA offline service worker caching (`sw.js`).
+* [x] **Stage 5 — Core DSP Voices, Pedalboard, Controls, Clock & App Shell Entrypoint (COMPLETED):** Decoupled `js/audio/dsp-voices.js`, `js/ui/pedalboard.js`, `js/ui/randomizer-controls.js`, `js/audio/clock-sequencer.js`, `js/ui/transport.js`, and `js/ui/touch-mobile.js`. Finalized lightweight app shell (`index.html` reduced from 24,200+ down to ~4,200 lines, >82% reduction) with full PWA offline service worker caching (`sw.js` cache `slambient-v41`).
 
 ##### Phase 8: Modular Studio Workspace & Custom Layout Engine (v2.0 Flagship) (COMPLETED)
 * **Pillar 1 — Self-Contained Module Sandboxing (CSS Container Queries):**

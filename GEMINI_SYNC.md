@@ -1979,3 +1979,13 @@ Summary of major architectural additions, layout enhancements, and performance o
    - **Precomputed Math & Typed Array LUTs**: Replaced per-pixel `Math.sin`/`Math.pow` calculations with hoisted trig LUTs, glow LUTs, and flat typed arrays (`FRACTAL_SIN_LUT`, `FRACTAL_GLOW_LUT`, `FRACTAL_PAL_R/G/B`).
    - **Pooled 3D Projections**: Eliminated object allocations in `drawWireframeEdges()` and `draw3DSphere()` using a static `PROJECTED_POOL`.
    - **Service Worker**: Cache version bumped to `slambient-v40`. All QA, device audits, and DSP unit tests pass cleanly.
+
+7. **Zero-Build Modular ES Decoupling Engine (Phase 7 Stage 5 Completed in v41)**:
+   - **`index.html` Dramatic Diet**: Shrunk from **9,248 lines down to ~4,200 lines** (over 54% reduction, >82% reduction from the original 24,200+ line monolith).
+   - **Extracted [js/audio/dsp-voices.js](file:///Users/benfox/Documents/Development/slambient_dev/js/audio/dsp-voices.js)** (1,123 lines): Sub-Drone, Didgeridoo, 4-string Tanpura physical model, multi-timbre chord voicings, and Shimmer Arp engines.
+   - **Extracted [js/ui/pedalboard.js](file:///Users/benfox/Documents/Development/slambient_dev/js/ui/pedalboard.js)** (2,029 lines): Studio FX pedalboard, dynamic Web Audio routing rewires (`rewireDspChain`), 5-unit / 10-pedal registry, bypass toggles, mini-cards, and drag-and-drop reordering.
+   - **Extracted [js/ui/randomizer-controls.js](file:///Users/benfox/Documents/Development/slambient_dev/js/ui/randomizer-controls.js)** (804 lines): Channel audibility, mute/solo managers, BPM sync, and per-module parameter randomizers.
+   - **Extracted [js/audio/clock-sequencer.js](file:///Users/benfox/Documents/Development/slambient_dev/js/audio/clock-sequencer.js)** (301 lines): Master coprime step cycles (7, 11, 13, 17, 19, 23), time signatures, Raga Taan phrasing, and polyphonic tick dispatching.
+   - **Extracted [js/ui/transport.js](file:///Users/benfox/Documents/Development/slambient_dev/js/ui/transport.js)** (216 lines): Master transport (`togglePlay`), session timers, master mute, and global hotkeys.
+   - **Extracted [js/ui/touch-mobile.js](file:///Users/benfox/Documents/Development/slambient_dev/js/ui/touch-mobile.js)** (563 lines): Touch zoom lockdown, slider scroll isolation, and outside-tap dropdown dismissals.
+   - **Service Worker & QA**: All modules integrated into `PRECACHE_URLS` in `sw.js` (bumped to `slambient-v41`). All 26 modules passed syntax checks and headless Chrome device lab audits (7/7 passed).

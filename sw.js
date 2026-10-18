@@ -1,5 +1,5 @@
 // Slambient Service Worker - Offline Caching & App Shell
-const CACHE_NAME = 'slambient-v41-exp';
+const CACHE_NAME = 'slambient-v41';
 const PRECACHE_URLS = [
   './',
   'index.html',
