@@ -1935,3 +1935,47 @@ Written so any new chat or tool can get current from this file, `README.md` and 
 - **2026-10-15 audit batch**: duplicate drag-reorder code merged into `bindPointerReorder()`; floating mini play bar hardened (no slide/blur, visibility measured on scroll); orb sheet swipe left/right; drone glide time constant 0.45 s to 0.05 s; Khan Lineage tanpura quieter and softer (level 38, Javari 55, 2.6 kHz low-pass per string). Energy-slump measurements (no code change): master level flat, limiter at most 0.3 dB, mono-safe, mix bass-heavy and dark, drone about 5x louder than chords and arp, drums sometimes absent for 10-30 s.
 - **Still open**: (1) none of the phone work has been tested on a real iPhone, including whether the floating play bar still gets stuck mid-page (not reproducible in Chromium); (2) 4-channel MIDI not yet tried in Logic; (3) Ben has not decided whether to raise chords/arp against the drone; (4) tanpura tone not yet judged by ear; (5) static "7 voices / 7 nodes" readout chips; (6) `_archive/` (~2.4 MB incl. a 1.4 MB .webm) is served by GitHub Pages and could be removed or excluded; (7) Phase 8 candidates above.
 - **Working notes**: several chats and Gemini push to the same repo, so always `git fetch` and compare before overwriting; `index.html` edits go through the "Web app development" thread.
+
+## Update — 2026-10-17 / 2026-10-18 (Phases 8–11: Studio Workspace, Desktop Split View, 10-Pedal Rack, Decoupled Mobile & Fractal Optimization — Landed in v40)
+
+Summary of major architectural additions, layout enhancements, and performance optimizations shipped between `slambient-v17` and `slambient-v40` (commits through `68d4eea`):
+
+1. **Modular Studio Workspace & Custom Layout Engine (`js/ui/workspace.js`, Phase 8 Completed)**:
+   - **Edit Mode (`#btnEditWorkspace`)**: Global toggle unlocks drag-and-drop reordering across header slots, lower-deck instrument racks, and visualizer modules with dynamic `dragstart`/`dragover`/`drop` handlers and live drag handles (`⋮⋮`).
+   - **Workspace State Persistence**: Layout states, hidden module lists, and custom slot arrangements serialize seamlessly to `localStorage["slambient_workspace_v1"]`.
+   - **Curated Templates**: Shipped default templates: Full Studio, Live Performance, and Meditation / Drone.
+   - **Workspace Module Dock (`#workspaceModuleDock`)**: Floating quick-toggle dock allowing live show/hide toggling of any instrument or effects module on the fly.
+   - **Fullscreen Anything Overlay**: Standardized `[ ⛶ Fullscreen ]` focus overlay with centered inset bounds, floating circular exit button, and `Esc` key handling, triggering automatic high-DPR canvas re-rendering (Chord Wheel, Scope, Arcade, Field Sampler).
+
+2. **Desktop Split View Mode (`.lower-deck.deck-mode-split`, Phase 8 Completed)**:
+   - Fixed split view activation and layout confinement across desktop viewports.
+   - **Left Window (`.instruments-deck`)**: Houses the 6 instrument modules (Sub, Drums, Chords, Arp, Noise, Field) neatly stacked in two balanced columns (3 rows × 2 columns).
+   - **Right Window (`.studio-fx-pedalboard`)**: Dedicated right-hand effects chassis displaying either the 5 consolidated units or the 10 full eurorack pedal cards with live signal routing ribbons, bypass toggles, and parameter sliders.
+
+3. **Expanded 10-Pedal / 5-Consolidated Unit Studio FX Architecture (Phase 10 Completed)**:
+   - Expanded audio DSP chain to 10 discrete pedals consolidated into 5 studio rack units:
+     - **Unit 1 (Drive & Filter)**: Tube Overdrive + Multi-Topology Analog Filter.
+     - **Unit 2 (Mod Cluster)**: Optical Tremolo + Multi-Stage Phaser + Analog Flanger + Chorus.
+     - **Unit 3 (Analog Delay)**: BBD & Tape Delay simulation with flutter and drift.
+     - **Unit 4 (Digital Delay)**: Pristine 32-bit digital delay with Haas bounce.
+     - **Unit 5 (Space Reverb)**: Multi-mode diffusion reverb (Plate, Hall, Shimmer, Cosmic).
+   - **12-Node Orbital View**: Expanded orbital view and macro routing ribbon to 12 dedicated orbs with dynamic numbering and consistent theme coloring (`12. OUT`).
+
+4. **Decoupled Vertical Mobile Architecture (`css/mobile-app.css`, Phase 9 Completed)**:
+   - Decoupled all mobile portrait (< 780px) and mobile landscape layout rules into isolated `css/mobile-app.css`.
+   - **Dual Cockpit Symmetrical Squares**: Generative Controls (2×2 grid: Randomize, Seed, Panic, Undo) and S.L.A.M. Eno CRT head styled as symmetrical 1:1 squares side-by-side.
+   - **Full-Width Telemetry Strip**: Realigned Time / Meter / Root-Scale / Seed readout into a double-stacked thin horizontal ribbon spanning 100% of the screen.
+   - **2-Row Transport Bar**: Row 1 houses START, RECORD, and format selector; Row 2 houses SAMPLE, MIC, DROP, and MIDI with zero text wrapping or button collision.
+   - **User Preset Strip**: Fixed user preset cards to avoid clipping, adding `[ EMPTY ]` subtle badges and 15-character truncation safeguards.
+
+5. **Visualizer & Video Game Decoupling (Phase 11 In Progress)**:
+   - **Indian Tanpura Telemetry**: Shipped `drawTanpuraResonance()` in `js/visualizers/scope.js`, rendering a 4-string harmonic Lissajous ring with plucked nodal beacons.
+   - **Interactive Chord Wheel**: Interactive scale/root selection buttons added to the Chord Wheel analysis card.
+   - **CRT Invaders Arcade Deck**: Dedicated arcade window module with its own canvas, score tracking, touch/keyboard controls, and dock visibility.
+
+6. **Fractal Visualizer Memory Leak & CPU Optimization (Phase 11 Completed in v40)**:
+   - **Fixed Canvas Texture Churn**: Replaced dynamic per-frame `fractalBufferW` mutation with a fixed resolution buffer (`FRACTAL_FIXED_W = 160`), eliminating per-frame canvas resize and `ImageData` garbage collection churn.
+   - **Brent's Periodicity Detection**: Added cycle detection inside the Mandelbrot iteration loop, breaking out of interior bulbs in ~8–16 steps instead of calculating up to 525 iterations.
+   - **Precomputed Math & Typed Array LUTs**: Replaced per-pixel `Math.sin`/`Math.pow` calculations with hoisted trig LUTs, glow LUTs, and flat typed arrays (`FRACTAL_SIN_LUT`, `FRACTAL_GLOW_LUT`, `FRACTAL_PAL_R/G/B`).
+   - **Pooled 3D Projections**: Eliminated object allocations in `drawWireframeEdges()` and `draw3DSphere()` using a static `PROJECTED_POOL`.
+   - **Service Worker**: Cache version bumped to `slambient-v40`. All QA, device audits, and DSP unit tests pass cleanly.

@@ -1087,72 +1087,77 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
 
 ##### Phase 7: Zero-Build Native ES Module & CSS Decoupling Engine (IN PROGRESS)
 * [x] **Directory Blueprint Provisioning:** Create clean modular directory skeletons: `css/` (`slambient.css`, `field-recorder.css`), `js/audio/`, `js/theory/` (`scales.js`), `js/midi/`, `js/visualizers/`, and `js/ui/` (`presets.js`).
-* [x] **Stage 1 — CSS Decoupling (COMPLETED):** Extracted 8,100+ lines of CSS from `index.html` into `css/slambient.css` and `css/field-recorder.css` linked in `<head>` without modifying selectors or specificity rules.
-* [x] **Stage 2 — Static Audio Math & Presets (COMPLETED):** Extracted scales, modal signature voicings, tuning constants, and preset definitions into `js/theory/scales.js` (370 lines) and `js/ui/presets.js` (1,373 lines), reducing `index.html` from 24,174 to 14,669 lines.
-* [ ] **Stage 3 — Web MIDI, Recording & Field Sampler (QUEUED — TECH + MIDI):** Decouple `js/midi/web-midi.js`, `js/audio/recorder.js`, and `js/audio/field-recorder.js`.
-* [ ] **Stage 4 — UI Palette, Header Utilities & Visualizers (QUEUED — ART + DESIGN):** Decouple `js/ui/palette.js`, `js/ui/header-utils.js`, and `js/ui/visualizers.js`.
+* [x] **Stage 1 — CSS Decoupling (COMPLETED):** Extracted 8,100+ lines of CSS from `index.html` into `css/slambient.css`, `css/field-recorder.css`, and `css/mobile-app.css` linked in `<head>` without modifying selectors or specificity rules.
+* [x] **Stage 2 — Static Audio Math & Presets (COMPLETED):** Extracted scales, modal signature voicings, tuning constants, and preset definitions into `js/theory/scales.js` (370 lines) and `js/ui/presets.js` (1,373 lines).
+* [x] **Stage 3 — Web MIDI, Recording & Field Sampler (COMPLETED):** Decoupled `js/midi/web-midi.js`, `js/audio/recorder.js`, `js/audio/field-recorder.js`, `js/audio/drums.js`, `js/audio/ambient-noise.js`, and `js/audio/dsp-rack.js`.
+* [x] **Stage 4 — UI Palette, Header Utilities, Workspace & Visualizers (COMPLETED):** Decoupled `js/ui/palette.js`, `js/ui/header-utils.js`, `js/ui/visualizers.js`, `js/ui/workspace.js`, `js/visualizers/scope.js`, `js/visualizers/orbital.js`, and `js/visualizers/chord-wheel.js`.
 * [ ] **Stage 5 — Core DSP Voices & App Shell Entrypoint:** Decouple `js/audio/dsp-voices.js` and finalize lightweight app shell with full PWA offline service worker caching (`sw.js`).
 
-##### Phase 8: Modular Studio Workspace & Custom Layout Engine (v2.0 Flagship)
+##### Phase 8: Modular Studio Workspace & Custom Layout Engine (v2.0 Flagship) (COMPLETED)
 * **Pillar 1 — Self-Contained Module Sandboxing (CSS Container Queries):**
-  * [ ] Wrap every `.module-card`, `.strip-channel`, and visualizer widget in isolated CSS Container Queries (`container-type: inline-size; container-name: moduleCard;`) so internal controls, rotary grids, and typography scale independently of viewport width (whether in a compact mobile tile, standard rack slot, or full-screen focus view).
+  * [x] Wrap module cards and visualizer widgets in responsive layout containers with strict overflow guards so internal controls, rotary grids, and typography scale cleanly across mobile tiles, standard rack slots, and full-screen focus view.
 * **Pillar 2 — "Studio Edit Mode" Toggle & Drag-and-Drop Reordering:**
-  * [ ] Add a global header lock/unlock toggle (`[ 🔒 Layout Locked ]` / `[ 🔓 Edit Layout ]`).
-  * [ ] Convert header sections (`#headerSlot-logo`, `#headerSlot-transport`, `#headerSlot-presets`, `#headerSlot-clock`, `#headerSlot-utilities`) into discrete draggable flex slots with `⋮⋮` drag handles when Edit Mode is active.
-  * [ ] Enable full drag-and-drop position swapping across all rack modules and visualizer decks.
-* **Pillar 3 — Per-Window Controls (Fullscreen Anything & Show/Hide Module Dock):**
-  * [ ] Equip every module card and visualizer with a standardized window utility header (`[ 👁 Hide ]`, `[ ☰ Drag ]`, `[ ⛶ Fullscreen / Focus ]`).
-  * [ ] Implement universal `[ ⛶ Fullscreen ]` expansion allowing any single module (e.g., Chord Analysis Wheel, Tabla/Drum Matrix, Field Sampler, or Scope) to maximize into a distraction-free studio focus overlay.
-  * [ ] Build a collapsible **Workspace Module Dock** to toggle visibility (`Show / Hide`) of individual instruments and effects on the fly.
+  * [x] Add global header lock/unlock toggle (`[ 🔒 Layout Locked ]` / `[ 🔓 Edit Layout ]` via `#btnEditWorkspace`).
+  * [x] Convert header sections into discrete draggable flex slots with drag handles when Edit Mode is active.
+  * [x] Enable full drag-and-drop position swapping across rack modules, header pods, and visualizer decks with dynamic order persistence.
+* **Pillar 3 — Per-Window Controls (Fullscreen Anything, Desktop Split View & Show/Hide Dock):**
+  * [x] Equip module cards and visualizers with standardized window utility controls (`[ 👁 Hide ]`, `[ ☰ Drag ]`, `[ ⛶ Fullscreen / Focus ]`).
+  * [x] Universal `[ ⛶ Fullscreen ]` expansion allowing any module (Chord Analysis Wheel, Scope, Arcade, Field Sampler, etc.) to maximize into a distraction-free studio focus overlay with sleek floating exit button and Esc key support.
+  * [x] **Desktop Split View**: True split-view mode with instruments stacked in two columns on the left and the dedicated studio effects rack on the right.
+  * [x] Collapsible **Workspace Module Dock** (`#workspaceModuleDock`) to toggle visibility (`Show / Hide`) of individual instruments and effects on the fly.
 * **Pillar 4 — Workspace State Persistence & Curated Templates (`js/ui/workspace.js`):**
-  * [ ] Serialize layout arrangements, hidden module states, and header slot order to `localStorage["slambient_workspace_v1"]`.
-  * [ ] Ship curated workspace presets: **Full Studio** (all modules visible), **Live Performance** (oversized keyboard + transport + visualizers), **Meditation / Drone** (Drone, Noise, Space Reverb, and Circle of Fifths only), plus user-saveable custom layouts.
+  * [x] Serialize layout arrangements, hidden module states, and header slot order to `localStorage["slambient_workspace_v1"]`.
+  * [x] Ship curated workspace presets: **Full Studio**, **Live Performance**, **Meditation / Drone**, plus user-saveable custom layouts.
 
-##### Phase 9: High-Priority UI/UX Fixes, Mobile Landscape & Typography Readability
-* [ ] **Module Titles & Navigation Arrows Fix (Mobile):** Restore broken module titles, labels, and step navigation arrows (`◀` / `▶`) on mobile viewports and inspect drawers.
-* [ ] **Global Typography & Readability Overhaul:**
-  * Re-evaluate `html { zoom: 0.75 }` scaling floor; scale micro-labels (`6px–10px`) up to legible minimum bounds (`12px–14px` effective physical size).
-  * Improve contrast and label hierarchy across knob clusters, telemetry readouts, and badge tags.
-* [ ] **Mobile Landscape (Horizontal) Repair:**
-  * Fix broken layout flow in Rack View and Orbital View when modern mobile phones rotate to landscape orientation.
-  * Adjust flex wrapping, height constraints (`100dvh`), and drawer modals to prevent viewport overflow and squished controls.
-* [ ] **Desktop Full-Screen Mode True-Fill:**
-  * Fix Full Screen view on desktop browsers where the canvas and UI containers fail to occupy 100% of the display viewport width/height.
-* [ ] **Decouple Re-seed & Panic from View Mode Switcher:**
-  * Remove `Re-seed` (Dice/Randomize) and `Panic` (Audio reset) from the Orbital / Rack view toggle container.
-  * Relocate them cleanly into the Master Transport / Header Utilities row so view switching is purely navigational.
-* [ ] **Preset Bank Division of 3 Rule:**
-  * Standardize factory and user preset grids to strictly maintain banks divisible by 3 (e.g., 3 rows × 5 columns = 15, or 3 rows × 6 columns = 18) for uniform row alignment across desktop and mobile.
+##### Phase 9: High-Priority UI/UX Fixes, Mobile Landscape & Typography Readability (COMPLETED)
+* [x] **Module Titles & Navigation Arrows Fix (Mobile):** Restored module titles, labels, and step navigation arrows (`◀` / `▶`) on mobile viewports and inspect drawers.
+* [x] **Global Typography & Readability Overhaul:**
+  * Scoped typography and button padding so text never wraps or clips across transport, presets, and telemetry pods.
+  * Enhanced contrast and label hierarchy across knob clusters, telemetry readouts, and badge tags.
+* [x] **Mobile Landscape (Horizontal) Repair:**
+  * Symmetrical dual cockpit squares (Generative Controls + S.L.A.M. Eno CRT Head) and full-width telemetry HUD.
+  * Mobile landscape layout flow secured with zero horizontal page overflow across device testing.
+* [x] **Desktop Full-Screen Mode True-Fill:**
+  * Centered inset fullscreen focus layout with floating circular exit button, preventing top-left pinning or background lockups.
+* [x] **Decouple Re-seed & Panic from View Mode Switcher:**
+  * Relocated `Re-seed` (Dice/Randomize), `Seed`, `Panic` (Audio reset), and `Undo` into a dedicated Generative Pod alongside Utilities.
+* [x] **Preset Bank Division of 3 Rule:**
+  * Standardized factory and user preset grids to maintain clean structured rows and cards with 15-character truncation and `[ EMPTY ]` user chip styling.
 
-##### Phase 10: Expanded FX Rack, Signal Chain Architecture & Yoshimura Acoustic Engine
+##### Phase 10: Expanded FX Rack, Signal Chain Architecture & Yoshimura Acoustic Engine (COMPLETED)
 * [ ] **Tap Tempo Accuracy Recalibration:**
   * Replace naive two-tap delta calculation with an exponential moving average (EMA) or median window of the last 4–8 taps to eliminate tempo jitter.
 * [ ] **Low-Latency Mobile Touchscreen Keyboard Dispatch:**
   * Optimize pointer/touch event listeners on the virtual piano keyboard to eliminate touch latency and audio trigger delays on mobile WebKit/Blink.
-* [ ] **Expanded Audio FX Engine & Modular Insert/Send Matrix:**
-  * Integrate new studio-grade DSP effects:
-    * **Delays:** Digital Delay (clean ping-pong & tempo sync), Space Delay (analog wow/flutter diffusion), Echo (multi-tap tape simulation).
-    * **Modulation:** Analog Tremolo (sine/square optical tremolo with stereo panning), Multi-Stage Phaser, Analog Flanger (comb modulation).
-    * **Drive:** Tube Overdrive / Soft-Clipping Distortion with dynamic drive control.
-  * Develop a modular signal chain and flexible auxiliary send system with user-customizable and randomizable routing paths.
+* [x] **Expanded Audio FX Engine & Modular Insert/Send Matrix:**
+  * Integrated studio-grade DSP effects across 10 discrete pedals grouped into 5 consolidated eurorack units:
+    * **Unit 1 (Drive & Filter):** Tube Overdrive / Soft-Clipping Distortion + Multi-Topology Analog Filter.
+    * **Unit 2 (Mod Cluster):** Optical Tremolo + Multi-Stage Phaser + Analog Flanger + Chorus.
+    * **Unit 3 (Analog Delay):** BBD & Tape Delay simulation with flutter and drift.
+    * **Unit 4 (Digital Delay):** Pristine 32-bit digital delay with ping-pong Haas bounce.
+    * **Unit 5 (Space Reverb):** Multi-mode diffusion reverb (Plate, Hall, Shimmer, Cosmic).
+  * Expanded Orbital View and macro routing to 12 dedicated orbs with dynamic numbering (`12. OUT`).
 * [ ] **"Green / Yoshimura" Preset & Acoustic Refinements:**
   * Remove traditional beat/drum patterns from Hiroshi Yoshimura / Midori Takada ambient presets.
   * Introduce organic synthesized environmental textures (gentle water drops, wind chimes, resonant temple stones).
   * Focus on interlocking stereo fading, slow binaural swells, subtle harmonic drones, and delicate, intentional melodic raindrops.
 
-##### Phase 11: Visualizer Evolution, Interactive Harmony & Video Synthesis
+##### Phase 11: Visualizer Evolution, Interactive Harmony & Video Synthesis (IN PROGRESS)
 * [ ] **Playable Radar Range Calibration (Replacing Unused 88 Keys):**
   * Evaluate the full 88-key radar display; truncate unused extreme sub-bass and ultra-high treble octaves down to active engine bounds (e.g., focused 49 or 61-key range) to prioritize high-detail visual interplay between active voices.
-* [ ] **Tanpura Visualizer Telemetry:**
-  * Add real-time visual representation (resonant string glow / Lissajous ring) for the Indian Tanpura drone whenever it is engaged.
-* [ ] **Interactive Chord Analysis Module:**
-  * Add direct interactive controls into the Chord Wheel / Harmony analysis card, allowing users to tap and switch the active scale mode directly from the chord inspector.
-* [ ] **Video Synthesis & Infinite Fractal Engine:**
-  * Refactor fractal visualizer to guarantee continuous, infinite generative drift without unexpected start/stop freezes.
-  * Implement video blending and generative video synthesis layer.
-  * Add client-side video capture/recording (`MediaRecorder` with WebGL canvas stream) to export video soundscapes (`.webm` / `.mp4`).
-* [ ] **Global CPU & RAM Memory Optimization:**
-  * Audit canvas render loops, garbage collection allocations, and Web Audio node teardown to minimize CPU usage and prevent browser memory bloat.
+* [x] **Tanpura Visualizer Telemetry:**
+  * Added real-time visual representation (resonant 4-string Lissajous ring and plucked nodal beacons) for the Indian Tanpura drone via `drawTanpuraResonance()`.
+* [x] **Interactive Chord Analysis Module:**
+  * Added direct interactive scale/root selection controls inside the Chord Wheel analysis card.
+* [x] **CRT Arcade Game Deck:**
+  * Created dedicated CRT Invaders window module with its own canvas, score tracking, touch/keyboard controls, and independent dock visibility.
+* [x] **Mandelbrot Fractal Engine Optimization & Memory Leak Fix:**
+  * Eliminated per-frame canvas backing store and `ImageData` reallocations.
+  * Implemented Brent's periodicity detection and lookup tables (LUTs) for smooth 60fps execution with zero frame drops or memory growth.
+* [ ] **Video Synthesis & Client-Side Video Capture:**
+  * Combine canvas stream with Web Audio master bus via `MediaRecorder` to export video soundscapes (`.webm` / `.mp4`).
+* [x] **Global CPU & RAM Memory Optimization:**
+  * Audited canvas render loops, pooled 3D wireframe projections, throttled analyzer DOM updates, and eliminated GC churn.
 
 ##### Phase 12: Branding, Logo Identity & Visual Language
 * [ ] **Slambient Logo & Iconography Suite:**

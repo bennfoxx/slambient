@@ -28,9 +28,10 @@ Docs: `GEMINI_SYNC.md` (dated change log and handoff notes, newest at the bottom
 
 ## Status
 
-* Roadmap Phases 1-7 are done (engine, console rack, orbital view, presets, field recorder, phone layout, decoupling). Phase 8, the Modular Studio Workspace (edit mode, drag-and-drop layout, per-module fullscreen, saved workspaces), is planned in `MASTER_BLUEPRINT.md` and not started.
-* Modules are named SUB, DRUMS, CHORDS, ARP, NOISE, FILTER, DELAY, SPACE (reverb), OUT (master EQ) and FIELD.
-* Still open: check the phone layout, silent-switch audio, Invaders sound and the floating play bar on a real iPhone; try the 4-channel MIDI out in Logic; decide whether chords and arp should sit higher against the drone; judge the softer Khan Lineage tanpura by ear. The "7 voices / 7 nodes" chips in the engine readout are static text.
+* Roadmap Phases 1–10 are largely completed (core engine, console rack, 12-node orbital view, presets, field recorder, decoupled mobile architecture, Phase 8 modular studio workspace with drag-and-drop layout, edit mode, desktop split view, and 10-pedal studio FX rack).
+* Modules are named SUB, DRUMS, CHORDS, ARP, NOISE, FIELD (instruments), plus consolidated FX units (Drive & Filter, Mod Cluster, Analog Delay, Digital Delay, Space Reverb) and OUT (master output stage).
+* Phase 11 visualizers and optimization: Tanpura string resonance, interactive chord wheel, CRT Invaders arcade deck, and fractal visualizer CPU/memory optimization shipped in `slambient-v40`.
+* Still open / roadmap items: Tap tempo EMA recalibration, 4-channel MIDI Logic verification, real-device audio session testing on iOS, and Phase 11 client-side video synthesis recording.
 
 ---
 
