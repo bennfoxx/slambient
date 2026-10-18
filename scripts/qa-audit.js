@@ -52,6 +52,7 @@ const jsFiles = [
   'js/ui/palette.js',
   'js/ui/visualizers.js',
   'js/ui/workspace.js',
+  'js/audio/dsp-voices.js',
   'js/audio/drums.js',
   'js/audio/ambient-noise.js',
   'js/audio/dsp-rack.js',
