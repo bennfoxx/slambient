@@ -101,7 +101,12 @@ function clockTick() {
       if (measureTick % ts.ticksPerBeat === 2) playHiHat(true);
       if (measureTick % (ts.ticksPerBeat * 2) === ts.ticksPerBeat) playSnare(true);
     } else if (drumStyle === "ORGANIC") {
-      if (isDownbeat) playKick(1.1);
+      if (isDownbeat) {
+        playKick(1.1);
+        playHiHat(true);
+      } else if (measureTick % ts.ticksPerBeat === 0 && randFloat() < 0.65) {
+        playHiHat(false);
+      }
       if (stepEuclid === 0 || stepEuclid === 4) playKick(1.0);
       if (stepEuclid === 2 || stepEuclid === 5) playWoodblock(1.15);
       if (stepEuclid === 3 && randFloat() < 0.75) playSnare(false);
@@ -113,12 +118,16 @@ function clockTick() {
       if (stepEuclid === 2 || stepEuclid === 5) playWoodblock(0.95);
       playHiHat(false);
     } else if (drumStyle === "DUB_TAPE") {
-      if (isDownbeat || (stepEuclid * 3) % 7 < 3) playKick(1.15);
+      if (isDownbeat) playKick(1.25);
+      else if ((stepEuclid * 3) % 7 < 3) playKick(1.10);
       if (stepEuclid === 3 || stepEuclid === 6) playWoodblock(1.2);
       if (stepEuclid === 5) playSnare(true);
       playHiHat(stepEuclid % 2 === 0);
     } else if (drumStyle === "MINIMAL_CLICK") {
-      if (isDownbeat) playKick(1.0);
+      if (isDownbeat) {
+        playKick(1.0);
+        playHiHat(false);
+      }
       if (stepEuclid === 2 || stepEuclid === 4) playWoodblock(1.35);
       if (randFloat() < 0.8) playHiHat(true);
     } else if (drumStyle === "TABLA_GROOVE") {

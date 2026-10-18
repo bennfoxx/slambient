@@ -1989,3 +1989,15 @@ Summary of major architectural additions, layout enhancements, and performance o
    - **Extracted [js/ui/transport.js](file:///Users/benfox/Documents/Development/slambient_dev/js/ui/transport.js)** (216 lines): Master transport (`togglePlay`), session timers, master mute, and global hotkeys.
    - **Extracted [js/ui/touch-mobile.js](file:///Users/benfox/Documents/Development/slambient_dev/js/ui/touch-mobile.js)** (563 lines): Touch zoom lockdown, slider scroll isolation, and outside-tap dropdown dismissals.
    - **Service Worker & QA**: All modules integrated into `PRECACHE_URLS` in `sw.js` (bumped to `slambient-v41`). All 26 modules passed syntax checks and headless Chrome device lab audits (7/7 passed).
+
+8. **Tap Tempo EMA Accuracy Recalibration & Acoustic Mix Balance (Phase 10 Completed in v42)**:
+   - **Tap Tempo Recalibration (`js/ui/header-utils.js`)**: Extended tap tempo pause reset threshold from `2200ms` to `2600ms` to seamlessly support slow-ambient tempos down to 45 BPM without premature buffer clears. Retained EMA smoothing (`alpha = 0.42`) and 40% median-window outlier filtering.
+   - **Acoustic Gain Staging Rebalance**:
+     - Reduced Drone & Sub-Bass multiplier from `droneVol * 0.16` to `droneVol * 0.12` in `js/ui/randomizer-controls.js`, `js/ui/transport.js`, and `js/audio/drums.js` sidechain ducking.
+     - Raised chord base volume multipliers in `js/audio/dsp-voices.js` from `0.19 / 0.21` to `0.23 / 0.26`.
+     - Raised Shimmer Arp velocity multiplier from `0.62` to `0.74`.
+     - Chords and shimmer arp now sit comfortably above the sub-drone bed, eliminating the ~5x perceived volume disparity.
+   - **Elimination of Coprime Percussion Dropout / Energy Slump (`js/audio/clock-sequencer.js`)**:
+     - Anchored bar downbeats (`isDownbeat`) in `ORGANIC`, `HEARTBEAT`, `DUB_TAPE`, and `MINIMAL_CLICK` drum grooves with metric pulse anchors (downbeat kick and hi-hat/woodblock taps).
+     - Drums no longer drop out for 10–30s during long coprime phasing gaps while preserving subtle ambient spacing.
+   - **Service Worker & QA**: Bumped `sw.js` cache to `slambient-v42`. Clean audit across all 26 ES modules and DSP test suites.

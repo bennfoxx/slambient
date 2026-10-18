@@ -567,7 +567,7 @@ function playSynthVoice(midi, duration, vel, isLead = false, delayOffsetSec = 0,
   // Gentle high-note damping to keep chords warm, lush, and un-piercing in upper octaves
   const highNoteDamp = Math.max(0.38, 1.0 - Math.max(0, midi - 56) * 0.018);
   let attackTime = isLead ? 0.08 : (0.14 + (strumMs / 400));
-  let baseVolume = (vel / 127) * (isLead ? 0.19 : 0.21) * highNoteDamp;
+  let baseVolume = (vel / 127) * (isLead ? 0.23 : 0.26) * highNoteDamp;
 
   if (chordTimbre === "SAW_SYNTH") {
     osc1.type = "sawtooth"; osc2.type = "triangle";
@@ -925,7 +925,7 @@ function playArpNote(midi, vel = 85, isLive = false) {
   if (pan) pan.pan.value = (Math.sin(tickCount * 0.45) * 0.65);
 
   const pitchDamp = Math.max(0.28, Math.min(1.0, 1.0 - Math.max(0, midi - 56) * 0.018));
-  const v = (vel / 127) * (arpVol * 0.62) * pitchDamp;
+  const v = (vel / 127) * (arpVol * 0.74) * pitchDamp;
   gain.gain.setValueAtTime(0.0001, now);
   gain.gain.linearRampToValueAtTime(v, now + 0.022);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);

@@ -339,7 +339,7 @@ function updateAudioParams() {
   if (droneOsc2) droneOsc2.detune.setTargetAtTime(+droneDetuneCents, audioCtx.currentTime, 0.08);
 
   if (droneGain) {
-    const targetDrone = (isPlaying && isChannelAudible('drone')) ? droneVol * 0.16 : 0.0001;
+    const targetDrone = (isPlaying && isChannelAudible('drone')) ? droneVol * 0.12 : 0.0001;
     droneGain.gain.cancelScheduledValues(audioCtx.currentTime);
     droneGain.gain.setValueAtTime(droneGain.gain.value, audioCtx.currentTime);
     droneGain.gain.linearRampToValueAtTime(targetDrone, audioCtx.currentTime + 0.035);

@@ -42,7 +42,7 @@ function playKick(drive = 1.0) {
   if (drive >= 0.85) triggerMusical3DObject("drum");
 
   if (isPlaying && !isDrumFillActive && isChannelAudible('drone') && droneGain && drumPunch > 0.1) {
-    const origDrone = droneVol * 0.16;
+    const origDrone = droneVol * 0.12;
     droneGain.gain.cancelScheduledValues(now);
     droneGain.gain.setValueAtTime(droneGain.gain.value, now);
     droneGain.gain.linearRampToValueAtTime(origDrone * (1.0 - drumPunch * 0.72), now + 0.015);

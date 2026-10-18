@@ -64,7 +64,7 @@ function togglePlay() {
       if (droneGain) {
         droneGain.gain.cancelScheduledValues(now);
         droneGain.gain.setValueAtTime(0.0001, now);
-        droneGain.gain.linearRampToValueAtTime(isDroneAudible ? droneVol * 0.16 : 0.0001, now + 0.035);
+        droneGain.gain.linearRampToValueAtTime(isDroneAudible ? droneVol * 0.12 : 0.0001, now + 0.035);
       }
       if (tanpuraBusGain) {
         tanpuraBusGain.gain.cancelScheduledValues(now);

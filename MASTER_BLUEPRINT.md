@@ -1125,8 +1125,9 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
   * Standardized factory and user preset grids to maintain clean structured rows and cards with 15-character truncation and `[ EMPTY ]` user chip styling.
 
 ##### Phase 10: Expanded FX Rack, Signal Chain Architecture & Yoshimura Acoustic Engine (COMPLETED)
-* [ ] **Tap Tempo Accuracy Recalibration:**
-  * Replace naive two-tap delta calculation with an exponential moving average (EMA) or median window of the last 4–8 taps to eliminate tempo jitter.
+* [x] **Tap Tempo Accuracy Recalibration & Acoustic Mix Balance:**
+  * Replaced naive delta calculations with an Exponential Moving Average (EMA) and 40% median-window outlier rejection across the last 4–8 taps, with slow-ambient timeout extended to 2600ms (supporting 45–115 BPM without premature buffer clears).
+  * Rebalanced default gain staging: dialed Sub-Drone multiplier from `0.16` to `0.12`, elevated chord base volume (`0.23`/`0.26`), boosted shimmer arp velocity (`0.74`), and anchored organic/heartbeat/dub drum styles with downbeat metric pulses to eliminate coprime energy slumps.
 * [ ] **Low-Latency Mobile Touchscreen Keyboard Dispatch:**
   * Optimize pointer/touch event listeners on the virtual piano keyboard to eliminate touch latency and audio trigger delays on mobile WebKit/Blink.
 * [x] **Expanded Audio FX Engine & Modular Insert/Send Matrix:**

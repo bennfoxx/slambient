@@ -62,12 +62,12 @@ refreshUndoButton();
 
 // TAP TEMPO: robust jitter-resistant algorithm with outlier rejection and
 // Exponential Moving Average (EMA) across a sliding window of the last 4-8 taps.
-// A pause longer than 2.2s starts a fresh count. Clamped to the tempo slider range.
+// A pause longer than 2.6s starts a fresh count. Clamped to the tempo slider range.
 const tapTimes = [];
 let tapSmoothedInterval = null;
 function tapTempo() {
   const now = performance.now();
-  if (tapTimes.length && now - tapTimes[tapTimes.length - 1] > 2200) {
+  if (tapTimes.length && now - tapTimes[tapTimes.length - 1] > 2600) {
     tapTimes.length = 0;
     tapSmoothedInterval = null;
   }
