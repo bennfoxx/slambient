@@ -49,6 +49,19 @@ function clockTick() {
     document.getElementById("telemMeter").textContent = `${currentTimeSig} [Beat ${currentBeat} of ${ts.beats}]`;
   }
 
+  // Broadcast clock tick & metrics to Meander Engine companion
+  if (typeof postToMeander === "function") {
+    postToMeander({
+      type: "SLAMBIENT_CLOCK",
+      step24: (measureTick % 4) * 6,
+      beatIndex: currentBeat - 1,
+      meterBeats: ts.beats,
+      bpm: bpm,
+      scale: typeof activeScaleKey === "string" ? activeScaleKey : "DORIAN",
+      meter: currentTimeSig
+    });
+  }
+
   stepEuclid = (stepEuclid + 1) % 7;
   stepShim   = (stepShim + 1) % 11;
   stepLead   = (stepLead + 1) % 13;

@@ -2001,3 +2001,17 @@ Summary of major architectural additions, layout enhancements, and performance o
      - Anchored bar downbeats (`isDownbeat`) in `ORGANIC`, `HEARTBEAT`, `DUB_TAPE`, and `MINIMAL_CLICK` drum grooves with metric pulse anchors (downbeat kick and hi-hat/woodblock taps).
      - Drums no longer drop out for 10–30s during long coprime phasing gaps while preserving subtle ambient spacing.
    - **Service Worker & QA**: Bumped `sw.js` cache to `slambient-v42`. Clean audit across all 26 ES modules and DSP test suites.
+
+9. **Studio FX Rack Slider Drag Decoupling & Pointer Isolation (Phase 10 Completed in v43)**:
+   - **Root Cause Resolution**:
+     - `initStudioFxDragAndDrop` previously set `draggable="true"` directly on the parent `.pedal-chassis[data-pedal]` containers. In WebKit and Chromium, dragging an `<input type="range">` nested inside an explicitly draggable container prioritizes the HTML5 drag ghost rather than slider thumb scrubbing.
+     - Removed global `draggable="true"` from outer pedal chassis. HTML5 drag is now strictly attached to `.pedal-drag-handle` elements (or active workspace edit mode `body.workspace-edit-mode`), while card dragstart rejects interactive slider rows and inputs.
+     - In `initMiniPedalDragAndDrop`, guarded both HTML5 drag and tactile pointerdrag against `.mini-pedal-controls`, `.mini-pedal-param`, `.mini-pedal-slider`, `.mini-fx-sliders`, `.mini-fx-slider-row`, and `.mini-fx-range`.
+     - In `renderSplitFxSidebar`, attached `pointerdown` and `mousedown` `stopPropagation()` to all range sliders and rows so horizontal thumb scrubbing never bubbles up to trigger card reordering.
+     - In `initPedalDragAndDrop`, expanded `isInteractive` to shield all `.control-row`, `.pedal-controls-body`, `.mini-fx-sliders`, and `.mini-pedal-param` elements from long-press card reorder capture.
+   - **CSS Touch & Pointer Isolation**:
+     - In `css/slambient.css`, added `touch-action: none !important; pointer-events: auto !important; user-select: none; -webkit-user-select: none;` to `.studio-fx-grid input[type="range"]` and `.mini-fx-range`.
+   - **Service Worker & QA**:
+     - Bumped cache to `slambient-v43`.
+     - Passed `qa-audit.js` (warnings: 0), `test-dsp-rack.js`, `test-presets-fx.js`, and `device-audit.js` (7/7 device viewports clean).
+

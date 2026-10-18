@@ -905,6 +905,12 @@ function renderSplitFxSidebar() {
   if (typeof syncAllMiniFxCards === "function") {
     syncAllMiniFxCards();
   }
+
+  // Stop pointer propagation on all range sliders and rows inside split rail
+  sidebar.querySelectorAll('input[type="range"], .mini-fx-range, .mini-fx-sliders, .mini-fx-slider-row').forEach(el => {
+    el.addEventListener("pointerdown", (e) => e.stopPropagation(), { passive: true });
+    el.addEventListener("mousedown", (e) => e.stopPropagation(), { passive: true });
+  });
 }
 
 function toggleUnitBypass(unitKey, event) {
@@ -1434,10 +1440,26 @@ function initStudioFxDragAndDrop() {
   let draggedKey = null;
 
   cards.forEach(card => {
-    card.setAttribute("draggable", "true");
+    // Only allow HTML5 drag if initiated on .pedal-drag-handle or when in workspace-edit-mode
+    const handle = card.querySelector(".pedal-drag-handle");
+    if (handle) {
+      handle.setAttribute("draggable", "true");
+      handle.addEventListener("dragstart", (e) => {
+        draggedKey = card.getAttribute("data-pedal");
+        card.classList.add("pedal-dragging");
+        document.body.classList.add("pedal-drag-in-progress");
+        if (e.dataTransfer) {
+          e.dataTransfer.effectAllowed = "move";
+          e.dataTransfer.setData("text/plain", draggedKey);
+        }
+      });
+    }
 
+    // Guard on card level against unwanted HTML5 drag
     card.addEventListener("dragstart", (e) => {
-      if (e.target.closest("button, a, input, select, .custom-dropdown-wrap")) {
+      const isEdit = document.body.classList.contains("workspace-edit-mode");
+      const isFromHandle = !!e.target.closest(".pedal-drag-handle");
+      if (e.target.closest("button, a, input, select, .custom-dropdown-wrap, .control-row, .pedal-controls-body") || (!isEdit && !isFromHandle)) {
         e.preventDefault();
         return;
       }
@@ -1479,7 +1501,6 @@ function initStudioFxDragAndDrop() {
       }
     });
 
-    const handle = card.querySelector(".pedal-drag-handle");
     if (handle) {
       handle.addEventListener("pointerdown", (e) => {
         const startX = e.clientX, startY = e.clientY;
@@ -1528,6 +1549,12 @@ function initStudioFxDragAndDrop() {
       });
     }
   });
+
+  // Stop pointer propagation from all range sliders and controls in studioFxGrid
+  grid.querySelectorAll('input[type="range"], select, button, .custom-dropdown-wrap, .control-row').forEach(el => {
+    el.addEventListener("pointerdown", (e) => e.stopPropagation(), { passive: true });
+    el.addEventListener("mousedown", (e) => e.stopPropagation(), { passive: true });
+  });
 }
 
 function initMiniPedalDragAndDrop() {
@@ -1537,9 +1564,9 @@ function initMiniPedalDragAndDrop() {
   let draggedKey = null;
 
   cards.forEach(card => {
-    // 1. HTML5 Drag and Drop
+    // 1. HTML5 Drag and Drop - only allow drag from handle or non-interactive areas
     card.addEventListener("dragstart", (e) => {
-      if (e.target.closest("button, a, input, select")) {
+      if (e.target.closest("button, a, input, select, .mini-pedal-controls, .mini-pedal-param, .mini-pedal-slider, .mini-fx-sliders, .mini-fx-slider-row, .mini-fx-range")) {
         e.preventDefault();
         return;
       }
@@ -1585,7 +1612,7 @@ function initMiniPedalDragAndDrop() {
     let startX = 0, startY = 0, isDragging = false, dragPointerId = null;
 
     card.addEventListener("pointerdown", (e) => {
-      if (e.target.closest("button, a, input, select")) return;
+      if (e.target.closest("button, a, input, select, .mini-pedal-controls, .mini-pedal-param, .mini-pedal-slider, .mini-fx-sliders, .mini-fx-slider-row, .mini-fx-range")) return;
       startX = e.clientX;
       startY = e.clientY;
       isDragging = false;
@@ -1628,8 +1655,8 @@ function initMiniPedalDragAndDrop() {
           isDragging = false;
           draggedKey = null;
         } else {
-          // Plain click on card body (outside buttons) -> open inspector
-          if (!e.target.closest("button, a, input, select")) {
+          // Plain click on card body (outside buttons & controls) -> open inspector
+          if (!e.target.closest("button, a, input, select, .mini-pedal-controls, .mini-pedal-param, .mini-pedal-slider, .mini-fx-sliders, .mini-fx-slider-row, .mini-fx-range")) {
             const pedalKey = card.getAttribute("data-pedal");
             const orbId = (typeof PEDAL_KEY_TO_ORBITAL_ID !== "undefined" && PEDAL_KEY_TO_ORBITAL_ID[pedalKey])
               ? PEDAL_KEY_TO_ORBITAL_ID[pedalKey] : pedalKey.toLowerCase();
@@ -1642,6 +1669,12 @@ function initMiniPedalDragAndDrop() {
       window.addEventListener("pointerup", onPointerUp);
       window.addEventListener("pointercancel", onPointerUp);
     });
+  });
+
+  // Stop pointer propagation on all sliders in birds eye rack
+  rack.querySelectorAll('input[type="range"], select, button, .mini-pedal-controls, .mini-pedal-slider').forEach(el => {
+    el.addEventListener("pointerdown", (e) => e.stopPropagation(), { passive: true });
+    el.addEventListener("mousedown", (e) => e.stopPropagation(), { passive: true });
   });
 }
 
@@ -1889,7 +1922,7 @@ function initPedalDragAndDrop() {
   });
 
   const isInteractive = (target) => {
-    return !!target.closest('input, select, button, .custom-dropdown-wrap, .custom-dropdown-trigger, .custom-dropdown-menu, label, canvas, .pedal-drag-handle, .btn-pedal-shift, .btn-power, .btn-mute, .btn-solo, .badge-tag, .module-drawer-toggle, .btn-pedal-action, .birds-eye-flow-bar');
+    return !!target.closest('input, select, button, .custom-dropdown-wrap, .custom-dropdown-trigger, .custom-dropdown-menu, label, canvas, .pedal-drag-handle, .btn-pedal-shift, .btn-power, .btn-mute, .btn-solo, .badge-tag, .module-drawer-toggle, .btn-pedal-action, .birds-eye-flow-bar, .control-row, .pedal-controls-body, .mini-fx-sliders, .mini-fx-slider-row, .mini-pedal-controls, .mini-pedal-param');
   };
 
   allModuleCards.forEach(card => {

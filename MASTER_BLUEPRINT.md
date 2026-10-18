@@ -1137,7 +1137,10 @@ A multi-engine ambient delay processor offering four distinct sonic character pr
     * **Unit 3 (Analog Delay):** BBD & Tape Delay simulation with flutter and drift.
     * **Unit 4 (Digital Delay):** Pristine 32-bit digital delay with ping-pong Haas bounce.
     * **Unit 5 (Space Reverb):** Multi-mode diffusion reverb (Plate, Hall, Shimmer, Cosmic).
-  * Expanded Orbital View and macro routing to 12 dedicated orbs with dynamic numbering (`12. OUT`).
+* [x] **Studio FX Rack Slider Drag Decoupling & Pointer Isolation:**
+  * Fixed range slider dragging across both the 10-pedal Eurorack grid (`#studioFxGrid`) and the Split-View vertical mini-rail (`#splitRailCards`).
+  * Removed global HTML5 `draggable="true"` from outer pedal chassis; restricted dragging strictly to dedicated drag handles (`.pedal-drag-handle`) and active workspace edit mode (`body.workspace-edit-mode`).
+  * Isolated all `<input type="range">`, `.mini-fx-range`, `.mini-pedal-slider`, and `.control-row` elements with `pointerdown` and `mousedown` `stopPropagation()`, `touch-action: none !important`, and `pointer-events: auto !important` so tweaking parameters never triggers module moves.
 * [ ] **"Green / Yoshimura" Preset & Acoustic Refinements:**
   * Remove traditional beat/drum patterns from Hiroshi Yoshimura / Midori Takada ambient presets.
   * Introduce organic synthesized environmental textures (gentle water drops, wind chimes, resonant temple stones).

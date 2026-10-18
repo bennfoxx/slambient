@@ -2231,6 +2231,58 @@ let midiOutput = null;
 const MIDI_CH = (typeof window !== "undefined" && window.MIDI_CH) ? window.MIDI_CH : { SUB: 0, CHORD: 1, ARP: 2, DRUMS: 3, MANUAL: 4 };
 // General-MIDI-style drum map for channel 4 (tabla strokes use the bongo/conga keys).
 const MIDI_DRUM_NOTE = (typeof window !== "undefined" && window.MIDI_DRUM_NOTE) ? window.MIDI_DRUM_NOTE : { KICK: 36, SNARE: 38, HAT: 42, HAT_ACCENT: 46, WOODBLOCK: 76, DAYAN_OPEN: 63, DAYAN_MUTE: 62, BAYAN: 64 };
+
+// ==========================================================================
+// MEANDER ENGINE COMPANION LINK (BroadcastChannel & postMessage)
+// ==========================================================================
+let meanderChannel = null;
+if (typeof BroadcastChannel !== "undefined") {
+  try {
+    meanderChannel = new BroadcastChannel("meander-slambient-link");
+    meanderChannel.onmessage = (e) => handleMeanderInbound(e.data);
+  } catch (err) {
+    console.warn("[Meander Link] BroadcastChannel init failed:", err);
+  }
+}
+window.addEventListener("message", (e) => {
+  if (e.data && e.data.source === "meander-engine") {
+    handleMeanderInbound(e.data);
+  }
+});
+
+function postToMeander(msg) {
+  if (!msg) return;
+  msg.source = "slambient";
+  if (meanderChannel) {
+    try { meanderChannel.postMessage(msg); } catch (e) {}
+  }
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage(msg, "*");
+    }
+  } catch (e) {}
+}
+
+function handleMeanderInbound(data) {
+  if (!data || typeof data !== "object") return;
+  if (data.type === "MEANDER_NOTE" && typeof data.scaleDegree === "number") {
+    // Trigger generative pluck on Slambient synth
+    if (typeof playSynthVoice === "function") {
+      const scale = (typeof SCALES !== "undefined" && SCALES[activeScaleKey]) || [0, 2, 3, 5, 7, 9, 10];
+      const deg = ((data.scaleDegree % scale.length) + scale.length) % scale.length;
+      const midi = 48 + rootNote + scale[deg];
+      playSynthVoice(midi, 1.8, 80, true, 0, "CHORD");
+    }
+  } else if (data.type === "MEANDER_CUTOFF" && typeof data.cutoff === "number") {
+    // Modulate filter if filterCutoff slider exists
+    const slider = document.getElementById("rngFilterCutoff");
+    if (slider && typeof updateFilterCutoffFromSlider === "function") {
+      slider.value = Math.max(200, Math.min(10000, data.cutoff));
+      updateFilterCutoffFromSlider();
+    }
+  }
+}
+
 function midiNoteOn(ch, note, vel) {
   if (window.midiRecorder) {
     window.midiRecorder.recordNoteOn(ch, note, vel);

@@ -4437,6 +4437,9 @@
     accent-color: var(--unit-accent, #00d2d3);
     margin: 0;
     touch-action: none !important;
+    pointer-events: auto !important;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   .mini-fx-val {
@@ -5235,6 +5238,10 @@
   .studio-fx-grid input[type="range"] {
     height: 26px;
     cursor: pointer;
+    touch-action: none !important;
+    pointer-events: auto !important;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   .pedalboard-master-section {
